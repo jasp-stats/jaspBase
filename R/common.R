@@ -1651,10 +1651,10 @@ isTryError <- function(obj){
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
 
-  # when run in jasptools do not save the state, but store it internally
+  # when run in jaspTools do not save the state, but store it internally
   searchPath <- search()
-  if ("package:jasptools" %in% searchPath) {
-    jasptools:::.setInternal("state", state)
+  if ("package:jaspTools" %in% searchPath) {
+    jaspTools:::.setInternal("state", state)
     return(list(relativePath = relativePath))
   }
 
