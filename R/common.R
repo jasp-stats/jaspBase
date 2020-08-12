@@ -92,8 +92,8 @@ run <- function(name, title, dataKey, options, resultsMeta, stateKey, requiresIn
 
   }
 
-  oldGraphOptions <- JASPgraphs::graphOptions()
-  on.exit(JASPgraphs::graphOptions(oldGraphOptions), add = TRUE)
+  oldGraphOptions <- jaspGraphs::graphOptions()
+  on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
 
   results <- tryCatch(expr={
 
@@ -205,8 +205,8 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
-  oldGraphOptions <- JASPgraphs::graphOptions()
-  on.exit(JASPgraphs::graphOptions(oldGraphOptions), add = TRUE)
+  oldGraphOptions <- jaspGraphs::graphOptions()
+  on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
 
   analysisResult <-
     tryCatch(
@@ -2306,9 +2306,9 @@ openGrDevice <- function(...) {
       limitsize = FALSE # only necessary if users make the plot ginormous.
     )
 
-    #If we have JASPgraphs available we can get the plotEditingOptions for this plot
-    if(requireNamespace("JASPgraphs", quietly = TRUE))
-      plotEditingOptions <- JASPgraphs::plotEditingOptions(graph=plot, asJSON=TRUE)
+    #If we have jaspGraphs available we can get the plotEditingOptions for this plot
+    if(requireNamespace("jaspGraphs", quietly = TRUE))
+      plotEditingOptions <- jaspGraphs::plotEditingOptions(graph=plot, asJSON=TRUE)
 
   } else {
 
@@ -2457,7 +2457,7 @@ saveImage <- function(plotName, format, height, width)
       # Plot and close graphics device
       if (inherits(plt, "recordedplot")) {
         .redrawPlot(plt)
-      } else if (inherits(plt, c("gtable", "ggMatrixplot", "JASPgraphs"))) {
+      } else if (inherits(plt, c("gtable", "ggMatrixplot", "jaspGraphs"))) {
         gridExtra::grid.arrange(plt)
       } else {
         plot(plt)
@@ -2833,10 +2833,10 @@ editImage <- function(optionsJson) {
       if (type == "interactive" && isGgplot) {
 
         newOpts       <- optionsList[["editOptions"]]
-        oldOpts       <- JASPgraphs::plotEditingOptions(plot)
+        oldOpts       <- jaspGraphs::plotEditingOptions(plot)
         newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis[names(newOpts$xAxis) != "type"]$settings )
         newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis[names(newOpts$yAxis) != "type"]$settings )
-        plot          <- JASPgraphs::plotEditing(plot, newOpts)
+        plot          <- jaspGraphs::plotEditing(plot, newOpts)
       }
 
       # plot editing did nothing or was cancelled

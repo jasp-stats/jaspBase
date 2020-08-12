@@ -1,6 +1,6 @@
 Package: jaspBase
 Type: Package
-Title: JASP analyses
+Title: JASP Base
 Version: 0.15
 Author: JASP Team
 Maintainer: Bruno Boutin <B.Boutin@uva.nl>
