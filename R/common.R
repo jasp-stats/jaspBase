@@ -263,7 +263,7 @@ initEnvironment <- function() {
 
   if (identical(.Platform$OS.type, "windows"))
     assignFunctionInPackage(fakeGrDevicesPdf, "pdf", "grDevices") # this fixes the problem that grDevices::pdf() does not work within JASP (https://github.com/jasp-stats/INTERNAL-jasp/issues/682)
-  
+
   for (package in packages)
     if (base::isNamespaceLoaded(package) == FALSE)
       try(base::loadNamespace(package), silent=TRUE)
@@ -2340,7 +2340,7 @@ openGrDevice <- function(...) {
   # Save path & plot object to output
   image[["png"]]           <- relativePathpng
   image[["revision"]]      <- 0
-  
+
   if (obj) {
     image[["obj"]]         <- plot2draw
     image[["editOptions"]] <- plotEditingOptions
@@ -2363,15 +2363,15 @@ saveImage <- function(plotName, format, height, width)
   # create file location string
   location <- .fromRCPP(".requestTempFileNameNative", "png") # to extract the root location
   relativePath <- paste0("temp.", format)
-  
+
   if (format == "pptx") {
 
     error <- try(.saveImageAsPPTX(plt, relativePath))
 
   } else {
-    
+
     error <- try({
-      
+
       # Get file size in inches by creating a mock file and closing it
       pngMultip <- .fromRCPP(".ppi") / 96
       png(
@@ -2382,7 +2382,7 @@ saveImage <- function(plotName, format, height, width)
       )
       insize <- dev.size("in")
       dev.off()
-      
+
       # Even though OSX is usually cairo able, the cairo devices should not be used as plot fonts are not scaled well.
       # On the other hand, Windows should use a cairo (eps/pdf) device as the standard devices use a wrong R_HOME for some reason.
       # Consequently on Windows you will get encoding/font errors because the devices cannot find their resources.
@@ -2392,24 +2392,24 @@ saveImage <- function(plotName, format, height, width)
         type <- "cairo"
       else
         type <- "Xlib"
-      
+
       # Open correct graphics device
       if (format == "eps") {
-        
+
         if (type == "cairo")
           device <- grDevices::cairo_ps
         else
           device <- grDevices::postscript
-        
+
         device(
           relativePath,
           width = insize[1],
           height = insize[2],
           bg = backgroundColor
         )
-        
+
       } else if (format == "tiff") {
-        
+
         hiResMultip <- 300 / 72
         grDevices::tiff(
           filename    = relativePath,
@@ -2420,23 +2420,23 @@ saveImage <- function(plotName, format, height, width)
           compression = "lzw",
           type        = type
         )
-        
+
       } else if (format == "pdf") {
-        
+
         if (type == "cairo")
           device <- grDevices::cairo_pdf
         else
           device <- grDevices::pdf
-        
+
         device(
           relativePath,
           width = insize[1],
           height = insize[2],
           bg = "transparent"
         )
-        
+
       } else if (format == "png") {
-        
+
         # Open graphics device and plot
         grDevices::png(
           filename = relativePath,
@@ -2446,13 +2446,13 @@ saveImage <- function(plotName, format, height, width)
           res      = 72 * pngMultip,
           type     = type
         )
-        
+
       } else { # add optional other formats here in "else if"-statements
-        
+
         stop("Format incorrectly specified")
-        
+
       }
-      
+
       # Plot and close graphics device
       if (inherits(plt, "recordedplot")) {
         .redrawPlot(plt)
@@ -2462,7 +2462,7 @@ saveImage <- function(plotName, format, height, width)
         plot(plt)
       }
       dev.off()
-      
+
     })
 
   }
@@ -2846,12 +2846,12 @@ editImage <- function(optionsJson) {
         # plot is modified or needs to be resized, let's save the new plot
         newPlot <- list()
         content <- .writeImage(width = width, height = height, plot = plot, obj = TRUE, relativePathpng = plotName) #Should we switch this over to the writeImage from jaspResults or we could also just directly use jaspPlot
-        
+
         newPlot[["data"]]     <- content[["png"]]
         newPlot[["width"]]    <- width
         newPlot[["height"]]   <- height
         newPlot[["revision"]] <- revision
-        
+
         # no new recorded plot is created in .writeImage so we recycle the old one
         # we can only resize recordedPlots anyway
         if (isGgplot) newPlot[["obj"]] <- content[["obj"]]
@@ -2891,8 +2891,8 @@ editImage <- function(optionsJson) {
     }
 
     key                 <- attr(x = state, which = "key")
-    state               <- .modifyStateFigures(state, identifier=plotName, 
-                                               replacement=list(width=width, height=height, revision=revision), 
+    state               <- .modifyStateFigures(state, identifier=plotName,
+                                               replacement=list(width=width, height=height, revision=revision),
                                                completeObject = FALSE)
     attr(state, "key")  <- key
 
@@ -3045,4 +3045,133 @@ editImage <- function(optionsJson) {
   #  stop(paste(".setSeedJASP was called with an incorrect argument.",
   #             "The argument options should be the options list from QML.",
   #             "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
+}
+
+.installJaspModule <- function(modulePkg, pkgName, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
+  loadLog <- ""
+  modulePkg <- paste0(modulePkg, "/.")
+
+  installDeps <- function(pkg) {
+    withr::with_libpaths(
+      new  = libPathsToUse,
+      code = remotes::install_deps(pkg=pkg, lib=moduleLibrary,  INSTALL_opts=c("--no-test-load --no-multiarch"), upgrade="never", repos=repos)
+    )
+  }
+
+  installLocal <- function(pkgPath) {
+    pkgPath <- sub("\\\\", "/", pkgPath, fixed=TRUE)
+    print(paste0("pkgPath: '", pkgPath, "'"))
+
+    if (length(libPathsToUse) > 1)
+      strlibPathsToUse <- paste0("c(", paste0("\"", libPathsToUse, collapse = "\", "), "\")")
+    else
+      strlibPathsToUse <- paste0("\"", libPathsToUse, "\"")
+
+    loadLog <- paste0(loadLog, "\n", .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs=\"", pkgPath, "\", lib=\"", moduleLibrary, "\", type=\"source\", repos=NULL, INSTALL_opts=c(\"--no-multiarch\"))))")))
+  }
+
+  if (!onlyModPkg) {
+    # Install dependencies:
+    # First the ones from CRAN because they cant depend on one from github
+    installDeps(modulePkg)
+
+    # And fix Mac OS libraries of dependencies:
+    .postProcessLibraryModule(moduleLibrary)
+  }
+
+  # Remove old copy of library (because we might be reinstalling and want the find.package check on the end to fail if something went wrong)
+  tryCatch(
+    expr = {
+      withr::with_libpaths(
+        new = libPathsToUse,
+        code = {
+          find.package(package=pkgName)
+          remove.packages(pkg=pkgName, lib=moduleLibrary)
+        }
+      )
+    },
+    error=function(e) {}
+  )
+
+  print("Module library now looks like: ")
+  print(list.files(path=moduleLibrary, recursive=FALSE))
+
+  installLocal(modulePkg)
+
+  # Check if install worked and through loadlog as error otherwise
+  tryCatch(
+    expr = {
+      withr::with_libpaths(
+        new = moduleLibrary,
+        code = {
+          find.package(package=pkgName)
+          return("succes!")
+        }
+      )
+    },
+    error=function(e) {
+      .setLog(loadLog)
+      return('fail')
+    }
+  )
+
+  return(NULL)
+}
+
+# Retrieve package dependencies by parsing a DESCRIPTION file or a DESCRIPTION string
+#
+# Returns a named list, e.g.:
+# type         package      version               remote
+# Depends        R          >= 3.0.2
+# Imports       stringr     >= 0.5         svn::https://github.com/hadley/stringr
+# Imports       brew            *
+# Imports       digest          *          foo/digest
+# Imports       methods         *
+# Imports       Rcpp         >= 0.11.0
+# Suggests      testthat     >= 0.8.0      local::/pkgs/testthat
+# Suggests      knitr           *
+# LinkingTo     Rcpp
+#
+# Or a json string, e.g.:
+# [{"type":"Depends","package":"R","version":">= 3.0.2","remote":""},
+#  {"type":"Imports","package":"stringr","version":">= 0.5","remote":"svn::https://github.com/hadley/stringr"},
+#  {"type":"Imports","package":"brew","version":"*","remote":""},
+#  {"type":"Imports","package":"digest","version":"*","remote":"foo/digest"},
+# etc]
+.getDepsFromDescription <- function(unparsedDescr, asJson = TRUE) {
+  deps <- NULL
+
+  descr <- .parseDescription(unparsedDescr)
+  if (any(descr$has_fields(c("Imports", "Depends", "LinkingTo")))) {
+    deps <- descr$get_deps()
+    pkgs <- deps[["package"]]
+    remotePerPkg <- character(length(pkgs))
+    if (descr$has_fields("Remotes")) {
+      remotes <- descr$get_remotes()
+      for (i in seq_along(remotePerPkg)) {
+        isRemoteForPkg <- endsWith(remotes, paste0("/", pkgs[i]))
+        if (any(isRemoteForPkg))
+          remotePerPkg[i] <- remotes[isRemoteForPkg]
+      }
+    }
+    deps[["remote"]] <- remotePerPkg
+  }
+
+  if (asJson)
+    deps <- jsonlite::toJSON(deps)
+
+  return(deps)
+}
+
+.parseDescription <- function(unparsedDescr) {
+  if (!nzchar(unparsedDescr))
+    stop("The description contains no data")
+
+  if (file.exists(unparsedDescr)) {
+    parsedDescr <- desc::description$new(file = unparsedDescr)
+  } else {
+    parsedDescr <- desc::description$new(text = unparsedDescr)
+  }
+
+  return(parsedDescr)
 }
