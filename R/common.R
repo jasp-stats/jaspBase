@@ -3047,33 +3047,21 @@ editImage <- function(optionsJson) {
   #             "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
 }
 
-.installJaspModule <- function(modulePkg, pkgName, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
-  loadLog <- ""
+.installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
+  pkgDescr <- file.path(modulePkg, "DESCRIPTION")
+  if (!file.exists(pkgDescr))
+    stop("Your module contains no DESCRIPTION file")
+
+  moduleInfo <- read.dcf(file.path(modulePkg, "DESCRIPTION"))[1, ]
+  pkgName <- moduleInfo["Package"]
   modulePkg <- paste0(modulePkg, "/.")
-
-  installDeps <- function(pkg) {
-    withr::with_libpaths(
-      new  = libPathsToUse,
-      code = remotes::install_deps(pkg=pkg, lib=moduleLibrary,  INSTALL_opts=c("--no-test-load --no-multiarch"), upgrade="never", repos=repos)
-    )
-  }
-
-  installLocal <- function(pkgPath) {
-    pkgPath <- sub("\\\\", "/", pkgPath, fixed=TRUE)
-    print(paste0("pkgPath: '", pkgPath, "'"))
-
-    if (length(libPathsToUse) > 1)
-      strlibPathsToUse <- paste0("c(", paste0("\"", libPathsToUse, collapse = "\", "), "\")")
-    else
-      strlibPathsToUse <- paste0("\"", libPathsToUse, "\"")
-
-    loadLog <- paste0(loadLog, "\n", .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs=\"", pkgPath, "\", lib=\"", moduleLibrary, "\", type=\"source\", repos=NULL, INSTALL_opts=c(\"--no-multiarch\"))))")))
-  }
 
   if (!onlyModPkg) {
     # Install dependencies:
-    # First the ones from CRAN because they cant depend on one from github
-    installDeps(modulePkg)
+    withr::with_libpaths(
+      new  = libPathsToUse,
+      code = remotes::install_deps(pkg=modulePkg, lib=moduleLibrary,  INSTALL_opts=c("--no-test-load --no-multiarch"), upgrade="never", repos=repos)
+    )
 
     # And fix Mac OS libraries of dependencies:
     .postProcessLibraryModule(moduleLibrary)
@@ -3096,7 +3084,15 @@ editImage <- function(optionsJson) {
   print("Module library now looks like: ")
   print(list.files(path=moduleLibrary, recursive=FALSE))
 
-  installLocal(modulePkg)
+  pkgPath <- sub("\\\\", "/", modulePkg, fixed=TRUE)
+  print(paste0("pkgPath: '", pkgPath, "'"))
+
+  if (length(libPathsToUse) > 1)
+    strlibPathsToUse <- paste0("c(", paste0("'", libPathsToUse, collapse = "', "), "')")
+  else
+    strlibPathsToUse <- paste0("'", libPathsToUse, "'")
+
+  loadLog <- .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs='", pkgPath, "', lib='", moduleLibrary, "', type='source', repos=NULL, INSTALL_opts=c('--no-multiarch'))))"))
 
   # Check if install worked and through loadlog as error otherwise
   tryCatch(
