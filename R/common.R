@@ -2647,6 +2647,12 @@ rewriteImages <- function() {
 # not .editImage() because RInside (interface to CPP) cannot handle that
 editImage <- function(optionsJson) {
   # assumption: state[["figures"]][[plotName]] is either of class "ggplot2" or "recordedPlot"
+  debugPlotEditing <- dir.exists("~/jaspDeletable")
+  if (debugPlotEditing) {
+    sink("~/jaspDeletable/logPlotEditing.txt")
+    on.exit(sink(NULL))
+    print(.libPaths())
+  }
 
   optionsList   <- fromJSON(optionsJson)
   plotName      <- optionsList[["data"]]
@@ -2674,12 +2680,18 @@ editImage <- function(optionsJson) {
       plot <- if (isGgplot) ggplot2:::plot_clone(oldPlot) else oldPlot
 
       if (type == "interactive" && isGgplot) {
-
+        print("Start modify plot")
         newOpts       <- optionsList[["editOptions"]]
         oldOpts       <- jaspGraphs::plotEditingOptions(plot)
-        newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis[names(newOpts$xAxis) != "type"]$settings )
-        newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis[names(newOpts$yAxis) != "type"]$settings )
+        newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
+        newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
+        if (debugPlotEditing)
+          save(plot, newOpts, state, oldPlot, revision, optionsList, optionsList, plotName, type, isGgplot, width, height, file = "~/jaspDeletable/editImage_.RData")
+        # load("~/jaspDeletable/editImage_.RData")
         plot          <- jaspGraphs::plotEditing(plot, newOpts)
+        if (debugPlotEditing)
+          save(plot, file = "~/jaspDeletable/editedImage_.RData")
+        print("End modify plot")
       }
 
       # plot editing did nothing or was cancelled
@@ -2729,10 +2741,8 @@ editImage <- function(optionsJson) {
     state[["figures"]][[plotName]][["height"]] <- height
     state[["figures"]][[plotName]][["revision"]]  <- revision
 
-    if (type == "interactive") {
+    if (type == "interactive")
       state[["figures"]][[plotName]][["obj"]] <- content[["obj"]]
-      replacement[["obj"]]                    <- content[["obj"]]
-    }
 
     key                 <- attr(x = state, which = "key")
     state               <- .modifyStateFigures(state, identifier=plotName, 
