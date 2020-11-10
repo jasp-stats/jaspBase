@@ -76,7 +76,7 @@
 	expected <- rbind(expected, c('VGAM', '1.1-1'))
 	expected <- rbind(expected, c('XML', '3.98-1.20'))
 	expected <- rbind(expected, c('abind', '1.4-5'))
-	expected <- rbind(expected, c('abtest', '0.2.0'))
+	expected <- rbind(expected, c('abtest', '0.2.1'))
 	expected <- rbind(expected, c('acepack', '1.4.1'))
 	expected <- rbind(expected, c('afex', '0.28-0'))
 	expected <- rbind(expected, c('arm', '1.10-1'))
