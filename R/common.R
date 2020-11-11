@@ -2710,8 +2710,7 @@ editImage <- function(optionsJson) {
         
         # no new recorded plot is created in .writeImage so we recycle the old one
         # we can only resize recordedPlots anyway
-        if (isGgplot) newPlot[["obj"]] <- content[["obj"]]
-        else          newPlot[["obj"]] <- plot
+        newPlot[["obj"]] <- plot
 
         newPlot # results == newPlot
       }
@@ -2742,7 +2741,7 @@ editImage <- function(optionsJson) {
     state[["figures"]][[plotName]][["revision"]]  <- revision
 
     if (type == "interactive")
-      state[["figures"]][[plotName]][["obj"]] <- content[["obj"]]
+      state[["figures"]][[plotName]][["obj"]] <- results[["obj"]]
 
     key                 <- attr(x = state, which = "key")
     state               <- .modifyStateFigures(state, identifier=plotName, 
