@@ -28,3 +28,11 @@
   else
     decodeColNames(x, ...)
 }
+
+interactionSymbol <- "\u2009\u273B\u2009"
+base::Encoding(interactionSymbol) <- "UTF-8"
+
+substituteInteractionSymbol <- function(strings) {
+  # assumes the input consists of encoded column names, which never contain ':'
+  gsub(":", interactionSymbol, strings, fixed = TRUE)
+}
