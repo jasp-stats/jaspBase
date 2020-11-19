@@ -107,7 +107,7 @@ initEnvironment <- function() {
 
   if (identical(.Platform$OS.type, "windows"))
     assignFunctionInPackage(fakeGrDevicesPdf, "pdf", "grDevices") # this fixes the problem that grDevices::pdf() does not work within JASP (https://github.com/jasp-stats/INTERNAL-jasp/issues/682)
-  
+
   for (package in packages)
     if (base::isNamespaceLoaded(package) == FALSE)
       try(base::loadNamespace(package), silent=TRUE)
@@ -2133,7 +2133,7 @@ openGrDevice <- function(...) {
 
   plot2draw <- decodeplot(plot)
 
-  if (ggplot2::is.ggplot(plot2draw) || inherits(plot2draw, c("gtable"))) {
+  if (ggplot2::is.ggplot(plot2draw) || inherits(plot2draw, c("gtable", "gTree"))) {
 
     # TODO: ggsave adds very little when we use a function as device...
     ggplot2::ggsave(
@@ -2184,7 +2184,7 @@ openGrDevice <- function(...) {
   # Save path & plot object to output
   image[["png"]]           <- relativePathpng
   image[["revision"]]      <- 0
-  
+
   if (obj) {
     image[["obj"]]         <- plot2draw
     image[["editOptions"]] <- plotEditingOptions
@@ -2207,15 +2207,15 @@ saveImage <- function(plotName, format, height, width)
   # create file location string
   location <- .fromRCPP(".requestTempFileNameNative", "png") # to extract the root location
   relativePath <- paste0("temp.", format)
-  
+
   if (format == "pptx") {
 
     error <- try(.saveImageAsPPTX(plt, relativePath))
 
   } else {
-    
+
     error <- try({
-      
+
       # Get file size in inches by creating a mock file and closing it
       pngMultip <- .fromRCPP(".ppi") / 96
       png(
@@ -2226,7 +2226,7 @@ saveImage <- function(plotName, format, height, width)
       )
       insize <- dev.size("in")
       dev.off()
-      
+
       # Even though OSX is usually cairo able, the cairo devices should not be used as plot fonts are not scaled well.
       # On the other hand, Windows should use a cairo (eps/pdf) device as the standard devices use a wrong R_HOME for some reason.
       # Consequently on Windows you will get encoding/font errors because the devices cannot find their resources.
@@ -2236,24 +2236,24 @@ saveImage <- function(plotName, format, height, width)
         type <- "cairo"
       else
         type <- "Xlib"
-      
+
       # Open correct graphics device
       if (format == "eps") {
-        
+
         if (type == "cairo")
           device <- grDevices::cairo_ps
         else
           device <- grDevices::postscript
-        
+
         device(
           relativePath,
           width = insize[1],
           height = insize[2],
           bg = backgroundColor
         )
-        
+
       } else if (format == "tiff") {
-        
+
         hiResMultip <- 300 / 72
         grDevices::tiff(
           filename    = relativePath,
@@ -2264,23 +2264,23 @@ saveImage <- function(plotName, format, height, width)
           compression = "lzw",
           type        = type
         )
-        
+
       } else if (format == "pdf") {
-        
+
         if (type == "cairo")
           device <- grDevices::cairo_pdf
         else
           device <- grDevices::pdf
-        
+
         device(
           relativePath,
           width = insize[1],
           height = insize[2],
           bg = "transparent"
         )
-        
+
       } else if (format == "png") {
-        
+
         # Open graphics device and plot
         grDevices::png(
           filename = relativePath,
@@ -2290,13 +2290,13 @@ saveImage <- function(plotName, format, height, width)
           res      = 72 * pngMultip,
           type     = type
         )
-        
+
       } else { # add optional other formats here in "else if"-statements
-        
+
         stop("Format incorrectly specified")
-        
+
       }
-      
+
       # Plot and close graphics device
       if (inherits(plt, "recordedplot")) {
         .redrawPlot(plt)
@@ -2306,7 +2306,7 @@ saveImage <- function(plotName, format, height, width)
         plot(plt)
       }
       dev.off()
-      
+
     })
 
   }
@@ -2690,12 +2690,12 @@ editImage <- function(optionsJson) {
         # plot is modified or needs to be resized, let's save the new plot
         newPlot <- list()
         content <- .writeImage(width = width, height = height, plot = plot, obj = TRUE, relativePathpng = plotName) #Should we switch this over to the writeImage from jaspResults or we could also just directly use jaspPlot
-        
+
         newPlot[["data"]]     <- content[["png"]]
         newPlot[["width"]]    <- width
         newPlot[["height"]]   <- height
         newPlot[["revision"]] <- revision
-        
+
         # no new recorded plot is created in .writeImage so we recycle the old one
         # we can only resize recordedPlots anyway
         if (isGgplot) newPlot[["obj"]] <- content[["obj"]]
@@ -2735,8 +2735,8 @@ editImage <- function(optionsJson) {
     }
 
     key                 <- attr(x = state, which = "key")
-    state               <- .modifyStateFigures(state, identifier=plotName, 
-                                               replacement=list(width=width, height=height, revision=revision), 
+    state               <- .modifyStateFigures(state, identifier=plotName,
+                                               replacement=list(width=width, height=height, revision=revision),
                                                completeObject = FALSE)
     attr(state, "key")  <- key
 
