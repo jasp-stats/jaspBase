@@ -32,15 +32,15 @@
 interactionSymbol <- "\u2009\u273B\u2009"
 base::Encoding(interactionSymbol) <- "UTF-8"
 
-gsubInteractionSym <- function(x, ...) {
-  UseMethod("gsubInteractionSym", x)
+gsubInteractionSymbol <- function(x, ...) {
+  UseMethod("gsubInteractionSymbol", x)
 }
 
-gsubInteractionSym.list <- function(x, how = "replace", ...) {
-  rapply(x, gsubInteractionSym, classes = "character", how = how, ...)
+gsubInteractionSymbol.list <- function(x, how = "replace", ...) {
+  rapply(x, gsubInteractionSymbol, classes = "character", how = how, ...)
 }
 
-gsubInteractionSym.character <- function(x, ...) {
+gsubInteractionSymbol.character <- function(x, ...) {
   # assumes the input consists of encoded column names, which never contain ':'
   gsub(":", interactionSymbol, x, fixed = TRUE, ...)
 }
