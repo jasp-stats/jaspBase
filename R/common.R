@@ -2674,11 +2674,10 @@ editImage <- function(optionsJson) {
       plot <- if (isGgplot) ggplot2:::plot_clone(oldPlot) else oldPlot
 
       if (type == "interactive" && isGgplot) {
-
         newOpts       <- optionsList[["editOptions"]]
         oldOpts       <- jaspGraphs::plotEditingOptions(plot)
-        newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis[names(newOpts$xAxis) != "type"]$settings )
-        newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis[names(newOpts$yAxis) != "type"]$settings )
+        newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
+        newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
         plot          <- jaspGraphs::plotEditing(plot, newOpts)
       }
 
@@ -2698,8 +2697,7 @@ editImage <- function(optionsJson) {
 
         # no new recorded plot is created in .writeImage so we recycle the old one
         # we can only resize recordedPlots anyway
-        if (isGgplot) newPlot[["obj"]] <- content[["obj"]]
-        else          newPlot[["obj"]] <- plot
+        newPlot[["obj"]] <- plot
 
         newPlot # results == newPlot
       }
@@ -2729,10 +2727,8 @@ editImage <- function(optionsJson) {
     state[["figures"]][[plotName]][["height"]] <- height
     state[["figures"]][[plotName]][["revision"]]  <- revision
 
-    if (type == "interactive") {
-      state[["figures"]][[plotName]][["obj"]] <- content[["obj"]]
-      replacement[["obj"]]                    <- content[["obj"]]
-    }
+    if (type == "interactive")
+      state[["figures"]][[plotName]][["obj"]] <- results[["obj"]]
 
     key                 <- attr(x = state, which = "key")
     state               <- .modifyStateFigures(state, identifier=plotName,
