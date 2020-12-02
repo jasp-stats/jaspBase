@@ -2647,12 +2647,6 @@ rewriteImages <- function() {
 # not .editImage() because RInside (interface to CPP) cannot handle that
 editImage <- function(optionsJson) {
   # assumption: state[["figures"]][[plotName]] is either of class "ggplot2" or "recordedPlot"
-  debugPlotEditing <- dir.exists("~/jaspDeletable")
-  if (debugPlotEditing) {
-    sink("~/jaspDeletable/logPlotEditing.txt")
-    on.exit(sink(NULL))
-    print(.libPaths())
-  }
 
   optionsList   <- fromJSON(optionsJson)
   plotName      <- optionsList[["data"]]
@@ -2680,18 +2674,11 @@ editImage <- function(optionsJson) {
       plot <- if (isGgplot) ggplot2:::plot_clone(oldPlot) else oldPlot
 
       if (type == "interactive" && isGgplot) {
-        print("Start modify plot")
         newOpts       <- optionsList[["editOptions"]]
         oldOpts       <- jaspGraphs::plotEditingOptions(plot)
         newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
         newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
-        if (debugPlotEditing)
-          save(plot, newOpts, state, oldPlot, revision, optionsList, optionsList, plotName, type, isGgplot, width, height, file = "~/jaspDeletable/editImage_.RData")
-        # load("~/jaspDeletable/editImage_.RData")
         plot          <- jaspGraphs::plotEditing(plot, newOpts)
-        if (debugPlotEditing)
-          save(plot, file = "~/jaspDeletable/editedImage_.RData")
-        print("End modify plot")
       }
 
       # plot editing did nothing or was cancelled
