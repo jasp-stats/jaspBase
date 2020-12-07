@@ -288,6 +288,7 @@
 	expected <- rbind(expected, c('processx', '3.4.1'))
 	expected <- rbind(expected, c('progress', '1.2.2'))
 	expected <- rbind(expected, c('promises', '1.1.0'))
+	expected <- rbind(expected, c('prophet', '0.6.1'))
 	expected <- rbind(expected, c('ps', '1.3.0'))
 	expected <- rbind(expected, c('psych', '1.8.12'))
 	expected <- rbind(expected, c('psychTools', '1.9.5.26'))
