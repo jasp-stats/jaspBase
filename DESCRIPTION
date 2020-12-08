@@ -8,5 +8,5 @@ Description: Package contains the JASP Bayesian and Frequentist analyses.
     See <https://jasp-stats.org> for more details.
 License: GPL2+
 Imports: 
-	rstan (<= 2.19.2),
-	StanHeaders (<= 2.19.2)
+	modules
+
