@@ -777,7 +777,7 @@
   # adapted from lavaan:::lav_data_missing_patterns
   findMissingRows <- function(x) {
     missingValues <- !is.na(x)
-    return(sum(rowSums(missingValues) == 0L))
+    return(100 * mean(rowSums(missingValues) == 0L))
   }
 
   if (length(grouping) > 0) {
@@ -786,7 +786,7 @@
     numberOfEmptyRows <- findMissingRows(dataset[, target])
   }
 
-  if (any(numberOfEmptyRows > maximumMissingRows)) {
+  if (any(numberOfEmptyRows > maximumPercentageMissing)) {
     result$error <- TRUE
     result$errorVars <- target
   }

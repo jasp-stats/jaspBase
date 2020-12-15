@@ -53,7 +53,7 @@
   m$error$duplicateColumns <-
     gettextf("Duplicate variables encountered in %s", "{{variables}}")
   m$error$missingRows <-
-    gettextf("Over %s% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue.", "{{factorLevels.amount}}")
+    gettextf("Over %s%% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue.", "{{missingRows.maximumPercentageMissing}}")
 
   ### Footnotes
   m$footnote$leveneSign <- 
