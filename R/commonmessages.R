@@ -52,7 +52,9 @@
     gettextf("Missing values encountered in %s", "{{variables}}")
   m$error$duplicateColumns <-
     gettextf("Duplicate variables encountered in %s", "{{variables}}")
-  
+  m$error$missingRows <-
+    gettextf("Over %s% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue.", "{{factorLevels.amount}}")
+
   ### Footnotes
   m$footnote$leveneSign <- 
     gettext("Levene's test is significant (p < .05), suggesting a violation of the equal variance assumption")

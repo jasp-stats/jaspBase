@@ -148,7 +148,8 @@
   checks[["negativeValues"]] <- list(callback=.checkNegativeValues, addGroupingMsg=TRUE)
   checks[["missingValues"]] <- list(callback=.checkMissingValues, addGroupingMsg=TRUE)
   checks[["duplicateColumns"]] <- list(callback=.checkDuplicateColumns, addGroupingMsg=TRUE)
-  
+  checks[["missingRows"]] <- list(callback=.checkMissingRows, addGroupingMsg=TRUE)
+
   args <- c(list(dataset=dataset), list(...))
   errors <- list(message=NULL)
   
@@ -763,6 +764,31 @@
       result$error <- TRUE
       result$errorVars <- unique(duplicatedVars)
     }
+  }
+
+  return(result)
+}
+
+.checkMissingRows <- function(dataset, target, grouping = NULL,
+                              maximumPercentageMissing = 30) {
+
+  result <- list(error = FALSE, errorVars = NULL)
+
+  # adapted from lavaan:::lav_data_missing_patterns
+  findMissingRows <- function(x) {
+    missingValues <- !is.na(x)
+    return(sum(rowSums(missingValues) == 0L))
+  }
+
+  if (length(grouping) > 0) {
+    numberOfEmptyRows <- c(by(dataset[, target, drop = FALSE], list(dataset[[grouping]]), findMissingRows))
+  } else {
+    numberOfEmptyRows <- findMissingRows(dataset[, target])
+  }
+
+  if (any(numberOfEmptyRows > maximumMissingRows)) {
+    result$error <- TRUE
+    result$errorVars <- target
   }
 
   return(result)
