@@ -776,8 +776,8 @@
 
   # adapted from lavaan:::lav_data_missing_patterns
   findMissingRows <- function(x) {
-    missingValues <- !is.na(x)
-    return(100 * mean(rowSums(missingValues) == 0L))
+    nonMissingValues <- !is.na(x)
+    return(100 * mean(rowSums(nonMissingValues) == 0L))
   }
 
   if (length(grouping) > 0) {
