@@ -2881,8 +2881,21 @@ editImage <- function(optionsJson) {
   if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
     if (isTRUE(options[["setSeed"]]))
       set.seed(options[["seed"]])
+  } else {
+    stop(paste(".setSeedJASP was called with an incorrect argument.",
+               "The argument options should be the options list from QML.",
+               "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
   }
-  #  stop(paste(".setSeedJASP was called with an incorrect argument.",
-  #             "The argument options should be the options list from QML.",
-  #             "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
+}
+
+.getSeedJASP <- function(options) {
+  
+  if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
+    if (isTRUE(options[["setSeed"]]))
+      return(options[["seed"]])
+  } else {
+    stop(paste(".getSeedJASP was called with an incorrect argument.",
+               "The argument options should be the options list from QML.",
+               "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
+  }
 }
