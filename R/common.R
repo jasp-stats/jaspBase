@@ -2882,9 +2882,10 @@ editImage <- function(optionsJson) {
     if (isTRUE(options[["setSeed"]]))
       set.seed(options[["seed"]])
   } else {
-    stop(paste(".setSeedJASP was called with an incorrect argument.",
-               "The argument options should be the options list from QML.",
-               "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
+    # some analysis (t-test) have common functions for computations, however, only some of the offer seed in the interface - therefore, this error message is disabled for the moment
+    # stop(paste(".setSeedJASP was called with an incorrect argument.",
+    #            "The argument options should be the options list from QML.",
+    #            "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
   }
 }
 
