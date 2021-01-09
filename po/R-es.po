@@ -1,183 +1,161 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: R 3.6.1\n"
-"Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
+"Project-Id-Version: JASP 0.9.2\n"
 "POT-Creation-Date: 2021-01-08 22:36\n"
-"PO-Revision-Date: 2020-12-02 21:29+0000\n"
-"Last-Translator: JASP Stats <F.A.M.Meerhoff@uva.nl>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jasp-engine/"
-"nl/>\n"
-"Language: nl\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
-"X-Generator: Weblate 4.4-dev\n"
 
 msgid "<em>Note.</em>"
-msgstr "<em>Opmerking.</em>"
+msgstr ""
 
 msgid "No items to show, please add a results description or set init to true"
 msgstr ""
-"Geen items om te tonen, voeg een resultaatsbeschrijving toe of stel init in "
-"op 'waar'"
 
 msgid "None of the result items has show set to 'true', cannot skip init phase"
 msgstr ""
-"Geen van de resultaten heeft 'toon' ingesteld op 'waar', kan de init-fase "
-"niet overslaan"
 
 msgid "Cannot create empty placeholder for element of type"
-msgstr "Kan geen lege plaatsvervanger creëren voor element van dit type"
+msgstr ""
 
 msgid "Cannot locate any items in the results description"
-msgstr "Er bevinden zich geen items in de beschrijving van de resultaten"
+msgstr ""
 
 msgid "Unknown type ("
-msgstr "Onbekend type ("
+msgstr ""
 
 msgid ")  provided in results description"
-msgstr ") gegeven in de beschrijving van de resultaten"
+msgstr ""
 
 msgid "Could not create meta for"
-msgstr "Kon geen meta maken voor"
+msgstr ""
 
 msgid "at depth"
-msgstr "op diepte"
+msgstr ""
 
 msgid "(class:"
-msgstr "(klasse:"
+msgstr ""
 
 msgid ", names:"
-msgstr ", namen:"
+msgstr ""
 
 msgid ", class children:"
-msgstr ", klasse kinderen:"
+msgstr ""
 
 msgid ", names children:"
-msgstr ", namen kinderen:"
+msgstr ""
 
 msgid ")"
-msgstr ")"
+msgstr ""
 
 msgid "Could not figure out the container structure in"
-msgstr "Kon niet achter de containersstructuur komen in"
+msgstr ""
 
 msgid "Could not find meta description for current plot"
-msgstr "Kon geen metabeschrijving voor deze grafiek vinden"
+msgstr ""
 
 msgid "Could not find meta description for current table"
-msgstr "Kon geen metabeschrijving van deze tabel vinden"
+msgstr ""
 
 msgid "Could not locate 'name' in custom table meta"
-msgstr "Er bevindt zich geen 'naam' in aangepaste meta tabel"
+msgstr ""
 
 msgid ""
 "Could not find any data in the table, cannot fetch items from the results "
 "description"
 msgstr ""
-"Kon geen data in de tabel vinden, kan geen items uit de beschrijving van de "
-"resultaten vinden"
 
 msgid ""
 "Could not locate any of the columns specified in the results description"
 msgstr ""
-"De gespecificeerde kolommen bevinden zich niet in de beschrijving van "
-"resultaten"
 
 msgid "expecting output to be a data.frame"
-msgstr "De verwachte uitvoer is een data.frame"
+msgstr ""
 
 msgid "no columns found to be imported"
-msgstr "Geen kolommen gevonden om te importeren"
+msgstr ""
 
 msgid "expecting the JASP options to be a named list"
-msgstr "er wordt verwacht dat JASP opties een genaamde lijst is"
+msgstr ""
 
 msgid ""
 "Trying to find dataset columns to read, but it appears some options don't "
 "exist: '"
 msgstr ""
-"Probeer gegevens- kolommen te vinden om te lezen, maar het lijkt erop dat "
-"sommige opties niet bestaan:'"
 
 msgid ","
-msgstr ","
+msgstr ""
 
 msgid "'"
-msgstr "'"
+msgstr ""
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
 msgstr ""
-"Invalide type geleverd aan .fromRCPP, er wordt een 'character' verwacht"
 
 msgid "Unknown RCPP object"
-msgstr "Onbekend RCPP object"
+msgstr ""
 
 msgid "Could not locate"
-msgstr "Kan niet worden gevonden"
+msgstr ""
 
 msgid "in environment (.fromRCPP)"
-msgstr "in omgeving (.fromRCPP)"
+msgstr ""
 
 msgid "Provide a numeric value to the progress updater"
-msgstr "Geef een numerieke waarde aan de progress updater"
+msgstr ""
 
 msgid "could not clean value"
-msgstr "kon waarde niet opschonen"
+msgstr ""
 
 msgid "Missing required replacement(s): \""
-msgstr "De benodigde vervanging(en) ontbreken: \""
+msgstr ""
 
 msgid "\""
-msgstr "\""
+msgstr ""
 
 msgid "Expecting row to be a numeric index"
-msgstr "voor rij wordt een numerieke index verwacht"
+msgstr ""
 
 msgid "Expecting cols to be a (vector of) character name(s)"
-msgstr "voor cols wordt een (vector van) 'character' namen verwacht"
+msgstr ""
 
 msgid "None of the gui options ("
-msgstr "Geen van de gui opties ("
+msgstr ""
 
 msgid ") is in the options list."
-msgstr ") staat in de optielijst."
+msgstr ""
 
 msgid "Format incorrectly specified"
-msgstr "Format incorrect gespecificeerd"
+msgstr ""
 
 msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
 "errors."
 msgstr ""
-"Momentopname grafiek laden van een andere sessie met mogelijke bijwerkingen "
-"of fouten."
 
 msgid "Invalid value provided to 'ticks', expecting positive integer"
 msgstr ""
-"Invalide waarde gegeven aan 'ticks', er wordt een positief geheel getal "
-"verwacht"
 
 msgid "The value provided to 'callback' does not appear to be a function"
-msgstr "De waarde gegeven aan 'callback' lijkt geen functie te zijn"
+msgstr ""
 
 msgid ""
 "Invalid value provided to 'skim', expecting numeric value in the range of "
 "0-99"
 msgstr ""
-"Invalide waarde gegeven aan 'skim', er wordt een numerieke waardetussen 0 en "
-"99 verwacht"
 
 msgid "Object provided in 'progressbar' is not of class JASP progressbar"
 msgstr ""
-"Het object gegeven in 'progressbar' is niet van de klasse 'JASP progressbar'"
 
 msgid "Object provided in 'cluster' is not of class cluster"
-msgstr "Het object gegeven in 'cluster' is niet van de klasse cluster"
+msgstr ""
 
 msgid "Cancelled by callback"
-msgstr "Geannuleerd door callback"
+msgstr ""
 
 msgid ".getSeedJASP was called with an incorrect argument."
 msgstr ""
@@ -191,88 +169,77 @@ msgid ""
 msgstr ""
 
 msgid "This function should not be used. In for reference."
-msgstr "Deze functie kan niet worden gebruikt. Erin voor referentie."
+msgstr ""
 
 msgid "Non-valid type argument provided"
-msgstr "Niet-valide argumenttype gegeven"
+msgstr ""
 
 msgid "Unknown check type provided: \""
-msgstr "Onbekende check type gegeven: \""
+msgstr ""
 
 msgid "Missing required argument(s): \""
-msgstr "Verplicht(e) argument(en) ontbreken: \""
+msgstr ""
 
 msgid "Each grouping variable must have a level specified"
-msgstr "Iedere groeperende variabele moet een gespecificeerd niveau hebben"
+msgstr ""
 
 msgid "the modelterms list must contain the named item `components`"
-msgstr "de modeltermenlijst moet een item hebben genaamd `componenten`"
+msgstr ""
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr "De volgende problemen deden zich voor tijdens de analyse:"
+msgstr ""
 
 msgid "after grouping on %s"
-msgstr "na het groeperen over %s"
+msgstr ""
 
 msgid ""
 "This analysis terminated unexpectedly. %s To receive assistance with this "
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
-"Deze analyse werd onverwacht beëindigd. %s Om hulp te krijgen met dit "
-"probleem, rapporteer het bovenstaande bericht aan: https://jasp-stats.org/"
-"bug-reports"
 
 msgid "Infinity found in %s"
-msgstr "Oneindigheid gevonden in %s"
+msgstr ""
 
 msgid "Number of factor levels is %s in %s"
-msgstr "Aantal factorniveaus is %s in %s"
+msgstr ""
 
 msgid "The variance in %s is equal to %s"
-msgstr "De variantie in %s is gelijk aan %s"
+msgstr ""
 
 msgid "Number of observations is %s in %s"
-msgstr "Aantal observaties is %s in %s"
+msgstr ""
 
 msgid "Cannot compute statistic reliably: number of observations is %s in %s"
 msgstr ""
-"Kan statistiek niet betrouwbaar berekenen: aantal observaties is %s in %s"
 
 msgid "Values in %s outside interval [%s, %s]"
-msgstr "Waarden in %s buiten interval [%s, %s]"
+msgstr ""
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
 msgstr ""
-"De gegevens vormen geen correcte variantie-covariantie matrix. Gebruik als "
-"invoer alleen een positieve definitieve symmetrische matrix."
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
 "definite. Please check if variables have many missings observations or are "
 "collinear"
 msgstr ""
-"De variantie-covariantie matrix van de gegeven dat is niet positief-"
-"definitief. Controleer a.u.b. of de variabelen ontbrekende observaties "
-"bevatten of dat ze collineair zijn"
 
 msgid ""
 "Main effects and lower-order interactions must be included whenever the "
 "corresponding higher-order interaction is included"
 msgstr ""
-"Hoofdeffecten en lagere-orde interacties moeten worden meegenomen wanneer de "
-"corresponderende hogere-orde interacties zijn meegenomen"
 
 msgid "Negative numbers found in %s"
-msgstr "Negatieve aantallen gevonden in %s"
+msgstr ""
 
 msgid "Missing values encountered in %s"
-msgstr "Ontbrekende waarden gevonden in %s"
+msgstr ""
 
 msgid "Duplicate variables encountered in %s"
-msgstr "Duplicate variabelen gevonden in %s"
+msgstr ""
 
 msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
@@ -283,35 +250,25 @@ msgid ""
 "Levene's test is significant (p < .05), suggesting a violation of the equal "
 "variance assumption"
 msgstr ""
-"Levene's toets is significant (p < .05), wat suggereert dat de aanname van "
-"gelijke variantie is geschonden"
 
 msgid ""
 "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
 "maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
-"Vovk-Sellke Maximum <em>p</em>-Ratio: Gebaseerd op de <em>p</em>-waarde, de "
-"maximaal mogelijke kansen ten gunste van H%1$s boven H%2$s is gelijk aan 1/(-"
-"e <em>p</em> log(<em>p</em>)) voor <em>p</em> %3$s .37 (Sellke, Bayarri, & "
-"Berger, 2001)."
 
 msgid "Proportions tested against value: %s"
-msgstr "Proporties getest tegen waarde: %s"
+msgstr ""
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
 msgstr ""
-"Voor alle toetsen specificeert de alternatieve hypothese dat de proportie "
-"minder is dan %s"
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
 msgstr ""
-"Voor alle toetsen specificeert de alternatieve hypothese dat de proportie "
-"groter is dan %s"
 
 msgid "Could not find message for class %s and type %s"
-msgstr "Kon geen bericht vinden voor klasse %s en type %s"
+msgstr ""
