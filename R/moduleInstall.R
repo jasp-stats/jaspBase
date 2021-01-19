@@ -1,5 +1,5 @@
 
-.installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
+installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
   pkgDescr <- file.path(modulePkg, "DESCRIPTION")
   if (!file.exists(pkgDescr))
     stop("Your module contains no DESCRIPTION file")
@@ -86,7 +86,7 @@
 #  {"type":"Imports","package":"brew","version":"*","remote":""},
 #  {"type":"Imports","package":"digest","version":"*","remote":"foo/digest"},
 # etc]
-.getDepsFromDescription <- function(unparsedDescr, asJson = TRUE) {
+getDepsFromDescription <- function(unparsedDescr, asJson = TRUE) {
   deps <- NULL
 
   descr <- .parseDescription(unparsedDescr)
