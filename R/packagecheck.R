@@ -58,7 +58,7 @@
 	expected <- rbind(expected, c('RColorBrewer', '1.1-2'))
 	expected <- rbind(expected, c('ROCR', '1.0-7'))
 	expected <- rbind(expected, c('RUnit', '0.4.32'))
-	expected <- rbind(expected, c('Rcpp', '1.0.3'))
+	expected <- rbind(expected, c('Rcpp', '1.0.6'))
 	expected <- rbind(expected, c('RcppArmadillo', '0.9.900.3.0'))
 	expected <- rbind(expected, c('RcppEigen', '0.3.3.7.0'))
 	expected <- rbind(expected, c('RcppParallel', '5.0.1'))
