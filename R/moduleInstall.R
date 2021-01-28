@@ -41,7 +41,6 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   on.exit(assign(".lib.loc", old.lib.loc, envir = environment(.libPaths)))
   assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
 
-  installModulePkg(modulePkg, moduleLibrary, prompt)
 
   lib <- renv::paths[["library"]](project = moduleLibrary)
   if (!dir.exists(lib))
@@ -51,6 +50,9 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
                 library = moduleLibrary,
                 lockfile = lockFileTemp, clean = TRUE,
                 prompt = prompt)
+
+  moduleInfo <- getModuleInfo(modulePkg)
+  installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo)
 
   renv::snapshot(
     project  = moduleLibraryTemp,
@@ -114,9 +116,10 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
 
 }
 
-installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive()) {
+installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), moduleInfo = NULL) {
 
-  moduleInfo <- getModuleInfo(modulePkg)
+  if (is.null(moduleInfo))
+    moduleInfo <- getModuleInfo(modulePkg)
   record <- recordFromModule(modulePkg, moduleInfo)
   renv::install(record, library = moduleLibrary, rebuild = TRUE, prompt = prompt)
 
