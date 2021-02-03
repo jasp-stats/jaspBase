@@ -44,7 +44,7 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   else
     strlibPathsToUse <- paste0("'", libPathsToUse, "'")
 
-  loadLog <- .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs='", pkgPath, "', lib='", moduleLibrary, "', type='source', repos=NULL, INSTALL_opts=c('--no-multiarch'))))"))
+  loadLog <- .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs='", pkgPath, "', lib='", moduleLibrary, "', type='source', repos=NULL, INSTALL_opts=c('--no-multiarch')), required=FALSE))"))
 
   # Check if install worked and through loadlog as error otherwise
   tryCatch(
