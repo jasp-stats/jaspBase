@@ -111,3 +111,7 @@ zScores.factor <- function(x) {
   else # assume this is really what the user wants
     return(scale(x))
 }
+
+hasSubstring <- function(string, substring) {
+  return(grepl(pattern = substring, x = string, fixed = TRUE))
+}
