@@ -12,6 +12,10 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
 
 installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
 
+  renv::consent() #Consent to doing stuff in certain paths: https://rstudio.github.io/renv/reference/consent.html We've changed at least the root and the cache so hopefully that means it won't be changing stuff in the locations it mentions
+	options(renv.verbose=TRUE) # More feedback wanted although this seems to do little
+  options(renv.config.install.verbose=TRUE)
+
   print(sprintf("Installing module with renv. installJaspModuleFromRenv('%s', c(%s), '%s', '%s', %s)",
                 modulePkg, paste0("'", libPathsToUse, "'", collapse = ", "), moduleLibrary, repos, onlyModPkg))
 
@@ -225,7 +229,7 @@ setupRenv <- function(moduleLibrary) {
   )
 
   # TODO: don't hardcode this!
-  Sys.setenv("RENV_PATHS_CACHE" = "/home/dvdb/.local/share/renv/cache/v5/JASP/")
+  #Sys.setenv("RENV_PATHS_CACHE" = "/home/dvdb/.local/share/renv/cache/v5/JASP/")
   if (!dir.exists(Sys.getenv("RENV_PATHS_CACHE")))
     stop(sprintf("The cache is supposed to be at '%s' but it does not exist!", Sys.getenv("RENV_PATHS_CACHE")))
 
