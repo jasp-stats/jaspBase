@@ -17,16 +17,40 @@
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall=name)
-{
+loadJaspResults <- function(name) {
+  jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
+}
+
+finishJaspResults <- function(jaspResultsCPP, returnKeepList = TRUE) {
+
+  jaspResultsCPP$prepareForWriting()
+
+  newState <- list(
+    figures = jaspResultsCPP$getPlotObjectsForState(),
+    other   = jaspResultsCPP$getOtherObjectsForState()
+  )
+
+  jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
+
+  returnThis <- NULL
+  if (returnKeepList)
+    returnThis <- list(keep=jaspResultsCPP$getKeepList()) #To keep the old keep-code functional we return it like this
+
+  jaspResultsCPP$complete() #sends last results to desktop, changes status to complete and saves results to json in tempfiles
+
+  return(returnThis)
+}
+
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
+
   if (identical(.Platform$OS.type, "windows"))
     compiler::enableJIT(0)
 
   suppressWarnings(RNGkind(sample.kind = "Rounding"))  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
 
-  jaspResultsCPP        <- jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
-  jaspResults           <- jaspResultsR$new(jaspResultsCPP)
+  jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
+  jaspResults           <- jaspResultsR$new(jaspResultsCPP)
 
   jaspResultsCPP$setOptions(options)
 
@@ -81,17 +105,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     return(paste0("{ \"status\" : \"", errorStatus, "\", \"results\" : { \"title\" : \"error\", \"error\" : 1, \"errorMessage\" : \"", errorMessage, "\" } }", sep=""))
   } else {
 
-    jaspResultsCPP$prepareForWriting()
-
-    newState                        <- list()
-    newState[["figures"]]           <- jaspResultsCPP$getPlotObjectsForState()
-    newState[["other"]]             <- jaspResultsCPP$getOtherObjectsForState()
-
-    jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
-
-    returnThis <- list(keep=jaspResultsCPP$getKeepList()) #To keep the old keep-code functional we return it like this
-
-    jaspResultsCPP$complete() #sends last results to desktop, changes status to complete and saves results to json in tempfiles
+    returnThis <- finishJaspResults(jaspResultsCPP)
 
     json <- try({ toJSON(returnThis) })
     if (class(json) == "try-error")
@@ -195,6 +209,104 @@ checkLavaanModel <- function(model, availableVars) {
   return(str)
 }
 
+# not .editImage() because RInside (interface to CPP) cannot handle that
+editImage <- function(name, optionsJson) {
+
+  optionsList <- fromJSON(optionsJson)
+  plotName    <- optionsList[["data"]]
+  type        <- optionsList[["type"]]
+  width       <- optionsList[["width"]]
+  height      <- optionsList[["height"]]
+  uniqueName  <- optionsList[["name"]]
+
+  plot     <- NULL
+  revision <- -1
+
+  # uncomment to profile (and make sure that profvis is installed)
+  # profvis::profvis(prof_output = "~/jaspDeletable/robjects/profileEditImage", expr = {
+
+  results <- try({
+
+    jaspResultsCPP <- loadJaspResults(name)
+
+    jaspPlotCPP         <- jaspResultsCPP$findObjectWithUniqueNestedName(uniqueName)
+    if (is.null(jaspPlotCPP))
+      stop("no jasp plot found")
+
+    jaspPlotCPP$editing <- TRUE
+    on.exit({jaspPlotCPP$editing <- FALSE}) # this should not persist!
+
+    plot <- jaspPlotCPP$plotObject
+    if (is.null(plot))
+      stop("no plot object found")
+
+    #We should get the extra special editing options out here and do something funky (https://www.youtube.com/watch?v=roQuEqxjDx4) with them ^^
+
+    if (type == "resize") {
+
+      oldWidth  <- jaspPlotCPP$width
+      oldHeight <- jaspPlotCPP$height
+
+      jaspPlotCPP$width      <- width
+      jaspPlotCPP$height     <- height
+      jaspPlotCPP$plotObject <- plot
+
+      # this may fail for base graphics (e.g., "figure margins too small")
+      if (jaspPlotCPP$getError()) {
+        jaspPlotCPP$width      <- oldWidth
+        jaspPlotCPP$height     <- oldHeight
+        jaspPlotCPP$plotObject <- plot
+      }
+
+    } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
+
+
+      # copy plot and check if we edit it
+      newPlot <- ggplot2:::plot_clone(plot)
+
+      newOpts       <- optionsList[["editOptions"]]
+      oldOpts       <- jaspGraphs::plotEditingOptions(plot)
+      newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
+      newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
+      newPlot       <- jaspGraphs::plotEditing(newPlot, newOpts)
+
+      # plot editing did nothing or was canceled
+      if (!identical(plot, newPlot))
+        jaspPlotCPP$plotObject <- newPlot
+
+    }
+    revision <- jaspPlotCPP$revision
+
+    finishJaspResults(jaspResultsCPP, returnKeepList = FALSE)
+
+  })
+
+  # end of profiling
+  # })
+
+  response <- list(
+    status  = "imageEdited",
+    results = list(
+      name     = plotName,
+      resized  = type == "resize",
+      width    = width,
+      height   = height,
+      revision = revision,
+      error    = FALSE
+    )
+  )
+
+  if (isTryError(results)) {
+
+    errorMessage <- if (is.null(plot)) gettext("no plot object was found") else .extractErrorMessage(results)
+
+    response[["results"]][["error"]]        <- TRUE
+    response[["results"]][["errorMessage"]] <- errorMessage
+
+  }
+
+  return(toJSON(response))
+}
 .createEmptyResults <- function(resultsMeta) {
   # Dispatches functions which build a fully completed results & .meta list that mimics the output
   # of the init phase of an analysis (empty tables, empty plots)
