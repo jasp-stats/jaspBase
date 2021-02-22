@@ -35,3 +35,5 @@ S3method(gsubInteractionSymbol, character)
 export(interactionSymbol)
 export(installJaspModule)
 export(getDepsFromDescription)
+
+S3method("[[",verySpecial)

@@ -234,12 +234,6 @@ addRenvBeforeAfterDispatch <- function() {
     class = "verySpecial"
   )
 
-
-  `[[.verySpecial` <- function(x, field) {
-    print(paste0("DISPATCH CALLED with name ", field)) #but we ignore field because we apply the same thing everytime anyway
-    return(unclass(x))
-  }
-  
   print("just testing")
   
   print(renBeforeAfterInstallStruct[["not a real pkg"]])
@@ -250,6 +244,10 @@ addRenvBeforeAfterDispatch <- function() {
   print(naOptions[["tsja"]])
 }
 
+`[[.verySpecial` <- function(x, ...) {
+  print(paste0("DISPATCH CALLED with name ", paste(..., collapse = ", "))) #but we ignore field because we apply the same thing everytime anyway
+  return(unclass(x))
+}
 
 setupRenv <- function(moduleLibrary) {
 
