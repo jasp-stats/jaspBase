@@ -219,6 +219,40 @@ libraryMatchesLockfile <- function(project = NULL) {
   # return(all(df[notNA, "Library"] == df[notNA, "Lockfile"]))
 }
 
+addRenvBeforeAfterDispatch <- function() { 
+
+	renBeforeAfterInstallStruct <- structure(
+    funcs=list(
+      before.install = function(x) {
+        print("BEFORE INSTALLING")
+        print(sprintf("Path = %s", mget("path", envir = parent.frame(1), ifnotfound = "unknown path")))
+      },
+      after.install  = function(x) {
+        print("AFTER INSTALLING")
+        print(sprintf("Path = %s", mget("path", envir = parent.frame(1), ifnotfound = "unknown path")))
+      }
+    ),
+	.Data=c(),
+    class="verySpecial"
+	)
+
+	
+	`[[.verySpecial` <- function(x, field) {
+	  print(paste0("DISPATCH CALLED with name ", field)) #but we ignore field because we apply the same thing everytime anyway
+	  return(x$funcs)
+	}
+	
+	print("just testing")
+	
+	print(renBeforeAfterInstallStruct[["not a real pkg"]])
+	
+	options(renv.install.package.options = renBeforeAfterInstallStruct)
+	
+	naOptions <- getOption("renv.install.package.options")
+	print(naOptions[["tsja"]])
+}
+
+
 setupRenv <- function(moduleLibrary) {
 
   # renv adds e.g,. "R-3.6/x86_64-pc-linux-gnu" to all paths (R-version/os) and we don't need that
@@ -237,9 +271,9 @@ setupRenv <- function(moduleLibrary) {
 
   print("Using the following paths:")
   print(sapply(renv::paths, function(x) x()))
-
+  
+	addRenvBeforeAfterDispatch()
 }
-
 
 installJaspModuleFromDescriptionOld <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
   pkgDescr <- file.path(modulePkg, "DESCRIPTION")
