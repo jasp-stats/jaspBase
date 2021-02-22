@@ -221,35 +221,33 @@ libraryMatchesLockfile <- function(project = NULL) {
 
 addRenvBeforeAfterDispatch <- function() { 
 
-	renBeforeAfterInstallStruct <- structure(
-    funcs=list(
-      before.install = function(x) {
-        print("BEFORE INSTALLING")
-        print(sprintf("Path = %s", mget("path", envir = parent.frame(1), ifnotfound = "unknown path")))
-      },
-      after.install  = function(x) {
-        print("AFTER INSTALLING")
-        print(sprintf("Path = %s", mget("path", envir = parent.frame(1), ifnotfound = "unknown path")))
-      }
-    ),
-	.Data=c(),
-    class="verySpecial"
-	)
+  renBeforeAfterInstallStruct <- structure(list(
+    before.install = function(x) {
+      print("BEFORE INSTALLING")
+      print(sprintf("Path = %s", mget("path", envir = parent.frame(1),
+                                      ifnotfound = "unknown path")))
+    }, after.install = function(x) {
+      print("AFTER INSTALLING")
+      print(sprintf("Path = %s", mget("path", envir = parent.frame(1),
+                                      ifnotfound = "unknown path")))
+    }),
+    class = "verySpecial"
+  )
 
-	
-	`[[.verySpecial` <- function(x, field) {
-	  print(paste0("DISPATCH CALLED with name ", field)) #but we ignore field because we apply the same thing everytime anyway
-	  return(x$funcs)
-	}
-	
-	print("just testing")
-	
-	print(renBeforeAfterInstallStruct[["not a real pkg"]])
-	
-	options(renv.install.package.options = renBeforeAfterInstallStruct)
-	
-	naOptions <- getOption("renv.install.package.options")
-	print(naOptions[["tsja"]])
+
+  `[[.verySpecial` <- function(x, field) {
+    print(paste0("DISPATCH CALLED with name ", field)) #but we ignore field because we apply the same thing everytime anyway
+    return(unclass(x))
+  }
+  
+  print("just testing")
+  
+  print(renBeforeAfterInstallStruct[["not a real pkg"]])
+  
+  options(renv.install.package.options = renBeforeAfterInstallStruct)
+  
+  naOptions <- getOption("renv.install.package.options")
+  print(naOptions[["tsja"]])
 }
 
 
