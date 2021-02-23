@@ -80,6 +80,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
+  registerFonts()
   oldGraphOptions <- jaspGraphs::graphOptions()
   on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
 
@@ -119,6 +120,28 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
       return(paste("{ \"status\" : \"error\", \"results\" : { \"error\" : 1, \"errorMessage\" : \"", "Unable to jsonify", "\" } }", sep=""))
     else
       return(json)
+  }
+}
+
+registerFonts <- function() {
+
+  if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
+
+    # Not sure if we actually want to do this
+    font_name0 <- "FreeSansJASP"
+    font_name1 <- "LatoJASP"
+    # TODO: this obviously only works on my machine
+    font_file0 <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
+    font_file1 <- "~/github/jasp-desktop/Desktop/html/font/Lato-Regular.ttf"
+
+    systemfonts::register_font(font_name0, normalizePath(font_file0))
+    systemfonts::register_font(font_name1, normalizePath(font_file1))
+
+    print("registered FreeSansJASP & LatoJASP")
+    jaspGraphs::setGraphOption("family", .resultsFont)
+
+  } else {
+    print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
   }
 }
 
