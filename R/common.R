@@ -21,7 +21,7 @@ loadJaspResults <- function(name) {
   jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
 }
 
-finishJaspResults <- function(jaspResultsCPP, returnKeepList = TRUE) {
+finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
 
   jaspResultsCPP$prepareForWriting()
 
@@ -33,10 +33,17 @@ finishJaspResults <- function(jaspResultsCPP, returnKeepList = TRUE) {
   jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
 
   returnThis <- NULL
-  if (returnKeepList)
-    returnThis <- list(keep=jaspResultsCPP$getKeepList()) #To keep the old keep-code functional we return it like this
+  if (calledFromAnalysis) {
+    returnThis <- list(keep = jaspResultsCPP$getKeepList()) #To keep the old keep-code functional we return it like this
 
-  jaspResultsCPP$complete() #sends last results to desktop, changes status to complete and saves results to json in tempfiles
+    jaspResultsCPP$complete() #sends last results to desktop, changes status to complete and saves results to json in tempfiles
+
+  } else {
+
+    jaspResultsCPP$saveResults()
+    jaspResultsCPP$finishWriting()
+
+  }
 
   return(returnThis)
 }
@@ -948,7 +955,7 @@ editImage <- function(name, optionsJson) {
     }
     revision <- jaspPlotCPP$revision
 
-    finishJaspResults(jaspResultsCPP, returnKeepList = FALSE)
+    finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
 
   })
 
