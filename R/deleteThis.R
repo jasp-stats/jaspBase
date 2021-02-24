@@ -1459,23 +1459,6 @@ as.list.footnotes <- function(footnotes) {
 
 }
 
-formula.modelTerms <- function(modelTerms, env = parent.frame()) {
-  # Converts a modelTerms list into a one-side R formula
-  #
-  # Args:
-  #   modelTerms:  A list of interaction terms, each term being a list of variable names involved in the interaction
-  #   env:         An environement associated with the variables in the formula, see ?as.formula
-  #
-  # Value:
-  #   A formula. See ?formula
-  #
-  terms = sapply(modelTerms, function(x) paste0(unlist(x), collapse = ":"))
-  terms = terms[terms != ""]
-  formula.rhs = paste(terms, collapse = " + ")
-  if (formula.rhs != "") as.formula(paste(" ~ ", formula.rhs), env = env)
-}
-
-
 b64 <- function(x, ...) UseMethod("b64")   ## Translate names in x to 'base64'
 d64 <- function(x, ...) UseMethod("d64")   ## Untranslate names in x from 'base64'
 
