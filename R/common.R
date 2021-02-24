@@ -139,7 +139,6 @@ registerFonts <- function() {
 
     print("registered FreeSansJASP & LatoJASP")
     jaspGraphs::setGraphOption("family", .resultsFont)
-
   } else {
     print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
   }
