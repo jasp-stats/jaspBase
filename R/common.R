@@ -424,6 +424,12 @@ isTryError <- function(obj){
   df
 }
 
+jaspResultsStrings <- function() {
+  # jaspResults does not exist as an R package within JASP, so we cannot use its po folder
+  # and we add the strings that need to be translated here.
+  gettext("<em>Note.</em>")
+}
+
 .fromRCPP <- function(x, ...) {
 
   if (length(x) != 1 || ! is.character(x)) {
@@ -585,6 +591,11 @@ isTryError <- function(obj){
                "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."))
   }
 }
+
+# USED BY CLASSICALMETAANALYSIS.R
+as.modelTerms <- function(object, ...) UseMethod("as.modelTerms")
+as.modelTerms.list <- function(object) structure(object, class = "modelTerms")
+as.modelTerms.formula <- function(formula) structure(sapply(attr(terms(formula), "term.labels"), strsplit, ":"), class="modelTerms")
 
 # PLOT RELATED FUNCTION ----
 .suppressGrDevice <- function(plotFunc) {

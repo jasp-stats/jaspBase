@@ -1,11 +1,5 @@
 # these functions should be deleted. I couldn't find any usage in the modules or jasp-desktop
 
-jaspResultsStrings <- function() {
-  # jaspResults does not exist as an R package within JASP, so we cannot use its po folder
-  # and we add the strings that need to be translated here.
-  gettext("<em>Note.</em>")
-}
-
 .createEmptyResults <- function(resultsMeta) {
   # Dispatches functions which build a fully completed results & .meta list that mimics the output
   # of the init phase of an analysis (empty tables, empty plots)
@@ -1248,50 +1242,6 @@ callback <- function(results=NULL, progress=NULL) {
 
 #.clean is not necessary for analyses using jaspResults, jaspTable will take care of it for you.
 
-.parseMessage <- function(message, class, ...) {
-  args <- list(...)
-
-  if (class == "error") {
-    # If a grouping argument is added, the message 'after grouping on {{}}' is automatically included.
-    if (! is.null(args[['grouping']])) {
-      message <- paste(message, .messages('error', 'grouping'))
-    }
-  }
-
-  # Find all {{string}}'s that needs to be replaced by values.
-  toBeReplaced <- regmatches(message, gregexpr("(?<=\\{{)\\S*?(?=\\}})", message, perl=TRUE))[[1]]
-  if (base::identical(toBeReplaced, character(0)) == FALSE) { # Were there any {{string}}'s?
-
-    if (all(toBeReplaced %in% names(args)) == FALSE) { # Were all replacements provided in the arguments?
-      missingReplacements <- toBeReplaced[! toBeReplaced %in% names(args)]
-      stop('Missing required replacement(s): "', paste(missingReplacements, collapse=','), '"')
-    }
-
-    for (i in 1:length(toBeReplaced)) {
-      value <- args[[ toBeReplaced[i] ]]
-      if (length(value) > 1) { # Some arguments may have multiple values, e.g. amount = c('< 3', '> 5000').
-        if (toBeReplaced[i] %in% c('variables', 'grouping')) {
-          value <- paste(value, collapse=', ')
-        } else {
-          value <- paste(value, collapse=' or ')
-        }
-      }
-      message <- gsub(paste0('{{', toBeReplaced[i], '}}'), value, message, fixed=TRUE)
-    }
-
-  }
-
-  # Find all values we do not want in the output, e.g. we do not want to show !=
-  replaceInMessage <- list('!=' = '\u2260', '==' = '=')
-  for (i in 1:length(replaceInMessage)) {
-    if (grepl(names(replaceInMessage)[i], message)) {
-      message <- gsub(names(replaceInMessage)[i], replaceInMessage[[i]], message)
-    }
-  }
-
-  return(message)
-}
-
 .newFootnotes <- function() {
 
   footnotes <- new.env()
@@ -1509,10 +1459,6 @@ as.list.footnotes <- function(footnotes) {
 
 }
 
-
-as.modelTerms <- function(object, ...) UseMethod("as.modelTerms")
-as.modelTerms.list <- function(object) structure(object, class = "modelTerms")
-as.modelTerms.formula <- function(formula) structure(sapply(attr(terms(formula), "term.labels"), strsplit, ":"), class="modelTerms")
 formula.modelTerms <- function(modelTerms, env = parent.frame()) {
   # Converts a modelTerms list into a one-side R formula
   #
@@ -1766,24 +1712,3 @@ d64.list <- function(x, ...) {
     return(expr)
   }
 }
-
-# Operator to perform an expression by group / conditionally on a factor / given a condition. (author: EJvK):
-# Usage: (abs(mtcars$mpg - mean(mtcars$mpg)) > var(mtcars$mpg)) %|% mtcars$cyl
-`%|%` <- function(expr, group)
-{
-  group       <- as.factor(group)
-  expr        <- as.list(match.call())$expr
-  nams        <- codetools::findGlobals(as.function(list(expr)), FALSE)$variables
-  vars        <- lapply(nams, get)
-  names(vars) <- nams
-  v           <- logical(length(group))
-
-  for (i in levels(group))
-  {
-    env           <- list2env(lapply(vars, function(x) subset(x, group == i)))
-    v[group == i] <- eval(expr = expr, envir = env)
-  }
-
-  return(v)
-}
-

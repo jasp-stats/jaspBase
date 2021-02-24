@@ -24,7 +24,6 @@ replaceNA.ordered <- function(column, replaceWith) {
   return(result)
 }
 
-
 ifElse <- function(test, yes, no) {
   useType <- findDominatingClass(yes, no)
   UseMethod("ifElse", useType)
@@ -114,4 +113,23 @@ zScores.factor <- function(x) {
 
 hasSubstring <- function(string, substring) {
   return(grepl(pattern = substring, x = string, fixed = TRUE))
+}
+
+# Operator to perform an expression by group / conditionally on a factor / given a condition. (author: EJvK):
+# Usage: (abs(mtcars$mpg - mean(mtcars$mpg)) > var(mtcars$mpg)) %|% mtcars$cyl
+`%|%` <- function(expr, group) {
+
+  group       <- as.factor(group)
+  expr        <- as.list(match.call())$expr
+  nams        <- codetools::findGlobals(as.function(list(expr)), FALSE)$variables
+  vars        <- lapply(nams, get)
+  names(vars) <- nams
+  v           <- logical(length(group))
+
+  for (i in levels(group)) {
+    env           <- list2env(lapply(vars, function(x) subset(x, group == i)))
+    v[group == i] <- eval(expr = expr, envir = env)
+  }
+
+  return(v)
 }
