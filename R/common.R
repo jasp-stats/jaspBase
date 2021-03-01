@@ -834,10 +834,15 @@ rewriteImages <- function(name, ppi, imageBackground) {
 
       # here we can modify general things for all plots (theme, font, etc.).
       # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
-      if (ggplot2::is.ggplot(plot)) {
-        plot <- plot + ggplot2::theme(text = ggplot2::element_text(family = jaspGraphs::getGraphOption("family")))
-      }
 
+      thm <- ggplot2::theme(text = ggplot2::element_text(family = jaspGraphs::getGraphOption("family")))
+      if (ggplot2::is.ggplot(plot)) {
+        plot <- plot + thm
+      } else if (jaspGraphs:::is.jaspGraphsPlot(plot)) {
+        for (i in seq_along(plot)) {
+          plot[[i]] <- plot[[i]] + thm
+        }
+      }
 
       jaspPlotCPP$plotObject <- plot
 
