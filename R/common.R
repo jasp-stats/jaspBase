@@ -127,15 +127,15 @@ registerFonts <- function() {
 
   if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
 
-    # Not sure if we actually want to do this
-    font_name0 <- "FreeSansJASP"
-    font_name1 <- "LatoJASP"
-    # TODO: this obviously only works on my machine
-    font_file0 <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
-    font_file1 <- "~/github/jasp-desktop/Desktop/html/font/Lato-Regular.ttf"
-
-    systemfonts::register_font(font_name0, normalizePath(font_file0))
-    systemfonts::register_font(font_name1, normalizePath(font_file1))
+    # # Not sure if we actually want to do this
+    # font_name0 <- "FreeSansJASP"
+    # font_name1 <- "LatoJASP"
+    # # TODO: this obviously only works on my machine
+    # font_file0 <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
+    # font_file1 <- "~/github/jasp-desktop/Desktop/html/font/Lato-Regular.ttf"
+    #
+    # systemfonts::register_font(font_name0, normalizePath(font_file0))
+    # systemfonts::register_font(font_name1, normalizePath(font_file1))
 
     print("registered FreeSansJASP & LatoJASP")
     jaspGraphs::setGraphOption("family", .resultsFont)
@@ -810,13 +810,14 @@ saveImage <- function(plotName, format, height, width)
 rewriteImages <- function(name, ppi, imageBackground) {
 
   jaspResultsCPP <- loadJaspResults(name)
-  on.exit( {
+  on.exit({
     jaspResultsCPP$status <- "imagesRewritten" # analysisResultStatus::imagesRewritten!
     jaspResultsCPP$send()
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
   })
   
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
+  registerFonts()
 
   for (i in seq_along(oldPlots)) {
     try({
@@ -833,6 +834,10 @@ rewriteImages <- function(name, ppi, imageBackground) {
 
       # here we can modify general things for all plots (theme, font, etc.).
       # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
+      if (ggplot2::is.ggplot(plot)) {
+        plot <- plot + ggplot2::theme(text = ggplot2::element_text(family = jaspGraphs::getGraphOption("family")))
+      }
+
 
       jaspPlotCPP$plotObject <- plot
 
