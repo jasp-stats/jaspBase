@@ -77,3 +77,47 @@
   
   return(message)
 }
+
+.parseMessage <- function(message, class, ...) {
+  args <- list(...)
+
+  if (class == "error") {
+    # If a grouping argument is added, the message 'after grouping on {{}}' is automatically included.
+    if (! is.null(args[['grouping']])) {
+      message <- paste(message, .messages('error', 'grouping'))
+    }
+  }
+
+  # Find all {{string}}'s that needs to be replaced by values.
+  toBeReplaced <- regmatches(message, gregexpr("(?<=\\{{)\\S*?(?=\\}})", message, perl=TRUE))[[1]]
+  if (base::identical(toBeReplaced, character(0)) == FALSE) { # Were there any {{string}}'s?
+
+    if (all(toBeReplaced %in% names(args)) == FALSE) { # Were all replacements provided in the arguments?
+      missingReplacements <- toBeReplaced[! toBeReplaced %in% names(args)]
+      stop('Missing required replacement(s): "', paste(missingReplacements, collapse=','), '"')
+    }
+
+    for (i in 1:length(toBeReplaced)) {
+      value <- args[[ toBeReplaced[i] ]]
+      if (length(value) > 1) { # Some arguments may have multiple values, e.g. amount = c('< 3', '> 5000').
+        if (toBeReplaced[i] %in% c('variables', 'grouping')) {
+          value <- paste(value, collapse=', ')
+        } else {
+          value <- paste(value, collapse=' or ')
+        }
+      }
+      message <- gsub(paste0('{{', toBeReplaced[i], '}}'), value, message, fixed=TRUE)
+    }
+
+  }
+
+  # Find all values we do not want in the output, e.g. we do not want to show !=
+  replaceInMessage <- list('!=' = '\u2260', '==' = '=')
+  for (i in 1:length(replaceInMessage)) {
+    if (grepl(names(replaceInMessage)[i], message)) {
+      message <- gsub(names(replaceInMessage)[i], replaceInMessage[[i]], message)
+    }
+  }
+
+  return(message)
+}
