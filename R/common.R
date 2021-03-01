@@ -788,7 +788,12 @@ saveImage <- function(plotName, format, height, width)
 rewriteImages <- function(name, ppi, imageBackground) {
 
   jaspResultsCPP <- loadJaspResults(name)
-  on.exit(finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE))
+  on.exit( {
+    jaspResultsCPP$status <- "imagesRewritten" # analysisResultStatus::imagesRewritten!
+    jaspResultsCPP$send()
+    finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
+  })
+  
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
 
   for (i in seq_along(oldPlots)) {
