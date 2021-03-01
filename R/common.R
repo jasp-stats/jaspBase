@@ -791,8 +791,6 @@ rewriteImages <- function(name, ppi, imageBackground) {
   on.exit(finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE))
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
 
-  saveRDS(oldPlots, file = tempfile(tmpdir = "~/jaspDeletable/robjects/rewriteImages"))
-
   for (i in seq_along(oldPlots)) {
     try({
 
