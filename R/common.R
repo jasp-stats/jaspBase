@@ -612,96 +612,6 @@ openGrDevice <- function(...) {
   grDevices::png(..., type = ifelse(Sys.info()["sysname"] == "Darwin", "quartz", "cairo"))
 }
 
-.writeImage <- function(width=320, height=320, plot, obj = TRUE, relativePathpng = NULL) {
-  # Set values from JASP'S Rcpp when available
-  if (exists(".fromRCPP")) {
-    location        <- .fromRCPP(".requestTempFileNameNative", "png")
-    backgroundColor <- .fromRCPP(".imageBackground")
-    ppi             <- .fromRCPP(".ppi")
-  }
-
-  # TRUE if called from analysis, FALSE if called from editImage
-  if (is.null(relativePathpng))
-    relativePathpng <- location$relativePath
-
-  fullPathpng                     <- paste(location$root, relativePathpng, sep="/")
-  plotEditingOptions              <- NULL
-  root                            <- location$root
-  oldwd                           <- getwd()
-  setwd(root)
-  on.exit(setwd(oldwd))
-
-  # IN CASE WE SWITCH TO SVG:
-  # # convert width & height from pixels to inches. ppi = pixels per inch. 72 is a magic number inherited from the past.
-  # # originally, this number was 96 but svglite scales this by (72/96 = 0.75). 0.75 * 96 = 72.
-  # # for reference see https://cran.r-project.org/web/packages/svglite/vignettes/scaling.html
-  # width  <- width / 72
-  # height <- height / 72
-
-  width  <- width * (ppi / 96)
-  height <- height * (ppi / 96)
-  image <- list()
-
-  plot2draw <- decodeplot(plot)
-
-  if (ggplot2::is.ggplot(plot2draw) || inherits(plot2draw, c("gtable", "gTree"))) {
-
-    # TODO: ggsave adds very little when we use a function as device...
-    ggplot2::ggsave(
-      filename  = relativePathpng,
-      plot      = plot2draw,
-      device    = grDevices::png,
-      dpi       = ppi,
-      width     = width,
-      height    = height,
-      bg        = backgroundColor,
-      res       = 72 * (ppi / 96),
-      type      = ifelse(Sys.info()["sysname"] == "Darwin", "quartz", "cairo"),
-      limitsize = FALSE # only necessary if users make the plot ginormous.
-    )
-
-  } else {
-
-    isRecordedPlot <- inherits(plot2draw, "recordedplot")
-
-    # Open graphics device and plot
-    openGrDevice(file = relativePathpng, width = width, height = height, res = 72 * (ppi / 96), bg = backgroundColor)
-    on.exit(dev.off())
-
-    if (is.function(plot2draw) && !isRecordedPlot) {
-
-      if (obj) dev.control('enable') # enable plot recording
-      eval(plot())
-      if (obj) plot2draw <- recordPlot() # save plot to R object
-
-    } else if (isRecordedPlot) { # function was called from editImage to resize the plot
-
-      .redrawPlot(plot2draw) #(see below)
-
-    } else if (inherits(plot2draw, "qgraph")) {
-
-      qgraph:::plot.qgraph(plot2draw)
-
-    } else {
-      plot(plot2draw)
-    }
-
-  }
-
-  # Save path & plot object to output
-  image[["png"]]           <- relativePathpng
-  image[["revision"]]      <- 0
-
-   if (obj) {
-    image[["obj"]]         <- plot2draw
-  }
-  #If we have jaspGraphs available we can get the plotEditingOptions for this plot
-  if(requireNamespace("jaspGraphs", quietly = TRUE))
-    image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
-
-  return(image)
-}
-
 # not .saveImage() because RInside (interface to CPP) cannot handle that
 saveImage <- function(plotName, format, height, width)
 {
@@ -875,18 +785,34 @@ saveImage <- function(plotName, format, height, width)
   suppressWarnings(grDevices::replayPlot(rec_plot))
 }
 
-rewriteImages <- function() {
-  state    <- .retrieveState()
-  oldPlots <- state[["figures"]]
+rewriteImages <- function(name, ppi, imageBackground) {
+
+  jaspResultsCPP <- loadJaspResults(name)
+  on.exit(finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE))
+  oldPlots <- jaspResultsCPP$getPlotObjectsForState()
+
+  saveRDS(oldPlots, file = tempfile(tmpdir = "~/jaspDeletable/robjects/rewriteImages"))
 
   for (i in seq_along(oldPlots)) {
     try({
-      plotName <- names(oldPlots)[i]
-      oldPlot  <- oldPlots[[i]]
-      width    <- oldPlot[["width"]]
-      height   <- oldPlot[["height"]]
-      plot     <- oldPlot[["obj"]]
-      invisible(.writeImage(width = width, height = height, plot = plot, obj = FALSE, relativePathpng = plotName))
+
+      uniqueName <- oldPlots[[i]][["getUnique"]]
+
+      jaspPlotCPP         <- jaspResultsCPP$findObjectWithUniqueNestedName(uniqueName)
+      if (is.null(jaspPlotCPP))
+        stop("no jasp plot found")
+
+      jaspPlotCPP$editing <- TRUE
+
+      plot <- jaspPlotCPP$plotObject
+
+      # here we can modify general things for all plots (theme, font, etc.).
+      # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
+
+      jaspPlotCPP$plotObject <- plot
+
+      jaspPlotCPP$editing <- FALSE
+
     })
   }
 
