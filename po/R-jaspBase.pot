@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-01-08 22:36\n"
+"POT-Creation-Date: 2021-03-03 15:48\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,81 +11,6 @@ msgstr ""
 
 
 msgid "<em>Note.</em>"
-msgstr ""
-
-msgid "No items to show, please add a results description or set init to true"
-msgstr ""
-
-msgid "None of the result items has show set to 'true', cannot skip init phase"
-msgstr ""
-
-msgid "Cannot create empty placeholder for element of type"
-msgstr ""
-
-msgid "Cannot locate any items in the results description"
-msgstr ""
-
-msgid "Unknown type ("
-msgstr ""
-
-msgid ")  provided in results description"
-msgstr ""
-
-msgid "Could not create meta for"
-msgstr ""
-
-msgid "at depth"
-msgstr ""
-
-msgid "(class:"
-msgstr ""
-
-msgid ", names:"
-msgstr ""
-
-msgid ", class children:"
-msgstr ""
-
-msgid ", names children:"
-msgstr ""
-
-msgid ")"
-msgstr ""
-
-msgid "Could not figure out the container structure in"
-msgstr ""
-
-msgid "Could not find meta description for current plot"
-msgstr ""
-
-msgid "Could not find meta description for current table"
-msgstr ""
-
-msgid "Could not locate 'name' in custom table meta"
-msgstr ""
-
-msgid "Could not find any data in the table, cannot fetch items from the results description"
-msgstr ""
-
-msgid "Could not locate any of the columns specified in the results description"
-msgstr ""
-
-msgid "expecting output to be a data.frame"
-msgstr ""
-
-msgid "no columns found to be imported"
-msgstr ""
-
-msgid "expecting the JASP options to be a named list"
-msgstr ""
-
-msgid "Trying to find dataset columns to read, but it appears some options don't exist: '"
-msgstr ""
-
-msgid ","
-msgstr ""
-
-msgid "'"
 msgstr ""
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
@@ -100,28 +25,13 @@ msgstr ""
 msgid "in environment (.fromRCPP)"
 msgstr ""
 
-msgid "Provide a numeric value to the progress updater"
+msgid ".getSeedJASP was called with an incorrect argument."
 msgstr ""
 
-msgid "could not clean value"
+msgid "The argument options should be the options list from QML."
 msgstr ""
 
-msgid "Missing required replacement(s): \""
-msgstr ""
-
-msgid "\""
-msgstr ""
-
-msgid "Expecting row to be a numeric index"
-msgstr ""
-
-msgid "Expecting cols to be a (vector of) character name(s)"
-msgstr ""
-
-msgid "None of the gui options ("
-msgstr ""
-
-msgid ") is in the options list."
+msgid "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."
 msgstr ""
 
 msgid "Format incorrectly specified"
@@ -130,31 +40,13 @@ msgstr ""
 msgid "Loading plot snapshot from a different session with possible side effects or errors."
 msgstr ""
 
-msgid "Invalid value provided to 'ticks', expecting positive integer"
+msgid "no jasp plot found"
 msgstr ""
 
-msgid "The value provided to 'callback' does not appear to be a function"
+msgid "no plot object found"
 msgstr ""
 
-msgid "Invalid value provided to 'skim', expecting numeric value in the range of 0-99"
-msgstr ""
-
-msgid "Object provided in 'progressbar' is not of class JASP progressbar"
-msgstr ""
-
-msgid "Object provided in 'cluster' is not of class cluster"
-msgstr ""
-
-msgid "Cancelled by callback"
-msgstr ""
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
-
-msgid "The argument options should be the options list from QML."
-msgstr ""
-
-msgid "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."
+msgid "no plot object was found"
 msgstr ""
 
 msgid "This function should not be used. In for reference."
@@ -166,7 +58,13 @@ msgstr ""
 msgid "Unknown check type provided: \""
 msgstr ""
 
+msgid "\""
+msgstr ""
+
 msgid "Missing required argument(s): \""
+msgstr ""
+
+msgid ","
 msgstr ""
 
 msgid "Each grouping variable must have a level specified"
@@ -239,4 +137,16 @@ msgid "For all tests, the alternative hypothesis specifies that the proportion i
 msgstr ""
 
 msgid "Could not find message for class %s and type %s"
+msgstr ""
+
+msgid "Missing required replacement(s): \""
+msgstr ""
+
+msgid "could not clean value"
+msgstr ""
+
+msgid "Your module contains no DESCRIPTION file"
+msgstr ""
+
+msgid "The description contains no data"
 msgstr ""
