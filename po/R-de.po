@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-01-08 22:36\n"
+"POT-Creation-Date: 2021-03-03 15:48\n"
 "PO-Revision-Date: 2021-01-14 11:32+0000\n"
 "Last-Translator: Johannes Keyser <johanneskeyser@posteo.de>\n"
-"Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/>"
-"\n"
+"Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/"
+">\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -16,96 +16,6 @@ msgstr ""
 
 msgid "<em>Note.</em>"
 msgstr "<em>Hinweis.</em>"
-
-msgid "No items to show, please add a results description or set init to true"
-msgstr ""
-"Keine Einträge anzeigbar, bitte ergänze eine Ergebnisbeschreibung oder setze "
-"die Initialisierung (init) auf 'wahr'"
-
-msgid "None of the result items has show set to 'true', cannot skip init phase"
-msgstr ""
-"Keins der Ergebniselemente wurde auf 'wahr' gesetzt, kann die Init-Phase "
-"nicht überspringen"
-
-msgid "Cannot create empty placeholder for element of type"
-msgstr "Kann keinen leeren Platzhalter erstellen für ein Element des Typs"
-
-msgid "Cannot locate any items in the results description"
-msgstr "Kann keine Elemente in der Ergebnisbeschreibung finden"
-
-msgid "Unknown type ("
-msgstr "Unbekannter Typ ("
-
-msgid ")  provided in results description"
-msgstr ") angegeben in der Beschreibung der Ergebnisse"
-
-msgid "Could not create meta for"
-msgstr "Konnte meta nicht erstellen für"
-
-msgid "at depth"
-msgstr "bei der Tiefe"
-
-msgid "(class:"
-msgstr "(Klasse:"
-
-msgid ", names:"
-msgstr ", Namen:"
-
-msgid ", class children:"
-msgstr ", Untergruppen:"
-
-msgid ", names children:"
-msgstr ", Namen der Untergruppen:"
-
-msgid ")"
-msgstr ")"
-
-msgid "Could not figure out the container structure in"
-msgstr "Konnte die Container-Struktur nicht ermitteln"
-
-msgid "Could not find meta description for current plot"
-msgstr "Konnte die Meta-Beschreibung für das aktuelle Diagramm nicht finden"
-
-msgid "Could not find meta description for current table"
-msgstr "Konnte die Meta-Beschreibung für die aktuelle Tabelle nicht finden"
-
-msgid "Could not locate 'name' in custom table meta"
-msgstr ""
-"Konnte 'name' nicht in der benutzerdefinierten Tabellen-Metadaten finden"
-
-msgid ""
-"Could not find any data in the table, cannot fetch items from the results "
-"description"
-msgstr ""
-"Konnte keine Daten in der Tabelle finden, konnte keine Elemente von der "
-"Ergebnisbeschreibung abrufen"
-
-msgid ""
-"Could not locate any of the columns specified in the results description"
-msgstr ""
-"Konnte keine der angegebenen Spalten in der Ergebnisbeschreibung finden"
-
-msgid "expecting output to be a data.frame"
-msgstr "erwarte vom Ergebnis, dass es ein data.frame ist"
-
-msgid "no columns found to be imported"
-msgstr "keine Spalten zum Importieren gefunden"
-
-msgid "expecting the JASP options to be a named list"
-msgstr "erwarte von den JASP-Optionen, dass sie eine benannte Liste ist"
-
-msgid ""
-"Trying to find dataset columns to read, but it appears some options don't "
-"exist: '"
-msgstr ""
-"Versuche die Spalten des Datensatzes zu lesen, einige Optionen scheinen zu "
-"fehlen: '"
-
-msgid ","
-msgstr ","
-
-msgid "'"
-msgstr "'"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
 msgstr "ungültiger Typ für .fromRCPP, habe einen Buchstaben erwartet"
@@ -118,64 +28,6 @@ msgstr "Konnte nicht finden"
 
 msgid "in environment (.fromRCPP)"
 msgstr "in Umgebung (.fromRCPP)"
-
-msgid "Provide a numeric value to the progress updater"
-msgstr "Übergib der Fortschrittsanzeige eine Zahl"
-
-msgid "could not clean value"
-msgstr "konnte den Wert nicht bereinigen"
-
-msgid "Missing required replacement(s): \""
-msgstr "Es fehlen benötigte Ersatzwerte: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Expecting row to be a numeric index"
-msgstr "für die Zeile wurde eine Zeilennummer / Index erwartet"
-
-msgid "Expecting cols to be a (vector of) character name(s)"
-msgstr "für die Spalten werden Namen aus Buchstaben erwartet"
-
-msgid "None of the gui options ("
-msgstr "Keine der Optionen der Benutzeroberfläche ("
-
-msgid ") is in the options list."
-msgstr ") befindet sich inder Options-Liste."
-
-msgid "Format incorrectly specified"
-msgstr "Format falsch angegeben"
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Lade Schnappschuss des Diagramms von einer anderen Sitzung mit potenziellen "
-"Nebenwirkungen oder Fehlern."
-
-msgid "Invalid value provided to 'ticks', expecting positive integer"
-msgstr "Ungültiger Wert für 'ticks' angegeben, erwarte positive Ganzzahl"
-
-msgid "The value provided to 'callback' does not appear to be a function"
-msgstr ""
-"Der Wert, der 'callback' übergeben wurde, scheint keine Funktion zu sein"
-
-msgid ""
-"Invalid value provided to 'skim', expecting numeric value in the range of "
-"0-99"
-msgstr ""
-"Ungültiger Wert für 'skim' angegeben, erwarte eine Zahl zwischen 0 und 99"
-
-msgid "Object provided in 'progressbar' is not of class JASP progressbar"
-msgstr ""
-"Objekt gegeben in 'progressbar' hat nicht die Art eines JASP "
-"Fortschrittsbalkens"
-
-msgid "Object provided in 'cluster' is not of class cluster"
-msgstr "Objekt gegeben in 'cluster' ist nicht von der Art eines Clusters"
-
-msgid "Cancelled by callback"
-msgstr "Abgebrochen durch Rückruf"
 
 msgid ".getSeedJASP was called with an incorrect argument."
 msgstr ".getSeedJASP wurde mit einem falschen Argument aufgerufen."
@@ -190,6 +42,25 @@ msgstr ""
 "Stelle sicher, dass die QML-Komponente SetSeed{} in der QML-Datei für diese "
 "Analyse vorhanden ist."
 
+msgid "Format incorrectly specified"
+msgstr "Format falsch angegeben"
+
+msgid ""
+"Loading plot snapshot from a different session with possible side effects or "
+"errors."
+msgstr ""
+"Lade Schnappschuss des Diagramms von einer anderen Sitzung mit potenziellen "
+"Nebenwirkungen oder Fehlern."
+
+msgid "no jasp plot found"
+msgstr ""
+
+msgid "no plot object found"
+msgstr ""
+
+msgid "no plot object was found"
+msgstr ""
+
 msgid "This function should not be used. In for reference."
 msgstr "Diese Funktion sollte nicht verwendet werden. Existiert für Referenz."
 
@@ -199,8 +70,14 @@ msgstr "Ungültigen Argumenttyp übergeben"
 msgid "Unknown check type provided: \""
 msgstr "Unbekannten Checktyp übergeben: \""
 
+msgid "\""
+msgstr "\""
+
 msgid "Missing required argument(s): \""
 msgstr "Fehlende(s) benötigte(s) Argument(e): \""
+
+msgid ","
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
 msgstr "Jede Gruppierungsvariable muss eine spezifizierte Stufe haben"
@@ -319,3 +196,143 @@ msgstr ""
 
 msgid "Could not find message for class %s and type %s"
 msgstr "Konnte keine Nachricht für Klasse %s und Typ %s finden"
+
+msgid "Missing required replacement(s): \""
+msgstr "Es fehlen benötigte Ersatzwerte: \""
+
+msgid "could not clean value"
+msgstr "konnte den Wert nicht bereinigen"
+
+msgid "Your module contains no DESCRIPTION file"
+msgstr ""
+
+msgid "The description contains no data"
+msgstr ""
+
+#~ msgid ""
+#~ "No items to show, please add a results description or set init to true"
+#~ msgstr ""
+#~ "Keine Einträge anzeigbar, bitte ergänze eine Ergebnisbeschreibung oder "
+#~ "setze die Initialisierung (init) auf 'wahr'"
+
+#~ msgid ""
+#~ "None of the result items has show set to 'true', cannot skip init phase"
+#~ msgstr ""
+#~ "Keins der Ergebniselemente wurde auf 'wahr' gesetzt, kann die Init-Phase "
+#~ "nicht überspringen"
+
+#~ msgid "Cannot create empty placeholder for element of type"
+#~ msgstr "Kann keinen leeren Platzhalter erstellen für ein Element des Typs"
+
+#~ msgid "Cannot locate any items in the results description"
+#~ msgstr "Kann keine Elemente in der Ergebnisbeschreibung finden"
+
+#~ msgid "Unknown type ("
+#~ msgstr "Unbekannter Typ ("
+
+#~ msgid ")  provided in results description"
+#~ msgstr ") angegeben in der Beschreibung der Ergebnisse"
+
+#~ msgid "Could not create meta for"
+#~ msgstr "Konnte meta nicht erstellen für"
+
+#~ msgid "at depth"
+#~ msgstr "bei der Tiefe"
+
+#~ msgid "(class:"
+#~ msgstr "(Klasse:"
+
+#~ msgid ", names:"
+#~ msgstr ", Namen:"
+
+#~ msgid ", class children:"
+#~ msgstr ", Untergruppen:"
+
+#~ msgid ", names children:"
+#~ msgstr ", Namen der Untergruppen:"
+
+#~ msgid ")"
+#~ msgstr ")"
+
+#~ msgid "Could not figure out the container structure in"
+#~ msgstr "Konnte die Container-Struktur nicht ermitteln"
+
+#~ msgid "Could not find meta description for current plot"
+#~ msgstr "Konnte die Meta-Beschreibung für das aktuelle Diagramm nicht finden"
+
+#~ msgid "Could not find meta description for current table"
+#~ msgstr "Konnte die Meta-Beschreibung für die aktuelle Tabelle nicht finden"
+
+#~ msgid "Could not locate 'name' in custom table meta"
+#~ msgstr ""
+#~ "Konnte 'name' nicht in der benutzerdefinierten Tabellen-Metadaten finden"
+
+#~ msgid ""
+#~ "Could not find any data in the table, cannot fetch items from the results "
+#~ "description"
+#~ msgstr ""
+#~ "Konnte keine Daten in der Tabelle finden, konnte keine Elemente von der "
+#~ "Ergebnisbeschreibung abrufen"
+
+#~ msgid ""
+#~ "Could not locate any of the columns specified in the results description"
+#~ msgstr ""
+#~ "Konnte keine der angegebenen Spalten in der Ergebnisbeschreibung finden"
+
+#~ msgid "expecting output to be a data.frame"
+#~ msgstr "erwarte vom Ergebnis, dass es ein data.frame ist"
+
+#~ msgid "no columns found to be imported"
+#~ msgstr "keine Spalten zum Importieren gefunden"
+
+#~ msgid "expecting the JASP options to be a named list"
+#~ msgstr "erwarte von den JASP-Optionen, dass sie eine benannte Liste ist"
+
+#~ msgid ""
+#~ "Trying to find dataset columns to read, but it appears some options don't "
+#~ "exist: '"
+#~ msgstr ""
+#~ "Versuche die Spalten des Datensatzes zu lesen, einige Optionen scheinen "
+#~ "zu fehlen: '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Provide a numeric value to the progress updater"
+#~ msgstr "Übergib der Fortschrittsanzeige eine Zahl"
+
+#~ msgid "Expecting row to be a numeric index"
+#~ msgstr "für die Zeile wurde eine Zeilennummer / Index erwartet"
+
+#~ msgid "Expecting cols to be a (vector of) character name(s)"
+#~ msgstr "für die Spalten werden Namen aus Buchstaben erwartet"
+
+#~ msgid "None of the gui options ("
+#~ msgstr "Keine der Optionen der Benutzeroberfläche ("
+
+#~ msgid ") is in the options list."
+#~ msgstr ") befindet sich inder Options-Liste."
+
+#~ msgid "Invalid value provided to 'ticks', expecting positive integer"
+#~ msgstr "Ungültiger Wert für 'ticks' angegeben, erwarte positive Ganzzahl"
+
+#~ msgid "The value provided to 'callback' does not appear to be a function"
+#~ msgstr ""
+#~ "Der Wert, der 'callback' übergeben wurde, scheint keine Funktion zu sein"
+
+#~ msgid ""
+#~ "Invalid value provided to 'skim', expecting numeric value in the range of "
+#~ "0-99"
+#~ msgstr ""
+#~ "Ungültiger Wert für 'skim' angegeben, erwarte eine Zahl zwischen 0 und 99"
+
+#~ msgid "Object provided in 'progressbar' is not of class JASP progressbar"
+#~ msgstr ""
+#~ "Objekt gegeben in 'progressbar' hat nicht die Art eines JASP "
+#~ "Fortschrittsbalkens"
+
+#~ msgid "Object provided in 'cluster' is not of class cluster"
+#~ msgstr "Objekt gegeben in 'cluster' ist nicht von der Art eines Clusters"
+
+#~ msgid "Cancelled by callback"
+#~ msgstr "Abgebrochen durch Rückruf"

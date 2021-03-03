@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-01-08 22:36\n"
+"POT-Creation-Date: 2021-03-03 15:48\n"
 "PO-Revision-Date: 2020-12-02 21:29+0000\n"
 "Last-Translator: JASP Stats <F.A.M.Meerhoff@uva.nl>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jasp-engine/"
@@ -17,96 +17,6 @@ msgstr ""
 msgid "<em>Note.</em>"
 msgstr "<em>Opmerking.</em>"
 
-msgid "No items to show, please add a results description or set init to true"
-msgstr ""
-"Geen items om te tonen, voeg een resultaatsbeschrijving toe of stel init in "
-"op 'waar'"
-
-msgid "None of the result items has show set to 'true', cannot skip init phase"
-msgstr ""
-"Geen van de resultaten heeft 'toon' ingesteld op 'waar', kan de init-fase "
-"niet overslaan"
-
-msgid "Cannot create empty placeholder for element of type"
-msgstr "Kan geen lege plaatsvervanger creëren voor element van dit type"
-
-msgid "Cannot locate any items in the results description"
-msgstr "Er bevinden zich geen items in de beschrijving van de resultaten"
-
-msgid "Unknown type ("
-msgstr "Onbekend type ("
-
-msgid ")  provided in results description"
-msgstr ") gegeven in de beschrijving van de resultaten"
-
-msgid "Could not create meta for"
-msgstr "Kon geen meta maken voor"
-
-msgid "at depth"
-msgstr "op diepte"
-
-msgid "(class:"
-msgstr "(klasse:"
-
-msgid ", names:"
-msgstr ", namen:"
-
-msgid ", class children:"
-msgstr ", klasse kinderen:"
-
-msgid ", names children:"
-msgstr ", namen kinderen:"
-
-msgid ")"
-msgstr ")"
-
-msgid "Could not figure out the container structure in"
-msgstr "Kon niet achter de containersstructuur komen in"
-
-msgid "Could not find meta description for current plot"
-msgstr "Kon geen metabeschrijving voor deze grafiek vinden"
-
-msgid "Could not find meta description for current table"
-msgstr "Kon geen metabeschrijving van deze tabel vinden"
-
-msgid "Could not locate 'name' in custom table meta"
-msgstr "Er bevindt zich geen 'naam' in aangepaste meta tabel"
-
-msgid ""
-"Could not find any data in the table, cannot fetch items from the results "
-"description"
-msgstr ""
-"Kon geen data in de tabel vinden, kan geen items uit de beschrijving van de "
-"resultaten vinden"
-
-msgid ""
-"Could not locate any of the columns specified in the results description"
-msgstr ""
-"De gespecificeerde kolommen bevinden zich niet in de beschrijving van "
-"resultaten"
-
-msgid "expecting output to be a data.frame"
-msgstr "De verwachte uitvoer is een data.frame"
-
-msgid "no columns found to be imported"
-msgstr "Geen kolommen gevonden om te importeren"
-
-msgid "expecting the JASP options to be a named list"
-msgstr "er wordt verwacht dat JASP opties een genaamde lijst is"
-
-msgid ""
-"Trying to find dataset columns to read, but it appears some options don't "
-"exist: '"
-msgstr ""
-"Probeer gegevens- kolommen te vinden om te lezen, maar het lijkt erop dat "
-"sommige opties niet bestaan:'"
-
-msgid ","
-msgstr ","
-
-msgid "'"
-msgstr "'"
-
 msgid "Invalid type supplied to .fromRCPP, expected character"
 msgstr ""
 "Invalide type geleverd aan .fromRCPP, er wordt een 'character' verwacht"
@@ -120,65 +30,6 @@ msgstr "Kan niet worden gevonden"
 msgid "in environment (.fromRCPP)"
 msgstr "in omgeving (.fromRCPP)"
 
-msgid "Provide a numeric value to the progress updater"
-msgstr "Geef een numerieke waarde aan de progress updater"
-
-msgid "could not clean value"
-msgstr "kon waarde niet opschonen"
-
-msgid "Missing required replacement(s): \""
-msgstr "De benodigde vervanging(en) ontbreken: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Expecting row to be a numeric index"
-msgstr "voor rij wordt een numerieke index verwacht"
-
-msgid "Expecting cols to be a (vector of) character name(s)"
-msgstr "voor cols wordt een (vector van) 'character' namen verwacht"
-
-msgid "None of the gui options ("
-msgstr "Geen van de gui opties ("
-
-msgid ") is in the options list."
-msgstr ") staat in de optielijst."
-
-msgid "Format incorrectly specified"
-msgstr "Format incorrect gespecificeerd"
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Momentopname grafiek laden van een andere sessie met mogelijke bijwerkingen "
-"of fouten."
-
-msgid "Invalid value provided to 'ticks', expecting positive integer"
-msgstr ""
-"Invalide waarde gegeven aan 'ticks', er wordt een positief geheel getal "
-"verwacht"
-
-msgid "The value provided to 'callback' does not appear to be a function"
-msgstr "De waarde gegeven aan 'callback' lijkt geen functie te zijn"
-
-msgid ""
-"Invalid value provided to 'skim', expecting numeric value in the range of "
-"0-99"
-msgstr ""
-"Invalide waarde gegeven aan 'skim', er wordt een numerieke waardetussen 0 en "
-"99 verwacht"
-
-msgid "Object provided in 'progressbar' is not of class JASP progressbar"
-msgstr ""
-"Het object gegeven in 'progressbar' is niet van de klasse 'JASP progressbar'"
-
-msgid "Object provided in 'cluster' is not of class cluster"
-msgstr "Het object gegeven in 'cluster' is niet van de klasse cluster"
-
-msgid "Cancelled by callback"
-msgstr "Geannuleerd door callback"
-
 msgid ".getSeedJASP was called with an incorrect argument."
 msgstr ""
 
@@ -190,6 +41,25 @@ msgid ""
 "analysis."
 msgstr ""
 
+msgid "Format incorrectly specified"
+msgstr "Format incorrect gespecificeerd"
+
+msgid ""
+"Loading plot snapshot from a different session with possible side effects or "
+"errors."
+msgstr ""
+"Momentopname grafiek laden van een andere sessie met mogelijke bijwerkingen "
+"of fouten."
+
+msgid "no jasp plot found"
+msgstr ""
+
+msgid "no plot object found"
+msgstr ""
+
+msgid "no plot object was found"
+msgstr ""
+
 msgid "This function should not be used. In for reference."
 msgstr "Deze functie kan niet worden gebruikt. Erin voor referentie."
 
@@ -199,8 +69,14 @@ msgstr "Niet-valide argumenttype gegeven"
 msgid "Unknown check type provided: \""
 msgstr "Onbekende check type gegeven: \""
 
+msgid "\""
+msgstr "\""
+
 msgid "Missing required argument(s): \""
 msgstr "Verplicht(e) argument(en) ontbreken: \""
+
+msgid ","
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
 msgstr "Iedere groeperende variabele moet een gespecificeerd niveau hebben"
@@ -315,3 +191,145 @@ msgstr ""
 
 msgid "Could not find message for class %s and type %s"
 msgstr "Kon geen bericht vinden voor klasse %s en type %s"
+
+msgid "Missing required replacement(s): \""
+msgstr "De benodigde vervanging(en) ontbreken: \""
+
+msgid "could not clean value"
+msgstr "kon waarde niet opschonen"
+
+msgid "Your module contains no DESCRIPTION file"
+msgstr ""
+
+msgid "The description contains no data"
+msgstr ""
+
+#~ msgid ""
+#~ "No items to show, please add a results description or set init to true"
+#~ msgstr ""
+#~ "Geen items om te tonen, voeg een resultaatsbeschrijving toe of stel init "
+#~ "in op 'waar'"
+
+#~ msgid ""
+#~ "None of the result items has show set to 'true', cannot skip init phase"
+#~ msgstr ""
+#~ "Geen van de resultaten heeft 'toon' ingesteld op 'waar', kan de init-fase "
+#~ "niet overslaan"
+
+#~ msgid "Cannot create empty placeholder for element of type"
+#~ msgstr "Kan geen lege plaatsvervanger creëren voor element van dit type"
+
+#~ msgid "Cannot locate any items in the results description"
+#~ msgstr "Er bevinden zich geen items in de beschrijving van de resultaten"
+
+#~ msgid "Unknown type ("
+#~ msgstr "Onbekend type ("
+
+#~ msgid ")  provided in results description"
+#~ msgstr ") gegeven in de beschrijving van de resultaten"
+
+#~ msgid "Could not create meta for"
+#~ msgstr "Kon geen meta maken voor"
+
+#~ msgid "at depth"
+#~ msgstr "op diepte"
+
+#~ msgid "(class:"
+#~ msgstr "(klasse:"
+
+#~ msgid ", names:"
+#~ msgstr ", namen:"
+
+#~ msgid ", class children:"
+#~ msgstr ", klasse kinderen:"
+
+#~ msgid ", names children:"
+#~ msgstr ", namen kinderen:"
+
+#~ msgid ")"
+#~ msgstr ")"
+
+#~ msgid "Could not figure out the container structure in"
+#~ msgstr "Kon niet achter de containersstructuur komen in"
+
+#~ msgid "Could not find meta description for current plot"
+#~ msgstr "Kon geen metabeschrijving voor deze grafiek vinden"
+
+#~ msgid "Could not find meta description for current table"
+#~ msgstr "Kon geen metabeschrijving van deze tabel vinden"
+
+#~ msgid "Could not locate 'name' in custom table meta"
+#~ msgstr "Er bevindt zich geen 'naam' in aangepaste meta tabel"
+
+#~ msgid ""
+#~ "Could not find any data in the table, cannot fetch items from the results "
+#~ "description"
+#~ msgstr ""
+#~ "Kon geen data in de tabel vinden, kan geen items uit de beschrijving van "
+#~ "de resultaten vinden"
+
+#~ msgid ""
+#~ "Could not locate any of the columns specified in the results description"
+#~ msgstr ""
+#~ "De gespecificeerde kolommen bevinden zich niet in de beschrijving van "
+#~ "resultaten"
+
+#~ msgid "expecting output to be a data.frame"
+#~ msgstr "De verwachte uitvoer is een data.frame"
+
+#~ msgid "no columns found to be imported"
+#~ msgstr "Geen kolommen gevonden om te importeren"
+
+#~ msgid "expecting the JASP options to be a named list"
+#~ msgstr "er wordt verwacht dat JASP opties een genaamde lijst is"
+
+#~ msgid ""
+#~ "Trying to find dataset columns to read, but it appears some options don't "
+#~ "exist: '"
+#~ msgstr ""
+#~ "Probeer gegevens- kolommen te vinden om te lezen, maar het lijkt erop dat "
+#~ "sommige opties niet bestaan:'"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Provide a numeric value to the progress updater"
+#~ msgstr "Geef een numerieke waarde aan de progress updater"
+
+#~ msgid "Expecting row to be a numeric index"
+#~ msgstr "voor rij wordt een numerieke index verwacht"
+
+#~ msgid "Expecting cols to be a (vector of) character name(s)"
+#~ msgstr "voor cols wordt een (vector van) 'character' namen verwacht"
+
+#~ msgid "None of the gui options ("
+#~ msgstr "Geen van de gui opties ("
+
+#~ msgid ") is in the options list."
+#~ msgstr ") staat in de optielijst."
+
+#~ msgid "Invalid value provided to 'ticks', expecting positive integer"
+#~ msgstr ""
+#~ "Invalide waarde gegeven aan 'ticks', er wordt een positief geheel getal "
+#~ "verwacht"
+
+#~ msgid "The value provided to 'callback' does not appear to be a function"
+#~ msgstr "De waarde gegeven aan 'callback' lijkt geen functie te zijn"
+
+#~ msgid ""
+#~ "Invalid value provided to 'skim', expecting numeric value in the range of "
+#~ "0-99"
+#~ msgstr ""
+#~ "Invalide waarde gegeven aan 'skim', er wordt een numerieke waardetussen 0 "
+#~ "en 99 verwacht"
+
+#~ msgid "Object provided in 'progressbar' is not of class JASP progressbar"
+#~ msgstr ""
+#~ "Het object gegeven in 'progressbar' is niet van de klasse 'JASP "
+#~ "progressbar'"
+
+#~ msgid "Object provided in 'cluster' is not of class cluster"
+#~ msgstr "Het object gegeven in 'cluster' is niet van de klasse cluster"
+
+#~ msgid "Cancelled by callback"
+#~ msgstr "Geannuleerd door callback"
