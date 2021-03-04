@@ -14,18 +14,18 @@ postInstallFixes <- function(folderToFix) {
   }
 }
 
-installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
+installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE) {
   assertValidJASPmodule(modulePkg)
 
-  r <- getOption("repos")
-  r["CRAN"] <- repos
-  options(repos = r)
+  # r <- getOption("repos")
+  # r["CRAN"] <- repos
+  # options(repos = r)
 
   return(
     pkgbuild::with_build_tools( 
     {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
+      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force)
+      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force)
     }, 
     required=FALSE )
   )
@@ -33,14 +33,19 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
 
 
 
-installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
-
-  renv::consent() #Consent to doing stuff in certain paths: https://rstudio.github.io/renv/reference/consent.html We've changed at least the root and the cache so hopefully that means it won't be changing stuff in the locations it mentions
-	options(renv.verbose=TRUE) # More feedback wanted although this seems to do little
-  options(renv.config.install.verbose=TRUE)
+installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), force = FALSE) {
 
   print(sprintf("Installing module with renv. installJaspModuleFromRenv('%s', c(%s), '%s', '%s', %s)",
                 modulePkg, paste0("'", libPathsToUse, "'", collapse = ", "), moduleLibrary, repos, onlyModPkg))
+
+  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
+    print("Nothing changed according to md5sums, not reinstalling.")
+    return("succes!")
+  }
+
+  renv::consent() #Consent to doing stuff in certain paths: https://rstudio.github.io/renv/reference/consent.html We've changed at least the root and the cache so hopefully that means it won't be changing stuff in the locations it mentions
+  options(renv.verbose=TRUE) # More feedback wanted although this seems to do little
+  options(renv.config.install.verbose=TRUE)
 
   if (!dir.exists(moduleLibrary))
     if (!dir.create(moduleLibrary))
@@ -78,8 +83,11 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
                 lockfile = lockFileTemp, clean = TRUE,
                 prompt   = prompt)
 
-  moduleInfo <- getModuleInfo(modulePkg)
-  installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo)
+  moduleInfo         <- getModuleInfo(modulePkg)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo)
+
+  if (correctlyInstalled)
+    writeMd5Sums(modulePkg, moduleLibrary)
 
   renv::snapshot(
     project  = moduleLibraryTemp,
@@ -112,9 +120,14 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   return("succes!")
 }
 
-installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
+installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), force = FALSE) {
 
   print("Installing module with DESCRIPTION file")
+
+  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
+    print("Nothing changed according to md5sums, not reinstalling.")
+    return("succes!")
+  }
 
   if (!dir.exists(moduleLibrary))
     if (!dir.create(moduleLibrary))
@@ -132,9 +145,20 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   on.exit(assign(".lib.loc", old.lib.loc, envir = environment(.libPaths)))
   assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
 
-  renv::hydrate(library = moduleLibrary, project = modulePkg)
+  renv::install(
+    project = modulePkg,
+    library = moduleLibrary,
+    prompt  = prompt
+  )
 
-  installModulePkg(modulePkg, moduleLibrary, prompt)
+  # TODO: this is not very efficient because renv::install looks up the remotes on github...
+  # there is a better way but it requires us to mess with renv's internals or to be more explicit about pkgs
+  renv::hydrate(library = moduleLibrary, project = modulePkg)
+  renv::install(project = modulePkg, library = moduleLibrary, prompt = prompt)
+
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt)
+  if (correctlyInstalled)
+    writeMd5Sums(modulePkg, moduleLibrary)
 
   if (unlink(moduleLibraryTemp, recursive = TRUE)) # 0/ FALSE for success
     warning(sprintf("Failed to remove temporary module libary at %s", moduleLibraryTemp))
@@ -149,6 +173,7 @@ installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), m
     moduleInfo <- getModuleInfo(modulePkg)
   record <- recordFromModule(modulePkg, moduleInfo)
   renv::install(record, library = moduleLibrary, rebuild = TRUE, prompt = prompt)
+  TRUE
 
 }
 
