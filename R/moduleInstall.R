@@ -21,11 +21,21 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   # r["CRAN"] <- repos
   # options(repos = r)
 
+  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
+    moduleName <- getModuleInfo(modulePkg)[["Package"]]
+    if (dir.exists(file.path(moduleLibrary, moduleName))) {
+      print(sprintf("Nothing changed according to md5sums, not reinstalling %s.", moduleName))
+      return("succes!")
+    } else {
+      print(sprintf("Checksums exist for %s but the package is missing, installing anyway!", moduleName))
+    }
+  }
+
   return(
     pkgbuild::with_build_tools( 
     {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force)
+      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
+      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
     }, 
     required=FALSE )
   )
@@ -33,15 +43,10 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
 
 
 
-installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), force = FALSE) {
+installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
 
   print(sprintf("Installing module with renv. installJaspModuleFromRenv('%s', c(%s), '%s', '%s', %s)",
                 modulePkg, paste0("'", libPathsToUse, "'", collapse = ", "), moduleLibrary, repos, onlyModPkg))
-
-  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
-    print("Nothing changed according to md5sums, not reinstalling.")
-    return("succes!")
-  }
 
   renv::consent() #Consent to doing stuff in certain paths: https://rstudio.github.io/renv/reference/consent.html We've changed at least the root and the cache so hopefully that means it won't be changing stuff in the locations it mentions
   options(renv.verbose=TRUE) # More feedback wanted although this seems to do little
@@ -120,14 +125,9 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   return("succes!")
 }
 
-installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), force = FALSE) {
+installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
 
   print("Installing module with DESCRIPTION file")
-
-  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
-    print("Nothing changed according to md5sums, not reinstalling.")
-    return("succes!")
-  }
 
   if (!dir.exists(moduleLibrary))
     if (!dir.create(moduleLibrary))
