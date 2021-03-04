@@ -17,9 +17,9 @@ postInstallFixes <- function(folderToFix) {
 installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE) {
   assertValidJASPmodule(modulePkg)
 
-  # r <- getOption("repos")
-  # r["CRAN"] <- repos
-  # options(repos = r)
+  r <- getOption("repos")
+  r["CRAN"] <- repos
+  options(repos = r)
 
   if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
     moduleName <- getModuleInfo(modulePkg)[["Package"]]
