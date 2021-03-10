@@ -127,18 +127,19 @@ registerFonts <- function() {
 
   if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
 
-    # # Not sure if we actually want to do this
-    # font_name0 <- "FreeSansJASP"
-    # font_name1 <- "LatoJASP"
-    # # TODO: this obviously only works on my machine
-    # font_file0 <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
-    # font_file1 <- "~/github/jasp-desktop/Desktop/html/font/Lato-Regular.ttf"
+    # To register custom font files shipped with JASP we need the path to the font file.
+    # Next the font could be loaded like this:
     #
-    # systemfonts::register_font(font_name0, normalizePath(font_file0))
-    # systemfonts::register_font(font_name1, normalizePath(font_file1))
+    # fontName <- "FreeSansJASP"
+    # fontFile <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
+    # systemfonts::register_font(fontName, normalizePath(fontFile))
+    # jaspGraphs::setGraphOption("family", fontName)
 
-    print("registered FreeSansJASP & LatoJASP")
-    jaspGraphs::setGraphOption("family", .resultsFont)
+    if (exists("resultsFont"))
+      jaspGraphs::setGraphOption("family", .resultsFont)
+    else
+      warning("registerFonts was called but resultsFont does not exist!")
+
   } else {
     print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
   }
@@ -155,7 +156,7 @@ initEnvironment <- function() {
     if (base::isNamespaceLoaded(package) == FALSE)
       try(base::loadNamespace(package), silent=TRUE)
 
-
+  registerFonts()
 
   if (base::exists(".requestTempRootNameNative")) {
     paths <- .fromRCPP(".requestTempRootNameNative")
