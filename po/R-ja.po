@@ -2,176 +2,184 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2021-03-03 15:48\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-03-11 09:03+0000\n"
+"Last-Translator: Koji Kosugi <kosugitti@gmail.com>\n"
+"Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
+"ja/>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.5.2-dev\n"
 
 msgid "<em>Note.</em>"
-msgstr ""
+msgstr "<em>注意.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
+msgstr "無効な型が .fromRCPP に指定されました。文字列が期待されています。"
 
 msgid "Unknown RCPP object"
-msgstr ""
+msgstr "不明なRCPPオブジェクト"
 
 msgid "Could not locate"
-msgstr ""
+msgstr "見つかりませんでした"
 
 msgid "in environment (.fromRCPP)"
-msgstr ""
+msgstr "環境内（.fromRCPP）"
 
 msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
+msgstr ".getSeedJASPが誤った引数で呼び出されました。"
 
 msgid "The argument options should be the options list from QML."
-msgstr ""
+msgstr "引数のオプションは、QMLのオプションリストである必要があります。"
 
 msgid ""
 "Ensure that the SetSeed{} QML component is present in the QML file for this "
 "analysis."
-msgstr ""
+msgstr "この分析では、SetSeed {} QMLコンポーネントがQMLファイルに存在することを確認してください。"
 
 msgid "Format incorrectly specified"
-msgstr ""
+msgstr "書式が正しく指定されていません"
 
 msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
 "errors."
-msgstr ""
+msgstr "誤反応やエラーの可能性がある別のセッションからプロットスナップショットを読み込んでいます。"
 
 msgid "no jasp plot found"
-msgstr ""
+msgstr "JASPプロットが見つかりません"
 
 msgid "no plot object found"
-msgstr ""
+msgstr "プロットオブジェクトが見つかりません"
 
 msgid "no plot object was found"
-msgstr ""
+msgstr "プロットオブジェクトが見つかりませんでした"
 
 msgid "This function should not be used. In for reference."
-msgstr ""
+msgstr "この機能は使用しないでください。ご参考まで。"
 
 msgid "Non-valid type argument provided"
-msgstr ""
+msgstr "無効な型引数が与えられました"
 
 msgid "Unknown check type provided: \""
-msgstr ""
+msgstr "不明なチェックタイプが提供されました： \""
 
 msgid "\""
-msgstr ""
+msgstr "\""
 
 msgid "Missing required argument(s): \""
-msgstr ""
+msgstr "必要な引数がありません： \""
 
 msgid ","
-msgstr ""
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
-msgstr ""
+msgstr "各グループ化変数には、レベルを指定する必要があります"
 
 msgid "the modelterms list must contain the named item `components`"
-msgstr ""
+msgstr "モデル項リストには、名前付きアイテム `components`が含まれている必要があります"
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr ""
+msgstr "分析の実行中に次の問題が発生しました:"
 
 msgid "after grouping on %s"
-msgstr ""
+msgstr "%s でグループ化した後"
 
 msgid ""
 "This analysis terminated unexpectedly. %s To receive assistance with this "
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
+"この分析は予期せず終了しました。 %s この問題のサポートを受けるには、上記のメッセージをhttps://jasp-stats.org/bug-"
+"reportsに報告してください"
 
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "無限大が %s で見つかりました"
 
 msgid "Number of factor levels is %s in %s"
-msgstr ""
+msgstr "%s の因子レベルの数は %s です"
 
 msgid "The variance in %s is equal to %s"
-msgstr ""
+msgstr "%s の分散が %s と等しくなります"
 
 msgid "Number of observations is %s in %s"
-msgstr ""
+msgstr "%s の観測度数は %s です"
 
 msgid "Cannot compute statistic reliably: number of observations is %s in %s"
-msgstr ""
+msgstr "信頼できる統計量を計算できません: %s のオブザベーションの数は %s です"
 
 msgid "Values in %s outside interval [%s, %s]"
-msgstr ""
+msgstr "%s の値が区間 [%s, %s] の外にあります"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
-msgstr ""
+msgstr "データセットは適切な分散共分散行列ではありません。データセットとして正定値対称行列だけを読み込んでください"
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
 "definite. Please check if variables have many missings observations or are "
 "collinear"
-msgstr ""
+msgstr "提供されたデータの分散共分散行列は正定値ではありません。変数に多くの欠落した観測値や共線性がないかチェックしてください"
 
 msgid ""
 "Main effects and lower-order interactions must be included whenever the "
 "corresponding higher-order interaction is included"
-msgstr ""
+msgstr "対応する高次交互作用が含まれる場合、主効果と低次交互作用を含める必要があります"
 
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "負の数字が %s で見つかりました。"
 
 msgid "Missing values encountered in %s"
-msgstr ""
+msgstr "％sに欠損値が見つかりました"
 
 msgid "Duplicate variables encountered in %s"
-msgstr ""
+msgstr "%s に重複した変数が見つかりました"
 
 msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
 "these rows from the data set if you wish to continue."
-msgstr ""
+msgstr "%s%%以上の行は、すべて欠損値で構成されています。続けたい場合は、これらの行をデータセットから削除してください。"
 
 msgid ""
 "Levene's test is significant (p < .05), suggesting a violation of the equal "
 "variance assumption"
-msgstr ""
+msgstr "Leveneの検定は有意ですから(p <.05)、等分散の仮定が満たされていないことを示しています"
 
 msgid ""
 "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
 "maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
+"Vovk-Sellke 最大 <em>p</em> 比: "
+"<em>p</em>-値に基づいて、H%2$sよりもH%1$sを支持する最大の可能なオッズは、<em>p</em> %3$s .37に対して1/(-e "
+"<em>p</em> log(<em>p</em>))に等しくなります(Sellke, Bayarri, & Berger, 2001)。"
 
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "値 %sに対してテストされました"
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
-msgstr ""
+msgstr "すべての検定において、対立仮説は比率が％s未満であることを指定します"
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
-msgstr ""
+msgstr "すべての検定において、対立仮説は比率が％sより大きいことを指定します"
 
 msgid "Could not find message for class %s and type %s"
-msgstr ""
+msgstr "クラス %s およびタイプ %s のメッセージが見つかりませんでした"
 
 msgid "Missing required replacement(s): \""
-msgstr ""
+msgstr "必要な代替品がありません。\""
 
 msgid "could not clean value"
-msgstr ""
+msgstr "値を消去できませんでした"
 
 msgid "Your module contains no DESCRIPTION file"
-msgstr ""
+msgstr "あなたのモジュールには DESCRIPTION ファイルがありません"
 
 msgid "The description contains no data"
-msgstr ""
+msgstr "description にはデータが含まれていません"
