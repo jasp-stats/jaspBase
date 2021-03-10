@@ -135,7 +135,7 @@ registerFonts <- function() {
     # systemfonts::register_font(fontName, normalizePath(fontFile))
     # jaspGraphs::setGraphOption("family", fontName)
 
-    if (exists("resultsFont"))
+    if (exists(".resultsFont"))
       jaspGraphs::setGraphOption("family", .resultsFont)
     else
       warning("registerFonts was called but resultsFont does not exist!")
