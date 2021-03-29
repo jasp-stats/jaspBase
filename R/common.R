@@ -869,6 +869,10 @@ editImage <- function(name, optionsJson) {
         jaspPlotCPP$width      <- oldWidth
         jaspPlotCPP$height     <- oldHeight
         jaspPlotCPP$plotObject <- plot
+
+        # ensures the JSON response matches the plot
+        width  <- oldWidth
+        height <- oldHeight
       }
 
     } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
