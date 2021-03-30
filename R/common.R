@@ -80,6 +80,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
+  registerFonts()
   oldGraphOptions <- jaspGraphs::graphOptions()
   on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
 
@@ -122,6 +123,28 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 }
 
+registerFonts <- function() {
+
+  if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
+
+    # To register custom font files shipped with JASP we need the path to the font file.
+    # Next the font could be loaded like this:
+    #
+    # fontName <- "FreeSansJASP"
+    # fontFile <- "~/github/jasp-desktop/Desktop/resources/fonts/FreeSans.ttf"
+    # systemfonts::register_font(fontName, normalizePath(fontFile))
+    # jaspGraphs::setGraphOption("family", fontName)
+
+    if (exists(".resultsFont"))
+      jaspGraphs::setGraphOption("family", .resultsFont)
+    else
+      warning("registerFonts was called but resultsFont does not exist!")
+
+  } else {
+    print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
+  }
+}
+
 initEnvironment <- function() {
 #Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
   packages <- c("BayesFactor") # Add any package that needs pre-loading
@@ -133,7 +156,7 @@ initEnvironment <- function() {
     if (base::isNamespaceLoaded(package) == FALSE)
       try(base::loadNamespace(package), silent=TRUE)
 
-
+  registerFonts()
 
   if (base::exists(".requestTempRootNameNative")) {
     paths <- .fromRCPP(".requestTempRootNameNative")
@@ -788,13 +811,14 @@ saveImage <- function(plotName, format, height, width)
 rewriteImages <- function(name, ppi, imageBackground) {
 
   jaspResultsCPP <- loadJaspResults(name)
-  on.exit( {
+  on.exit({
     jaspResultsCPP$status <- "imagesRewritten" # analysisResultStatus::imagesRewritten!
     jaspResultsCPP$send()
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
   })
   
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
+  registerFonts()
 
   for (i in seq_along(oldPlots)) {
     try({
@@ -811,6 +835,15 @@ rewriteImages <- function(name, ppi, imageBackground) {
 
       # here we can modify general things for all plots (theme, font, etc.).
       # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
+
+      thm <- ggplot2::theme(text = ggplot2::element_text(family = jaspGraphs::getGraphOption("family")))
+      if (ggplot2::is.ggplot(plot)) {
+        plot <- plot + thm
+      } else if (jaspGraphs:::is.jaspGraphsPlot(plot)) {
+        for (i in seq_along(plot)) {
+          plot[[i]] <- plot[[i]] + thm
+        }
+      }
 
       jaspPlotCPP$plotObject <- plot
 
