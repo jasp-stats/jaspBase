@@ -2,28 +2,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2021-03-03 15:48\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-04-19 01:26+0000\n"
+"Last-Translator: phlostically <phlostically@mailinator.com>\n"
+"Language-Team: Esperanto <https://hosted.weblate.org/projects/jasp/jaspbase/"
+"eo/>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.6-dev\n"
 
 msgid "<em>Note.</em>"
-msgstr ""
+msgstr "<em>Noto.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
 msgstr ""
 
 msgid "Unknown RCPP object"
-msgstr ""
+msgstr "Nekonata RCPP-objekto"
 
 msgid "Could not locate"
-msgstr ""
+msgstr "Malsukcesis trovi"
 
 msgid "in environment (.fromRCPP)"
-msgstr ""
+msgstr "en medio (.fromRCPP)"
 
 msgid ".getSeedJASP was called with an incorrect argument."
 msgstr ""
@@ -59,13 +62,13 @@ msgid "Unknown check type provided: \""
 msgstr ""
 
 msgid "\""
-msgstr ""
+msgstr "\""
 
 msgid "Missing required argument(s): \""
 msgstr ""
 
 msgid ","
-msgstr ""
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
 msgstr ""
@@ -83,7 +86,7 @@ msgid "This analysis terminated unexpectedly. %s To receive assistance with this
 msgstr ""
 
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "Nefinio troviĝis en %s"
 
 msgid "Number of factor levels is %s in %s"
 msgstr ""
@@ -98,7 +101,7 @@ msgid "Cannot compute statistic reliably: number of observations is %s in %s"
 msgstr ""
 
 msgid "Values in %s outside interval [%s, %s]"
-msgstr ""
+msgstr "Valoroj en %s ekster la intervalo [%s, %s]"
 
 msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."
 msgstr ""
@@ -110,10 +113,10 @@ msgid "Main effects and lower-order interactions must be included whenever the c
 msgstr ""
 
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "Negativaj nombroj troviĝis en %s"
 
 msgid "Missing values encountered in %s"
-msgstr ""
+msgstr "Mankantaj valoroj troviĝis en %s"
 
 msgid "Duplicate variables encountered in %s"
 msgstr ""
@@ -143,7 +146,7 @@ msgid "Missing required replacement(s): \""
 msgstr ""
 
 msgid "could not clean value"
-msgstr ""
+msgstr "Malsukcesis purigi valoron"
 
 msgid "Your module contains no DESCRIPTION file"
 msgstr ""
