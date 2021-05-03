@@ -18,6 +18,12 @@ fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
 loadJaspResults <- function(name) {
+  if (base::exists(".requestStateFileNameNative")) {
+	location              <- .fromRCPP(".requestStateFileNameNative")
+	oldwd                 <- getwd()
+	setwd(location$root)
+	on.exit(setwd(oldwd))
+  }
   jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
 }
 
@@ -518,8 +524,8 @@ jaspResultsStrings <- function() {
 
     base::tryCatch(
       base::load(location$relativePath),
-      error=function(e) e,
-      warning=function(w) w
+      error=function(e) { print(paste0("error:", e)) },
+      warning=function(w) { print(paste0("warning:", w)) }
     )
   }
 
