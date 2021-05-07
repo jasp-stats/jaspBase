@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-03-03 15:48\n"
+"POT-Creation-Date: 2021-05-07 13:30\n"
 "PO-Revision-Date: 2020-12-02 21:29+0000\n"
 "Last-Translator: JASP Stats <F.A.M.Meerhoff@uva.nl>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jasp-engine/"
@@ -13,6 +13,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
 "X-Generator: Weblate 4.4-dev\n"
+
+msgid "registerFonts was called but resultsFont does not exist!"
+msgstr ""
 
 msgid "<em>Note.</em>"
 msgstr "<em>Opmerking.</em>"
@@ -198,7 +201,31 @@ msgstr "De benodigde vervanging(en) ontbreken: \""
 msgid "could not clean value"
 msgstr "kon waarde niet opschonen"
 
+msgid "failed to create moduleLibrary!"
+msgstr ""
+
+msgid "Failed to recreate lock file of module!"
+msgstr ""
+
+msgid "Failed to remove temporary module libary at %s"
+msgstr ""
+
+msgid "Your module is missing a 'DESCRIPTION' file!"
+msgstr ""
+
+msgid "Your module is missing 'inst/Description.qml'!"
+msgstr ""
+
+msgid "Your module is missing an 'R' directory!"
+msgstr ""
+
+msgid "Your module is missing the 'inst/qml' directory!"
+msgstr ""
+
 msgid "Your module contains no DESCRIPTION file"
+msgstr ""
+
+msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr ""
 
 msgid "The description contains no data"

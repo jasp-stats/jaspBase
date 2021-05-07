@@ -2,17 +2,20 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-03-03 15:48\n"
+"POT-Creation-Date: 2021-05-07 13:30\n"
 "PO-Revision-Date: 2021-03-17 16:18+0000\n"
 "Last-Translator: Johannes Keyser <johanneskeyser@posteo.de>\n"
-"Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/>"
-"\n"
+"Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/"
+">\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
 "X-Generator: Weblate 4.5.2-dev\n"
+
+msgid "registerFonts was called but resultsFont does not exist!"
+msgstr ""
 
 msgid "<em>Note.</em>"
 msgstr "<em>Hinweis.</em>"
@@ -203,8 +206,33 @@ msgstr "Es fehlen benötigte Ersatzwerte: \""
 msgid "could not clean value"
 msgstr "konnte den Wert nicht bereinigen"
 
+msgid "failed to create moduleLibrary!"
+msgstr ""
+
+msgid "Failed to recreate lock file of module!"
+msgstr ""
+
+msgid "Failed to remove temporary module libary at %s"
+msgstr ""
+
+#, fuzzy
+msgid "Your module is missing a 'DESCRIPTION' file!"
+msgstr "Dein Modul enthält keine DESCRIPTION-Datei"
+
+msgid "Your module is missing 'inst/Description.qml'!"
+msgstr ""
+
+msgid "Your module is missing an 'R' directory!"
+msgstr ""
+
+msgid "Your module is missing the 'inst/qml' directory!"
+msgstr ""
+
 msgid "Your module contains no DESCRIPTION file"
 msgstr "Dein Modul enthält keine DESCRIPTION-Datei"
+
+msgid "A cache is supposed to be at '%s' but it does not exist!"
+msgstr ""
 
 msgid "The description contains no data"
 msgstr "Die Beschreibung enthält keine Daten"
