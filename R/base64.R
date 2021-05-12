@@ -15,19 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-.v <- function(x, ...) {
-  if (.automaticColumnEncDecoding)
-    x
-  else
-    encodeColNames(x, ...)
-}
+.v <- function(x, ...) { x }
 
-.unv <- function(x, ...) {
-  if (.automaticColumnEncDecoding)
-    x
-  else
-    decodeColNames(x, ...)
-}
+.unv <- function(x, ...) { x }
 
 interactionSymbol <- "\u2009\u273B\u2009"
 base::Encoding(interactionSymbol) <- "UTF-8"
