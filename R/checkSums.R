@@ -6,6 +6,7 @@ createMd5Sums <- function(modulePkg) {
     list.files(file.path(modulePkg, "src"),       recursive=TRUE, full.names = TRUE, pattern = "(\\.(cpp|c|hpp|h)|(Makevars|Makevars\\.win))$"),
     list.files(file.path(modulePkg, "R"),         recursive=TRUE, full.names = TRUE, pattern = "\\.R$"),
 	list.files(file.path(modulePkg, "inst"),      recursive=TRUE, full.names = TRUE, pattern = "\\.(qml|po|svg|png|jpg|md)$"),
+	list.files(file.path(modulePkg, "inst"),      recursive=TRUE, full.names = TRUE, pattern = "\\qmldir$"),
     list.files(modulePkg,                         recursive=TRUE, full.names = TRUE, pattern = "renv\\.lock")
   )
   newMd5Sums <- tools::md5sum(srcFiles)
