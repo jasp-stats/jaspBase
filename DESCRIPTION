@@ -7,12 +7,27 @@ Maintainer: Bruno Boutin <B.Boutin@uva.nl>
 Description: Package contains the JASP Bayesian and Frequentist analyses.
     See <https://jasp-stats.org> for more details.
 License: GPL2+
-Imports: 
+Imports:
+  BH,
+  codetools,
+  desc,
+  gbm,
+  ggplot2,
+  gridExtra,
   gridGraphics,
-  modules,
-  pkgbuild,
-  renv,
-  remotes, 
   jsonlite,
+  modules,
+  officer,
+  pkgbuild,
+  plyr,
+  qgraph,
+  ragg,
+  R6,
+  Rcpp (>= 0.12.14),
+  remotes,
+  renv,
   rjson,
-  Rcpp
+  rvg,
+  stringr,
+  systemfonts,
+  withr
