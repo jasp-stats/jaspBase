@@ -31,7 +31,7 @@
 
       lapply(terms, function(term) {
       components <- strsplit(term, ":")
-      components <- sapply(components, stringr::str_trim, simplify=FALSE)
+      components <- sapply(components, trimws, simplify=FALSE)
 
       })[[1]]
     })

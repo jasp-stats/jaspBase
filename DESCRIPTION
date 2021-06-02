@@ -25,6 +25,5 @@ Imports:
   renv,
   rjson,
   rvg,
-  stringr,
   systemfonts,
   withr
