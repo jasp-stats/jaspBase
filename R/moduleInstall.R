@@ -4,7 +4,7 @@ postInstallFixes <- function(folderToFix) {
     #print("we are *in* jasp, so we use .postProcessLibraryModule!")
     .postProcessLibraryModule(folderToFix)
   }
-  else 
+  else
   {
     #We do not have that function available so we will need to start JASPEngine ourselves, but where is it?
     jaspEngineLocation <- Sys.getenv("JASPENGINE_LOCATION", unset = file.path(getwd(), "..", "JASPEngine"))
@@ -32,11 +32,11 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   }
 
   return(
-    pkgbuild::with_build_tools( 
+    pkgbuild::with_build_tools(
     {
       if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
       else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
-    }, 
+    },
     required=FALSE )
   )
 }
@@ -224,7 +224,7 @@ renv_diagnostics_packages_as_df <- function(project) {
                  names(recdeps))
 
   renv:::renv_scope_locale(category = "LC_COLLATE", locale = "C")
-  
+
   all                        <- sort(unique(all))
   deps                       <- rep.int(NA_character_, length(all))
   names(deps)                <- all
@@ -258,11 +258,11 @@ libraryMatchesLockfile <- function(project = NULL) {
     print("Found the following mismatches between Library and the lockfile!")
     print(df[notNA[idxDiff], ])
   }
-   
+
   return(!hasDiff)
 }
 
-addRenvBeforeAfterDispatch <- function() { 
+addRenvBeforeAfterDispatch <- function() {
 
   renBeforeAfterInstallStruct <- structure(list(
     before.install = function(x) {
@@ -270,20 +270,20 @@ addRenvBeforeAfterDispatch <- function() {
       #print(sprintf("Path = %s", mget("path", envir = parent.frame(1),
       #                                ifnotfound = "unknown path")))
       0 #do nothing
-    }, 
-    
-    after.install = function(x) 
+    },
+
+    after.install = function(x)
     {
       installPath <- mget("installpath", envir = parent.frame(1), ifnotfound = "unknown")
 
-      if(installPath != "unknown") 
+      if(installPath != "unknown")
       {
         print(sprintf("Installed %s to '%s', now running post install fixes.", x, installPath))
         postInstallFixes(installPath)
-      } 
+      }
       else
         print(sprintf("Installing %s did not work immediately, but renv might still look at remotes for this.", x))
-                                      
+
     }),
     class = "renvInstallHookOverride"
   )
@@ -321,7 +321,7 @@ setupRenv <- function(moduleLibrary) {
   #Try to nudge renv towards installing binaries when possible
    if(getOS() == "windows" || getOS() == "osx")
     options(pkgType = "binary");
-  
+
   addRenvBeforeAfterDispatch()
 }
 
@@ -386,60 +386,4 @@ installJaspModuleFromDescriptionOld <- function(modulePkg, libPathsToUse, module
   )
 
   return(NULL)
-}
-
-# Retrieve package dependencies by parsing a DESCRIPTION file or a DESCRIPTION string
-#
-# Returns a named list, e.g.:
-# type         package      version               remote
-# Depends        R          >= 3.0.2
-# Imports       stringr     >= 0.5         svn::https://github.com/hadley/stringr
-# Imports       brew            *
-# Imports       digest          *          foo/digest
-# Imports       methods         *
-# Imports       Rcpp         >= 0.11.0
-# Suggests      testthat     >= 0.8.0      local::/pkgs/testthat
-# Suggests      knitr           *
-# LinkingTo     Rcpp
-#
-# Or a json string, e.g.:
-# [{"type":"Depends","package":"R","version":">= 3.0.2","remote":""},
-#  {"type":"Imports","package":"stringr","version":">= 0.5","remote":"svn::https://github.com/hadley/stringr"},
-#  {"type":"Imports","package":"brew","version":"*","remote":""},
-#  {"type":"Imports","package":"digest","version":"*","remote":"foo/digest"},
-# etc]
-getDepsFromDescription <- function(unparsedDescr, asJson = TRUE) {
-  deps  <- NULL
-  descr <- .parseDescription(unparsedDescr)
-
-  if (any(descr$has_fields(c("Imports", "Depends", "LinkingTo")))) {
-    deps         <- descr$get_deps()
-    pkgs         <- deps[["package"]]
-    remotePerPkg <- character(length(pkgs))
-
-    if (descr$has_fields("Remotes")) {
-      remotes <- descr$get_remotes()
-
-      for (i in seq_along(remotePerPkg)) {
-        isRemoteForPkg <- endsWith(remotes, paste0("/", pkgs[i]))
-
-        if (any(isRemoteForPkg))
-          remotePerPkg[i] <- remotes[isRemoteForPkg]
-      }
-    }
-    deps[["remote"]] <- remotePerPkg
-  }
-
-  if (asJson)
-    deps <- jsonlite::toJSON(deps)
-
-  return(deps)
-}
-
-.parseDescription <- function(unparsedDescr) {
-  if (!nzchar(unparsedDescr))
-    stop("The description contains no data")
-
-  if (file.exists(unparsedDescr)) return(desc::description$new(file = unparsedDescr))
-  else                            return(desc::description$new(text = unparsedDescr))
 }

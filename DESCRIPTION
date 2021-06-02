@@ -10,7 +10,6 @@ License: GPL2+
 Imports:
   BH,
   codetools,
-  desc,
   gbm,
   ggplot2,
   gridExtra,
