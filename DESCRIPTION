@@ -23,7 +23,6 @@ Imports:
   ragg,
   R6,
   Rcpp (>= 0.12.14),
-  remotes,
   renv,
   rjson,
   rvg,
