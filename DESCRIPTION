@@ -8,7 +8,6 @@ Description: Package contains the JASP Bayesian and Frequentist analyses.
     See <https://jasp-stats.org> for more details.
 License: GPL2+
 Imports:
-  BH,
   codetools,
   compiler,
   ggplot2,
