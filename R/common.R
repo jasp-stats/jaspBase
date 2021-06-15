@@ -487,7 +487,7 @@ jaspResultsStrings <- function() {
 
   split <- base::strsplit(as.character(error), ":")[[1]]
   last <- split[[length(split)]]
-  stringr::str_trim(last)
+  trimws(last)
 }
 
 .recodeBFtype <- function(bfOld, newBFtype = c("BF10", "BF01", "LogBF10"), oldBFtype = c("BF10", "BF01", "LogBF10")) {
@@ -561,7 +561,7 @@ jaspResultsStrings <- function() {
 }
 
 .getSeedJASP <- function(options) {
-  
+
   if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
     if (isTRUE(options[["setSeed"]]))
       return(options[["seed"]])
@@ -773,7 +773,7 @@ rewriteImages <- function(name, ppi, imageBackground) {
     jaspResultsCPP$send()
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
   })
-  
+
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
   registerFonts()
 
