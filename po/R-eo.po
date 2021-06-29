@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-05-07 13:30\n"
+"POT-Creation-Date: 2021-06-29 14:16\n"
 "PO-Revision-Date: 2021-04-19 01:26+0000\n"
 "Last-Translator: phlostically <phlostically@mailinator.com>\n"
 "Language-Team: Esperanto <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -201,7 +201,4 @@ msgid "Your module contains no DESCRIPTION file"
 msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
-
-msgid "The description contains no data"
 msgstr ""
