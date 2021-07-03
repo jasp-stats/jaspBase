@@ -7,50 +7,53 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-06-29 14:16\n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: gl_ES\n"
+"PO-Revision-Date: 2021-07-01 20:32+0000\n"
+"Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
+"Language-Team: Galician <https://hosted.weblate.org/projects/jasp/jaspbase/"
+"gl/>\n"
+"Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.8-dev\n"
 "X-Virgin-Header: remove this line if you change anything in the header.\n"
 "X-Language: gl_ES\n"
 "X-Source-Language: C\n"
-"X-Generator: Poedit 2.3\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
+msgstr "chamouse por registerFonts pero resultsFont non existe!"
 
 msgid "<em>Note.</em>"
-msgstr ""
+msgstr "<em>Nota.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
+msgstr "Indicado un tipo incorrecto para .fromRCPP, agardábase un carácter"
 
 msgid "Unknown RCPP object"
-msgstr ""
+msgstr "Obxecto RCPP descoñecido"
 
 msgid "Could not locate"
-msgstr ""
+msgstr "Non pode atoparse"
 
 msgid "in environment (.fromRCPP)"
-msgstr ""
+msgstr "no eido (.fromRCPP)"
 
 msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
+msgstr "Requiriuse .getSeedJASP cun argumento incorrecto."
 
 msgid "The argument options should be the options list from QML."
-msgstr ""
+msgstr "As opcións dos argumentos deben ser os da lista de opcións de QML."
 
 msgid ""
 "Ensure that the SetSeed{} QML component is present in the QML file for this "
 "analysis."
 msgstr ""
+"Verifica que a compoñente SetSeed{} de QML está presente no ficheiro QML "
+"para esta análise."
 
-#, fuzzy
 msgid "Format incorrectly specified"
-msgstr "Non se especificou o factor"
+msgstr "Formato indicado incorrectamente"
 
 msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
@@ -58,25 +61,25 @@ msgid ""
 msgstr ""
 
 msgid "no jasp plot found"
-msgstr ""
+msgstr "non se atopou unha gráfica jasp"
 
 msgid "no plot object found"
-msgstr ""
+msgstr "non se atopou un obxecto gráfico"
 
 msgid "no plot object was found"
-msgstr ""
+msgstr "non se atopou un obxecto gráfico"
 
 msgid "This function should not be used. In for reference."
-msgstr ""
+msgstr "Esta función non debe utilizarse. Para referencia."
 
 msgid "Non-valid type argument provided"
-msgstr ""
+msgstr "Forneceuse un argumento de tipo incorrecto"
 
 msgid "Unknown check type provided: \""
-msgstr ""
+msgstr "Forneceuse un tipo de comprobación descoñecido: \""
 
 msgid "\""
-msgstr ""
+msgstr "\""
 
 msgid "Missing required argument(s): \""
 msgstr ""
