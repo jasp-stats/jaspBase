@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2021-06-29 14:16\n"
-"PO-Revision-Date: 2021-07-01 20:32+0000\n"
+"PO-Revision-Date: 2021-07-06 19:32+0000\n"
 "Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Galician <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "gl/>\n"
@@ -59,6 +59,8 @@ msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
 "errors."
 msgstr ""
+"Cargando a captura da gráfica dunha sesión diferente con posibles efectos "
+"secundarios ou fallos."
 
 msgid "no jasp plot found"
 msgstr "non se atopou unha gráfica jasp"
@@ -82,154 +84,163 @@ msgid "\""
 msgstr "\""
 
 msgid "Missing required argument(s): \""
-msgstr ""
+msgstr "Falta(n) argumento(s) obrigatorio(s):\""
 
 msgid ","
-msgstr ""
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
-msgstr ""
+msgstr "Cada variable de agrupamento debe ter un nivel determinado"
 
 msgid "the modelterms list must contain the named item `components`"
 msgstr ""
+"a lista de elementos do modelo debe conter o elemento denominado "
+"`compoñentes`"
 
-#, fuzzy
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr "O procedemento rachou tratando de executar esta análise..."
+msgstr "Aconteceron os seguintes problemas ao executar a análise:"
 
 msgid "after grouping on %s"
-msgstr ""
+msgstr "logo de agrupar en %s"
 
-#, fuzzy
 msgid ""
 "This analysis terminated unexpectedly. %s To receive assistance with this "
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
-"Por desgraza, a gráfica non se pode gardar.\n"
-"\n"
-"Mensaxe de fallo:\n"
-"%1\n"
-"\n"
-"Se persiste o problema, por favor envía a mensaxe anterior a: https://jasp-"
-"stats.org/bug-reports"
+"Esta análise rematou de xeito imprevisto. %s Para obter axuda con este "
+"problema, por favor, envía a mensaxe anterior a: https://jasp-stats.org/bug-"
+"reports"
 
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "Atopouse o infinito en %s"
 
-#, fuzzy
 msgid "Number of factor levels is %s in %s"
-msgstr "Número de factores"
+msgstr "O número de niveis de factores é %s en %s"
 
 msgid "The variance in %s is equal to %s"
-msgstr ""
+msgstr "A varianza en %s é igual a %s"
 
-#, fuzzy
 msgid "Number of observations is %s in %s"
-msgstr "Número de transaccións consideradas"
+msgstr "O número de observacións é %s en %s"
 
 msgid "Cannot compute statistic reliably: number of observations is %s in %s"
 msgstr ""
+"Non se pode calcular o estatístico con fiabilidade: o número de observacións "
+"é %s en %s"
 
 msgid "Values in %s outside interval [%s, %s]"
-msgstr ""
+msgstr "Valores en %s fóra do intervalo [%s, %s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
 msgstr ""
+"O conxunto de datos non é unha matriz de varianzas-covarianzas axeitada. Por "
+"favor, carga só unha matriz simétrica definida positiva como conxunto de "
+"datos."
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
 "definite. Please check if variables have many missings observations or are "
 "collinear"
 msgstr ""
+"A matriz de varianzas-covarianzas dos datos fornecidos non é definida "
+"positiva. Por favor, comproba se as variables teñen moitas observacións "
+"ausentes ou multicolinearidade perfecta"
 
 msgid ""
 "Main effects and lower-order interactions must be included whenever the "
 "corresponding higher-order interaction is included"
 msgstr ""
+"Os efectos principais e as interaccións de nivel inferior deben incluírse "
+"sempre que se inclúa a correspondente interacción de nivel superior"
 
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "Atopáronse número negativos en %s"
 
-#, fuzzy
 msgid "Missing values encountered in %s"
-msgstr "Manexo de valores ausentes"
+msgstr "Atopáronse valores ausentes en %s"
 
 msgid "Duplicate variables encountered in %s"
-msgstr ""
+msgstr "Atopáronse variables duplicadas en %s"
 
 msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
 "these rows from the data set if you wish to continue."
 msgstr ""
+"Máis do %s%% das filas están completas de valores ausentes. Por favor, "
+"elimina esas filas do conxunto de datos se queres continuar."
 
 msgid ""
 "Levene's test is significant (p < .05), suggesting a violation of the equal "
 "variance assumption"
 msgstr ""
+"A proba de Levene é significativa (p < .05), suxerindo o incumprimento do "
+"suposto de igualdade de varianzas"
 
 msgid ""
 "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
 "maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
+"Máximo Cociente <em>p</em> de Vovk-Sellke: Baseado no valor <em>p</em>, a "
+"máxima probabilidade posible favorable a H%1$s sobre H%2$s igual a 1/(-e "
+"<em>p</em> log(<em>p</em>)) para <em>p</em> %3$s .37 (Sellke, Bayarri & "
+"Berger, 2001)."
 
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "Proporcións probadas en relación ao valor: %s"
 
-#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
 msgstr ""
-"Hipótese alternativa dunha cola, de que a media da poboación é maior que o "
-"valor a probar."
+"Para todas as probas, a hipótese alternativa indica que a proporción é menor "
+"que %s"
 
-#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
 msgstr ""
-"Hipótese alternativa dunha cola, de que a media da poboación é maior que o "
-"valor a probar."
+"Para todas as probas, a hipótese alternativa indica que a proporción é maior "
+"que %s"
 
 msgid "Could not find message for class %s and type %s"
-msgstr ""
+msgstr "Non se puido atopar a mensaxe para a clase %s e o tipo %s"
 
 msgid "Missing required replacement(s): \""
-msgstr ""
+msgstr "Substitución(s) necesaria(s) ausentes:\""
 
 msgid "could not clean value"
-msgstr ""
+msgstr "non se pode limpar o valor"
 
 msgid "failed to create moduleLibrary!"
-msgstr ""
+msgstr "fallou a creación de moduleLibrary!"
 
 msgid "Failed to recreate lock file of module!"
-msgstr ""
+msgstr "Fallo ao refacer o ficheiro de bloqueo do módulo!"
 
 msgid "Failed to remove temporary module libary at %s"
-msgstr ""
+msgstr "Fallo ao eliminar a biblioteca temporal do módulo en %s"
 
 msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr ""
+msgstr "O teu módulo non ten un ficheiro de 'DESCRICIÓN'!"
 
 msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
+msgstr "O teu módulo non ten o 'inst/Description.qml'!"
 
 msgid "Your module is missing an 'R' directory!"
-msgstr ""
+msgstr "O teu módulo non ten un directorio de 'R'!"
 
 msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
+msgstr "O teu módulo non ten o directorio 'inst/qml'!"
 
 msgid "Your module contains no DESCRIPTION file"
-msgstr ""
+msgstr "O teu módulo non inclúe ningún ficheiro de DESCRICIÓN"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
+msgstr "Agardábase que houbera unha caché en '%s', pero non existe!"
 
 #~ msgid " "
 #~ msgstr " "
