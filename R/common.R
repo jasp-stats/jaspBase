@@ -899,7 +899,8 @@ editImage <- function(name, optionsJson) {
       width    = width,
       height   = height,
       revision = revision,
-      error    = FALSE
+      error    = FALSE,
+      editOptions = jaspGraphs::plotEditingOptions(plot)
     )
   )
 
