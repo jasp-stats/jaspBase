@@ -28,5 +28,6 @@ Imports:
   renv,
   rjson,
   rvg,
+  svglite,
   systemfonts,
   withr
