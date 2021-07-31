@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-06-29 14:16\n"
+"POT-Creation-Date: 2021-07-31 03:47\n"
 "PO-Revision-Date: 2021-07-06 19:32+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -47,9 +47,6 @@ msgid ""
 msgstr ""
 "Certifique-se de que o SetSeed{} O componente QML está presente no ficheiro "
 "QML para esta análise."
-
-msgid "Format incorrectly specified"
-msgstr "Formato incorretamente especificado"
 
 msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
@@ -236,6 +233,9 @@ msgstr "O seu módulo não contém nenhum ficheiro DESCRIÇÃO"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Um cache é suposto estar em '%s' mas não existe!"
+
+#~ msgid "Format incorrectly specified"
+#~ msgstr "Formato incorretamente especificado"
 
 #~ msgid "The description contains no data"
 #~ msgstr "A descrição não contém dados"
