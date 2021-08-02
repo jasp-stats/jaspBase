@@ -863,6 +863,8 @@ editImage <- function(name, optionsJson) {
         # ensures the JSON response matches the plot
         width  <- oldWidth
         height <- oldHeight
+      } else {
+        jaspPlotCPP$resizedByUser <- TRUE
       }
 
     } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
