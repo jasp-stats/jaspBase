@@ -146,7 +146,7 @@ registerFonts <- function() {
 }
 
 initEnvironment <- function() {
-#Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
+  #Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
   packages <- c("BayesFactor") # Add any package that needs pre-loading
 
   if (identical(.Platform$OS.type, "windows"))
@@ -186,16 +186,16 @@ checkPackages <- function() {
 }
 
 isTryError <- function(obj){
-    if (is.list(obj)){
-        return(any(sapply(obj, function(obj) {
-            inherits(obj, "try-error")
-        }))
-        )
-    } else {
-        return(any(sapply(list(obj), function(obj){
-            inherits(obj, "try-error")
-        })))
-    }
+  if (is.list(obj)){
+    return(any(sapply(obj, function(obj) {
+      inherits(obj, "try-error")
+    }))
+    )
+  } else {
+    return(any(sapply(list(obj), function(obj){
+      inherits(obj, "try-error")
+    })))
+  }
 }
 
 .readDataSetCleanNAs <- function(cols) {
@@ -526,11 +526,11 @@ jaspResultsStrings <- function() {
 
 .parseRCodeInOptions <- function(option) {
   if (.RCodeInOptionsIsOk(option)) {
-     if (length(option) > 1L)
-        return(eval(parse(text = option[[1L]])))
-     else
-        return(eval(parse(text = option)))
-     }
+    if (length(option) > 1L)
+      return(eval(parse(text = option[[1L]])))
+    else
+      return(eval(parse(text = option)))
+  }
   else
     return(NA)
 }
@@ -585,13 +585,6 @@ jaspResultsStrings <- function() {
   eval(plotFunc, parent.frame())
 }
 
-openGrDevice <- function(...) {
-  #if (jaspResultsCalledFromJasp())
-  #  svglite::svglite(...)
-  #else
-  grDevices::png(..., type = ifelse(Sys.info()["sysname"] == "Darwin", "quartz", "cairo"))
-}
-
 # not .saveImage() because RInside (interface to CPP) cannot handle that
 saveImage <- function(plotName, format, height, width)
 {
@@ -626,13 +619,13 @@ saveImage <- function(plotName, format, height, width)
       insize <- dev.size("in")
       dev.off()
 
-      # Even though OSX is usually cairo able, the cairo devices should not be used as plot fonts are not scaled well.
-      # On the other hand, Windows should use a cairo (eps/pdf) device as the standard devices use a wrong R_HOME for some reason.
-      # Consequently on Windows you will get encoding/font errors because the devices cannot find their resources.
-      if (capabilities("aqua"))
-        type <- "quartz"
-      else if (capabilities("cairo"))
+      # Where available use the cairo devices, because:
+      # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
+      # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
+      if (capabilities("cairo"))
         type <- "cairo"
+      else if (capabilities("aqua"))
+        type <- "quartz"
       else
         type <- "Xlib"
 
@@ -654,14 +647,13 @@ saveImage <- function(plotName, format, height, width)
       } else if (format == "tiff") {
 
         hiResMultip <- 300 / 72
-        grDevices::tiff(
+        ragg::agg_tiff(
           filename    = relativePath,
           width       = width * hiResMultip,
           height      = height * hiResMultip,
           res         = 300,
-          bg          = backgroundColor,
-          compression = "lzw",
-          type        = type
+          background  = backgroundColor,
+          compression = "lzw"
         )
 
       } else if (format == "pdf") {
@@ -681,13 +673,12 @@ saveImage <- function(plotName, format, height, width)
       } else if (format == "png") {
 
         # Open graphics device and plot
-        grDevices::png(
-          filename = relativePath,
-          width    = width * pngMultip,
-          height   = height * pngMultip,
-          bg       = backgroundColor,
-          res      = 72 * pngMultip,
-          type     = type
+        ragg::agg_png(
+          filename   = relativePath,
+          width      = width * pngMultip,
+          height     = height * pngMultip,
+          background = backgroundColor,
+          res        = 72 * pngMultip
         )
 
       } else if (format == "svg") {
@@ -749,9 +740,9 @@ saveImage <- function(plotName, format, height, width)
     #@jeroenooms
     for (i in 1:length(rec_plot[[1]]))
       if ('NativeSymbolInfo' %in% class(rec_plot[[1]][[i]][[2]][[1]]))
-          rec_plot[[1]][[i]][[2]][[1]] <- getNativeSymbolInfo(rec_plot[[1]][[i]][[2]][[1]]$name)
+        rec_plot[[1]][[i]][[2]][[1]] <- getNativeSymbolInfo(rec_plot[[1]][[i]][[2]][[1]]$name)
   } else
-  #@jjallaire
+    #@jjallaire
     for (i in 1:length(rec_plot[[1]]))
     {
       symbol <- rec_plot[[1]][[i]][[2]][[1]]
