@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2021-07-31 03:47\n"
-"PO-Revision-Date: 2021-07-06 19:32+0000\n"
-"Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
+"PO-Revision-Date: 2021-08-24 22:34+0000\n"
+"Last-Translator: Daiki Hojo <dhojo.bayes@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "ja/>\n"
 "Language: ja\n"
@@ -11,16 +11,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.8-dev\n"
+"X-Generator: Weblate 4.8.1-dev\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
+msgstr "registerFontsが呼び出されましたが、resultsFontが存在しません!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>注意.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "無効な型が .fromRCPP に指定されました。文字列が期待されています。"
+msgstr "無効な型が .fromRCPP に指定されました。文字列が期待されています"
 
 msgid "Unknown RCPP object"
 msgstr "不明なRCPPオブジェクト"
@@ -112,7 +112,7 @@ msgid "Number of observations is %s in %s"
 msgstr "%s の観測度数は %s です"
 
 msgid "Cannot compute statistic reliably: number of observations is %s in %s"
-msgstr "信頼できる統計量を計算できません: %s のオブザベーションの数は %s です"
+msgstr "統計量をうまく計算できません: %s の観測数は %s です"
 
 msgid "Values in %s outside interval [%s, %s]"
 msgstr "%s の値が区間 [%s, %s] の外にあります"
@@ -120,9 +120,7 @@ msgstr "%s の値が区間 [%s, %s] の外にあります"
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
-msgstr ""
-"データセットは適切な分散共分散行列ではありません。データセットとして正定値対"
-"称行列だけを読み込んでください"
+msgstr "データセットは適切な分散共分散行列ではありません。データセットとして正定値対称行列だけを読み込んでください。"
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
@@ -140,7 +138,7 @@ msgstr ""
 "す"
 
 msgid "Negative numbers found in %s"
-msgstr "負の数字が %s で見つかりました。"
+msgstr "負の数字が %s で見つかりました"
 
 msgid "Missing values encountered in %s"
 msgstr "％s に欠損値が見つかりました"
@@ -194,32 +192,31 @@ msgid "could not clean value"
 msgstr "値を消去できませんでした"
 
 msgid "failed to create moduleLibrary!"
-msgstr ""
+msgstr "moduleLibraryの作成に失敗しました!"
 
 msgid "Failed to recreate lock file of module!"
-msgstr ""
+msgstr "モジュールのロックファイルを再作成できませんでした!"
 
 msgid "Failed to remove temporary module libary at %s"
-msgstr ""
+msgstr "一時的なモジュールライブラリ を %s で削除できませんでした"
 
-#, fuzzy
 msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "あなたのモジュールには DESCRIPTION ファイルがありません"
+msgstr "あなたのモジュールには DESCRIPTION ファイルがありません!"
 
 msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
+msgstr "モジュールに 'inst/Description.qml' がありません!"
 
 msgid "Your module is missing an 'R' directory!"
-msgstr ""
+msgstr "モジュールに 'R' ディレクトリがありません!"
 
 msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
+msgstr "モジュールに 'inst/qml' ディレクトリがありません!"
 
 msgid "Your module contains no DESCRIPTION file"
 msgstr "あなたのモジュールには DESCRIPTION ファイルがありません"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
+msgstr "キャッシュは '%s' に設定されていますが、存在しません!"
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "書式が正しく指定されていません"
