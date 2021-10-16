@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JASP 0.9.2\n"
 "POT-Creation-Date: 2021-07-31 03:47\n"
-"PO-Revision-Date: 2021-08-08 19:33+0000\n"
+"PO-Revision-Date: 2021-10-15 19:45+0000\n"
 "Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/jasp/jaspbase/es/"
 ">\n"
@@ -11,191 +11,224 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.8-dev\n"
+"X-Generator: Weblate 4.9-dev\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
+msgstr "se invocó registerFonts pero resultsFont no existe!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Nota.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
+msgstr "Indicado un tipo incorrecto para .fromRCPP, se esperaba un carácter"
 
 msgid "Unknown RCPP object"
-msgstr ""
+msgstr "Objeto RCPP desconocido"
 
 msgid "Could not locate"
 msgstr "No pudo localizarse"
 
 msgid "in environment (.fromRCPP)"
-msgstr ""
+msgstr "en el entorno (.fromRCPP)"
 
 msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
+msgstr "Se invocó .getSeedJASP con un argumento incorrecto."
 
 msgid "The argument options should be the options list from QML."
 msgstr ""
+"Las opciones de los argumentos deben ser las de la lista de opciones de QML."
 
 msgid ""
 "Ensure that the SetSeed{} QML component is present in the QML file for this "
 "analysis."
 msgstr ""
+"Asegurarse de que el componente SetSeed{} de QML está presente en el archivo "
+"QML para este análisis."
 
 msgid ""
 "Loading plot snapshot from a different session with possible side effects or "
 "errors."
 msgstr ""
+"Cargando la captura del gráfico de una sesión diferente con posibles efectos "
+"secundarios o fallos."
 
 msgid "no jasp plot found"
-msgstr ""
+msgstr "no se encontró un gráfico jasp"
 
 msgid "no plot object found"
-msgstr ""
+msgstr "no se encuentra ningún objeto gráfico"
 
 msgid "no plot object was found"
-msgstr ""
+msgstr "no se encontró ningún objeto gráfico"
 
 msgid "This function should not be used. In for reference."
-msgstr ""
+msgstr "Esta función no debe utilizarse. Para referencia."
 
 msgid "Non-valid type argument provided"
-msgstr ""
+msgstr "Se proporcionó un argumento de tipo incorrecto"
 
 msgid "Unknown check type provided: \""
-msgstr ""
+msgstr "Se proporcionó un tipo de comprobación desconocido: \""
 
 msgid "\""
-msgstr ""
+msgstr "\""
 
 msgid "Missing required argument(s): \""
-msgstr ""
+msgstr "Falta(n) argumento(s) requerido(s):\""
 
 msgid ","
-msgstr ""
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
-msgstr ""
+msgstr "Cada variable de agrupación debe tener un nivel determinado"
 
 msgid "the modelterms list must contain the named item `components`"
 msgstr ""
+"la lista de elementos del modelo debe contener el elemento denominado "
+"`componentes`"
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr ""
+msgstr "Surgieron los siguientes problemas al ejecutar el análisis:"
 
 msgid "after grouping on %s"
-msgstr ""
+msgstr "después de agrupar en %s"
 
 msgid ""
 "This analysis terminated unexpectedly. %s To receive assistance with this "
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
+"Este análisis acabó de forma imprevista. %s Para obtener ayuda con este "
+"problema, por favor, envía el mensaje anterior a: https://jasp-stats.org/bug-"
+"reports"
 
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "Se encontró el infinito en %s"
 
 msgid "Number of factor levels is %s in %s"
-msgstr ""
+msgstr "El número de niveles de factores es %s en %s"
 
 msgid "The variance in %s is equal to %s"
-msgstr ""
+msgstr "La varianza en %s es igual a %s"
 
 msgid "Number of observations is %s in %s"
-msgstr ""
+msgstr "El número de observaciones es %s en %s"
 
 msgid "Cannot compute statistic reliably: number of observations is %s in %s"
 msgstr ""
+"No se puede calcular el estadístico con fiabilidad: el número de "
+"observaciones es %s en %s"
 
 msgid "Values in %s outside interval [%s, %s]"
-msgstr ""
+msgstr "Valores en %s fuera del intervalo [%s, %s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
 msgstr ""
+"El conjunto de datos no es una matriz de varianzas-covarianzas apropiada. "
+"Por favor, carga solo una matriz simétrica definida positiva como conjunto "
+"de datos."
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
 "definite. Please check if variables have many missings observations or are "
 "collinear"
 msgstr ""
+"La matriz de varianzas-covarianzas de los datos ofrecidos no es definida "
+"positiva. Por favor, comprueba si las variables tienen muchas observaciones "
+"ausentes o multicolinealidad perfecta"
 
 msgid ""
 "Main effects and lower-order interactions must be included whenever the "
 "corresponding higher-order interaction is included"
 msgstr ""
+"Los efectos principales y las interacciones de nivel inferior deben "
+"incluirse siempre que se incluya la correspondiente interacción de nivel "
+"superior"
 
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "Se encontraron números negativos en %s"
 
 msgid "Missing values encountered in %s"
-msgstr ""
+msgstr "Se encontraron valores ausentes en %s"
 
 msgid "Duplicate variables encountered in %s"
-msgstr "Variables duplicadas encontradas en %s"
+msgstr "Se encontraron variables duplicadas en %s"
 
 msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
 "these rows from the data set if you wish to continue."
 msgstr ""
+"Más del %s%% de las filas están llenas de valores ausentes. Por favor, "
+"elimina esas filas del conjunto de datos si quieres continuar."
 
 msgid ""
 "Levene's test is significant (p < .05), suggesting a violation of the equal "
 "variance assumption"
 msgstr ""
+"El contraste de Levene es significativo (p < .05), sugiriendo el "
+"incumplimiento del supuesto de igualdad de varianzas"
 
 msgid ""
 "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
 "maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
+"Máximo Ratio <em>p</em> de Vovk-Sellke: Basado en el valor <em>p</em>, la "
+"máxima probabilidad posible favorable a H%1$s sobre H%2$s igual a 1/(-e "
+"<em>p</em> log(<em>p</em>)) para <em>p</em> %3$s .37 (Sellke, Bayarri & "
+"Berger, 2001)."
 
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "Proporciones contrastadas respecto al valor: %s"
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
 msgstr ""
+"Para todos los contrastes, la hipótesis alternativa indica que la proporción "
+"es menor que %s"
 
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
 msgstr ""
+"Para todos los contrastes, la hipótesis alternativa indica que la proporción "
+"es mayor que %s"
 
 msgid "Could not find message for class %s and type %s"
-msgstr ""
+msgstr "No se pudo encontrar el mensaje para la clase %s y el tipo %s"
 
 msgid "Missing required replacement(s): \""
-msgstr ""
+msgstr "Falta(n) la(s) sustitución(s) requerida(s):\""
 
 msgid "could not clean value"
-msgstr ""
+msgstr "no se puede borrar el valor"
 
 msgid "failed to create moduleLibrary!"
-msgstr ""
+msgstr "falló la creación de moduleLibrary!"
 
 msgid "Failed to recreate lock file of module!"
-msgstr ""
+msgstr "Fallo al rehacer el archivo de bloqueo del módulo!"
 
 msgid "Failed to remove temporary module libary at %s"
-msgstr ""
+msgstr "Fallo al eliminar la biblioteca temporal del módulo en %s"
 
 msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr ""
+msgstr "Tu módulo no tiene un archivo de 'DESCRIPCIÓN'!"
 
 msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
+msgstr "Tu módulo no tiene el 'inst/Description.qml'!"
 
 msgid "Your module is missing an 'R' directory!"
-msgstr ""
+msgstr "Tu módulo no tiene un directorio de 'R'!"
 
 msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
+msgstr "Tu módulo no tiene el directorio 'inst/qml'!"
 
 msgid "Your module contains no DESCRIPTION file"
-msgstr ""
+msgstr "Tu módulo no incluye ningún archivo de DESCRIPCIÓN"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
+msgstr "Se suponía que habría una caché en '%s', pero no existe!"
