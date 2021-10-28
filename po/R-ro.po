@@ -2,82 +2,92 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2021-07-31 03:47\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-10-28 18:05+0000\n"
+"Last-Translator: BogdanKKJ <bogdan.dm.cocos@gmail.com>\n"
+"Language-Team: Romanian <https://hosted.weblate.org/projects/jasp/jaspbase/"
+"ro/>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2;\n"
+"X-Generator: Weblate 4.9-dev\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
+msgstr "registerFonts a fost numit dar resultsFont nu există!"
 
 msgid "<em>Note.</em>"
-msgstr ""
+msgstr "<em>Notă.</em>"
 
 msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
+msgstr "Tip nevalid furnizat către .fromRCPP, caracter așteptat"
 
 msgid "Unknown RCPP object"
-msgstr ""
+msgstr "Obiect RCPP necunoscut"
 
 msgid "Could not locate"
-msgstr ""
+msgstr "Nu poate fi localizat"
 
 msgid "in environment (.fromRCPP)"
-msgstr ""
+msgstr "în mediu (.fromRCPP)"
 
 msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
+msgstr ",getSeedJASP a fost numit printr-un argument incorect."
 
 msgid "The argument options should be the options list from QML."
 msgstr ""
+"Opțiunile argumentului ar trebui să coincidă cu opțiunile din lista de la "
+"QML."
 
 msgid "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."
 msgstr ""
+"Asigurați-vă de existența componentei QML SetSeed{} în fișierul QML pentru "
+"această analiză."
 
 msgid "Loading plot snapshot from a different session with possible side effects or errors."
 msgstr ""
+"Se încarcă un instantaneu al graficului dintr-o sesiune diferită cu posibile "
+"efecte secundare sau erori."
 
 msgid "no jasp plot found"
-msgstr ""
+msgstr "nu a fost găsit un grafic jasp"
 
 msgid "no plot object found"
-msgstr ""
+msgstr "nu a fost găsit un obiect al graficului"
 
 msgid "no plot object was found"
-msgstr ""
+msgstr "nu a fost găsit un obiect al graficului"
 
 msgid "This function should not be used. In for reference."
-msgstr ""
+msgstr "Această funcție nu ar trebui utilizată. Pentru referință."
 
 msgid "Non-valid type argument provided"
-msgstr ""
+msgstr "A fost furnizat un argument de tip nevalid"
 
 msgid "Unknown check type provided: \""
-msgstr ""
+msgstr "A fost furnizat un tip de verificare necunoscut: \""
 
 msgid "\""
-msgstr ""
+msgstr "\""
 
 msgid "Missing required argument(s): \""
-msgstr ""
+msgstr "Lipsesc argumentele necesare: \""
 
 msgid ","
-msgstr ""
+msgstr ","
 
 msgid "Each grouping variable must have a level specified"
-msgstr ""
+msgstr "Fiecare variabilă de grupare trebuie să aibă un nivel specificat"
 
 msgid "the modelterms list must contain the named item `components`"
-msgstr ""
+msgstr "lista modelterms trebuie să conțină obiectul denumit `components`"
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr ""
+msgstr "Următoarele probleme au apărut în timpul executării analizei:"
 
 msgid "after grouping on %s"
-msgstr ""
+msgstr "după gruparea pe %s"
 
 msgid "This analysis terminated unexpectedly. %s To receive assistance with this problem, please report the message above at: https://jasp-stats.org/bug-reports"
 msgstr ""
