@@ -17,6 +17,12 @@
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
+# This is a temporary fix
+# TODO: remove it when R will solve this problem!
+gettextf <- function(fmt, ..., domain = NULL)  {
+  return(sprintf(gettext(fmt, domain = domain), ...))
+}
+
 loadJaspResults <- function(name) {
   jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
 }
