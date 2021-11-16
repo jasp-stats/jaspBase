@@ -25,7 +25,7 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     moduleName <- getModuleInfo(modulePkg)[["Package"]]
     if (dir.exists(file.path(moduleLibrary, moduleName))) {
       print(sprintf("Nothing changed according to md5sums, not reinstalling %s.", moduleName))
-      return("succes!")
+      return("Success!")
     } else {
       print(sprintf("Checksums exist for %s but the package is missing, installing anyway!", moduleName))
     }
@@ -122,7 +122,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   if (unlink(moduleLibraryTemp, recursive = TRUE)) # 0/ FALSE for success
     warning(sprintf("Failed to remove temporary module libary at %s", moduleLibraryTemp))
 
-  return("succes!")
+  return("Success!")
 }
 
 installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
@@ -157,7 +157,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   if (unlink(moduleLibraryTemp, recursive = TRUE)) # 0/ FALSE for success
     warning(sprintf("Failed to remove temporary module libary at %s", moduleLibraryTemp))
 
-  return("succes!")
+  return("Success!")
 
 }
 
