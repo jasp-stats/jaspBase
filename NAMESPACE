@@ -29,3 +29,21 @@ export(interactionSymbol)
 export(installJaspModule)
 export(getOS)
 S3method("[[",renvInstallHookOverride)
+
+export(replaceNA)
+S3method(replaceNA, numeric)
+S3method(replaceNA, character)
+S3method(replaceNA, factor)
+S3method(replaceNA, ordered)
+
+export(ifElse)
+S3method(ifElse, integer)
+S3method(ifElse, numeric)
+S3method(ifElse, character)
+S3method(ifElse, factor)
+S3method(ifElse, ordered)
+
+export(zScores)
+S3method(zScores, numeric)
+S3method(zScores, factor)
+
