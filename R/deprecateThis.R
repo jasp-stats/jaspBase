@@ -1,6 +1,6 @@
 # these functions should be deprecated but they are still used in the modules
 
-
+#' @export
 .vf <- function(formula) {
 
   in.pieces <- .decompose(formula)
@@ -8,6 +8,7 @@
   .compose(ved)
 }
 
+#' @export
 .unvf <- function(formula) {
 
   in.pieces <- .decompose(formula)
@@ -78,6 +79,7 @@
   base::identical(value, 0) || base::identical(value, as.integer(0)) || (is.list(value) && value$status == "ok")
 }
 
+#' @export
 .clean <- function(value) {
     # Clean function value so it can be reported in json/html
 

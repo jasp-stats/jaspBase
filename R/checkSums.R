@@ -1,4 +1,4 @@
-
+#' @export
 createMd5Sums <- function(modulePkg) {
 
   srcFiles <- c(
@@ -13,18 +13,22 @@ createMd5Sums <- function(modulePkg) {
   newMd5Sums
 }
 
+#' @export
 makeMd5SumsFilename <- function(modulePkg, moduleLibrary) {
   file.path(paste0(moduleLibrary, "/.."), paste(basename(modulePkg), "md5sums.rds", sep = "_"))
 }
 
+#' @export
 writeMd5Sums <- function(modulePkg, moduleLibrary) {
   saveRDS(createMd5Sums(modulePkg), file = makeMd5SumsFilename(modulePkg, moduleLibrary))
 }
 
+#' @export
 readMd5Sums <- function(modulePkg, moduleLibrary) {
   readRDS(file = makeMd5SumsFilename(modulePkg, moduleLibrary))
 }
 
+#' @export
 md5SumsChanged <- function(modulePkg, moduleLibrary) {
 
   file <- makeMd5SumsFilename(modulePkg, moduleLibrary)

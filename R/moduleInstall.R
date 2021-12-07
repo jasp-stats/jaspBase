@@ -14,6 +14,7 @@ postInstallFixes <- function(folderToFix) {
   }
 }
 
+#' @export
 installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE) {
   assertValidJASPmodule(modulePkg)
 
@@ -40,8 +41,6 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     required=FALSE )
   )
 }
-
-
 
 installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
 
@@ -262,6 +261,7 @@ libraryMatchesLockfile <- function(project = NULL) {
   return(!hasDiff)
 }
 
+#' @export
 addRenvBeforeAfterDispatch <- function() {
 
   renBeforeAfterInstallStruct <- structure(list(
@@ -291,6 +291,7 @@ addRenvBeforeAfterDispatch <- function() {
   options(renv.install.package.options = renBeforeAfterInstallStruct)
 }
 
+#' @export
 `[[.renvInstallHookOverride` <- function(x, ...) {
   return(unclass(x))
 }

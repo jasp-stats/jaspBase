@@ -31,3 +31,5 @@ Imports:
   svglite,
   systemfonts,
   withr
+RoxygenNote: 7.1.2
+Encoding: UTF-8

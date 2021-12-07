@@ -16,6 +16,7 @@
 #
 
 .messages <- function(class, type, ...) {  
+#' @export
   m <- list()
   
   ### Error general

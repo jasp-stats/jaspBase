@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#' @export
 .quitAnalysis <- function(message) {
   # Function to gracefully exit an analysis when continuing to run is nonsensical.
   # Comparable to stop(message), except this raises an validationError.
@@ -115,6 +116,7 @@
 }
 
 
+#' @export
 .hasErrors <- function(dataset=NULL, type=NULL, custom=NULL, message='default', exitAnalysisIfErrors=FALSE, ...) {
   # Generic error checking function.
   # Args:

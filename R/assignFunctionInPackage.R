@@ -1,12 +1,13 @@
+#'@title Overwrite functions inside R packages
+#'
+#'@param fun    : function you want to replace
+#'@param name   : the name of the function in a package
+#'@param package: the name of the package
+#'
+#' example usage:
+#' avoid a parallel backend from being registered which triggers a firewall message
+#' @export
 assignFunctionInPackage <- function(fun, name, package) {
-  #'@title Overwrite functions inside R packages
-  #'
-  #'@param fun    : function you want to replace
-  #'@param name   : the name of the function in a package
-  #'@param package: the name of the package
-  #'
-  #' example usage:
-  #' avoid a parallel backend from being registered which triggers a firewall message
   ns <- getNamespace(package)
   unlockBinding(name, ns)
   assign(name, fun, ns)
@@ -18,6 +19,7 @@ assignFunctionInPackage <- function(fun, name, package) {
 # to be resolved completely for R syntax.
 
 # cowplot, used in flexplot (and other analyses that open pdf devices on Windows) ----
+#' @export
 fakeGrDevicesPdf <- function(file = if(onefile) "Rplots.pdf" else "Rplot%03d.pdf",
                              width, height, onefile, family, title, fonts, version,
                              paper, encoding, bg, fg, pointsize, pagecentre, colormodel,
