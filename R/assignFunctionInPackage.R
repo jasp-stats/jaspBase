@@ -19,7 +19,6 @@ assignFunctionInPackage <- function(fun, name, package) {
 # to be resolved completely for R syntax.
 
 # cowplot, used in flexplot (and other analyses that open pdf devices on Windows) ----
-#' @export
 fakeGrDevicesPdf <- function(file = if(onefile) "Rplots.pdf" else "Rplot%03d.pdf",
                              width, height, onefile, family, title, fonts, version,
                              paper, encoding, bg, fg, pointsize, pagecentre, colormodel,

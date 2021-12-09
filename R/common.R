@@ -250,6 +250,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .vdf <- function(df, columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
   new.df <- NULL
   namez <- NULL

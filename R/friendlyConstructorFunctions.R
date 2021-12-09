@@ -67,7 +67,6 @@ ifElse.ordered <- function(test, yes, no) {
   return(result)
 }
 
-#' @export
 findDominatingClass <- function(...) {
   args <- list(...)
 
@@ -89,7 +88,6 @@ findDominatingClass <- function(...) {
   }
 }
 
-#' @export
 reorderFactor <- function(someFactor) {
   stopifnot(is.factor(someFactor))
 
