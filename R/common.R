@@ -611,7 +611,6 @@ jaspResultsStrings <- function() {
 }
 
 # not .saveImage() because RInside (interface to CPP) cannot handle that
-#' @export
 saveImage <- function(plotName, format, height, width)
 {
   state           <- .retrieveState()     # Retrieve plot object from state
@@ -791,7 +790,6 @@ saveImage <- function(plotName, format, height, width)
   suppressWarnings(grDevices::replayPlot(rec_plot))
 }
 
-#' @export
 rewriteImages <- function(name, ppi, imageBackground) {
 
   jaspResultsCPP <- loadJaspResults(name)
@@ -840,7 +838,6 @@ rewriteImages <- function(name, ppi, imageBackground) {
 }
 
 # not .editImage() because RInside (interface to CPP) cannot handle that
-#' @export
 editImage <- function(name, optionsJson) {
 
   optionsList <- fromJSON(optionsJson)
