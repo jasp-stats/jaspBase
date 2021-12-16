@@ -1,12 +1,13 @@
+#'@title Overwrite functions inside R packages
+#'
+#'@param fun    : function you want to replace
+#'@param name   : the name of the function in a package
+#'@param package: the name of the package
+#'
+#' example usage:
+#' avoid a parallel backend from being registered which triggers a firewall message
+#' @export
 assignFunctionInPackage <- function(fun, name, package) {
-  #'@title Overwrite functions inside R packages
-  #'
-  #'@param fun    : function you want to replace
-  #'@param name   : the name of the function in a package
-  #'@param package: the name of the package
-  #'
-  #' example usage:
-  #' avoid a parallel backend from being registered which triggers a firewall message
   ns <- getNamespace(package)
   unlockBinding(name, ns)
   assign(name, fun, ns)

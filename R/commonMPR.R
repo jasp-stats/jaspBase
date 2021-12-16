@@ -18,6 +18,7 @@
 # Vovk-Sellke-Bayarri-Berger Maximum p-Ratio calculation.
 # Sellke, T., Bayarri, M.J., Berger, J.O. (2001) Calibration of p Values for
 # Testing Precise Null Hypotheses. The American Statistician. 55(1) 62-71
+#' @export
 VovkSellkeMPR <- function(p){
   MPR <- ifelse(p >= 1/exp(1), 1, 1/(-exp(1)*p*log(p)))
   if (any(is.nan(MPR)))
@@ -26,6 +27,7 @@ VovkSellkeMPR <- function(p){
 }
 
 # Type I error probability / posterior probability from same paper
+#' @export
 VovkSellkeMPROneSided <- function(p){
   stop("This function should not be used. In for reference.")
   pTwoSided <- ifelse(p>=0.5,(1-p)*2,p*2)

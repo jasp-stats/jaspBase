@@ -1,4 +1,3 @@
-
 createMd5Sums <- function(modulePkg) {
 
   srcFiles <- c(

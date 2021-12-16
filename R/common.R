@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
@@ -54,6 +55,7 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
   return(returnThis)
 }
 
+#' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
 
   if (identical(.Platform$OS.type, "windows"))
@@ -151,6 +153,7 @@ registerFonts <- function() {
   }
 }
 
+#' @export
 initEnvironment <- function() {
   #Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
   packages <- c("BayesFactor") # Add any package that needs pre-loading
@@ -191,6 +194,7 @@ checkPackages <- function() {
   return(str)
 }
 
+#' @export
 isTryError <- function(obj){
   if (is.list(obj)){
     return(any(sapply(obj, function(obj) {
@@ -212,6 +216,7 @@ isTryError <- function(obj){
   return(cols);
 }
 
+#' @export
 .readDataSetToEnd <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
 
   columns              <- .readDataSetCleanNAs(columns)
@@ -229,6 +234,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .readDataSetHeader <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
 
   columns              <- .readDataSetCleanNAs(columns)
@@ -244,6 +250,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .vdf <- function(df, columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
   new.df <- NULL
   namez <- NULL
@@ -348,6 +355,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .shortToLong <- function(dataset, rm.factors, rm.vars, bt.vars, dependentName = "dependent", subjectName = "subject") {
 
   f  <- rm.factors[[length(rm.factors)]]
@@ -416,6 +424,7 @@ jaspResultsStrings <- function() {
   gettext("<em>Note.</em>")
 }
 
+#' @export
 .fromRCPP <- function(x, ...) {
 
   if (length(x) != 1 || ! is.character(x)) {
@@ -489,6 +498,7 @@ jaspResultsStrings <- function() {
   state
 }
 
+#' @export
 .extractErrorMessage <- function(error) {
 
   split <- base::strsplit(as.character(error), ":")[[1]]
@@ -496,6 +506,7 @@ jaspResultsStrings <- function() {
   trimws(last)
 }
 
+#' @export
 .recodeBFtype <- function(bfOld, newBFtype = c("BF10", "BF01", "LogBF10"), oldBFtype = c("BF10", "BF01", "LogBF10")) {
 
   # Arguments:
@@ -514,6 +525,7 @@ jaspResultsStrings <- function() {
   else                          {	if (newBFtype == "BF10") { return(exp(bfOld)); } else { return(1 / exp(bfOld));	} } # log(BF10)
 }
 
+#' @export
 .parseAndStoreFormulaOptions <- function(jaspResults, options, names) {
   for (i in seq_along(names)) {
     name <- names[[i]]
@@ -530,6 +542,7 @@ jaspResultsStrings <- function() {
   return(options)
 }
 
+#' @export
 .parseRCodeInOptions <- function(option) {
   if (.RCodeInOptionsIsOk(option)) {
     if (length(option) > 1L)
@@ -541,11 +554,14 @@ jaspResultsStrings <- function() {
     return(NA)
 }
 
+#' @export
 .RCodeInOptionsIsOk <- function(option) UseMethod(".RCodeInOptionsIsOk", option)
 
+#' @export
 .RCodeInOptionsIsOk.default <- function(option)
   return (length(option) == 1L) || (length(option) > 1L && identical(option[[2L]], "T"))
 
+#' @export
 .RCodeInOptionsIsOk.list <- function(option) {
   for (i in seq_along(option))
     if (!.RCodeInOptionsIsOk(option[[i]]))
@@ -553,6 +569,7 @@ jaspResultsStrings <- function() {
   return(TRUE)
 }
 
+#' @export
 .setSeedJASP <- function(options) {
 
   if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
@@ -566,6 +583,7 @@ jaspResultsStrings <- function() {
   }
 }
 
+#' @export
 .getSeedJASP <- function(options) {
 
   if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
@@ -579,6 +597,7 @@ jaspResultsStrings <- function() {
 }
 
 # PLOT RELATED FUNCTION ----
+#' @export
 .suppressGrDevice <- function(plotFunc) {
   plotFunc <- substitute(plotFunc)
   tmpFile <- tempfile()
