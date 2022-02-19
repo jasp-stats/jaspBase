@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2021-07-31 03:47\n"
-"PO-Revision-Date: 2021-10-29 06:00+0000\n"
+"PO-Revision-Date: 2022-02-16 17:04+0000\n"
 "Last-Translator: BogdanKKJ <bogdan.dm.cocos@gmail.com>\n"
 "Language-Team: Romanian <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "ro/>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2;\n"
-"X-Generator: Weblate 4.9-dev\n"
+"X-Generator: Weblate 4.11-dev\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
 msgstr "registerFonts a fost numit dar resultsFont nu există!"
@@ -152,48 +152,55 @@ msgstr ""
 
 msgid "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
+"Rata Maximă Vovk-Sellke: În baza valorii <em>p</em>, cota maximă posibilă în "
+"favoarea lui H%1$s peste H%2$s este egală cu 1/(-e <em>p</em> "
+"log(<em>p</em>)) pentru <em>p</em> %3$s .37(Sellke, Bayarri, & Berger, 2001)."
 
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "Proporții testate în raport cu valoarea: %s"
 
 msgid "For all tests, the alternative hypothesis specifies that the proportion is less than %s"
 msgstr ""
+"Pentru toate testele, ipoteza alternativă specifică faptul că proporția este "
+"mai mică de %s"
 
 msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
 msgstr ""
+"Pentru toate testele, ipoteza alternativă specifică faptul că proporția este "
+"mai mare decât %s"
 
 msgid "Could not find message for class %s and type %s"
-msgstr ""
+msgstr "Nu a putut fi găsit mesajul pentru clasa %s și tipul %s"
 
 msgid "Missing required replacement(s): \""
-msgstr ""
+msgstr "Lipsesc înlocuiri necesare: \""
 
 msgid "could not clean value"
-msgstr ""
+msgstr "valoarea nu a putut fi curățată"
 
 msgid "failed to create moduleLibrary!"
-msgstr ""
+msgstr "nu s-a putut crea moduleLibrary!"
 
 msgid "Failed to recreate lock file of module!"
-msgstr ""
+msgstr "Nu s-a putut recrea fișierul de blocare a modulului!"
 
 msgid "Failed to remove temporary module libary at %s"
-msgstr ""
+msgstr "Eroare la eliminarea bibliotecii temporare de module la %s"
 
 msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr ""
+msgstr "Modulului tău îi lipsește un fișier 'DESCRIERE'!"
 
 msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
+msgstr "Modulului tău îi lipsește 'inst/Description.qml'!"
 
 msgid "Your module is missing an 'R' directory!"
-msgstr ""
+msgstr "Modulului tău îi lipsește un director 'R'!"
 
 msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
+msgstr "Modulului tău îi lipsește directorul 'inst/qml'!"
 
 msgid "Your module contains no DESCRIPTION file"
-msgstr ""
+msgstr "Modulul tău nu conține fișierul DESCRIERE"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
+msgstr "Un cache ar trebui să fie la '%s', dar nu există!"
