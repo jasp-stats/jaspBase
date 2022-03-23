@@ -1,0 +1,18 @@
+Package: jaspDescriptivesLockfile
+Type: Package
+Title: Descriptives Module for JASP
+Version: 0.15.0
+Date: 2021-05-30
+Author: JASP Team
+Website: jasp-stats.org
+Maintainer: JASP Team <info@jasp-stats.org>
+Description: Explore the data with tables and plots
+License: GPL (>= 2)
+Encoding: UTF-8
+Imports:
+  crayon,
+  jaspBase,
+  jaspGraphs
+Remotes:
+  jasp-stats/jaspBase,
+  jasp-stats/jaspGraphs

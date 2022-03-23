@@ -60,3 +60,7 @@ src/Makevars.win
 .Rproj.user
 !.github
 !.Rbuildignore
+
+# renv stuff
+/renv
+renv.lock
