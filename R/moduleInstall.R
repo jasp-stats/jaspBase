@@ -24,7 +24,7 @@ postInstallFixes <- function(folderToFix) {
 }
 
 #' @export
-installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE) {
+installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE, cacheAble=TRUE) {
   assertValidJASPmodule(modulePkg)
 
   r <- getOption("repos")
@@ -44,14 +44,14 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   return(
     pkgbuild::with_build_tools(
     {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
+      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble)
+      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble)
     },
     required=FALSE )
   )
 }
 
-installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
+installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), cacheAble=TRUE) {
 
   print(sprintf("Installing module with renv. installJaspModuleFromRenv('%s', c(%s), '%s', '%s', %s)",
                 modulePkg, paste0("'", libPathsToUse, "'", collapse = ", "), moduleLibrary, repos, onlyModPkg))
@@ -97,7 +97,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
                 prompt   = prompt)
 
   moduleInfo         <- getModuleInfo(modulePkg)
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo, cacheAble)
 
   if (correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
@@ -133,7 +133,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   return("succes!")
 }
 
-installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
+installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), cacheAble=TRUE) {
 
   print("Installing module with DESCRIPTION file")
 
@@ -158,7 +158,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   renv::hydrate(library = moduleLibrary, project = modulePkg)
   renv::install(project = modulePkg, library = moduleLibrary, prompt = prompt)
 
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble)
   if (correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
@@ -169,11 +169,11 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
 
 }
 
-installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), moduleInfo = NULL) {
+installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), moduleInfo = NULL, cacheAble=TRUE) {
 
   if (is.null(moduleInfo))
     moduleInfo <- getModuleInfo(modulePkg)
-  record <- recordFromModule(modulePkg, moduleInfo)
+  record <- recordFromModule(modulePkg, moduleInfo, cacheAble)
 
  # print(paste0("Im telling renv to install to '", moduleLibrary, "'"))
 
@@ -202,14 +202,14 @@ hasRenvLockFile <- function(modulePkg) {
   return(file.exists(file.path(modulePkg, "renv.lock")))
 }
 
-recordFromModule <- function(modulePkg, moduleInfo) {
+recordFromModule <- function(modulePkg, moduleInfo, cacheAble=TRUE) {
 
   record <- list(list(
     Package   = moduleInfo[["Package"]],
     Version   = moduleInfo[["Version"]],
     Path      = modulePkg,
     Source    = "Local",
-    Cacheable = FALSE
+    Cacheable = cacheAble
   ))
   names(record) <- moduleInfo[["Package"]]
 
