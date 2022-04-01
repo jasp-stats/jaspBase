@@ -44,8 +44,8 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   return(
     pkgbuild::with_build_tools(
     {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble)
+      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
+      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
     },
     required=FALSE )
   )
@@ -97,7 +97,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
                 prompt   = prompt)
 
   moduleInfo         <- getModuleInfo(modulePkg)
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo, cacheAble)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo, cacheAble=cacheAble)
 
   if (correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
@@ -158,7 +158,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   renv::hydrate(library = moduleLibrary, project = modulePkg)
   renv::install(project = modulePkg, library = moduleLibrary, prompt = prompt)
 
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble=cacheAble)
   if (correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
@@ -173,7 +173,7 @@ installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), m
 
   if (is.null(moduleInfo))
     moduleInfo <- getModuleInfo(modulePkg)
-  record <- recordFromModule(modulePkg, moduleInfo, cacheAble)
+  record <- recordFromModule(modulePkg, moduleInfo, cacheAble=cacheAble)
 
  # print(paste0("Im telling renv to install to '", moduleLibrary, "'"))
 
