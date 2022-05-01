@@ -24,15 +24,20 @@ postInstallFixes <- function(folderToFix) {
   }
 }
 
+isModulePkgArchive <- function(modulePkg) { return(any(endsWith(modulePkg, c(".tar.gz", ".zip", ".tgz")))) }
+
 #' @export
 installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE, cacheAble=TRUE, frameworkLibrary=NULL) {
+
+  isPkgArchive <- isModulePkgArchive(modulePkg)
+
   assertValidJASPmodule(modulePkg)
 
   r <- getOption("repos")
   r["CRAN"] <- repos
   options(repos = r)
 
-  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
+  if (!isPkgArchive && !(force || md5SumsChanged(modulePkg, moduleLibrary))) {
     moduleName <- getModuleInfo(modulePkg)[["Package"]]
     if (dir.exists(file.path(moduleLibrary, moduleName))) {
       print(sprintf("Nothing changed according to md5sums, not reinstalling %s.", moduleName))
@@ -71,8 +76,8 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   if (!dir.exists(file.path(moduleLibraryTemp, "renv")))
     dir.create(   file.path(moduleLibraryTemp, "renv"), recursive = TRUE)
 
-  lockFileModule <- file.path(modulePkg,         "renv.lock")
-  lockFileTemp   <- file.path(moduleLibraryTemp, "renv.lock")
+  lockFileModule <- getFileFromModule(modulePkg,  "renv.lock")
+  lockFileTemp   <- file.path(moduleLibraryTemp,  "renv.lock")
   file.copy(from = lockFileModule, to = lockFileTemp, overwrite = TRUE)
 
   setupRenv(moduleLibrary, modulePkg)
@@ -100,7 +105,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   moduleInfo         <- getModuleInfo(modulePkg)
   correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo, cacheAble=cacheAble)
 
-  if (correctlyInstalled)
+  if (!isPkgArchive && correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
   renv::snapshot(
@@ -159,7 +164,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   renv::hydrate(library = moduleLibrary, project = modulePkg, sources=c(moduleLibrary, frameworkLibrary))
 
   correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble=cacheAble)
-  if (correctlyInstalled)
+  if (!isModulePkgArchive(modulePkg) && correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
   if (unlink(moduleLibraryTemp, recursive = TRUE)) # 0/ FALSE for success
@@ -175,7 +180,7 @@ installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), m
     moduleInfo <- getModuleInfo(modulePkg)
   record <- recordFromModule(modulePkg, moduleInfo, cacheAble=cacheAble)
 
- # print(paste0("Im telling renv to install to '", moduleLibrary, "'"))
+  print(paste0("Im telling renv to install to '", moduleLibrary, "' from '", modulePkg, "' which is a pkg", ifElse(isModulePkgArchive(modulePkg), "archive", "module")))
 
   renv::install(record, library = moduleLibrary, rebuild = TRUE, prompt = prompt)
   TRUE
@@ -183,6 +188,9 @@ installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), m
 }
 
 assertValidJASPmodule <- function(modulePkg) {
+
+  if(isModulePkgArchive(modulePkg))
+    return() #Let R and JASP handle it
 
   if (!file.exists(file.path(modulePkg, "DESCRIPTION")))
     stop("Your module is missing a 'DESCRIPTION' file!")
@@ -216,13 +224,36 @@ recordFromModule <- function(modulePkg, moduleInfo, cacheAble=TRUE) {
   return(record)
 }
 
+getFileFromModule <- function(modulePkg, filename) {
+  hereItGoes <- file.path(modulePkg, filename)
+
+  if(isModulePkgArchive(modulePkg))
+  {
+    temp <- tempdir()
+
+    #The archive contains a folder first, which has the name of the package, which we could or could not guess here.
+    #lets just look at all the files
+    files <- untar(tarfile=modulePkg, list=TRUE)
+    found <- endsWith(files, filename)
+
+    if(!any(found))
+      stop(paste0("Can't find file '", filename, "' in archive '", modulePkg, "'"))
+    
+    #this will only work properly if the requested file is in there only once but for things like DESCRIPTION that should be no problem
+    filename <- files[found]
+    
+    untar(tarfile=modulePkg, files=filename, exdir=temp)
+    hereItGoes <- file.path(temp, filename)
+  }
+
+    if (!file.exists(hereItGoes))
+      stop(paste("Your module contains no ",filename," file"))
+
+  return(hereItGoes)
+}
+
 getModuleInfo <- function(modulePkg) {
-  pkgDescr <- file.path(modulePkg, "DESCRIPTION")
-  if (!file.exists(pkgDescr))
-    stop("Your module contains no DESCRIPTION file")
-
-  return(read.dcf(file.path(modulePkg, "DESCRIPTION"))[1, ])
-
+  return(read.dcf(getFileFromModule(modulePkg, "DESCRIPTION"))[1, ])
 }
 
 renv_diagnostics_packages_as_df <- function(project) {
