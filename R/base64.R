@@ -16,10 +16,26 @@
 #
 
 #' @export
-.v <- function(x, ...) { x }
+.v <- function(x, ...) {
+  lifecycle::deprecate_warn(
+    "0.15",
+    "jaspBase::.v()",
+    "jaspResults::encodeColNames()",
+    details = "JASP handles encoding automatically. If you are sure you want to encode column names manually, use `jaspResults::encodeColNames()`. The call to `.v()` has no effect anymore and should be removed."
+  )
+  x
+}
 
 #' @export
-.unv <- function(x, ...) { x }
+.unv <- function(x, ...) {
+  lifecycle::deprecate_warn(
+    "0.15",
+    "jaspBase::.unv()",
+    "jaspResults::decodeColNames()",
+    details = "JASP handles decoding automatically. If you are sure you want to decode column names manually, use `jaspResults::decodeColNames()`. The call to `.unv()` has no effect anymore and should be removed."
+  )
+  x
+}
 
 #' @export
 interactionSymbol <- "\u2009\u273B\u2009"
