@@ -72,3 +72,9 @@ YeoJohnson <- function(x, lambda) {
 
   return(result)
 }
+
+#' @export
+logit <- function(x) { stats::qlogis(x) }
+
+#' @export
+invLogit <- function(x) { stats::plogis(x) }
