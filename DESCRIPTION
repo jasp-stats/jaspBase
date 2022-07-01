@@ -34,3 +34,6 @@ Imports:
   withr
 RoxygenNote: 7.2.0
 Encoding: UTF-8
+LinkingTo: Rcpp
+RcppModules: jaspResults
+NeedsCompilation: yes

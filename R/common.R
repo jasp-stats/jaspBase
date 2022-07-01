@@ -25,7 +25,7 @@ gettextf <- function(fmt, ..., domain = NULL)  {
 }
 
 loadJaspResults <- function(name) {
-  jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
+  create_cpp_jaspResults(name, .retrieveState())
 }
 
 finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
