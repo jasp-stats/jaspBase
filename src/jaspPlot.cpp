@@ -87,7 +87,7 @@ void jaspPlot::renderPlot()
 
 		jaspPrint("Now rendering a plot with name: " + _name);
 
-		static Rcpp::Function tryToWriteImage = jaspResults::isInsideJASP() ? Rcpp::Function("tryToWriteImageJaspResults") : Rcpp::Environment::namespace_env("jaspResults")["tryToWriteImageJaspResults"];
+		static Rcpp::Function tryToWriteImage = Rcpp::Environment::namespace_env("jaspBase")["tryToWriteImageJaspResults"];
 		Rcpp::List writeResult, oldPlotInfo;
 		if (_editing)
 		{

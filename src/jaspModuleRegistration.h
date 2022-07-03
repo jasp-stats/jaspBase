@@ -26,6 +26,16 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("cpp_progressbarTick",	jaspResults::staticProgressbarTick);
 
 	Rcpp::function("destroyAllAllocatedObjects", jaspObject::destroyAllAllocatedObjects);
+	Rcpp::function("setSendFunc",					jaspResults::setSendFuncXPtr);
+	Rcpp::function("setPollMessagesFunc",			jaspResults::setPollMessagesFuncXPtr);
+	Rcpp::function("setBaseCitation",				jaspResults::setBaseCitation);
+	Rcpp::function("setInsideJasp",					jaspResults::setInsideJASP);
+	Rcpp::function("writeSealFilename",				jaspResults::writeSealFilename);
+	Rcpp::function("setResponseData",				jaspResults::setResponseData);
+	Rcpp::function("setDeveloperMode",				jaspResults::setDeveloperMode);
+	Rcpp::function("setSaveLocation",				jaspResults::setSaveLocation);
+	Rcpp::function("setWriteSealLocation",			jaspResults::setWriteSealLocation);
+
 	Rcpp::class_<jaspObject_Interface>("jaspObject")
 
 		.method("print",							&jaspObject_Interface::print,											"Prints the contents of the jaspObject")
@@ -202,7 +212,7 @@ RCPP_MODULE(jaspResults)
 		.method("prepareForWriting",		&jaspResults_Interface::prepareForWriting,						"Remove seal for writing")
 		.method("finishWriting",			&jaspResults_Interface::finishWriting,							"Set seal for writing")
 		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")
-		
+
 		.method("setCurrentColumnNames",	&jaspResults_Interface::setCurrentColumnNames,					"setCurrentColumnNames")
 		.method("encodeColumnName",			&jaspResults_Interface::encodeColumnName,						"encodeColumnName")
 		.method("decodeColumnName",			&jaspResults_Interface::decodeColumnName,						"decodeColumnName")
@@ -219,9 +229,9 @@ RCPP_MODULE(jaspResults)
 }
 
 
-Rcpp::RObject givejaspResultsModule()
-{
-	/* Should be done through LOAD_RCPP_MODULE actually but there seems to be something wrong with the macro.. So we just copy the underlying code like  https://stackoverflow.com/questions/45344260/load-rcpp-module-seems-not-right */
-	Rcpp::Shield<SEXP> __load_module_call__( Rf_lang2( GET_MODULE_SYM, _rcpp_module_boot_jaspResults() ) );
-	return Rcpp_eval( __load_module_call__, R_GlobalEnv );
-}
+ Rcpp::RObject givejaspResultsModule()
+ {
+ 	/* Should be done through LOAD_RCPP_MODULE actually but there seems to be something wrong with the macro.. So we just copy the underlying code like  https://stackoverflow.com/questions/45344260/load-rcpp-module-seems-not-right */
+ 	Rcpp::Shield<SEXP> __load_module_call__( Rf_lang2( GET_MODULE_SYM, _rcpp_module_boot_jaspResults() ) );
+ 	return Rcpp_eval( __load_module_call__, R_GlobalEnv );
+ }

@@ -32,9 +32,19 @@ void jaspResults::setSendFunc(sendFuncDef sendFunc)
 	_ipccSendFunc = sendFunc;
 }
 
+void jaspResults::setSendFuncXPtr(Rcpp::XPtr<sendFuncDef> sendFunc)
+{
+	setSendFunc(*sendFunc);
+}
+
 void jaspResults::setPollMessagesFunc(pollMessagesFuncDef pollFunc)
 {
 	_ipccPollFunc = pollFunc;
+}
+
+void jaspResults::setPollMessagesFuncXPtr(Rcpp::XPtr<pollMessagesFuncDef> pollFunc)
+{
+	setPollMessagesFunc(*pollFunc);
 }
 
 void jaspResults::setBaseCitation(std::string baseCitation)
@@ -97,7 +107,7 @@ jaspResults::jaspResults(Rcpp::String title, Rcpp::RObject oldState)
 			throw std::runtime_error("Write seal location not given and we are running in JASP, this should never happen!");
 	}
 	else
-		_RStorageEnv = new Rcpp::Environment(Rcpp::as<Rcpp::Environment>(Rcpp::Environment::namespace_env("jaspResults")[".plotStateStorage"]));
+		_RStorageEnv = new Rcpp::Environment(Rcpp::as<Rcpp::Environment>(Rcpp::Environment::namespace_env("jaspBase")[".plotStateStorage"]));
 
 	bool imNotReincarnatedAfterBeingMurdered = lastWriteWorked();
 
@@ -319,7 +329,7 @@ void jaspResults::checkForAnalysisChanged()
 	{
 		jaspPrint("Polling for analysis changes found a change, analysis should restart!");
 		setStatus("changed");
-		static Rcpp::Function signalAnalysisAbort = jaspResults::isInsideJASP() ? Rcpp::Function("signalAnalysisAbort") : Rcpp::Environment::namespace_env("jaspResults")["signalAnalysisAbort"];
+		static Rcpp::Function signalAnalysisAbort = Rcpp::Environment::namespace_env("jaspBase")["signalAnalysisAbort"];
 		signalAnalysisAbort();
 	}
 }

@@ -1,7 +1,6 @@
 #Originally in common.R in package JASP, extracted here and changed for standalone use in jaspResults/jaspTools
 
-tryToWriteImageJaspResults <- function(...)
-{
+tryToWriteImageJaspResults <- function(...) {
   tryCatch(
     suppressWarnings(return(writeImageJaspResults(...))),
     error	= function(e) { return(list(error = e$message)) }
@@ -28,8 +27,7 @@ openGrDevice <- function(...) {
 }
 
 writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, relativePathpng = NULL, ppi = 300, backgroundColor = "white",
-                                  location = getImageLocation(), oldPlotInfo = list())
-{
+                                  location = getImageLocation(), oldPlotInfo = list()) {
   # Set values from JASP'S Rcpp when available
   if (exists(".fromRCPP")) {
     location        <- .fromRCPP(".requestTempFileNameNative", "png")
