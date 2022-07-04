@@ -35,9 +35,9 @@ startProgressbar <- function(expectedTicks, label="") {
   if (nchar(label) > 80) # if you update this value, also update it in the progressbar in jaspwidgets.js
     warning("The progressbar label is more than 80 characters, label will be truncated", domain = NA)
 
-  if (jaspResultsCalledFromJasp())
-    jaspResultsModule$cpp_startProgressbar(expectedTicks, label)
-  else
+  # if (jaspResultsCalledFromJasp())
+  #   jaspResultsModule$cpp_startProgressbar(expectedTicks, label)
+  # else
     cpp_startProgressbar(expectedTicks, label)
 }
 
@@ -98,12 +98,7 @@ destroyAllAllocatedRObjects <- function() {
 
 #' @export
 jaspResultsCalledFromJasp <- function() {
-  # a variety of tests to check if a createJasp*() function is called from JASP
-  return(
-    exists("jaspResultsModule", mode = "S4") &&
-      inherits(jaspResultsModule, "Module") &&
-      identical(slotNames(jaspResultsModule), ".xData")
-  )
+  return(isInsideJASP())
 }
 
 #' @export
@@ -171,11 +166,11 @@ jaspResultsR <- R6::R6Class(
     getError              = function()      private$jaspObject$getError(),
     length                = function()      private$jaspObject$length,
     #The following functions for column encoding will fail hard when you run them inside JASP, only for R in other words
-    setCurrentColumnNames = function(names)	private$jaspObject$setCurrentColumnNames(names),
-    encodeColumnName      = function(input)	private$jaspObject$encodeColumnName(input),
-    decodeColumnName      = function(input)	private$jaspObject$decodeColumnName(input),
-    encodeAllColumnNames  = function(input)	private$jaspObject$encodeAllColumnNames(input),
-    decodeAllColumnNames  = function(input)	private$jaspObject$decodeAllColumnNames(input)
+    setCurrentColumnNames = function(names) private$jaspObject$setCurrentColumnNames(names),
+    encodeColumnName      = function(input) private$jaspObject$encodeColumnName(input),
+    decodeColumnName      = function(input) private$jaspObject$decodeColumnName(input),
+    encodeAllColumnNames  = function(input) private$jaspObject$encodeAllColumnNames(input),
+    decodeAllColumnNames  = function(input) private$jaspObject$decodeAllColumnNames(input)
   ),
   private = list(
     children    = list(),
@@ -194,12 +189,12 @@ jaspResultsR <- R6::R6Class(
       ))
     },
     #These two functions should be the exact same as those on jaspContainer
-    setField	= function(field, value) {
+    setField    = function(field, value) {
       field <- decodeName(field)
       private$jaspObject[[field]] <- private$getJaspObject(value);
       private$children[[field]]   <- value;
     },
-    getField	= function(field) {
+    getField    = function(field) {
       field <- decodeName(field)
       #maybe changing the dependencies removed this object when we weren't looking!
       if (is.null(private$jaspObject[[field]]) && !is.null(private$children[[field]]))
@@ -300,8 +295,8 @@ jaspStateR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      } else if (jaspResultsCalledFromJasp()) {
-        stateObj <- jaspResultsModule$create_cpp_jaspState("")
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   stateObj <- jaspResultsModule$create_cpp_jaspState("")
       } else {
         checkForJaspResultsInit()
         stateObj <- create_cpp_jaspState("")
@@ -359,8 +354,8 @@ jaspHtmlR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      } else if (jaspResultsCalledFromJasp()) {
-        htmlObj <- jaspResultsModule$create_cpp_jaspHtml(text)
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   htmlObj <- jaspResultsModule$create_cpp_jaspHtml(text)
       } else {
         checkForJaspResultsInit()
         htmlObj <- create_cpp_jaspHtml(text)
@@ -401,8 +396,8 @@ jaspContainerR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      } else if (jaspResultsCalledFromJasp()) {
-        container <- jaspResultsModule$create_cpp_jaspContainer(title)
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   container <- jaspResultsModule$create_cpp_jaspContainer(title)
       } else {
         checkForJaspResultsInit()
         container <- create_cpp_jaspContainer(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspContainer, title))
@@ -483,13 +478,9 @@ jaspPlotR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      }
-      else if (jaspResultsCalledFromJasp())
-      {
-        private$jaspObject <- jaspResultsModule$create_cpp_jaspPlot(title)
-      }
-      else
-      {
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   private$jaspObject <- jaspResultsModule$create_cpp_jaspPlot(title)
+      } else {
         checkForJaspResultsInit()
         private$jaspObject  <- create_cpp_jaspPlot(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspPlot, title)
       }
@@ -558,8 +549,8 @@ jaspTableR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      } else if (jaspResultsCalledFromJasp()) {
-        jaspObj <- jaspResultsModule$create_cpp_jaspTable(title)
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   jaspObj <- jaspResultsModule$create_cpp_jaspTable(title)
       } else {
         checkForJaspResultsInit()
         jaspObj <- create_cpp_jaspTable(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspTable, title)
@@ -706,8 +697,8 @@ jaspQmlSourceR <- R6::R6Class(
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
-      } else if (jaspResultsCalledFromJasp()) {
-        jaspObj <- jaspResultsModule$create_cpp_jaspQmlSource(sourceID)
+      # } else if (jaspResultsCalledFromJasp()) {
+      #   jaspObj <- jaspResultsModule$create_cpp_jaspQmlSource(sourceID)
       } else {
         checkForJaspResultsInit()
         jaspObj <- create_cpp_jaspQmlSource(sourceID) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspTable, title)
@@ -747,12 +738,12 @@ jaspColumnR <- R6::R6Class(
       if (columnName == "")
         stop("You MUST specify a name for the column you want to change the data of", domain = NA)
 
-      if (jaspResultsCalledFromJasp()) {
-        columnObj <- jaspResultsModule$create_cpp_jaspColumn(columnName)
-      } else {
+      # if (jaspResultsCalledFromJasp()) {
+      #   columnObj <- jaspResultsModule$create_cpp_jaspColumn(columnName)
+      # } else {
         checkForJaspResultsInit()
         columnObj <- create_cpp_jaspColumn(columnName)
-      }
+      # }
 
       if (!is.null(scalarData))      columnObj$setScale(scalarData)
       if (!is.null(ordinalData))     columnObj$setOrdinal(ordinalData)

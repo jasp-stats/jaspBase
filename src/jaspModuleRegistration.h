@@ -30,6 +30,7 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("setPollMessagesFunc",			jaspResults::setPollMessagesFuncXPtr);
 	Rcpp::function("setBaseCitation",				jaspResults::setBaseCitation);
 	Rcpp::function("setInsideJasp",					jaspResults::setInsideJASP);
+	Rcpp::function("isInsideJASP",					jaspResults::isInsideJASP);
 	Rcpp::function("writeSealFilename",				jaspResults::writeSealFilename);
 	Rcpp::function("setResponseData",				jaspResults::setResponseData);
 	Rcpp::function("setDeveloperMode",				jaspResults::setDeveloperMode);

@@ -118,45 +118,10 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   if (obj) {
     image[["obj"]]         <- plot2draw
   }
-  #If we have jaspGraphs available we can get the plotEditingOptions for this plot
-  if(requireNamespace("jaspGraphs", quietly = TRUE))
-    image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
+
+  image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
 
   return(image)
-}
-
-# Source: https://github.com/Rapporter/pander/blob/master/R/evals.R#L1389
-# THANK YOU FOR THIS FUNCTION!
-redrawPlotJaspResults <- function(rec_plot)
-{
-  if (getRversion() < '3.0.0')
-  {
-    #@jeroenooms
-    for (i in 1:length(rec_plot[[1]]))
-      if ('NativeSymbolInfo' %in% class(rec_plot[[1]][[i]][[2]][[1]]))
-          rec_plot[[1]][[i]][[2]][[1]] <- getNativeSymbolInfo(rec_plot[[1]][[i]][[2]][[1]]$name)
-  } else
-  #@jjallaire
-    for (i in 1:length(rec_plot[[1]]))
-    {
-      symbol <- rec_plot[[1]][[i]][[2]][[1]]
-      if ('NativeSymbolInfo' %in% class(symbol))
-      {
-        if (!is.null(symbol$package)) name <- symbol$package[['name']]
-        else                          name <- symbol$dll[['name']]
-
-        pkg_dll       <- getLoadedDLLs()[[name]]
-        native_symbol <- getNativeSymbolInfo(name = symbol$name, PACKAGE = pkg_dll, withRegistrationInfo = TRUE)
-        rec_plot[[1]][[i]][[2]][[1]] <- native_symbol
-      }
-    }
-
-  if (is.null(attr(rec_plot, 'pid')) || attr(rec_plot, 'pid') != Sys.getpid()) {
-    warning('Loading plot snapshot from a different session with possible side effects or errors.', domain = NA)
-    attr(rec_plot, 'pid') <- Sys.getpid()
-  }
-
-  suppressWarnings(grDevices::replayPlot(rec_plot))
 }
 
 decodeplot <- function(x, ...) {
@@ -165,7 +130,8 @@ decodeplot <- function(x, ...) {
 
 decodeplot.jaspGraphsPlot <- function(x, ...) {
   for (i in seq_along(x$subplots))
-    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = FALSE)
+    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = TRUE)
+
   return(x)
 }
 
@@ -241,22 +207,26 @@ encodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   if (!is.function(fun))
     fun <- .getDefaultEnDeCoderFun("decode", strict)
-  return(.applyEnDeCoder(x, fun, ...))
+  out <- .applyEnDeCoder(x, fun, ...)
+  print(sprintf("called decodeColNames with input %s and output %s\n", x, out))
+  # print(fun)
+  return(out)
 }
 
 .getDefaultEnDeCoderFun <- function(type, strict) {
+
+  # TODO: this function would benefit if jasp assigns the functions into an environment
+  # that way they can be looked up directly instead of using findFun (jaspTools can also do that).
+
   defaults <- list(encode = list(strict = ".encodeColNamesStrict", lax = ".encodeColNamesLax"),
                    decode = list(strict = ".decodeColNamesStrict", lax = ".decodeColNamesLax"))
 
-  if (strict)
-    method <- "strict"
-  else
-    method <- "lax"
+  method <- if (strict) "strict" else "lax"
 
   fun <- .findFun(defaults[[type]][[method]])
 
   if (!is.function(fun))
-    stop(paste("Could not locate", type, "function; an analysis won't work correctly unless run inside JASP or jasptools"), domain = NA)
+    stop("Could not locate ", type, " function; an analysis won't work correctly unless run inside JASP or jasptools", domain = NA)
 
   return(fun)
 }
