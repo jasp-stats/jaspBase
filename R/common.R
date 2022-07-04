@@ -58,8 +58,9 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
 #' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
 
-  if (identical(.Platform$OS.type, "windows"))
-    compiler::enableJIT(0)
+  # let's disable this for now
+  # if (identical(.Platform$OS.type, "windows"))
+  #   compiler::enableJIT(0)
 
   suppressWarnings(RNGkind(sample.kind = "Rounding"))  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
 
@@ -98,6 +99,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
+
+  if (!jaspResultsCalledFromJasp())
+    return(jaspResults)
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
     jaspResultsCPP$send()

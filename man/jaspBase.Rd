@@ -3,4 +3,4 @@
 \docType{package}
 \name{jaspBase}
 \alias{jaspBase}
-\title{jaspBase: A package for ...}
+\title{jaspBase: A package for interfacing between Jasp and R}
