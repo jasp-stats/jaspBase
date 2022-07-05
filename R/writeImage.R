@@ -130,7 +130,7 @@ decodeplot <- function(x, ...) {
 
 decodeplot.jaspGraphsPlot <- function(x, ...) {
   for (i in seq_along(x$subplots))
-    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = TRUE)
+    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = FALSE)
 
   return(x)
 }

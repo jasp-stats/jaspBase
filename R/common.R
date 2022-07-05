@@ -100,8 +100,10 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
       jaspAnalysisAbort=function(e) e
     )
 
-  if (!jaspResultsCalledFromJasp())
+  if (!jaspResultsCalledFromJasp()) {
+    finishJaspResults(jaspResultsCPP)
     return(jaspResults)
+  }
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
     jaspResultsCPP$send()
