@@ -124,10 +124,13 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   return(image)
 }
 
+# intentionally not exported
 decodeplot <- function(x, ...) {
   UseMethod("decodeplot", x)
 }
 
+# S3 methods must be registered (done by @export) so that jaspGraphs can call jaspBase:::decodeplot
+#' @export
 decodeplot.jaspGraphsPlot <- function(x, ...) {
   for (i in seq_along(x$subplots))
     x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = FALSE)
@@ -135,6 +138,7 @@ decodeplot.jaspGraphsPlot <- function(x, ...) {
   return(x)
 }
 
+#' @export
 decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
@@ -158,15 +162,21 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   }
 }
 
+#' @export
 decodeplot.recordedplot <- function(x, ...) {
   decodeplot.gTree(grid::grid.grabExpr(gridGraphics::grid.echo(x)))
 }
 
+#' @export
 decodeplot.gtable <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+#' @export
 decodeplot.grob   <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+#' @export
 decodeplot.gTree  <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+#' @export
 decodeplot.gDesc  <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
 
+#' @export
 decodeplot.qgraph <- function(x, ...) {
   labels <- x[["graphAttributes"]][["Nodes"]][["labels"]]
   names  <- x[["graphAttributes"]][["Nodes"]][["names"]]
@@ -177,6 +187,7 @@ decodeplot.qgraph <- function(x, ...) {
   return(x)
 }
 
+#' @export
 decodeplot.function <- function(x, ...) {
 
   f <- tempfile()
@@ -207,10 +218,7 @@ encodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   if (!is.function(fun))
     fun <- .getDefaultEnDeCoderFun("decode", strict)
-  out <- .applyEnDeCoder(x, fun, ...)
-  print(sprintf("called decodeColNames with input %s and output %s\n", x, out))
-  # print(fun)
-  return(out)
+  return(.applyEnDeCoder(x, fun, ...))
 }
 
 .getDefaultEnDeCoderFun <- function(type, strict) {
