@@ -2,18 +2,12 @@
 #include <fstream>
 #include <cmath>
 
-#ifdef BUILDING_JASP
-#include <boost/nowide/fstream.hpp>
-#include <boost/nowide/cstdio.hpp>
-typedef boost::nowide::ofstream bofstream; //Use this to work around problems on Windows with utf8 conversion
-typedef boost::nowide::ifstream bifstream;
-#define BREMOVE boost::nowide::remove //Its not a type
-#else
+
 #include <cstdio>
 typedef std::ofstream bofstream;
 typedef std::ifstream bifstream;
 #define BREMOVE std::remove //Also not a type
-#endif
+
 
 
 sendFuncDef			jaspResults::_ipccSendFunc		= nullptr;
