@@ -210,11 +210,13 @@ decodeplot.function <- function(x, ...) {
 
 # Two convenience functions to encode/decode jasp column names. A custom encoder/decoder function may be supplied, otherwise a default is used.
 # The strict parameter affects the default; if TRUE then every value of x must be an exact column name, otherwise other values may be mixed in and pattern matching is performed.
+#' @export
 encodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   if (!is.function(fun))
     fun <- .getDefaultEnDeCoderFun("encode", strict)
   return(.applyEnDeCoder(x, fun, ...))
 }
+#' @export
 decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   if (!is.function(fun))
     fun <- .getDefaultEnDeCoderFun("decode", strict)

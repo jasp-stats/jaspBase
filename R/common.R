@@ -101,6 +101,25 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     )
 
   if (!jaspResultsCalledFromJasp()) {
+
+    if (inherits(analysisResult, "error")) {
+
+      if (inherits(analysisResult, "validationError")) {
+        errorStatus  <- "validationError"
+        errorMessage <- analysisResult$message
+      } else {
+        errorStatus  <- "fatalError"
+        error        <- .sanitizeForJson(analysisResult)
+        stackTrace   <- .sanitizeForJson(analysisResult$stackTrace)
+        stackTrace   <- paste(stackTrace, collapse="<br><br>")
+        errorMessage <- .generateErrorMessage(type=errorStatus, error=error, stackTrace=stackTrace)
+      }
+
+      jaspResultsCPP$setErrorMessage(errorMessage, errorStatus)
+      jaspResultsCPP$send()
+
+    }
+
     finishJaspResults(jaspResultsCPP)
     return(jaspResults)
   }
