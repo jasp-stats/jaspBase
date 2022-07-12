@@ -319,10 +319,10 @@ setupRenv <- function(moduleLibrary) {
 
   cachePaths <- strsplit(Sys.getenv("RENV_PATHS_CACHE"), .Platform$path.sep)
 
-  for(cachePath in cachePaths)
+  for(cachePath in cachePaths[[1]]) #strsplit is vectorized but we only give it a single string, so index to that single first one
     if (!dir.exists(cachePath))
      stop(sprintf("A cache is supposed to be at '%s' but it does not exist!", cachePath))
-
+  
   Sys.setenv("RENV_PATHS_LIBRARY" = moduleLibrary)
 
   print("Using the following paths:")
