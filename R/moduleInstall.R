@@ -1,5 +1,5 @@
 postInstallFixes <- function(folderToFix) {
-  if(length(ls(all.names=TRUE,pattern="\\..postProcessLibraryModule")) > 0 ) #We seem to be running in JASP
+  if(length(ls(all.names=TRUE,pattern="\\.postProcessLibraryModule")) > 0 ) #We seem to be running in JASP (but this won't be used because renv starts a separate R process)
   {
     #print("we are *in* jasp, so we use .postProcessLibraryModule!")
     .postProcessLibraryModule(folderToFix)
@@ -15,7 +15,8 @@ postInstallFixes <- function(folderToFix) {
   
     jaspEngineLocation <- Sys.getenv("JASPENGINE_LOCATION", unset = file.path(getwd(), "..", "JASPEngine"))
     jaspEngineCall     <- paste0(jaspEngineLocation, ' "', folderToFix ,'"')
-    #print(paste0("Calling JASPEngine as: '", jaspEngineCall ,"'"))
+    #print(paste0("Not *in* JASP so calling JASPEngine as: '", jaspEngineCall ,"'"))
+
     system(jaspEngineCall)
 
     if(getOS() == "windows")
