@@ -1,7 +1,7 @@
 # configure script that automatically downloads jaspColumnEncoder if it is missing.
 # to manual specify a location for jaspColumnEncoder and not download it, do
 #
-# options(configure.vars = c(jaspBase = "INCLUDE_DIR='-I<path>/github/jaspColumnEncoder -I<path>/github'"))
+# options(configure.vars = c(jaspBase = "INCLUDE_DIR='-I<path>/github/jaspColumnEncoder'"))
 # install.packages("jaspBase", ...)
 
 if test -f "/etc/redhat-release" && ! grep -Fq Fedora "/etc/redhat-release"; then
@@ -27,10 +27,12 @@ if [ "${INCLUDE_DIR}" ]; then
 	echo "Found INCLUDE_DIR: ${INCLUDE_DIR}"
 	DOWNLOAD_SUCCESS=0
 	PKG_CPPFLAGS="${INCLUDE_DIR}"
+	JASPCOLUMNENCODER_DIR="${INCLUDE_DIR}"
 
 else
 
-	PKG_CPPFLAGS='-I"../inst/include/jaspColumnEncoder" -I"../inst/include"'
+	PKG_CPPFLAGS='-I"../inst/include/jaspColumnEncoder"'
+	JASPCOLUMNENCODER_DIR='../inst/include/jaspColumnEncoder'
 	mkdir -p 'inst/include'
 
 	echo "seeing if git is available"
@@ -99,6 +101,13 @@ location of the parent directory (e.g., the default is '-I\"../inst/include/jasp
 	exit 1
 fi
 
-sed -e "s|@cppflags@|${PKG_CPPFLAGS}|" src/Makevars.in > src/Makevars
+SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
+JASPCOLUMNENCODER_SOURCES="$(cd src/ && ls ${JASPCOLUMNENCODER_DIR}/*.cpp | tr '\n' ' ')"
+
+echo "SRC_SOURCES = ${SRC_SOURCES}"
+echo "JASPCOLUMNENCODER_DIR = ${JASPCOLUMNENCODER_DIR}"
+echo "JASPCOLUMNENCODER_SOURCES = ${JASPCOLUMNENCODER_SOURCES}"
+
+sed -e "s|@cppflags@|${PKG_CPPFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
 
 exit 0
