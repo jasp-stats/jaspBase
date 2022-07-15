@@ -1,0 +1,4 @@
+CXX_STD				= CXX11
+PKG_CPPFLAGS	= @cppflags@
+CXX11STD			= -std=c++11
+

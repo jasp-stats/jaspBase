@@ -25,7 +25,7 @@ gettextf <- function(fmt, ..., domain = NULL)  {
 }
 
 loadJaspResults <- function(name) {
-  jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
+  create_cpp_jaspResults(name, .retrieveState())
 }
 
 finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
@@ -58,8 +58,9 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
 #' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
 
-  if (identical(.Platform$OS.type, "windows"))
-    compiler::enableJIT(0)
+  # let's disable this for now
+  # if (identical(.Platform$OS.type, "windows"))
+  #   compiler::enableJIT(0)
 
   suppressWarnings(RNGkind(sample.kind = "Rounding"))  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
 
@@ -98,6 +99,30 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
+
+  if (!jaspResultsCalledFromJasp()) {
+
+    if (inherits(analysisResult, "error")) {
+
+      if (inherits(analysisResult, "validationError")) {
+        errorStatus  <- "validationError"
+        errorMessage <- analysisResult$message
+      } else {
+        errorStatus  <- "fatalError"
+        error        <- .sanitizeForJson(analysisResult)
+        stackTrace   <- .sanitizeForJson(analysisResult$stackTrace)
+        stackTrace   <- paste(stackTrace, collapse="<br><br>")
+        errorMessage <- .generateErrorMessage(type=errorStatus, error=error, stackTrace=stackTrace)
+      }
+
+      jaspResultsCPP$setErrorMessage(errorMessage, errorStatus)
+      jaspResultsCPP$send()
+
+    }
+
+    finishJaspResults(jaspResultsCPP)
+    return(jaspResults)
+  }
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
     jaspResultsCPP$send()

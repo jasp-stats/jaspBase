@@ -1,0 +1,104 @@
+# configure script that automatically downloads jaspColumnEncoder if it is missing.
+# to manual specify a location for jaspColumnEncoder and not download it, do
+#
+# options(configure.vars = c(jaspBase = "INCLUDE_DIR='-I<path>/github/jaspColumnEncoder -I<path>/github'"))
+# install.packages("jaspBase", ...)
+
+if test -f "/etc/redhat-release" && ! grep -Fq Fedora "/etc/redhat-release"; then
+	echo "on RHEL"
+fi
+
+if test -f "/etc/os-release" && grep -Fq Ubuntu "/etc/os-release"; then
+	echo "on Ubuntu"
+fi
+
+if [ "$UNAME" = "Darwin" ]; then
+	echo "on macOS"
+fi
+
+if [ "$UNAME" = "SunOS" ]; then
+	echo "on SunOS"
+fi
+
+DOWNLOAD_SUCCESS=1
+
+if [ "${INCLUDE_DIR}" ]; then
+
+	echo "Found INCLUDE_DIR: ${INCLUDE_DIR}"
+	DOWNLOAD_SUCCESS=0
+	PKG_CPPFLAGS="${INCLUDE_DIR}"
+
+else
+
+	PKG_CPPFLAGS='-I"../inst/include/jaspColumnEncoder" -I"../inst/include"'
+	mkdir -p 'inst/include'
+
+	echo "seeing if git is available"
+	if git --version 2>&1 >/dev/null; then
+
+		if [ -d 'inst/include/jaspColumnEncoder' ] && [ -d 'inst/include/jaspColumnEncoder/.git' ]; then
+
+			echo 'Fetching and pulling existing repo'
+			WORK_TREE="$(pwd)/inst/include/jaspColumnEncoder"
+			git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" fetch origin
+			git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" pull
+			DOWNLOAD_SUCCESS=0
+
+		else
+
+			echo 'Cloning c++ dependency jaspColumnEncoder'
+			rm -rf 'inst/include/jaspColumnEncoder'
+			git clone --depth 1 https://github.com/jasp-stats/jaspColumnEncoder.git inst/include/jaspColumnEncoder
+			DOWNLOAD_SUCCESS=0
+
+		fi
+
+	fi
+
+	if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
+
+		echo "seeing if curl is available"
+		if curl --version 2>&1 >/dev/null; then
+
+			echo 'Downloading jaspColumnEncoder with curl'
+
+			rm -rf 'inst/include/jaspColumnEncoder'
+			mkdir -p 'inst/include/jaspColumnEncoder'
+
+			curl --silent --location https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
+			DOWNLOAD_SUCCESS=$?
+
+		fi
+	fi
+
+	if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
+
+		echo "seeing if wget is available"
+		if wget --version 2>&1 >/dev/null; then
+
+			echo 'Downloading jaspColumnEncoder with wget'
+
+			rm -rf 'inst/include/jaspColumnEncoder'
+			mkdir -p 'inst/include/jaspColumnEncoder'
+
+			wget --quiet --output-document=- https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
+			DOWNLOAD_SUCCESS=$?
+
+		fi
+	fi
+fi
+
+if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
+	printf "Installing jaspBase failed because the required C++ dependency jaspColumnEncoder is missing.\n\
+Normally this is downloaded automatically if either git, curl, or wget is available, but apparently this failed.\n\
+Either download \"https://github.com/jasp-stats/jaspColumnEncoder\" manually and specify the path through configure.args,\
+download git, or download curl.\n\
+If you're specifying configure.args manually, note that you must provide the location of jaspColumnEncoder and the\
+location of the parent directory (e.g., the default is '-I\"../inst/include/jaspColumnEncoder\" -I\"../inst/include\"'))
+"
+	exit 1
+fi
+
+sed -e "s|@cppflags@|${PKG_CPPFLAGS}|" src/Makevars.in > src/Makevars
+
+exit 0
