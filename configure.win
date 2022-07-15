@@ -89,10 +89,6 @@ fi
 SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
 JASPCOLUMNENCODER_SOURCES="$(cd src/ && ls ${JASPCOLUMNENCODER_DIR}/*.cpp | tr '\n' ' ')"
 
-echo "SRC_SOURCES = ${SRC_SOURCES}"
-echo "JASPCOLUMNENCODER_DIR = ${JASPCOLUMNENCODER_DIR}"
-echo "JASPCOLUMNENCODER_SOURCES = ${JASPCOLUMNENCODER_SOURCES}"
-
 sed -e "s|@cppflags@|${PKG_CPPFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
 
 exit 0
