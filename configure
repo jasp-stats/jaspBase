@@ -1,7 +1,7 @@
 # configure script that automatically downloads jaspColumnEncoder if it is missing.
 # to manual specify a location for jaspColumnEncoder and not download it, do
 #
-# options(configure.vars = c(jaspBase = "INCLUDE_DIR='-I<path>/github/jaspColumnEncoder'"))
+# options(configure.vars = c(jaspBase = "INCLUDE_DIR='<path>/github/jaspColumnEncoder'"))
 # install.packages("jaspBase", ...)
 
 if test -f "/etc/redhat-release" && ! grep -Fq Fedora "/etc/redhat-release"; then
@@ -26,7 +26,7 @@ if [ "${INCLUDE_DIR}" ]; then
 
 	echo "Found INCLUDE_DIR: ${INCLUDE_DIR}"
 	DOWNLOAD_SUCCESS=0
-	PKG_CPPFLAGS="${INCLUDE_DIR}"
+	PKG_CPPFLAGS="-I\"${INCLUDE_DIR}\""
 	JASPCOLUMNENCODER_DIR="${INCLUDE_DIR}"
 
 else
