@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-07-31 03:47\n"
+"POT-Creation-Date: 2022-07-16 03:55\n"
 "PO-Revision-Date: 2021-09-11 03:39+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -233,6 +233,9 @@ msgstr "O seu módulo não contém nenhum ficheiro DESCRIÇÃO"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Um cache é suposto estar em '%s' mas não existe!"
+
+msgid "Expected not-null but got null"
+msgstr ""
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "Formato incorretamente especificado"

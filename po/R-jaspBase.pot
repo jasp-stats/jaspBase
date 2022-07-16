@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-07-31 03:47\n"
+"Project-Id-Version: jaspBase 0.16.4\n"
+"POT-Creation-Date: 2022-07-16 03:55\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -170,4 +170,7 @@ msgid "Your module contains no DESCRIPTION file"
 msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
+msgstr ""
+
+msgid "Expected not-null but got null"
 msgstr ""

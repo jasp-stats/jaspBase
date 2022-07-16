@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-07-31 03:47\n"
+"POT-Creation-Date: 2022-07-16 03:55\n"
 "PO-Revision-Date: 2021-11-08 13:05+0000\n"
 "Last-Translator: Daiki Hojo <dhojo.bayes@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -120,7 +120,9 @@ msgstr "%s の値が区間 [%s, %s] の外にあります"
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
-msgstr "データセットは適切な分散共分散行列ではありません。データセットとして正定値対称行列だけを読み込んでください。"
+msgstr ""
+"データセットは適切な分散共分散行列ではありません。データセットとして正定値対"
+"称行列だけを読み込んでください。"
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
@@ -217,6 +219,9 @@ msgstr "あなたのモジュールには DESCRIPTION ファイルがありま�
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "キャッシュは '%s' に設定されていますが、存在しません!"
+
+msgid "Expected not-null but got null"
+msgstr ""
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "書式が正しく指定されていません"

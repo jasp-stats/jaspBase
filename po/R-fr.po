@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-07-31 03:47\n"
+"POT-Creation-Date: 2022-07-16 03:55\n"
 "PO-Revision-Date: 2021-07-26 14:33+0000\n"
 "Last-Translator: Martin Constant <martinc.1994@gmail.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/jasp/jaspbase/fr/"
@@ -233,6 +233,9 @@ msgstr "Votre module ne contient pas de fichier DESCRIPTION"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Un cache est censé se trouver à '%s' mais il n'existe pas !"
+
+msgid "Expected not-null but got null"
+msgstr ""
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "Format incorrectement spécifié"
