@@ -55,6 +55,17 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
   return(returnThis)
 }
 
+
+sendFatalErrorMessage <- function(name, title, msg)
+{
+  jaspResultsCPP        <- loadJaspResults(name)
+  jaspResultsCPP$title  <- title
+
+  jaspResultsCPP$setErrorMessage(msg, "fatalError")
+  jaspResultsCPP$send()
+}
+
+
 #' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
 
