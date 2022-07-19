@@ -333,8 +333,8 @@ setupRenv <- function(moduleLibrary) {
   options(install.opts = "--no-docs --no-test-load"); #make sure we do not do a test-load, because this will not work on mac. the rpaths still need to be fixed
 
   #Try to nudge renv towards installing binaries when possible
-   if(getOS() == "windows" || getOS() == "osx")
-    options(pkgType = "binary");
+  if(getOS() == "windows" || getOS() == "osx")
+    options(install.packages.compile.from.source = "never")
 
   addRenvBeforeAfterDispatch()
 }
