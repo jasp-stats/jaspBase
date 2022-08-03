@@ -35,10 +35,12 @@ startProgressbar <- function(expectedTicks, label="") {
   if (nchar(label) > 80) # if you update this value, also update it in the progressbar in jaspwidgets.js
     warning("The progressbar label is more than 80 characters, label will be truncated", domain = NA)
 
-  # if (jaspResultsCalledFromJasp())
-  #   jaspResultsModule$cpp_startProgressbar(expectedTicks, label)
-  # else
-    cpp_startProgressbar(expectedTicks, label)
+  cpp_startProgressbar(expectedTicks, label)
+}
+
+#' @export
+progressbarTick <- function() {
+  cpp_progressbarTick()
 }
 
 # we need to decode all the names for jaspObjects before going to CPP to avoid some problems. This because otherwise some jaspPlots (and others) might contain encoded columnnames. Which breaks plot-resizing-persistence
@@ -46,14 +48,6 @@ startProgressbar <- function(expectedTicks, label="") {
 decodeName <- function(name) {
   if(jaspResultsCalledFromJasp())    return(.decodeColNamesLax(name))
   else                               return(name)
-}
-
-#' @export
-progressbarTick <- function() {
-  if (jaspResultsCalledFromJasp())
-    jaspResultsModule$cpp_progressbarTick()
-  else
-    cpp_progressbarTick()
 }
 
 # TODO: this won't work?
