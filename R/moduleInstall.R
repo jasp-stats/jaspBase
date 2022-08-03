@@ -330,7 +330,7 @@ setupRenv <- function(moduleLibrary) {
   for(name in names(renv::paths))
     print(sprintf("%s:%s%s", name, paste0(rep(" ", 12 - nchar(name)), collapse=""), renv::paths[[name]]()))
 
-  options(install.opts = "--no-docs --no-test-load"); #make sure we do not do a test-load, because this will not work on mac. the rpaths still need to be fixed
+  options(install.opts = "--no-multiarch --no-docs --no-test-load"); #make sure we do not do a test-load, because this will not work on mac. the rpaths still need to be fixed
 
   #Try to nudge renv towards installing binaries when possible
   if(getOS() == "windows" || getOS() == "osx")
