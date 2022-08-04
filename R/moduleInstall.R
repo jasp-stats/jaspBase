@@ -156,11 +156,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
 
   # TODO: this is not very efficient because renv::install looks up the remotes on github...
   # there is a better way but it requires us to mess with renv's internals or to be more explicit about pkgs
-  # R gurus: the following if-else can be prettier no doubt...
-  if(!is.null(frameworkLibrary))  { sources <- c(moduleLibrary, frameworkLibrary)
-  } else                          { sources <- c(moduleLibrary)                   }
-
-  renv::hydrate(library = moduleLibrary, project = modulePkg, sources=sources)
+  renv::hydrate(library = moduleLibrary, project = modulePkg, sources=c(moduleLibrary, frameworkLibrary))
 
   correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble=cacheAble)
   if (correctlyInstalled)
