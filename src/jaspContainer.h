@@ -6,6 +6,7 @@
 #include "jaspState.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
+#include "jaspReport.h"
 #include <map>
 
 
@@ -23,7 +24,7 @@ public:
 	jaspContainer(const jaspContainer& that) = delete;
 
 	std::string dataToString(std::string prefix = "")						const	override;
-	std::string toHtml()															override;
+	std::string toHtml()													const	override;
 
 	void			insert(std::string field, Rcpp::RObject value);
 	Rcpp::RObject	at(std::string field);

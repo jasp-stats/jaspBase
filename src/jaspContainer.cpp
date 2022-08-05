@@ -17,6 +17,7 @@ void jaspContainer::insert(std::string field, Rcpp::RObject value)
 	else if(Rcpp::is<jaspContainer_Interface>(value))	obj = Rcpp::as<jaspContainer_Interface>(value).returnMyJaspObject();
 	else if(Rcpp::is<jaspQmlSource_Interface>(value))	obj = Rcpp::as<jaspQmlSource_Interface>(value).returnMyJaspObject();
 	else if(Rcpp::is<jaspColumn_Interface>(value))		obj = Rcpp::as<jaspColumn_Interface>(value).returnMyJaspObject();
+	else if(Rcpp::is<jaspReport_Interface>(value))		obj = Rcpp::as<jaspReport_Interface>(value).returnMyJaspObject();
 	else if(Rcpp::is<jaspTable_Interface>(value))		obj = Rcpp::as<jaspTable_Interface>(value).returnMyJaspObject();
 	else if(Rcpp::is<jaspState_Interface>(value))		obj = Rcpp::as<jaspState_Interface>(value).returnMyJaspObject();
 	else if(Rcpp::is<jaspPlot_Interface>(value))		obj = Rcpp::as<jaspPlot_Interface>(value).returnMyJaspObject();
@@ -82,6 +83,7 @@ Rcpp::RObject jaspContainer::wrapJaspObject(jaspObject * ref)
 	case jaspObjectType::container:	return Rcpp::wrap(jaspContainer_Interface(ref));
 	case jaspObjectType::qmlSource:	return Rcpp::wrap(jaspQmlSource_Interface(ref));
 	case jaspObjectType::column:	return Rcpp::wrap(jaspColumn_Interface(ref));
+	case jaspObjectType::report:	return Rcpp::wrap(jaspReport_Interface(ref));
 	case jaspObjectType::table:		return Rcpp::wrap(jaspTable_Interface(ref));
 	case jaspObjectType::state:		return Rcpp::wrap(jaspState_Interface(ref));
 	case jaspObjectType::html:		return Rcpp::wrap(jaspHtml_Interface(ref));
@@ -100,7 +102,7 @@ std::string jaspContainer::dataToString(std::string prefix) const
 	return out.str();
 }
 
-std::string jaspContainer::toHtml()
+std::string jaspContainer::toHtml() const
 {
 	std::stringstream out;
 
@@ -108,8 +110,8 @@ std::string jaspContainer::toHtml()
 			<< htmlTitle() << "\n"
 			<< "<ul>";
 
-	for(auto key : getSortedDataFields())
-		out << "<li><p><b>" << key << "</b></p>" << _data[key]->toHtml() << "</li>\n";
+	for(const auto & key : getSortedDataFields())
+		out << "<li><p><b>" << key << "</b></p>" << _data.at(key)->toHtml() << "</li>\n";
 
 	out << "</ul>" "\n" "</div>" "\n";
 
@@ -234,11 +236,13 @@ std::string jaspContainer::getCommonDenominatorMetaType() const
 {
 	std::string comDenom = "";
 
-	for(auto keyval: _data)
+	for(const auto & keyval : _data)
 	{
 		std::string currentType = keyval.second->metaEntry()["type"].asString();
+		
 		if(comDenom == "")
 			comDenom = currentType;
+
 		else if(comDenom != currentType) //at least two kinds of types in here
 			return "various";
 	}
@@ -255,7 +259,7 @@ Json::Value jaspContainer::metaEntry(jaspObject * oldResult) const
 
 	std::vector<std::string> orderedDataFields = getSortedDataFieldsWithOld(oldContainer);
 
-	for(std::string field: orderedDataFields)
+	for(const std::string & field: orderedDataFields)
 	{
 		jaspObject *	obj			= getJaspObjectNewOrOld(field, oldContainer);
 		bool			objIsOld	= jaspObjectComesFromOldResults(field, oldContainer);

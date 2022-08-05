@@ -7,6 +7,7 @@ JASP_OBJECT_CREATOR(jaspPlot)
 JASP_OBJECT_CREATOR(jaspTable)
 JASP_OBJECT_CREATOR(jaspState)
 JASP_OBJECT_CREATOR(jaspColumn)
+JASP_OBJECT_CREATOR(jaspReport)
 JASP_OBJECT_CREATOR(jaspContainer)
 JASP_OBJECT_CREATOR(jaspQmlSource)
 JASP_OBJECT_CREATOR_ARG(jaspResults, oldState)
@@ -18,6 +19,7 @@ RCPP_MODULE(jaspResults)
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspTable);
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspState);
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspColumn);
+	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspReport);
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspResults);
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspContainer);
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspQmlSource);
@@ -169,7 +171,7 @@ RCPP_MODULE(jaspResults)
 		.method( "[[<-",						&jaspTable_Interface::setColumn,					"Insert a single column into the table, if a string is used then it will look for an existing column name and set that column with the new data and otherwise will just add it at the end. If it is indexed by integer it will simply set it there.")
 
 		.method("setExpectedSize",				&jaspTable_Interface::setExpectedSize,				"Set the expected size of this table to the specified columnCount and rowCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.")
-		.method("setExpectedColumns",			&jaspTable_Interface::setExpectedColumns,				"Set the expected size of this table to the specified columnCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.")
+		.method("setExpectedColumns",			&jaspTable_Interface::setExpectedColumns,			"Set the expected size of this table to the specified columnCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.")
 		.method("setExpectedRows",				&jaspTable_Interface::setExpectedRows,				"Set the expected size of this table to the specified rowCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.")
 	;
 
@@ -181,11 +183,16 @@ RCPP_MODULE(jaspResults)
 		.property("class",			&jaspHtml_Interface::getClass,			&jaspHtml_Interface::setClass,			"The Css-class of this element, for monospace one could use jasp-code or simply leave it empty.")
 		.property("maxWidth",		&jaspHtml_Interface::getMaxWidth,		&jaspHtml_Interface::setMaxWidth,		"The Css-max-width property. It will be set on a span around your html.")
 	;
-
+	
+	Rcpp::class_<jaspReport_Interface>("jaspReport")
+		.derives<jaspObject_Interface>("jaspObject")
+		.property("text",			&jaspReport_Interface::getText,			&jaspReport_Interface::setText,			"The text of this element")
+        .property("report",	&jaspReport_Interface::getReport,	&jaspReport_Interface::setReport,	"Should a report be sent/made?")
+	;
 
 	Rcpp::class_<jaspState_Interface>("jaspState")
 		.derives<jaspObject_Interface>("jaspObject")
-		.property("object", &jaspState_Interface::getObject, &jaspState_Interface::setObject, "The object that you might want to keep for the next revision of your analysis.")
+		.property("object",			&jaspState_Interface::getObject, 		&jaspState_Interface::setObject, 		"The object that you might want to keep for the next revision of your analysis.")
 	;
 
 	Rcpp::class_<jaspColumn_Interface>("jaspColumn")
@@ -221,7 +228,7 @@ RCPP_MODULE(jaspResults)
 		.method("prepareForWriting",		&jaspResults_Interface::prepareForWriting,						"Remove seal for writing")
 		.method("finishWriting",			&jaspResults_Interface::finishWriting,							"Set seal for writing")
 		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")
-
+		
 		.method("setCurrentColumnNames",	&jaspResults_Interface::setCurrentColumnNames,					"setCurrentColumnNames")
 		.method("encodeColumnName",			&jaspResults_Interface::encodeColumnName,						"encodeColumnName")
 		.method("decodeColumnName",			&jaspResults_Interface::decodeColumnName,						"decodeColumnName")
@@ -238,9 +245,9 @@ RCPP_MODULE(jaspResults)
 }
 
 
- Rcpp::RObject givejaspResultsModule()
- {
- 	/* Should be done through LOAD_RCPP_MODULE actually but there seems to be something wrong with the macro.. So we just copy the underlying code like  https://stackoverflow.com/questions/45344260/load-rcpp-module-seems-not-right */
- 	Rcpp::Shield<SEXP> __load_module_call__( Rf_lang2( GET_MODULE_SYM, _rcpp_module_boot_jaspResults() ) );
- 	return Rcpp_eval( __load_module_call__, R_GlobalEnv );
- }
+Rcpp::RObject givejaspResultsModule()
+{
+	/* Should be done through LOAD_RCPP_MODULE actually but there seems to be something wrong with the macro.. So we just copy the underlying code like  https://stackoverflow.com/questions/45344260/load-rcpp-module-seems-not-right */
+	Rcpp::Shield<SEXP> __load_module_call__( Rf_lang2( GET_MODULE_SYM, _rcpp_module_boot_jaspResults() ) );
+	return Rcpp_eval( __load_module_call__, R_GlobalEnv );
+}

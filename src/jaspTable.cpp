@@ -809,7 +809,7 @@ std::string jaspTable::dataToString(std::string prefix) const
 	return out.str();
 }
 
-std::string jaspTable::toHtml()
+std::string jaspTable::toHtml() const
 {
 	std::stringstream out;
 
@@ -853,7 +853,7 @@ std::string jaspTable::toHtml()
 	return out.str();
 }
 
-void jaspTable::rectangularDataWithNamesToHtml(std::stringstream & out, std::vector<std::vector<std::string>> vierkant, std::vector<std::string> sideNames, std::vector<std::string> topNames, std::map<std::string,std::string> sideOvertitles, std::map<std::string,std::string> topOvertitles)
+void jaspTable::rectangularDataWithNamesToHtml(std::stringstream & out, std::vector<std::vector<std::string>> vierkant, std::vector<std::string> sideNames, std::vector<std::string> topNames, std::map<std::string,std::string> sideOvertitles, std::map<std::string,std::string> topOvertitles) const
 {
 	if(vierkant.size() == 0)
 	{
