@@ -1,4 +1,16 @@
 CXX_STD				= CXX11
-PKG_CPPFLAGS	= @cppflags@
+PKG_CPPFLAGS		= @cppflags@
 CXX11STD			= -std=c++11
 
+# Include all C++ files in src/ and jaspColumnEncoder
+SOURCES=@src_sources@ @jaspColumnEncoder_sources@
+
+# Obtain the object files
+OBJECTS=$(SOURCES:.cpp=.o)
+
+# Make the shared object
+all: $(SHLIB)
+
+# Provide recipe to remove all objects
+clean:
+	@rm -f $(OBJECTS)

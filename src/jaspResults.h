@@ -10,7 +10,7 @@ typedef void (*sendFuncDef)(const char *);
 typedef bool (*pollMessagesFuncDef)();
 //If you edit any function(signatures) or objects for JASP* Rcpp modules and you want to run it as an R-Package you should run Rcpp::compileAttributes from an R instance started in $PWD/R-Interface/jaspResults
 
-#include "jaspColumnEncoder/columnencoder.h"
+#include "columnencoder.h"
 #define INCLUDE_COLUMN_ENCODING_ETC
 #define GUARD_ENCODE_FUNCS(CODE) CODE
 #endif

@@ -12,7 +12,7 @@ bool	jaspRCPP_setColumnDataAsNominal(		std::string, Rcpp::RObject) { jaspPrint("
 bool	jaspRCPP_setColumnDataAsNominalText(	std::string, Rcpp::RObject) { jaspPrint("jaspColumn does nothing in R stand-alone!"); return false; };
 
 #define ENUM_DECLARATION_CPP
-#include "jaspColumnEncoder/columntype.h"
+#include "columntype.h"
 
 columnType jaspRCPP_getColumnType(std::string columnName) { return columnType::unknown; }
 

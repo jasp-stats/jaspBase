@@ -12,7 +12,7 @@ postInstallFixes <- function(folderToFix) {
     #sometimes R.dll is not in the path on windows, despite this being called from R...
     if(getOS() == "windows")
         Sys.setenv("PATH"=paste(R.home(component='bin'), ';', old_PATH, sep="", collapse=""))
-  
+
     jaspEngineLocation <- Sys.getenv("JASPENGINE_LOCATION", unset = file.path(getwd(), "..", "JASPEngine"))
     jaspEngineCall     <- paste0(jaspEngineLocation, ' "', folderToFix ,'"')
     #print(paste0("Not *in* JASP so calling JASPEngine as: '", jaspEngineCall ,"'"))
@@ -317,12 +317,16 @@ setupRenv <- function(moduleLibrary) {
     package = "renv"
   )
 
+  # renv_package_find crashes when package is base.
+  # for some terrible reason, people explicitly do base:: even though this isn't necessary.
+  renv::settings$ignored.packages(project = modulePkg, value = "base", persist = FALSE)
+
   cachePaths <- strsplit(Sys.getenv("RENV_PATHS_CACHE"), .Platform$path.sep)
 
   for(cachePath in cachePaths[[1]]) #strsplit is vectorized but we only give it a single string, so index to that single first one
     if (!dir.exists(cachePath))
      stop(sprintf("A cache is supposed to be at '%s' but it does not exist!", cachePath))
-  
+
   Sys.setenv("RENV_PATHS_LIBRARY" = moduleLibrary)
 
   print("Using the following paths:")
