@@ -548,8 +548,10 @@ installModuleNew <- function(
         cat("Package hash in lockfile different from local folder, reinstalling from scratch\n")
 
       # hacky but leaves no trails
-      fs::dir_delete(moduleLibrary)
-      fs::dir_create(moduleLibrary)
+      unlink(moduleLibrary, recursive = TRUE, expand = FALSE)
+      dir.create(moduleLibrary)
+      # fs::dir_delete(moduleLibrary)
+      # fs::dir_create(moduleLibrary)
       # file.remove
       # fs::link_delete(fs::dir_ls(moduleLibrary, type = "link"))
       # fs::link_delete(fs::dir_ls(moduleLibrary, type = "all"))
