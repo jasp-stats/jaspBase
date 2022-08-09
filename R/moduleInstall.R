@@ -832,7 +832,7 @@ hackRenv <- function() {
     # start of changes
     commitHashes <- getOption("JASP_LOCAL_COMMIT_HASHES", FALSE)
     if (!isFALSE(commitHashes) && dcf$Package %in% names(commitHashes)) {
-      cat(sprintf("renv_snapshot_description: Package: %shash: %s\n", format(dcf$Package, width = 20), commitHashes[[dcf$Package]]))
+      # cat(sprintf("renv_snapshot_description: Package: %shash: %s\n", format(dcf$Package, width = 20), commitHashes[[dcf$Package]]))
       dcf[["Hash"]] <- commitHashes[[dcf$Package]]
     } else {
       dcf[["Hash"]] <- renv:::renv_hash_description(path)
@@ -866,7 +866,7 @@ hackRenv <- function() {
     # start of changes
     commitHashes <- getOption("JASP_LOCAL_COMMIT_HASHES", FALSE)
     if (!isFALSE(commitHashes) && record$Package %in% names(commitHashes)) {
-      cat(sprintf("renv_retrieve_explicit: Package: %shash: %s\n", format(record$Package, width = 20), commitHashes[[record$Package]]))
+      # cat(sprintf("renv_retrieve_explicit: Package: %shash: %s\n", format(record$Package, width = 20), commitHashes[[record$Package]]))
       record$Hash <- commitHashes[[record$Package$Package]]
     }
     # end of changes
