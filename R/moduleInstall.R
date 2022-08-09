@@ -75,7 +75,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   lockFileTemp   <- file.path(moduleLibraryTemp, "renv.lock")
   file.copy(from = lockFileModule, to = lockFileTemp, overwrite = TRUE)
 
-  setupRenv(moduleLibrary)
+  setupRenv(moduleLibrary, modulePkg)
 
   # TODO: unclear whether this is necessary within JASP, or just within Rstudio.
   # renv must be unaware of any other libPaths than the cache and the directory designated for the module.
@@ -147,7 +147,7 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   if (!dir.exists(file.path(moduleLibraryTemp, "renv")))
     dir.create(file.path(moduleLibraryTemp, "renv"), recursive = TRUE)
 
-  setupRenv(moduleLibrary)
+  setupRenv(moduleLibrary, modulePkg)
 
   # make renv blind for other libPaths
   #old.lib.loc <- .libPaths()
@@ -308,7 +308,7 @@ addRenvBeforeAfterDispatch <- function() {
   return(unclass(x))
 }
 
-setupRenv <- function(moduleLibrary) {
+setupRenv <- function(moduleLibrary, modulePkg) {
 
   # renv adds e.g,. "R-3.6/x86_64-pc-linux-gnu" to all paths (R-version/os) and we don't need that
   assignFunctionInPackage(
