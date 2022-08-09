@@ -24,7 +24,7 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-        shell: bash 
+        shell: bash
 
       - uses: actions/checkout@v2
 
@@ -39,9 +39,23 @@ jobs:
         with:
           extra-packages: rcmdcheck
 
-      - uses: r-lib/actions/check-r-package@v2
-        with:
-          error-on: '"error"'
+      # This always uploads stuff on failure...
+      # - uses: r-lib/actions/check-r-package@v2
+      #   with:
+      #     error-on: '"error"'
+
+# copied from https://github.com/r-lib/actions/blob/v2/check-r-package/action.yaml
+      - name: Check
+        id: rcmdcheck
+        env:
+          _R_CHECK_CRAN_INCOMING_: false
+        run: |
+          options(crayon.enabled = TRUE)
+          if (Sys.getenv("_R_CHECK_FORCE_SUGGESTS_", "") == "") Sys.setenv("_R_CHECK_FORCE_SUGGESTS_" = "false")
+          cat("##[set-output name=check-dir-path;]", ("check"), "\n", sep = "")
+          check_results <- rcmdcheck::rcmdcheck(args = c("--no-manual", "--as-cran"), build_args = "--no-manual", error_on = "error", check_dir = "check")
+        shell: Rscript {0}
+        working-directory: '.'
 
       - name: Show testthat output
         if: always()
