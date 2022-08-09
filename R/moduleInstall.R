@@ -535,7 +535,7 @@ installModuleNew <- function(
       df$identical[df$identical] <- df$identical[df$identical] & dir.exists(file.path(moduleLibrary, jaspPkgs[df$identical]))
 
     # if the module didn't change then we can reuse the lockfile, otherwise we reinstall everything from scratch
-    reusingLockfile <- df[moduleName, "identical"]
+    reusingLockfile <- df[[moduleName, "identical"]]
 
     if (reusingLockfile) {
 
@@ -547,7 +547,8 @@ installModuleNew <- function(
       if (verbose >= 1)
         cat("Package hash in lockfile different from local folder, reinstalling from scratch\n")
 
-      file.remove(c(
+      # file.remove
+      fs::file_delete(c(
         list.dirs(moduleLibrary, full.names = TRUE, recursive = FALSE),
         # checking for existence avoids warnings in file.remove
         if (file.exists(lockfilePath)) lockfilePath,
@@ -584,6 +585,13 @@ installModuleNew <- function(
   options("JASP_LOCAL_PATHS"         = localPaths)
   options("JASP_LOCAL_COMMIT_HASHES" = commitHashes)
   hackRenv()
+
+  if (file.exists(file.path(modulePath, ".RBuildignore"))) {
+    rBuildIgnorePath <- file.path(modulePath, ".RBuildignore")
+    tempRBuildIgnorePath <- tempfile()
+    copyOfRBuildIgnore <- file.copy(rBuildIgnorePath, tempRBuildIgnorePath)
+    on.exit(file.copy(tempRBuildIgnorePath, rBuildIgnorePath), add = TRUE, after = FALSE)
+  }
 
   if (!allIdenticalJaspPkgs) {
 
