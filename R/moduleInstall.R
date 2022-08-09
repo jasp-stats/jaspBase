@@ -547,13 +547,20 @@ installModuleNew <- function(
       if (verbose >= 1)
         cat("Package hash in lockfile different from local folder, reinstalling from scratch\n")
 
+      # hacky but leaves no trails
+      fs::dir_delete(moduleLibrary)
+      fs::dir_create(moduleLibrary)
       # file.remove
-      fs::file_delete(c(
-        list.dirs(moduleLibrary, full.names = TRUE, recursive = FALSE),
-        # checking for existence avoids warnings in file.remove
-        if (file.exists(lockfilePath)) lockfilePath,
-        if (file.exists(file.path(moduleLibrary, ".renv"))) file.path(moduleLibrary, ".renv")
-      ))
+      # fs::link_delete(fs::dir_ls(moduleLibrary, type = "link"))
+      # fs::link_delete(fs::dir_ls(moduleLibrary, type = "all"))
+      # fs::link_delete(fs::dir_ls(moduleLibrary, type = "all"))
+      #
+      # fs::file_delete(c(
+      #   list.dirs(moduleLibrary, full.names = TRUE, recursive = FALSE),
+      #   # checking for existence avoids warnings in file.remove
+      #   if (file.exists(lockfilePath)) lockfilePath,
+      #   if (file.exists(file.path(moduleLibrary, ".renv"))) file.path(moduleLibrary, ".renv")
+      # ))
     }
     allIdenticalJaspPkgs <- all(df$identical)
 
