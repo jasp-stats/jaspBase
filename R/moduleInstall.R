@@ -469,10 +469,21 @@ installModuleNew <- function(
   }
 
   moduleName   <- basename(modulePath)
-  localPaths   <- getLocalPaths(jaspRoot)
+
+  cachedObjectPath <- getOption("JASP_COMMIT_HASHES_OBJECT", default = "")
+  if (cachedObjectPath == "" || !file.exists(cachedObjectPath)) {
+    cat("Did not find a cached object with commit information")
+    localPaths   <- getLocalPaths(jaspRoot)
+    commitHashes <- getModuleHashes(localPaths)
+  } else {
+    cat(sprintf("Using cached object with commit information from %s\n", cachedObjectPath))
+    temp <- readRDS(cachedObjectPath)
+    localPaths   <- temp[["localPaths"]]
+    commitHashes <- temp[["commitHashes"]]
+  }
+
   deps         <- renv::dependencies(file.path(modulePath, "DESCRIPTION"), progress = FALSE)
   jaspPkgs     <- c(moduleName, intersect(deps$Package, names(localPaths)))
-  commitHashes <- getModuleHashes(localPaths)
   updatePkgs   <- parseUpdatePkgs(jaspRoot, updatePackages)
   maybeSilence <- if (verbose >= 2) identity else silence
 
@@ -996,4 +1007,13 @@ prettyCat <- function(keys, values = NULL) {
   for (i in seq_along(keys))
     cat(sprintf("%s:%s %s\n", keys[i], pads[i], values[[i]]))
 
+}
+
+createCommitHashObject <- function(jaspRoot, file) {
+  localPaths   <- getLocalPaths(jaspRoot)
+  commitHashes <- getModuleHashes(localPaths)
+  saveRDS(list(
+    localPaths   = localPaths,
+    commitHashes = commitHashes
+  ), file = file)
 }
