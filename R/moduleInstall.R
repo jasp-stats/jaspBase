@@ -181,7 +181,7 @@ installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), m
     moduleInfo <- getModuleInfo(modulePkg)
   record <- recordFromModule(modulePkg, moduleInfo, cacheAble=cacheAble)
 
-  print(paste0("Im telling renv to install to '", moduleLibrary, "' from '", modulePkg, "' which is a pkg", ifElse(isModulePkgArchive(modulePkg), "archive", "module")))
+  print(paste0("Im telling renv to install to '", moduleLibrary, "' from '", modulePkg, "' which is a pkg", ifelse(isModulePkgArchive(modulePkg), "archive", "module")))
 
   renv::install(record, library = moduleLibrary, rebuild = TRUE, prompt = prompt)
   TRUE
