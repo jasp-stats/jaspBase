@@ -161,7 +161,8 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
 
   # TODO: this is not very efficient because renv::install looks up the remotes on github...
   # there is a better way but it requires us to mess with renv's internals or to be more explicit about pkgs
-  renv::hydrate(library = moduleLibrary, project = modulePkg, sources=c(moduleLibrary, frameworkLibrary))
+  renv::hydrate(library = moduleLibrary, project = modulePkg, sources=c(moduleLibrary, frameworkLibrary), recursive=(getOS() != "windows"))
+  # the recursive if not windows is related to https://github.com/jasp-stats/INTERNAL-jasp/issues/2072
 
   correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble=cacheAble)
   if (!isModulePkgArchive(modulePkg) && correctlyInstalled)
