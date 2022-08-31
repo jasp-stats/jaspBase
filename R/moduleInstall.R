@@ -17,7 +17,8 @@ postInstallFixes <- function(folderToFix) {
     jaspEngineCall     <- paste0(jaspEngineLocation, ' "', folderToFix ,'"')
     #print(paste0("Not *in* JASP so calling JASPEngine as: '", jaspEngineCall ,"'"))
 
-    system(jaspEngineCall)
+    if(getOS() == "osx")
+      system(jaspEngineCall)
 
     if(getOS() == "windows")
         Sys.setenv("PATH"=old_PATH);
