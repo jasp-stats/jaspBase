@@ -101,8 +101,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   registerFonts()
-  oldGraphOptions <- jaspGraphs::graphOptions()
-  on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
+
+  # resets jaspGraphs::graphOptions & options after this function finishes
+  setOptionsCleanupHook()
 
   analysisResult <-
     tryCatch(
