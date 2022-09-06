@@ -15,9 +15,9 @@ getOS <- function() {
 }
 
 restoreOptions <- function(oldOptions) {
-  # avoid contaminating options
 
-  # NOTE: options(oldOptions) is insufficient (like withr does), because this does not remove any options that were set before
+  # NOTE: `options(oldOptions)`, like withr does, is insufficient because this does not remove any options that were set before
+
   # for example,
   # oldOptions <- options()
   # options("a")
