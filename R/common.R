@@ -536,10 +536,8 @@ jaspResultsStrings <- function() {
 
 #' @export
 .extractErrorMessage <- function(error) {
-
-  split <- base::strsplit(as.character(error), ":")[[1]]
-  last <- split[[length(split)]]
-  trimws(last)
+  msg <- attr(error, "condition")$message
+  trimws(msg)
 }
 
 #' @export
