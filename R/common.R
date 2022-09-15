@@ -536,8 +536,18 @@ jaspResultsStrings <- function() {
 
 #' @export
 .extractErrorMessage <- function(error) {
-  msg <- attr(error, "condition")$message
-  trimws(msg)
+  stopifnot(length(error) == 1)
+
+  if (isTryError(error)) {
+    msg <- attr(error, "condition")$message
+    return(trimws(msg))
+  } else if (is.character(error)){
+    split <- base::strsplit(error, ":")[[1]]
+    last <- split[[length(split)]]
+    return(trimws(last))
+  } else {
+    stop("Do not know what to do with an object of class `", class(error)[1], "`; The class of the `error` object should be `try-error` or `character`!" )
+  }
 }
 
 #' @export
