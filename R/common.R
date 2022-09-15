@@ -683,6 +683,7 @@ saveImage <- function(plotName, format, height, width)
       # Where available use the cairo devices, because:
       # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
       # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
+
       if (capabilities("cairo"))
         type <- "cairo"
       else if (capabilities("aqua"))
@@ -693,7 +694,9 @@ saveImage <- function(plotName, format, height, width)
       # Open correct graphics device
       if (format == "eps") {
 
-        if (type == "cairo")
+        # The call to capabilities("X11") may throw an error. This error has for effect that ragg::agg_tiff cannot be called anymore wthout crashing the enigne.
+        # So the call to capabilities("X11") must be done only when the eps (or pdf) type is set.
+        if (type == "cairo" && try(capabilities("X11")))
           device <- grDevices::cairo_ps
         else
           device <- grDevices::postscript
@@ -719,7 +722,7 @@ saveImage <- function(plotName, format, height, width)
 
       } else if (format == "pdf") {
 
-        if (type == "cairo")
+        if (type == "cairo" && try(capabilities("X11")))
           device <- grDevices::cairo_pdf
         else
           device <- grDevices::pdf
