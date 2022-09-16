@@ -191,7 +191,6 @@ registerFonts <- function() {
 
 #' @export
 initEnvironment <- function() {
-  #Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
   packages <- c("BayesFactor") # Add any package that needs pre-loading
 
   if (identical(.Platform$OS.type, "windows"))
