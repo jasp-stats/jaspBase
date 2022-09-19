@@ -546,7 +546,7 @@ jaspResultsStrings <- function() {
     last <- split[[length(split)]]
     return(trimws(last))
   } else {
-    stop("Do not know what to do with an object of class `", class(error)[1], "`; The class of the `error` object should be `try-error` or `character`!" )
+    stop("Do not know what to do with an object of class `", class(error)[1], "`; The class of the `error` object should be `try-error` or `character`!", domain = NA)
   }
 }
 
