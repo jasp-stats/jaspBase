@@ -104,6 +104,15 @@ fi
 SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
 JASPCOLUMNENCODER_SOURCES="$(cd src/ && ls ${JASPCOLUMNENCODER_DIR}/*.cpp | tr '\n' ' ')"
 
+#if [ "${JASP_R_INTERFACE_LIBRARY}" ]; then
+#	JASP_R_INTERFACE_LIBRARY_VALUE="-DJASP_R_INTERFACE_LIBRARY=1 -I${INCLUDE_DIR}/../../R-Interface -I/home/don/github/build-jasp-desktop-Desktop_Qt_6_3_1_GCC_64bit-Debug/R/library/RInside/include/"
+#else
+#	JASP_R_INTERFACE_LIBRARY_VALUE="-DJASP_R_INTERFACE_LIBRARY=0"
+#fi
+
+echo "JASP_R_INTERFACE_LIBRARY=${JASP_R_INTERFACE_LIBRARY_VALUE}"
+
 sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
+#sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" -e "s|@jasp_r_interface@|${JASP_R_INTERFACE_LIBRARY_VALUE}|" src/Makevars.in > src/Makevars
 
 exit 0

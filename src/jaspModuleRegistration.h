@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "jaspResults.h"
+#include "jaspColumn.h"
 
 JASP_OBJECT_CREATOR(jaspHtml)
 JASP_OBJECT_CREATOR(jaspPlot)
@@ -36,6 +37,13 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("setDeveloperMode",				jaspResults::setDeveloperMode);
 	Rcpp::function("setSaveLocation",				jaspResults::setSaveLocation);
 	Rcpp::function("setWriteSealLocation",			jaspResults::setWriteSealLocation);
+
+	Rcpp::function("setColumnDataAsScaleFunc",			jaspColumn::set_jaspRCPP_setColumnDataAsScaleFuncXPtr);
+	Rcpp::function("setColumnDataAsOrdinalFunc",		jaspColumn::set_jaspRCPP_setColumnDataAsOrdinalFuncXPtr);
+	Rcpp::function("setColumnDataAsNominalFunc",		jaspColumn::set_jaspRCPP_setColumnDataAsNominalFuncXPtr);
+	Rcpp::function("setColumnDataAsNominalTextFunc",	jaspColumn::set_jaspRCPP_setColumnDataAsNominalTextFuncXPtr);
+	Rcpp::function("setColumnTypeFunc",					jaspColumn::set_jaspRCPP_getColumnTypeFuncXPtr);
+
 
 	Rcpp::class_<jaspObject_Interface>("jaspObject")
 
