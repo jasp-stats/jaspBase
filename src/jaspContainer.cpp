@@ -59,7 +59,7 @@ jaspContainer * jaspContainer::jaspContainerFromRcppList(Rcpp::List convertThis)
 
 	for(int i=0; i<convertThis.size(); i++)
 		if(colNamesVec[i] == "title")
-			newContainer->_title = jaspNativeToUtf8(Rcpp::RObject(convertThis[i]));
+			newContainer->_title = Rcpp::String(Rcpp::RObject(convertThis[i]));
 		else
 			newContainer->insert(colNamesVec[i], convertThis[i]);
 
@@ -471,7 +471,7 @@ void jaspContainer::setError()
 
 void jaspContainer::setError(Rcpp::String message)
 {
-	_errorMessage = jaspNativeToUtf8(message);
+	_errorMessage = message;
 	setError();
 }
 

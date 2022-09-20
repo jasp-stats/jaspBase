@@ -107,13 +107,13 @@ void jaspPlot::renderPlot()
 			plotInfo["obj"] = writeResult["obj"];
 
 		if(writeResult.containsElementNamed("png"))
-			_filePathPng = jaspNativeToUtf8(Rcpp::as<Rcpp::String>(writeResult["png"]));
+			_filePathPng = Rcpp::as<Rcpp::String>(writeResult["png"]);
 
 		_editOptions = Json::nullValue;
 
 		if(writeResult.containsElementNamed("editOptions") && !Rf_isNull(writeResult["editOptions"]))
 		{
-			std::string editOptionsStr = jaspNativeToUtf8(Rcpp::as<Rcpp::String>(writeResult["editOptions"]));
+			std::string editOptionsStr = Rcpp::as<Rcpp::String>(writeResult["editOptions"]);
 
 			if(editOptionsStr != "")
 			{
@@ -133,7 +133,7 @@ void jaspPlot::renderPlot()
 		if(writeResult.containsElementNamed("error"))
 		{
 			_error			= true;
-			_errorMessage	= jaspNativeToUtf8(Rcpp::as<Rcpp::String>(writeResult["error"]));
+			_errorMessage	= Rcpp::as<Rcpp::String>(writeResult["error"]);
 		}
 		else
 		{

@@ -1,6 +1,9 @@
 #define ENUM_DECLARATION_CPP
 #include "jaspObject.h"
-#include "jaspResults.h"
+
+//Now we undef it again to avoid making a second implementation of columntype.o in here
+#undef ENUM_DECLARATION_CPP
+//#include "jaspResults.h"
 #include <chrono>
 
 #ifdef BUILDING_JASP
@@ -46,35 +49,22 @@ std::vector<std::string> stringSplit(std::string str, char kar)
 	return strs;
 }
 
+logFuncDef _jaspRCPP_logString = nullptr;
+
+void		setJaspLogFunction(Rcpp::XPtr<logFuncDef> func)
+{
+	_jaspRCPP_logString = * func;
+
+	_jaspRCPP_logString("Log string function received loud and clear!");
+}
+
 void jaspPrint(std::string msg)
 {
 #ifdef JASP_R_INTERFACE_LIBRARY
-	jaspRCPP_logString(msg + "\n");
+	_jaspRCPP_logString(msg + "\n");
 #else
 	Rcpp::Rcout << msg << "\n";
 	//Rprintf(msg.c_str());
-#endif
-}
-
-std::string jaspNativeToUtf8(const Rcpp::RObject &in)
-{
-	if(in.isNULL())
-		return "";
-	
-	return jaspNativeToUtf8(Rcpp::as<Rcpp::String>(in));
-}
-
-
-std::string jaspNativeToUtf8(const Rcpp::String & in)
-{
-#ifdef _WIN32
-	#ifdef JASP_R_INTERFACE_LIBRARY
-		return jaspRCPP_nativeToUtf8(in);
-	#else
-		return in; //If running in R then it's the users problem really.
-	#endif	
-#else
-	return in;
 #endif
 }
 
@@ -217,7 +207,7 @@ Rcpp::DataFrame jaspObject::convertFactorsToCharacters(Rcpp::DataFrame df)
 
 			for(int i=0; i<originalColumn.size(); i++)
 				if(originalColumn[i] > 0) //it can be INT_MIN at least, but if we are doing a -1 on it anyhow it should just be bigger than 0
-					charCol[i] = jaspNativeToUtf8(factorLevels[originalColumn[i] - 1]);
+					charCol[i] = factorLevels[originalColumn[i] - 1];
 
 			df[col] = charCol;
 		}

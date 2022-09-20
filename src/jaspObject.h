@@ -1,29 +1,21 @@
-#pragma once
+#ifndef JASPOBJECT_MANUAL_INCLUDE_GUARD
+#define JASPOBJECT_MANUAL_INCLUDE_GUARD
 #include <Rcpp.h>
 #include <set>
 #include <sstream>
 #include <queue>
 #include "enumutilities.h"
-
-#ifdef BUILDING_JASP
 #include <json/json.h>
-#else
-#include "json/json.h"
-#endif
 
-#ifdef JASP_R_INTERFACE_LIBRARY
-extern void			jaspRCPP_logString(		const std::string  & code);
-extern std::string	jaspRCPP_nativeToUtf8(	const Rcpp::String & in);
-#endif
+typedef void (*logFuncDef)(const std::string &);
 
+void		setJaspLogFunction( Rcpp::XPtr<logFuncDef> func );
 void		jaspPrint(			std::string msg);
-std::string jaspNativeToUtf8(const Rcpp::String & in);
-std::string jaspNativeToUtf8(const Rcpp::RObject & in);
 
 #define JASPOBJECT_DEFAULT_POSITION 9999
 
 DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource);
-DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
+DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType... But not right now
 
 jaspObjectType jaspObjectTypeStringToObjectType(std::string type);
 
@@ -38,8 +30,8 @@ class jaspObject
 {
 public:
 						jaspObject()										: _title(""),		_type(jaspObjectType::unknown)	{ allocatedObjects->insert(this); }
-						jaspObject(Rcpp::String title)						: _title(jaspNativeToUtf8(title)),	_type(jaspObjectType::unknown)	{ allocatedObjects->insert(this); }
-						jaspObject(jaspObjectType type, Rcpp::String title)	: _title(jaspNativeToUtf8(title)),	_type(type)						{ allocatedObjects->insert(this); }
+						jaspObject(Rcpp::String title)						: _title(title),	_type(jaspObjectType::unknown)	{ allocatedObjects->insert(this); }
+						jaspObject(jaspObjectType type, Rcpp::String title)	: _title(title),	_type(type)						{ allocatedObjects->insert(this); }
 						jaspObject(const jaspObject& that) = delete;
 	virtual				~jaspObject();
 
@@ -54,7 +46,7 @@ public:
 
 			bool		getError()								{ return _error; }
 	virtual void		setError()								{ _error = true; }
-	virtual void		setError(Rcpp::String message)			{ _errorMessage = jaspNativeToUtf8(message); _error = true; }
+	virtual void		setError(Rcpp::String message)			{ _errorMessage = message; _error = true; }
 	virtual bool		canShowErrorMessage()			const	{ return false; }
 
 			void		print()									{ try { jaspPrint(toString()); } catch(std::exception e) { jaspPrint(std::string("toString failed because of: ") + e.what()); } }
@@ -291,7 +283,7 @@ template<> inline Json::Value jaspObject::RVectorEntry_to_JsonValue<LGLSXP>(Rcpp
 
 template<> inline Json::Value jaspObject::RVectorEntry_to_JsonValue<STRSXP>(Rcpp::Vector<STRSXP> obj, int row)
 {
-	return obj[row] == NA_STRING	? "" : Json::Value(_escapeHtml ? stringUtils::escapeHtmlStuff(jaspNativeToUtf8(obj[row])) : jaspNativeToUtf8(obj[row]));
+	return obj[row] == NA_STRING	? "" : Json::Value(_escapeHtml ? stringUtils::escapeHtmlStuff(std::string(obj[row])) : std::string(obj[row]));
 }
 
 template<> inline Json::Value jaspObject::RVectorEntry_to_JsonValue<REALSXP>(Rcpp::Vector<REALSXP> obj, int row)				TO_INFINITY_AND_BEYOND
@@ -300,7 +292,7 @@ template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<INTSXP
 
 template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<LGLSXP>(Rcpp::MatrixColumn<LGLSXP> obj, int row)		{ return obj[row] == NA_LOGICAL	? "" : Json::Value((bool)(obj[row]));			}
 
-template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<STRSXP>(Rcpp::MatrixColumn<STRSXP> obj, int row)		{ return obj[row] == NA_STRING	? "" : Json::Value(_escapeHtml ? stringUtils::escapeHtmlStuff(jaspNativeToUtf8(obj[row])) : jaspNativeToUtf8(obj[row]));	}
+template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<STRSXP>(Rcpp::MatrixColumn<STRSXP> obj, int row)		{ return obj[row] == NA_STRING	? "" : Json::Value(_escapeHtml ? stringUtils::escapeHtmlStuff(std::string(obj[row])) : std::string(obj[row])); }
 
 template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<REALSXP>(Rcpp::MatrixColumn<REALSXP> obj, int row)	TO_INFINITY_AND_BEYOND
 
@@ -314,7 +306,7 @@ template<> inline Json::Value jaspObject::RMatrixColumnEntry_to_JsonValue<REALSX
 	PROP_TYPE get ## PROP_CAPITALIZED_NAME () { return ((JASP_TYPE *)myJaspObject)->PROP_NAME; }
 
 #define JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NATIVE_STRING(JASP_TYPE, PROP_NAME, PROP_CAPITALIZED_NAME) \
-void set ## PROP_CAPITALIZED_NAME (Rcpp::String new ## PROP_CAPITALIZED_NAME) { ((JASP_TYPE *)myJaspObject)->PROP_NAME = jaspNativeToUtf8( new ## PROP_CAPITALIZED_NAME ); myJaspObject->notifyParentOfChanges(); } \
+void set ## PROP_CAPITALIZED_NAME (Rcpp::String new ## PROP_CAPITALIZED_NAME) { ((JASP_TYPE *)myJaspObject)->PROP_NAME =  new ## PROP_CAPITALIZED_NAME; myJaspObject->notifyParentOfChanges(); } \
 Rcpp::String get ## PROP_CAPITALIZED_NAME () { return ((JASP_TYPE *)myJaspObject)->PROP_NAME; }
 
 
@@ -337,7 +329,7 @@ public:
 	}
 
 	void		print()								{ myJaspObject->print(); }
-	void		addMessage(Rcpp::String msg)		{ myJaspObject->addMessage(jaspNativeToUtf8(msg)); }
+	void		addMessage(Rcpp::String msg)		{ myJaspObject->addMessage(msg); }
 	std::string	toHtml()							{ return myJaspObject->toHtml(); }
 	std::string	type()								{ return myJaspObject->type(); }
 	void		printHtml()							{ jaspPrint(myJaspObject->toHtml()); }
@@ -346,13 +338,13 @@ public:
 	void		setOptionMustContainDependency(std::string optionName, Rcpp::RObject mustContainThis)	{ myJaspObject->setOptionMustContainDependency(optionName, mustContainThis);	}
 	void		dependOnOptions(Rcpp::CharacterVector listOptions)										{ myJaspObject->dependOnOptions(listOptions);									}
 	void		copyDependenciesFromJaspObject(jaspObject_Interface * other)							{ myJaspObject->copyDependenciesFromJaspObject(other->myJaspObject);			}
-	void		addCitation(Rcpp::String fullCitation)													{ myJaspObject->addCitation(jaspNativeToUtf8(fullCitation));						}
+	void		addCitation(Rcpp::String fullCitation)													{ myJaspObject->addCitation(fullCitation);										}
 
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NATIVE_STRING(jaspObject, _title,		Title)
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NATIVE_STRING(jaspObject, _info,		Info)
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspObject, int,			_position,	Position)
 
-	void		setError(Rcpp::String message)		{ myJaspObject->setError(jaspNativeToUtf8(message)); }
+	void		setError(Rcpp::String message)		{ myJaspObject->setError(message); }
 	bool		getError()							{ return myJaspObject->getError(); }
 
 	jaspObject * returnMyJaspObject() { return myJaspObject; }
@@ -382,4 +374,6 @@ RCPP_EXPOSED_CLASS_NODECL(jaspObject_Interface)
 #else
 #define JASP_OBJECT_TIMERBEGIN			/* Doin' nothing */
 #define JASP_OBJECT_TIMEREND(ACTIVITY)	/* What you didn't start you need not stop */
+#endif
+
 #endif

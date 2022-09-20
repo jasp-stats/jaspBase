@@ -3,9 +3,13 @@
 
 #include "jaspObject.h"
 #include "columntype.h"
+#include <Rcpp.h>
 
 typedef bool			(*setColumnDataFuncDef)	(std::string, Rcpp::RObject);
 typedef columnType		(*getColumnTypeFuncDef)	(std::string);
+
+typedef  Rcpp::XPtr<setColumnDataFuncDef> colDataF;
+typedef  Rcpp::XPtr<getColumnTypeFuncDef> colgetTF;
 
 class jaspColumn : public jaspObject
 {
@@ -26,18 +30,8 @@ public:
 	void setNominal(	Rcpp::RObject nominalData);
 	void setNominalText(Rcpp::RObject nominalData);
 
-	static void			set_jaspRCPP_setColumnDataAsScaleFunc(setColumnDataFuncDef func);
-	static void			set_jaspRCPP_setColumnDataAsOrdinalFunc(setColumnDataFuncDef func);
-	static void			set_jaspRCPP_setColumnDataAsNominalFunc(setColumnDataFuncDef func);
-	static void			set_jaspRCPP_setColumnDataAsNominalTextFunc(setColumnDataFuncDef func);
-	static void			set_jaspRCPP_getColumnTypeFunc(getColumnTypeFuncDef func);
 
-	static void			set_jaspRCPP_setColumnDataAsScaleFuncXPtr(Rcpp::XPtr<setColumnDataFuncDef> func);
-	static void			set_jaspRCPP_setColumnDataAsOrdinalFuncXPtr(Rcpp::XPtr<setColumnDataFuncDef> func);
-	static void			set_jaspRCPP_setColumnDataAsNominalFuncXPtr(Rcpp::XPtr<setColumnDataFuncDef> func);
-	static void			set_jaspRCPP_setColumnDataAsNominalTextFuncXPtr(Rcpp::XPtr<setColumnDataFuncDef> func);
-	static void			set_jaspRCPP_getColumnTypeFuncXPtr(Rcpp::XPtr<getColumnTypeFuncDef> func);
-
+	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colgetTF colType);
 
 private:
 	std::string		_columnName		= "";
@@ -45,17 +39,17 @@ private:
 					_typeChanged	= false;
 	jaspColumnType	_columnType		= jaspColumnType::unknown;
 
-	bool			jaspRCPP_setColumnDataAsScale(			std::string columnName, Rcpp::RObject scalarData);
-	bool			jaspRCPP_setColumnDataAsOrdinal(		std::string columnName, Rcpp::RObject scalarData);
-	bool			jaspRCPP_setColumnDataAsNominal(		std::string columnName, Rcpp::RObject scalarData);
-	bool			jaspRCPP_setColumnDataAsNominalText(	std::string columnName, Rcpp::RObject scalarData);
-	columnType		jaspRCPP_getColumnType(					std::string columnName							);
+	bool			setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data);
+	columnType		getColumnType(				const std::string & columnName							);
 
-	static setColumnDataFuncDef		_jaspRCPP_setColumnDataAsScaleFunc,
-									_jaspRCPP_setColumnDataAsOrdinalFunc,
-									_jaspRCPP_setColumnDataAsNominalFunc,
-									_jaspRCPP_setColumnDataAsNominalTextFunc;
-	static getColumnTypeFuncDef		_jaspRCPP_getColumnTypeFunc;
+	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
+									_setColumnDataAsOrdinalFunc,
+									_setColumnDataAsNominalFunc,
+									_setColumnDataAsNominalTextFunc;
+	static getColumnTypeFuncDef		_getColumnTypeFunc;
 
 
 

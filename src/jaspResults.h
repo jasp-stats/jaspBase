@@ -1,13 +1,14 @@
 #pragma once
 #include "jaspContainer.h"
 
-#ifdef JASP_R_INTERFACE_LIBRARY
-#include "jasprcpp_interface.h"
-
-#define GUARD_ENCODE_FUNCS(...) throw std::runtime_error("Do not use column encoding from jaspResults when running in JASP!");
-#else
+//copied from jasprcpp_interface.h
 typedef void (*sendFuncDef)(const char *);
 typedef bool (*pollMessagesFuncDef)();
+
+#ifdef JASP_R_INTERFACE_LIBRARY
+#define GUARD_ENCODE_FUNCS(...) throw std::runtime_error("Do not use column encoding from jaspResults when running in JASP!");
+#else
+
 //If you edit any function(signatures) or objects for JASP* Rcpp modules and you want to run it as an R-Package you should run Rcpp::compileAttributes from an R instance started in $PWD/R-Interface/jaspResults
 
 #include "columnencoder.h"
@@ -25,10 +26,8 @@ public:
 	~jaspResults();
 
 	//static functions to allow the values to be set before the constructor is called from R. Would be nicer to just run the constructor in C++ maybe?
-	static void			setSendFunc(sendFuncDef sendFunc);
-	static void			setSendFuncXPtr(Rcpp::XPtr<sendFuncDef> sendFunc);
-	static void			setPollMessagesFunc(pollMessagesFuncDef pollFunc);
-	static void			setPollMessagesFuncXPtr(Rcpp::XPtr<pollMessagesFuncDef> pollFunc);
+	static void			setSendFunc(Rcpp::XPtr<sendFuncDef> sendFunc);
+	static void			setPollMessagesFunc(Rcpp::XPtr<pollMessagesFuncDef> pollFunc);
 	static void			setResponseData(int analysisID, int revision);
 	static void			setSaveLocation(const std::string & root, const std::string & relativePath);
 	static void			setWriteSealLocation(const std::string & root, const std::string & relativePath);
