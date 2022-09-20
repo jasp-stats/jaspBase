@@ -1,9 +1,5 @@
 #define ENUM_DECLARATION_CPP
 #include "jaspObject.h"
-
-//Now we undef it again to avoid making a second implementation of columntype.o in here
-#undef ENUM_DECLARATION_CPP
-//#include "jaspResults.h"
 #include <chrono>
 
 #ifdef BUILDING_JASP
@@ -64,7 +60,6 @@ void jaspPrint(std::string msg)
 	_jaspRCPP_logString(msg + "\n");
 #else
 	Rcpp::Rcout << msg << "\n";
-	//Rprintf(msg.c_str());
 #endif
 }
 
