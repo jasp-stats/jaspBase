@@ -110,6 +110,5 @@ if [ "${JASP_R_INTERFACE_LIBRARY}" != "" ]; then
 fi
 
 sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
-#sed -e "s|@cppflags@|${PKG_CXXFLAGS_EXPANDED}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" -e "s|@jasp_r_interface@|${JASP_R_INTERFACE_LIBRARY_VALUE}|" src/Makevars.in > src/Makevars
 
 exit 0
