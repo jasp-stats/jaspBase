@@ -21,24 +21,14 @@ Rcpp::Environment*	jaspResults::_RStorageEnv		= nullptr;
 bool				jaspResults::_insideJASP		= false;
 jaspResults*		jaspResults::_jaspResults		= nullptr;
 
-void jaspResults::setSendFunc(sendFuncDef sendFunc)
+void jaspResults::setSendFunc(Rcpp::XPtr<sendFuncDef> sendFunc)
 {
-	_ipccSendFunc = sendFunc;
+	_ipccSendFunc = *sendFunc;
 }
 
-void jaspResults::setSendFuncXPtr(Rcpp::XPtr<sendFuncDef> sendFunc)
+void jaspResults::setPollMessagesFunc(Rcpp::XPtr<pollMessagesFuncDef> pollFunc)
 {
-	setSendFunc(*sendFunc);
-}
-
-void jaspResults::setPollMessagesFunc(pollMessagesFuncDef pollFunc)
-{
-	_ipccPollFunc = pollFunc;
-}
-
-void jaspResults::setPollMessagesFuncXPtr(Rcpp::XPtr<pollMessagesFuncDef> pollFunc)
-{
-	setPollMessagesFunc(*pollFunc);
+	_ipccPollFunc = *pollFunc;
 }
 
 void jaspResults::setBaseCitation(std::string baseCitation)
@@ -426,7 +416,7 @@ Json::Value jaspResults::dataEntry(std::string &) const
 
 void jaspResults::setErrorMessage(Rcpp::String msg, std::string errorStatus)
 {
-	errorMessage = jaspNativeToUtf8(msg);
+	errorMessage = msg;
 	setStatus(errorStatus);
 }
 
@@ -577,7 +567,7 @@ void jaspResults::startProgressbar(int expectedTicks, Rcpp::String label)
 
 	Json::Value progress;
 	progress["value"]		= 0;
-	progress["label"]		= jaspNativeToUtf8(label);
+	progress["label"]		= std::string(label);
 	_response["progress"]	= progress;
 
 	send();

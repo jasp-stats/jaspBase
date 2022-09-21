@@ -1102,8 +1102,8 @@ void jaspTable::addFootnote(Rcpp::RObject message, Rcpp::RObject symbol, Rcpp::R
 	if (message.isNULL())
 		Rf_error("One would expect a footnote to at least contain a message..");
 		
-	std::string strMessage	= jaspNativeToUtf8(message);
-	std::string strSymbol	= symbol.isNULL() ? "" : jaspNativeToUtf8(symbol);
+	std::string strMessage	= Rcpp::String(message);
+	std::string strSymbol	= symbol.isNULL() ? "" : Rcpp::String(symbol);
 	
 	std::vector<Json::Value> colNames;
 	if (!col_names.isNULL())
@@ -1336,11 +1336,11 @@ void jaspTable::addColumnInfo(Rcpp::RObject name, Rcpp::RObject title, Rcpp::ROb
 
 	std::string lastAddedColName = getColName(_colNames.rowCount() - 1);
 
-	if(!title.isNULL())		_colTitles[		lastAddedColName ] = jaspNativeToUtf8(title);
-	if(!type.isNULL())		_colTypes[		lastAddedColName ] = jaspNativeToUtf8(type);
-	if(!format.isNULL())	_colFormats[	lastAddedColName ] = jaspNativeToUtf8(format);
+	if(!title.isNULL())		_colTitles[		lastAddedColName ] = Rcpp::String(title);
+	if(!type.isNULL())		_colTypes[		lastAddedColName ] = Rcpp::String(type);
+	if(!format.isNULL())	_colFormats[	lastAddedColName ] = Rcpp::String(format);
+	if(!overtitle.isNULL())	_colOvertitles[	lastAddedColName ] = Rcpp::String(overtitle);
 	if(!combine.isNULL())	_colCombines[	lastAddedColName ] = Rcpp::as<bool>(combine);
-	if(!overtitle.isNULL())	_colOvertitles[	lastAddedColName ] = jaspNativeToUtf8(overtitle);
 }
 
 

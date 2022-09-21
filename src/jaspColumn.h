@@ -2,6 +2,14 @@
 #define _JASPCOLUMN_HEADER
 
 #include "jaspObject.h"
+#include "columntype.h"
+#include <Rcpp.h>
+
+typedef bool			(*setColumnDataFuncDef)	(std::string, Rcpp::RObject);
+typedef columnType		(*getColumnTypeFuncDef)	(std::string);
+
+typedef  Rcpp::XPtr<setColumnDataFuncDef> colDataF;
+typedef  Rcpp::XPtr<getColumnTypeFuncDef> colgetTF;
 
 class jaspColumn : public jaspObject
 {
@@ -22,11 +30,29 @@ public:
 	void setNominal(	Rcpp::RObject nominalData);
 	void setNominalText(Rcpp::RObject nominalData);
 
+
+	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colgetTF colType);
+
 private:
 	std::string		_columnName		= "";
 	bool			_dataChanged	= false,
 					_typeChanged	= false;
 	jaspColumnType	_columnType		= jaspColumnType::unknown;
+
+	bool			setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data);
+	bool			setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data);
+	columnType		getColumnType(				const std::string & columnName							);
+
+	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
+									_setColumnDataAsOrdinalFunc,
+									_setColumnDataAsNominalFunc,
+									_setColumnDataAsNominalTextFunc;
+	static getColumnTypeFuncDef		_getColumnTypeFunc;
+
+
+
 };
 
 

@@ -1,28 +1,49 @@
-
 #include "jaspColumn.h"
 
-#ifdef JASP_R_INTERFACE_LIBRARY
-#include "jasprcpp.h"
-#else
+getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
+setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
+setColumnDataFuncDef	jaspColumn::_setColumnDataAsOrdinalFunc			= nullptr;
+setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalFunc			= nullptr;
+setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalTextFunc		= nullptr;
 
-enum ColumnType { ColumnTypeUnknown = 0, ColumnTypeNominal = 1, ColumnTypeNominalText = 2, ColumnTypeOrdinal = 4, ColumnTypeScale = 8 };
-bool	jaspRCPP_setColumnDataAsScale(			std::string, Rcpp::RObject) { jaspPrint("jaspColumn does nothing in R stand-alone!"); return false; };
-bool	jaspRCPP_setColumnDataAsOrdinal(		std::string, Rcpp::RObject) { jaspPrint("jaspColumn does nothing in R stand-alone!"); return false; };
-bool	jaspRCPP_setColumnDataAsNominal(		std::string, Rcpp::RObject) { jaspPrint("jaspColumn does nothing in R stand-alone!"); return false; };
-bool	jaspRCPP_setColumnDataAsNominalText(	std::string, Rcpp::RObject) { jaspPrint("jaspColumn does nothing in R stand-alone!"); return false; };
+void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colgetTF colType)
+{
+	_getColumnTypeFunc 				= * colType;
+	_setColumnDataAsScaleFunc 		= * scalar;
+	_setColumnDataAsOrdinalFunc 	= * ordinal;
+	_setColumnDataAsNominalFunc 	= * nominal;
+	_setColumnDataAsNominalTextFunc = * nominalText;
+}
 
-#define ENUM_DECLARATION_CPP
-#include "columntype.h"
+#define SET_COLUMN_DATA_BASE(FUNC)									\
+{																	\
+	if ( FUNC == nullptr ) 											\
+	{																\
+		jaspPrint("jaspColumn does nothing in R stand-alone!"); 	\
+		return false;												\
+	} 																\
+	else 															\
+		return (*FUNC)(columnName, data);							\
+}																	\
 
-columnType jaspRCPP_getColumnType(std::string columnName) { return columnType::unknown; }
+bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
+bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
+bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalTextFunc)
 
-#endif
+columnType jaspColumn::getColumnType(const std::string & columnName)
+{ 
+	if(!_getColumnTypeFunc) 
+		return columnType::unknown;
+	else
+		return (*_getColumnTypeFunc)(columnName); 
+}
 
 jaspColumn::jaspColumn(std::string columnName)
 	: jaspObject(jaspObjectType::column, "jaspColumn for " + columnName)
 	, _columnName(columnName)
 {
-	switch(jaspRCPP_getColumnType(columnName))
+	switch(getColumnType(columnName))
 	{
 	case columnType::scale:			_columnType = jaspColumnType::scale;		break;
 	case columnType::ordinal:		_columnType = jaspColumnType::ordinal;		break;
@@ -63,7 +84,7 @@ std::string jaspColumn::dataToString(std::string prefix) const
 
 void jaspColumn::setScale(Rcpp::RObject scalarData)
 {
-	_dataChanged	= jaspRCPP_setColumnDataAsScale(_columnName, scalarData);
+	_dataChanged	= setColumnDataAsScale(_columnName, scalarData);
 	_typeChanged	= _columnType != jaspColumnType::scale;
 	_columnType		= jaspColumnType::scale;
 
@@ -73,7 +94,7 @@ void jaspColumn::setScale(Rcpp::RObject scalarData)
 
 void jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 {
-	_dataChanged	= jaspRCPP_setColumnDataAsOrdinal(_columnName, ordinalData);
+	_dataChanged	= setColumnDataAsOrdinal(_columnName, ordinalData);
 	_typeChanged	= _columnType != jaspColumnType::ordinal;
 	_columnType		= jaspColumnType::ordinal;
 
@@ -83,7 +104,7 @@ void jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 
 void jaspColumn::setNominal(Rcpp::RObject nominalData)
 {
-	_dataChanged	= jaspRCPP_setColumnDataAsNominal(_columnName, nominalData);
+	_dataChanged	= setColumnDataAsNominal(_columnName, nominalData);
 	_typeChanged	= _columnType != jaspColumnType::nominal;
 	_columnType		= jaspColumnType::nominal;
 
@@ -93,7 +114,7 @@ void jaspColumn::setNominal(Rcpp::RObject nominalData)
 
 void jaspColumn::setNominalText(Rcpp::RObject nominalData)
 {
-	_dataChanged	= jaspRCPP_setColumnDataAsNominalText(_columnName, nominalData);
+	_dataChanged	= setColumnDataAsNominalText(_columnName, nominalData);
 	_typeChanged	= _columnType != jaspColumnType::nominalText;
 	_columnType		= jaspColumnType::nominalText;
 
