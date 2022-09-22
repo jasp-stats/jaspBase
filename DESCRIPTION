@@ -16,6 +16,7 @@ Imports:
   gridExtra,
   gridGraphics,
   jsonlite,
+  kknn,
   lifecycle,
   methods,
   modules,
