@@ -48,13 +48,23 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     }
   }
 
+    returnVal = 'null';
+		tryCatch(
+		    suppressWarnings({	
+          returnVal <- pkgbuild::with_build_tools(
+                    {
+                      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
+                      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble, frameworkLibrary=frameworkLibrary)
+                    },
+                    required=FALSE )
+        }),	
+		    error	= function(e) { .setRError(  paste0(toString(e), '\n', e$output, '\n', paste0(sys.calls(), collapse='\n'))) } 	
+		)
+		
+    return(returnVal);
+
   return(
-    pkgbuild::with_build_tools(
-    {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble, frameworkLibrary=frameworkLibrary)
-    },
-    required=FALSE )
+    
   )
 }
 
