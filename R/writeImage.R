@@ -138,17 +138,18 @@ decodeplot.jaspGraphsPlot <- function(x, ...) {
   return(x)
 }
 
+
 #' @export
 decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
   # alternatively, those edge cases will need to be handled by the developer.
-  labels <- x[["labels"]]
+  labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
   for (i in seq_along(labels))
     if (!is.null(labels[[i]]))
       labels[[i]] <- decodeColNames(labels[[i]])
 
-  x[["labels"]] <- labels
+  x$labels <- labels
   if (returnGrob) {
     grDevices::png(f <- tempfile())
     on.exit({
@@ -160,6 +161,23 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   } else {
     return(x)
   }
+}
+
+#' @export
+decodeplot.patchwork <- function(x, ...) {
+  # the last plot in a patchwork is the "active" plot
+  # and is essentially a ggplot (with some extras),
+  # so we can decode it as such
+  x <- decodeplot.gg(x, returnGrob = FALSE)
+  # but it also contains annotations, which need to be decoded in addition to the standard gg stuff
+  x$patches$annotation$title    <- decodeColNames(x$patches$annotation$title   )
+  x$patches$annotation$subtitle <- decodeColNames(x$patches$annotation$subtitle)
+  x$patches$annotation$caption  <- decodeColNames(x$patches$annotation$caption )
+
+  # each subplot can be either a patchwork or a ggplot object
+  x$patches$plots <-  lapply(x$patches$plots, decodeplot, returnGrob = FALSE)
+
+  return(x)
 }
 
 #' @export
