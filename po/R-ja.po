@@ -102,20 +102,20 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "無限大が %s で見つかりました"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "%s の因子レベルの数は %s です"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "%1$s の因子レベルの数は %2$s です"
 
-msgid "The variance in %s is equal to %s"
-msgstr "%s の分散が %s と等しくなります"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s の分散が %2$s と等しくなります"
 
-msgid "Number of observations is %s in %s"
-msgstr "%s の観測度数は %s です"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "%1$s の観測度数は %2$s です"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
-msgstr "統計量をうまく計算できません: %s の観測数は %s です"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "統計量をうまく計算できません: %1$s の観測数は %2$s です"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "%s の値が区間 [%s, %s] の外にあります"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "%s の値が区間 [%1$s, %2$s] の外にあります"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "

@@ -83,7 +83,7 @@ msgstr "Chaque variable de regroupement doit avoir un niveau"
 
 msgid "the modelterms list must contain the named item `components`"
 msgstr ""
-"la liste des termes du modèle doit contenir l’élément nommé « composants »"
+"la liste des termes du modèle doit contenir l’élément nommé « composants »"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr ""
@@ -105,22 +105,22 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Infini trouvé dans %s"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "Le nombre de niveaux de facteurs est de %s dans %s"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "Le nombre de niveaux de facteurs est de %1$s dans %2$s"
 
-msgid "The variance in %s is equal to %s"
-msgstr "La variance de %s est égale à %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "La variance de %1$s est égale à %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "Le nombre d'observations est de %s dans %s"
+msgid "Number of observations is %1$s in %2$ss"
+msgstr "Le nombre d'observations est de %1$s dans %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Impossible de calculer la statistique de manière fiable : le nombre "
-"d'observations est de %s dans %s"
+"d'observations est de %1$s dans %2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "Valeurs en %s en dehors de l'intervalle [%s, %s]"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "Valeurs en %s en dehors de l'intervalle [%1$s, %2$s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
@@ -220,7 +220,7 @@ msgid "Your module is missing a 'DESCRIPTION' file!"
 msgstr "Il manque un fichier 'DESCRIPTION' à votre module !"
 
 msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "Il manque 'inst/Description.qml' à votre module !"
+msgstr "Il manque 'inst/Description.qml' à votre module !"
 
 msgid "Your module is missing an 'R' directory!"
 msgstr "Il manque un répertoire 'R' à votre module !"

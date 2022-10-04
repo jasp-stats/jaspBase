@@ -107,22 +107,22 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Infinito encontrado em %s"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "O número de níveis de fatores é %s em %s"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "O número de níveis de fatores é %1$s em %2$s"
 
-msgid "The variance in %s is equal to %s"
-msgstr "A variância em %s é igual a %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "A variância em %1$s é igual a %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "O número de observações é %s em %s"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "O número de observações é %1$s em %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Não é possível calcular a estatística de forma confiável: o número de "
-"observações é %s em %s"
+"observações é %1$s em %2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "Valores em %s fora do intervalo [%s, %s]"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "Valores em %s fora do intervalo [%1$s, %2$s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "

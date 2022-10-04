@@ -32,15 +32,15 @@
   m$error$infinity <-
     gettextf("Infinity found in %s", "{{variables}}")
   m$error$factorLevels <-
-    gettextf("Number of factor levels is %s in %s", "{{factorLevels.amount}}", "{{variables}}")
+    gettextf("Number of factor levels is %1$s in %2$s", "{{factorLevels.amount}}", "{{variables}}")
   m$error$variance <-
-    gettextf("The variance in %s is equal to %s", "{{variables}}", "{{variance.equalTo}}")
+    gettextf("The variance in %1$s is equal to %2$s", "{{variables}}", "{{variance.equalTo}}")
   m$error$observations <-
-    gettextf("Number of observations is %s in %s", "{{observations.amount}}", "{{variables}}")
+    gettextf("Number of observations is %1$s in %2$s", "{{observations.amount}}", "{{variables}}")
   m$error$levene <-
-    gettextf("Cannot compute statistic reliably: number of observations is %s in %s", "{{observations.amount}}", "{{variables}}")
+    gettextf("Cannot compute statistic reliably: number of observations is %1$s in %2$s", "{{observations.amount}}", "{{variables}}")
   m$error$limits <-
-    gettextf("Values in %s outside interval [%s, %s]", "{{variables}}", "{{limits.min}}", "{{limits.max}}")
+    gettextf("Values in %1$s outside interval [%2$s, %3$s]", "{{variables}}", "{{limits.min}}", "{{limits.max}}")
   m$error$varCovMatrix <-
     gettext("Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset.")
   m$error$varCovData <-
