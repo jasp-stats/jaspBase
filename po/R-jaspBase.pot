@@ -85,19 +85,19 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr ""
 
-msgid "Number of factor levels is %s in %s"
+msgid "Number of factor levels is %1$s in %2$s"
 msgstr ""
 
-msgid "The variance in %s is equal to %s"
+msgid "The variance in %1$s is equal to %2$s"
 msgstr ""
 
-msgid "Number of observations is %s in %s"
+msgid "Number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Values in %s outside interval [%s, %s]"
+msgid "Values in %s outside interval [%1$s, %2$s]"
 msgstr ""
 
 msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."

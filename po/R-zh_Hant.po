@@ -97,20 +97,20 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "%s 出現無限值"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "在 %s 的因素個數為 %s"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "在 %1$s 的因素個數為 %2$s"
 
-msgid "The variance in %s is equal to %s"
-msgstr "%s 的變異量為 %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s 的變異量為 %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "在 %s 的樣本數為 %s"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "在 %1$s 的樣本數為 %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
-msgstr "無法計算穩定的統計數: 因為在 %s 的樣本數為 %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "無法計算穩定的統計數: 因為在 %1$s 的樣本數為 %2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "%s 裡有數值在 [%s, %s] 此區間之外"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "%s 裡有數值在 [%1$s, %2$s] 此區間之外"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "

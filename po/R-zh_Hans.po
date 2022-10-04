@@ -97,20 +97,20 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "在 %s 中发现无穷值"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "因子水平数 %s 在%s 中"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "因子水平数 %1$s 在%2$s 中"
 
-msgid "The variance in %s is equal to %s"
-msgstr "%s 中的方差等于 %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s 中的方差等于 %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "%s 中的观测值数量为 %s"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "%1$s 中的观测值数量为 %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
-msgstr "无法可靠地计算统计数据： %s 中观测值数量为 %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "无法可靠地计算统计数据： %1$s 中观测值数量为 %2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "%s 中的值在区间 [%s, %s] 之外"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "%s 中的值在区间 [%1$s, %2$s] 之外"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "

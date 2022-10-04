@@ -104,21 +104,21 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Oneindigheid gevonden in %s"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "Aantal factorniveaus is %s in %s"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "Aantal factorniveaus is %1$s in %2$s"
 
-msgid "The variance in %s is equal to %s"
-msgstr "De variantie in %s is gelijk aan %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "De variantie in %1$s is gelijk aan %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "Aantal observaties is %s in %s"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "Aantal observaties is %1$s in %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
-"Kan statistiek niet betrouwbaar berekenen: aantal observaties is %s in %s"
+"Kan statistiek niet betrouwbaar berekenen: aantal observaties is %1$s in %2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "Waarden in %s buiten interval [%s, %s]"
+msgid "Values in %s outside interval [%1$s, %2$s]"
+msgstr "Waarden in %s buiten interval [%1$s, %2$s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
