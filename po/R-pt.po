@@ -198,8 +198,8 @@ msgstr ""
 "Para todos os testes, a hipótese alternativa especifica que a proporção é "
 "maior do que %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Não foi possível encontrar mensagem para a classe %s e tipo %s"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Não foi possível encontrar mensagem para a classe %1$s e tipo %2$s"
 
 msgid "Missing required replacement(s): \""
 msgstr "Valores ausentes necessitam de substituição(ões): \""

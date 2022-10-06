@@ -194,8 +194,8 @@ msgstr ""
 "Pentru toate testele, ipoteza alternativă specifică faptul că proporția este "
 "mai mare decât %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Nu a putut fi găsit mesajul pentru clasa %s și tipul %s"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Nu a putut fi găsit mesajul pentru clasa %1$s și tipul %2$s"
 
 msgid "Missing required replacement(s): \""
 msgstr "Lipsesc înlocuiri necesare: \""

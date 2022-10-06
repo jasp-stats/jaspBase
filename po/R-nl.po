@@ -193,8 +193,8 @@ msgstr ""
 "Voor alle toetsen specificeert de alternatieve hypothese dat de proportie "
 "groter is dan %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Kon geen bericht vinden voor klasse %s en type %s"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Kon geen bericht vinden voor klasse %1$s en type %2$s"
 
 msgid "Missing required replacement(s): \""
 msgstr "De benodigde vervanging(en) ontbreken: \""

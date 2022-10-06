@@ -203,8 +203,8 @@ msgstr ""
 "Para tódalas probas, a hipótese alternativa indica que a proporción é maior "
 "que %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Non se puido atopar a mensaxe para a clase %s e o tipo %s"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Non se puido atopar a mensaxe para a clase %1$s e o tipo %2$s"
 
 msgid "Missing required replacement(s): \""
 msgstr "Falta(n) a(s) substitución(s) requirida(s):\""

@@ -169,8 +169,8 @@ msgid ""
 "greater than %s"
 msgstr "所有考驗中，對立假設為比例高於 %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "無法找到 %s 群與 %s類的訊息"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "無法找到 %1$s 群與 %2$s類的訊息"
 
 msgid "Missing required replacement(s): \""
 msgstr "缺乏所需的替代數"

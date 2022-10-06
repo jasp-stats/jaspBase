@@ -169,8 +169,8 @@ msgid ""
 "greater than %s"
 msgstr "对于所有检验，备择假设指定比例大于 %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "找不到类 %s 和类型 %s 的消息"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "找不到类 %1$s 和类型 %2$s 的消息"
 
 msgid "Missing required replacement(s): \""
 msgstr "缺少必需的替代(replacement)：“"
