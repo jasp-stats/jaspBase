@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2022-07-19 10:03+0000\n"
 "Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Galician <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -121,12 +121,14 @@ msgstr "A varianza en %1$s é igual a %2$s"
 msgid "Number of observations is %1$s in %2$s"
 msgstr "O número de observacións é %1$s en %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Non se pode calcular o estatístico con fiabilidade: o número de observacións "
 "é %1$s en %2$s"
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Valores en %s fóra do intervalo [%1$s, %2$s]"
 
 msgid ""
@@ -233,8 +235,22 @@ msgstr "O teu módulo non ten un directorio de 'R'!"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "O teu módulo non ten o directorio 'inst/qml'!"
 
-msgid "Your module contains no DESCRIPTION file"
+#, fuzzy
+msgid "Can't find file '"
+msgstr "Creando un novo ficheiro "
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr ""
+
+#, fuzzy
+msgid "Your module contains no"
 msgstr "O teu módulo non inclúe ningún ficheiro de DESCRICIÓN"
+
+msgid "file"
+msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Agardábase que houbera unha caché en '%s', pero non existe!"
@@ -6951,9 +6967,6 @@ msgstr "Agardado non nulo, mais cero obtido"
 
 #~ msgid "Upload of "
 #~ msgstr "Carga de "
-
-#~ msgid "Creating new file "
-#~ msgstr "Creando un novo ficheiro "
 
 #~ msgid "%1 %2 failed because %3"
 #~ msgstr "%1 %2 falla porque %3"

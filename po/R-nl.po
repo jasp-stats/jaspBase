@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2022-09-25 09:15+0000\n"
 "Last-Translator: Don van den Bergh <donvdbergh@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jaspbase/nl/>"
-"\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jaspbase/nl/"
+">\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,11 +113,13 @@ msgstr "De variantie in %1$s is gelijk aan %2$s"
 msgid "Number of observations is %1$s in %2$s"
 msgstr "Aantal observaties is %1$s in %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Kan statistiek niet betrouwbaar berekenen: aantal observaties is %1$s in %2$s"
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Waarden in %s buiten interval [%1$s, %2$s]"
 
 msgid ""
@@ -223,8 +225,21 @@ msgstr "Uw module mist een 'R'-map!"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Uw module mist de 'inst/qml'-map!"
 
-msgid "Your module contains no DESCRIPTION file"
+msgid "Can't find file '"
+msgstr ""
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr "'"
+
+#, fuzzy
+msgid "Your module contains no"
 msgstr "Uw module bevat geen DESCRIPTION-bestand"
+
+msgid "file"
+msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Er moet een cache zijn bij '%s', maar is er niet!"
@@ -320,9 +335,6 @@ msgstr "Verwacht niet-nul maar kreeg nul"
 #~ msgstr ""
 #~ "Probeer gegevens- kolommen te vinden om te lezen, maar het lijkt erop dat "
 #~ "sommige opties niet bestaan:'"
-
-#~ msgid "'"
-#~ msgstr "'"
 
 #~ msgid "Provide a numeric value to the progress updater"
 #~ msgstr "Geef een numerieke waarde aan de progress updater"

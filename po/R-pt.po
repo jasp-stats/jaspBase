@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2021-09-11 03:39+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -116,12 +116,14 @@ msgstr "A variância em %1$s é igual a %2$s"
 msgid "Number of observations is %1$s in %2$s"
 msgstr "O número de observações é %1$s em %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Não é possível calcular a estatística de forma confiável: o número de "
 "observações é %1$s em %2$s"
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Valores em %s fora do intervalo [%1$s, %2$s]"
 
 msgid ""
@@ -228,8 +230,21 @@ msgstr "Seu módulo está faltando um diretório 'R'!"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Seu módulo está faltando o diretório 'inst/qml'!"
 
-msgid "Your module contains no DESCRIPTION file"
+msgid "Can't find file '"
+msgstr ""
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr ""
+
+#, fuzzy
+msgid "Your module contains no"
 msgstr "O seu módulo não contém nenhum ficheiro DESCRIÇÃO"
+
+msgid "file"
+msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Um cache é suposto estar em '%s' mas não existe!"

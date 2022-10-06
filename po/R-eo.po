@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2021-04-19 01:26+0000\n"
 "Last-Translator: phlostically <phlostically@mailinator.com>\n"
 "Language-Team: Esperanto <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -95,19 +95,21 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Nefinio troviĝis en %s"
 
-msgid "Number of factor levels is %s in %s"
+msgid "Number of factor levels is %1$s in %2$s"
 msgstr ""
 
-msgid "The variance in %s is equal to %s"
+msgid "The variance in %1$s is equal to %2$s"
 msgstr ""
 
-msgid "Number of observations is %s in %s"
+msgid "Number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Valoroj en %s ekster la intervalo [%1$s, %2$s]"
 
 msgid ""
@@ -164,7 +166,7 @@ msgid ""
 "greater than %s"
 msgstr ""
 
-msgid "Could not find message for class %s and type %s"
+msgid "Could not find message for class %1$s and type %2$s"
 msgstr ""
 
 msgid "Missing required replacement(s): \""
@@ -194,7 +196,19 @@ msgstr ""
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr ""
 
-msgid "Your module contains no DESCRIPTION file"
+msgid "Can't find file '"
+msgstr ""
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr ""
+
+msgid "Your module contains no"
+msgstr ""
+
+msgid "file"
 msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"

@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2022-09-15 09:10+0000\n"
 "Last-Translator: Josée Turcotte <jturcotte@laurentienne.ca>\n"
-"Language-Team: French <https://hosted.weblate.org/projects/jasp/jaspbase/fr/>"
-"\n"
+"Language-Team: French <https://hosted.weblate.org/projects/jasp/jaspbase/fr/"
+">\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,15 +111,18 @@ msgstr "Le nombre de niveaux de facteurs est de %1$s dans %2$s"
 msgid "The variance in %1$s is equal to %2$s"
 msgstr "La variance de %1$s est égale à %2$s"
 
-msgid "Number of observations is %1$s in %2$ss"
+#, fuzzy
+msgid "Number of observations is %1$s in %2$s"
 msgstr "Le nombre d'observations est de %1$s dans %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 "Impossible de calculer la statistique de manière fiable : le nombre "
 "d'observations est de %1$s dans %2$s"
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Valeurs en %s en dehors de l'intervalle [%1$s, %2$s]"
 
 msgid ""
@@ -228,8 +231,21 @@ msgstr "Il manque un répertoire 'R' à votre module !"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Le répertoire 'inst/qml' est manquant dans votre module !"
 
-msgid "Your module contains no DESCRIPTION file"
+msgid "Can't find file '"
+msgstr ""
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr ""
+
+#, fuzzy
+msgid "Your module contains no"
 msgstr "Votre module ne contient pas de fichier DESCRIPTION"
+
+msgid "file"
+msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Un cache est censé se trouver à '%s' mais il n'existe pas !"

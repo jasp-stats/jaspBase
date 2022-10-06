@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-07-16 03:55\n"
+"POT-Creation-Date: 2022-10-06 09:38\n"
 "PO-Revision-Date: 2022-09-28 09:43+0000\n"
 "Last-Translator: Shun Wang <shuonwang@gmail.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
@@ -106,10 +106,12 @@ msgstr "%1$s 中的方差等于 %2$s"
 msgid "Number of observations is %1$s in %2$s"
 msgstr "%1$s 中的观测值数量为 %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr "无法可靠地计算统计数据： %1$s 中观测值数量为 %2$s"
 
-msgid "Values in %s outside interval [%1$s, %2$s]"
+#, fuzzy
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "%s 中的值在区间 [%1$s, %2$s] 之外"
 
 msgid ""
@@ -123,7 +125,8 @@ msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
 "definite. Please check if variables have many missings observations or are "
 "collinear"
-msgstr "所提供数据的方差-协方差矩阵不是正定的。请检查变量是否有很多缺失的观测值或是否"
+msgstr ""
+"所提供数据的方差-协方差矩阵不是正定的。请检查变量是否有很多缺失的观测值或是否"
 "共线"
 
 msgid ""
@@ -199,8 +202,21 @@ msgstr "您的模块缺少 “R” 目录！"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "您的模块缺少 “inst/qml”目录！"
 
-msgid "Your module contains no DESCRIPTION file"
+msgid "Can't find file '"
+msgstr ""
+
+msgid "' in archive '"
+msgstr ""
+
+msgid "'"
+msgstr ""
+
+#, fuzzy
+msgid "Your module contains no"
 msgstr "您的模块去缺少 DESCRIPTION 文件"
+
+msgid "file"
+msgstr ""
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "缓存应该在 “%s”，但它不存在！"
