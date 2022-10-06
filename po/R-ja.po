@@ -184,8 +184,8 @@ msgid ""
 "greater than %s"
 msgstr "すべての検定において、対立仮説は比率が %s より大きいことを指定します"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "クラス %s およびタイプ %s のメッセージが見つかりませんでした"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "クラス %1$s およびタイプ %2$s のメッセージが見つかりませんでした"
 
 msgid "Missing required replacement(s): \""
 msgstr "必要な代替品がありません。\""

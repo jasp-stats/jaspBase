@@ -70,7 +70,7 @@
 
   message <- m[[class]][[type]]
   if (is.null(message))
-    stop(gettextf("Could not find message for class %s and type %s", as.character(class), as.character(type)))
+    stop(gettextf("Could not find message for class %1$s and type %2$s", as.character(class), as.character(type)))
 
   args <- list(...)
   if (length(args) > 0)

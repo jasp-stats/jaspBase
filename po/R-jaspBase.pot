@@ -136,7 +136,7 @@ msgstr ""
 msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
 msgstr ""
 
-msgid "Could not find message for class %s and type %s"
+msgid "Could not find message for class %1$s and type %2$s"
 msgstr ""
 
 msgid "Missing required replacement(s): \""

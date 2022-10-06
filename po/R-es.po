@@ -197,8 +197,8 @@ msgstr ""
 "Para todos los contrastes, la hipótesis alternativa indica que la proporción "
 "es mayor que %s"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "No se pudo encontrar el mensaje para la clase %s y el tipo %s"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "No se pudo encontrar el mensaje para la clase %1$s y el tipo %2$s"
 
 msgid "Missing required replacement(s): \""
 msgstr "Falta(n) la(s) sustitución(s) requerida(s):\""

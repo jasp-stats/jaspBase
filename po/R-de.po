@@ -194,8 +194,8 @@ msgstr ""
 "Bei allen Tests gibt die Alternativhypothese an, dass das Verhältnisgrößer "
 "als %s ist"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Konnte keine Nachricht für Klasse %s und Typ %s finden"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Konnte keine Nachricht für Klasse %1$s und Typ %2$s finden"
 
 msgid "Missing required replacement(s): \""
 msgstr "Es fehlen benötigte Ersatzwerte: \""
