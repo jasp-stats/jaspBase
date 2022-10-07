@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2022-10-06 09:38\n"
-"PO-Revision-Date: 2022-10-07 06:06+0000\n"
-"Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
+"PO-Revision-Date: 2022-10-07 18:15+0000\n"
+"Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Galician <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "gl/>\n"
 "Language: gl\n"
@@ -234,22 +234,20 @@ msgstr "O teu módulo non ten un directorio de 'R'!"
 msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "O teu módulo non ten o directorio 'inst/qml'!"
 
-#, fuzzy
 msgid "Can't find file '"
-msgstr "Creando un novo ficheiro "
+msgstr "Non pode atoparse o ficheiro '"
 
 msgid "' in archive '"
-msgstr ""
+msgstr "' no ficheiro '"
 
 msgid "'"
-msgstr ""
+msgstr "'"
 
-#, fuzzy
 msgid "Your module contains no"
-msgstr "O teu módulo non inclúe ningún ficheiro de DESCRICIÓN"
+msgstr "O teu módulo non inclúe"
 
 msgid "file"
-msgstr ""
+msgstr "ficheiro"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Agardábase que houbera unha caché en '%s', pero non existe!"
