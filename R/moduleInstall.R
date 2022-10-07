@@ -640,7 +640,7 @@ installModuleNew <- function(
     # change the hash of jasp pkgs in the lockfile matches the custom hash
 
     if (is.null(jaspRecords))
-      jaspRecords <- createLocalRecordFromLocalJaspPkgs(jaspPkgs, records, cachedObject, localPaths, commitHashes)
+      jaspRecords <- createLocalRecordFromLocalJaspPkgs(jaspPkgs, lockfile, cachedObject, localPaths, commitHashes)
 
     for (jaspPkg in names(jaspRecords))
       lockfile[["Packages"]][[jaspPkg]][["Hash"]] <- jaspRecords[[jaspPkg]][["Hash"]]
