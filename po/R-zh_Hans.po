@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2022-10-06 09:38\n"
-"PO-Revision-Date: 2022-10-07 06:06+0000\n"
-"Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
+"PO-Revision-Date: 2022-10-07 14:24+0000\n"
+"Last-Translator: Shun Wang <shuonwang@gmail.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
 "jasp/jaspbase/zh_Hans/>\n"
 "Language: zh_Hans\n"
@@ -110,7 +110,6 @@ msgid ""
 "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr "无法可靠地计算统计数据： %1$s 中观测值数量为 %2$s"
 
-#, fuzzy
 msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "%1$s 中的值在区间 [%2$s, %3$s] 之外"
 
@@ -203,7 +202,7 @@ msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "您的模块缺少 “inst/qml”目录！"
 
 msgid "Can't find file '"
-msgstr ""
+msgstr "找不到文件\""
 
 msgid "' in archive '"
 msgstr ""
