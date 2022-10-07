@@ -818,48 +818,6 @@ hackRenv <- function() {
     keep <- renv:::renv_vector_intersect(all, names(dcf))
     as.list(dcf[keep])
   }
-  # renv_snapshot_description_override <- function(path = NULL, package = NULL) {
-  #   `%||%` <- renv:::`%||%`
-  #   path <- path %||% renv:::renv_package_find(package)
-  #
-  #   dcf <- renv:::catch(renv:::renv_description_read(path, package))
-  #   if (inherits(dcf, "error"))
-  #     return(dcf)
-  #
-  #   source <- renv:::renv_snapshot_description_source(dcf)
-  #   dcf[names(source)] <- source
-  #   required <- c("Package", "Version", "Source")
-  #   missing <- renv:::renv_vector_diff(required, names(dcf))
-  #   if (length(missing)) {
-  #     fmt <- "required fields %s missing from DESCRIPTION at path '%s'"
-  #     msg <- sprintf(fmt, paste(shQuote(missing), collapse = ", "), path)
-  #     return(simpleError(msg))
-  #   }
-  #   # start of changes
-  #   commitHashes <- getOption("JASP_LOCAL_COMMIT_HASHES", FALSE)
-  #   if (!isFALSE(commitHashes) && dcf$Package %in% names(commitHashes)) {
-  #     # cat(sprintf("renv_snapshot_description: Package: %shash: %s\n", format(dcf$Package, width = 20), commitHashes[[dcf$Package]]))
-  #     dcf[["Hash"]] <- commitHashes[[dcf$Package]]
-  #   } else {
-  #     dcf[["Hash"]] <- renv:::renv_hash_description(path)
-  #   }
-  #   # end of changes
-  #
-  #   fields <- c("Depends", "Imports", "LinkingTo")
-  #   for (field in fields) {
-  #     if (!is.null(dcf[[field]])) {
-  #       parts <- strsplit(dcf[[field]], "\\s*,\\s*", perl = TRUE)[[1L]]
-  #       parts <- gsub("\\s+", " ", parts, perl = TRUE)
-  #       dcf[[field]] <- parts[nzchar(parts)]
-  #     }
-  #   }
-  #   git <- grep("^git", names(dcf), value = TRUE)
-  #   remotes <- grep("^Remote", names(dcf), value = TRUE)
-  #   extra <- c("Repository", "OS_type")
-  #   all <- c(required, fields, extra, remotes, git, "Hash")
-  #   keep <- renv:::renv_vector_intersect(all, names(dcf))
-  #   as.list(dcf[keep])
-  # }
 
   # ensure that looking for jasp packages in the cache uses the modified hash
   renv_retrieve_explicit_override <- function(record) {
@@ -873,8 +831,10 @@ hackRenv <- function() {
     # start of changes
     commitHashes <- getOption("JASP_LOCAL_COMMIT_HASHES", FALSE)
     if (!isFALSE(commitHashes) && record$Package %in% names(commitHashes)) {
+      # browser()
       # cat(sprintf("renv_retrieve_explicit: Package: %shash: %s\n", format(record$Package, width = 20), commitHashes[[record$Package]]))
-      record$Hash <- commitHashes[[record$Package]]
+      # record$Hash <- commitHashes[[record$Package]]
+      resolved$Hash <- commitHashes[[record$Package]]
     }
     # end of changes
     renv:::renv_retrieve_successful(resolved, normalized)
@@ -901,7 +861,6 @@ hackRenv <- function() {
   }
 
   assignFunctionInPackage(renv_remotes_resolve_path_impl_override, "renv_remotes_resolve_path_impl", "renv")
-  # assignFunctionInPackage(renv_snapshot_description_override,      "renv_snapshot_description",       "renv")
   assignFunctionInPackage(renv_snapshot_description_impl_override, "renv_snapshot_description_impl", "renv")
   assignFunctionInPackage(renv_retrieve_explicit_override,         "renv_retrieve_explicit",         "renv")
   assignFunctionInPackage(renv_lockfile_diff_record_override,      "renv_lockfile_diff_record",      "renv")
