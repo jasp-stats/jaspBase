@@ -569,6 +569,7 @@ installModuleNew <- function(
     on.exit(file.copy(tempRBuildIgnorePath, rBuildIgnorePath), add = TRUE, after = FALSE)
   }
 
+  jaspRecords <- NULL
   if (!allIdenticalJaspPkgs) {
 
     if (verbose >= 1) cat("Updating and installing jasp modules and new R package dependencies but not (yet) updating older dependencies\n")
@@ -590,23 +591,7 @@ installModuleNew <- function(
     }
 
     # construct custom entries for lockfile
-    descriptionInfo <- map(jaspPkgs, if (is.null(cachedObject)) {
-      function(x) renv:::renv_description_read(localPaths[x])
-    } else {
-      function(x) cachedObject[["descriptions"]][[x]]
-    })
-    jaspRecords <- map(jaspPkgs, function(pkg) {
-      list(
-        Package      = descriptionInfo[[pkg]]$Package,
-        Version      = descriptionInfo[[pkg]]$Version,
-        Source       = "Local",
-        RemoteType   = "local",
-        RemoteUrl    = localPaths[[pkg]],
-        Cacheable    = TRUE,
-        Hash         = commitHashes[[pkg]],
-        Requirements = records$Packages[[pkg]]$Requirements
-      )
-    })
+    jaspRecords <- createLocalRecordFromLocalJaspPkgs(jaspPkgs, records, cachedObject, localPaths, commitHashes)
 
     recordsOriginal <- records
     records$Packages[names(jaspRecords)] <- jaspRecords
@@ -653,6 +638,9 @@ installModuleNew <- function(
   } else {
 
     # change the hash of jasp pkgs in the lockfile matches the custom hash
+
+    if (is.null(jaspRecords))
+      jaspRecords <- createLocalRecordFromLocalJaspPkgs(jaspPkgs, records, cachedObject, localPaths, commitHashes)
 
     for (jaspPkg in names(jaspRecords))
       lockfile[["Packages"]][[jaspPkg]][["Hash"]] <- jaspRecords[[jaspPkg]][["Hash"]]
@@ -971,6 +959,26 @@ createGitHubRecordFromLocalJaspPkg <- function(path, lockfile, commitHashes) {
 
   return(newRecord)
 
+}
+
+createLocalRecordFromLocalJaspPkgs <- function(jaspPkgs, records, cachedObject, localPaths, commitHashes) {
+  descriptionInfo <- map(jaspPkgs, if (is.null(cachedObject)) {
+    function(x) renv:::renv_description_read(localPaths[x])
+  } else {
+    function(x) cachedObject[["descriptions"]][[x]]
+  })
+  jaspRecords <- map(jaspPkgs, function(pkg) {
+    list(
+      Package      = descriptionInfo[[pkg]]$Package,
+      Version      = descriptionInfo[[pkg]]$Version,
+      Source       = "Local",
+      RemoteType   = "local",
+      RemoteUrl    = localPaths[[pkg]],
+      Cacheable    = TRUE,
+      Hash         = commitHashes[[pkg]],
+      Requirements = records$Packages[[pkg]]$Requirements
+    )
+  })
 }
 
 silence <- function(expr) {
