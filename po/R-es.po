@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JASP 0.9.2\n"
 "POT-Creation-Date: 2022-10-06 09:38\n"
-"PO-Revision-Date: 2022-10-07 06:06+0000\n"
-"Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
+"PO-Revision-Date: 2022-10-07 18:17+0000\n"
+"Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/jasp/jaspbase/es/"
 ">\n"
 "Language: es\n"
@@ -229,20 +229,19 @@ msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Tu módulo no tiene el directorio 'inst/qml'!"
 
 msgid "Can't find file '"
-msgstr ""
+msgstr "No se puede encontrar el archivo '"
 
 msgid "' in archive '"
-msgstr ""
+msgstr "' en el archivo '"
 
 msgid "'"
-msgstr ""
+msgstr "'"
 
-#, fuzzy
 msgid "Your module contains no"
-msgstr "Tu módulo no incluye ningún archivo de DESCRIPCIÓN"
+msgstr "Tu módulo no incluye"
 
 msgid "file"
-msgstr ""
+msgstr "archivo"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Se suponía que habría una caché en '%s', pero no existe!"
