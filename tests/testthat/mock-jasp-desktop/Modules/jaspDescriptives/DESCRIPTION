@@ -10,4 +10,6 @@ Description: Explore the data with tables and plots
 License: GPL (>= 2)
 Encoding: UTF-8
 Imports:
-  crayon
+  crayon,
+  jaspBase,
+  jaspGraphs
