@@ -874,7 +874,7 @@ hackRenv <- function() {
     commitHashes <- getOption("JASP_LOCAL_COMMIT_HASHES", FALSE)
     if (!isFALSE(commitHashes) && record$Package %in% names(commitHashes)) {
       # cat(sprintf("renv_retrieve_explicit: Package: %shash: %s\n", format(record$Package, width = 20), commitHashes[[record$Package]]))
-      record$Hash <- commitHashes[[record$Package$Package]]
+      record$Hash <- commitHashes[[record$Package]]
     }
     # end of changes
     renv:::renv_retrieve_successful(resolved, normalized)
