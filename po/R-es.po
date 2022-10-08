@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JASP 0.9.2\n"
 "POT-Creation-Date: 2022-10-06 09:38\n"
-"PO-Revision-Date: 2022-07-19 10:20+0000\n"
+"PO-Revision-Date: 2022-10-07 18:17+0000\n"
 "Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/jasp/jaspbase/es/"
 ">\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14-dev\n"
+"X-Generator: Weblate 4.14.1\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
 msgstr "se invocó registerFonts pero resultsFont no existe!"
@@ -120,9 +120,8 @@ msgstr ""
 "No se puede calcular el estadístico con fiabilidad: el número de "
 "observaciones es %1$s en %2$s"
 
-#, fuzzy
 msgid "Values in %1$s outside interval [%2$s, %3$s]"
-msgstr "Valores en %s fuera del intervalo [%1$s, %2$s]"
+msgstr "Valores en %1$s fuera del intervalo [%2$s, %3$s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
@@ -230,20 +229,19 @@ msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Tu módulo no tiene el directorio 'inst/qml'!"
 
 msgid "Can't find file '"
-msgstr ""
+msgstr "No se puede encontrar el archivo '"
 
 msgid "' in archive '"
-msgstr ""
+msgstr "' en el archivo '"
 
 msgid "'"
-msgstr ""
+msgstr "'"
 
-#, fuzzy
 msgid "Your module contains no"
-msgstr "Tu módulo no incluye ningún archivo de DESCRIPCIÓN"
+msgstr "Tu módulo no incluye"
 
 msgid "file"
-msgstr ""
+msgstr "archivo"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Se suponía que habría una caché en '%s', pero no existe!"
