@@ -28,12 +28,18 @@ Imports:
   Rcpp (>= 0.12.14),
   renv,
   rjson,
+  rlang,
   rvg,
   svglite,
   systemfonts,
   withr
-RoxygenNote: 7.2.0
+Suggests:
+  testthat (>= 3.0.0)
+LinkingTo:
+  Rcpp
+RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
-LinkingTo: Rcpp
 RcppModules: jaspResults
 NeedsCompilation: yes
+Config/testthat/edition: 3
