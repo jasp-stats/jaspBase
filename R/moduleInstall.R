@@ -48,14 +48,22 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     }
   }
 
-  return(
-    pkgbuild::with_build_tools(
-    {
+  result <- tryCatch({
+    pkgbuild::with_build_tools({
       if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
       else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble, frameworkLibrary=frameworkLibrary)
     },
-    required=FALSE )
-  )
+    required = FALSE)
+  }, error = function(e) {
+    save(e, file = "~/GitHub/jasp/deleteable/renverrorobj.Rdata")
+    if (is.null(e[["output"]])) {
+      stop(e, domain = NA)
+    } else {
+      return(stop(e[["output"]], domain = NA))
+    }
+  })
+
+  return(result)
 }
 
 installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), cacheAble=TRUE) {
@@ -239,10 +247,10 @@ getFileFromModule <- function(modulePkg, filename) {
 
     if(!any(found))
       stop(paste0("Can't find file '", filename, "' in archive '", modulePkg, "'"))
-    
+
     #this will only work properly if the requested file is in there only once but for things like DESCRIPTION that should be no problem
     filename <- files[found]
-    
+
     untar(tarfile=modulePkg, files=filename, exdir=temp)
     hereItGoes <- file.path(temp, filename)
   }
