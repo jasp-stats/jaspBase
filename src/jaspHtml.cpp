@@ -111,7 +111,7 @@ Rcpp::List jaspHtml::toRObject()
 	);
 
 	lst.attr("title") = _title;
-	lst.attr("class") = std::vector<std::string>({"jaspHtmlWrapper", "jaspWrapper"});
+	lst.attr("class") = Rcpp::CharacterVector({"jaspHtmlWrapper", "jaspWrapper"});
 
 	// the reason this function is not const
 	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();

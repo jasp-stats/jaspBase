@@ -513,9 +513,14 @@ Rcpp::List jaspTable::toRObject()
 
 	df.attr("footnotes")  = _footnotes.toRObject();
 	df.attr("title") = _title;
-	df.attr("class") = std::vector<std::string>({"jaspTableWrapper", "jaspWrapper", "data.frame"});
-	// TODO: this can be smarter! and maybe there are actual names?
-	df.attr("row.names") = Rcpp::seq(1, _data[0].size());
+	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
+
+	std::vector<std::string> rowNames;
+	rowNames.reserve(_data[0].size());
+	for (size_t i = 0; i < _data[0].size(); i++)
+		rowNames.push_back(_rowNames[i] != "" ? _rowNames[i] : std::to_string(i + 1)); // R numbers from 1 to n by default
+
+	df.attr("row.names") = rowNames;
 
 	// the reason this function is not const
 	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();

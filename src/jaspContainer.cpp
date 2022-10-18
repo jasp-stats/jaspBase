@@ -414,24 +414,18 @@ Rcpp::List jaspContainer::toRObject() /*const*/
 
 	std::vector<std::string> keys = getSortedDataFields();
 	Rcpp::List lst;
-//	std::vector<std::string> names;
+
 	for (const auto & key : keys)
 	{
 
-		Rcpp::Rcout << "key: " << key << std::endl;
-
 		jaspObject* child = _data.at(key);
-		Rcpp::Rcout << "child has type: " << child->type() << std::endl;
 
 		Rcpp::List Robj = child->toRObject();
-		if (Robj.length() > 0) {
-			Rcpp::Rcout << "added child has type: " << child->type() << std::endl;
+		if (Robj.length() > 0)
 			lst.push_back(Robj, child->_title);
-		}
 	}
 
-//	lst.attr("names") = names;
-	lst.attr("class") = std::vector<std::string>({"jaspContainerWrapper", "jaspWrapper"});
+	lst.attr("class") = Rcpp::CharacterVector({"jaspContainerWrapper", "jaspWrapper"});
 	lst.attr("title") = _title;
 
 	// the reason this function is not const

@@ -275,7 +275,7 @@ Rcpp::List jaspPlot::toRObject()
 {
 	Rcpp::List lst = Rcpp::List::create(Rcpp::Named(_title.empty() ? "plot" : _title) = getPlotObject());
 	lst.attr("title") = _title;
-	lst.attr("class") = std::vector<std::string>({"jaspPlotWrapper", "jaspWrapper"});
+	lst.attr("class") = Rcpp::CharacterVector({"jaspPlotWrapper", "jaspWrapper"});
 
 	// the reason this function is not const
 	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();
