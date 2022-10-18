@@ -55,7 +55,6 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     },
     required = FALSE)
   }, error = function(e) {
-    save(e, file = "~/GitHub/jasp/deleteable/renverrorobj.Rdata")
     if (is.null(e[["output"]])) {
       stop(e, domain = NA)
     } else {
