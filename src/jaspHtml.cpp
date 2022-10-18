@@ -98,3 +98,26 @@ std::string jaspHtml::getText() {
 std::string jaspHtml::getHtml() {
     return convertTextToHtml(_rawText);
 }
+
+Rcpp::List jaspHtml::toRObject()
+{
+	// mimics convertToJSON, could also be a named character vector since everything is a string
+	Rcpp::List lst = Rcpp::List::create(
+		Rcpp::Named("rawtext")		= _rawText,
+		Rcpp::Named("text")			= convertTextToHtml(_rawText),
+		Rcpp::Named("class")		= _class,
+		Rcpp::Named("maxWidth")		= _maxWidth,
+		Rcpp::Named("elementType")	= _elementType
+	);
+
+	lst.attr("title") = _title;
+	lst.attr("class") = std::vector<std::string>({"jaspHtmlWrapper", "jaspWrapper"});
+
+	// the reason this function is not const
+	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();
+	jaspObjectEnvironment.assign("jaspObject", Rcpp::as<Rcpp::RObject>(Rcpp::wrap(jaspHtml_Interface(this))));
+	lst.attr("jaspObjectEnvironment") = jaspObjectEnvironment;
+
+
+	return lst;
+}

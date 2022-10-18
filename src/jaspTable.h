@@ -28,8 +28,8 @@ struct tableFields
 
 	tableFields(std::set<Json::Value> rows, std::set<Json::Value> cols) : _rows(rows), _cols(cols) {}
 
-	Json::Value rowsToJSON()		const;
-	Json::Value colsToJSON()		const;
+	Json::Value rowsToJSON()				const;
+	Json::Value colsToJSON()				const;
 
 	struct hasher //Special hash func obj to differentiate between different sets of tableFields
 	{
@@ -66,6 +66,7 @@ struct footnotes
 	void		convertFromJSON_SetFields(Json::Value footnotes);
 	Json::Value	convertToJSON() const;
 	void		convertToJSONOrdered(std::map<std::string, size_t> rowNames, std::map<std::string, size_t> colNames, Json::Value & fullList, Json::Value & mergedList) const;
+	Rcpp::List	toRObject() const;
 
 	private:
 		std::map<std::string, std::map<std::string, std::set<tableFields, tableFields::comparer> >> _data; //text -> symbol -> rows+cols
@@ -155,6 +156,8 @@ public:
 	void		setExpectedRows(size_t rows)					{ _expectedRowCount = rows;								}
 	void		setExpectedColumns(size_t columns)				{ _expectedColumnCount = columns;						}
 
+	Rcpp::List	toRObject()			/*const*/	override;
+
 protected:
 	std::vector<std::string>	getDisplayableColTitles(bool normalizeLengths = true, bool onlySpecifiedColumns = true)		const;
 	std::vector<std::string>	getDisplayableRowTitles(bool normalizeLengths = true)										const;
@@ -172,7 +175,7 @@ protected:
 
 	Json::Value	schemaJson(Json::Value tmpFootnotesFull)	const;
 	Json::Value	rowsJson(Json::Value tmpFootnotesFull)		const;
-	std::string deriveColumnType(int col)					const;
+	jaspTableColumnType deriveColumnType(int col)			const;
 
 	std::map<std::string, size_t> mapColNamesToIndices()	const;
 	std::map<std::string, size_t> mapRowNamesToIndices()	const;

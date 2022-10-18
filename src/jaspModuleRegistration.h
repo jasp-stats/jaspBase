@@ -67,6 +67,7 @@ RCPP_MODULE(jaspResults)
 		.method("copyDependenciesFromJaspObject",		&	jaspObject_Interface::copyDependenciesFromJaspObject,					"Will make the object depend on whatever the other jaspObject depends.")
 		.method("getError",								&	jaspObject_Interface::getError, 										"Get the error status of this object.")
 		.method("setError",								&	jaspObject_Interface::setError, 										"Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.")
+		.method("toRObject",							&	jaspObject_Interface::toRObject,										"convert this jaspResults object (and possibly it's children) to R objects.")
 	;
 
 	Rcpp::class_<jaspContainer_Interface>("jaspContainer")

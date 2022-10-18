@@ -429,7 +429,8 @@ jaspOutputObjR <- R6::R6Class(
         stop("Citation must be a character (vector)", domain = NA)
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
-    }
+    },
+    toRObject   = function() private$jaspObject$toRObject()
   ),
   active = list(
     position = function(x) { if (missing(x)) private$jaspObject$position else private$jaspObject$position <- as.numeric(x) },
