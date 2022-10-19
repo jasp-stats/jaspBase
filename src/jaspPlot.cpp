@@ -273,7 +273,7 @@ std::string jaspPlot::toHtml() const
 
 Rcpp::List jaspPlot::toRObject()
 {
-	Rcpp::List lst = Rcpp::List::create(Rcpp::Named(_title.empty() ? "plot" : _title) = getPlotObject());
+	Rcpp::List lst = Rcpp::List::create(Rcpp::Named("plotObject") = getPlotObject());
 	lst.attr("title") = _title;
 	lst.attr("class") = Rcpp::CharacterVector({"jaspPlotWrapper", "jaspWrapper"});
 
