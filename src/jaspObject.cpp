@@ -126,6 +126,29 @@ void jaspObject::removeChild(jaspObject * child)
 	child->parent = NULL;
 }
 
+Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> nestedKey, Json::Value ifNotFound) const
+{
+	Json::Value obj = currentOptions;
+	for (const auto& key: nestedKey)
+	{
+		// NOTE: this fails if we have options which are an array where some elements are named, but not all.
+		// I think that would violate the Json spec for arrays, but I'm not 100% sure.
+		if (obj.isArray() && !key.empty() && std::all_of(key.begin(), key.end(), ::isdigit))
+		{
+			int index = stoi(key);
+			obj = obj.get(index, Json::nullValue);
+		}
+		else
+		{
+			obj = obj.get(key, Json::nullValue);
+		}
+
+		if (obj.isNull())
+			return ifNotFound;
+	}
+	return obj;
+}
+
 void jaspObject::finalized()
 {
 	//std::cout << "jaspObject::finalized() called on "<<objectTitleString()<<" " << (_finalizedAlready ? "again!" :"") << "\n" << std::flush;
@@ -356,6 +379,42 @@ void jaspObject::setOptionMustContainDependency(std::string optionName, Rcpp::RO
 	_optionMustContain[optionName] = RObject_to_JsonValue(mustContainThis);
 }
 
+void jaspObject::dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName)
+{
+	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
+
+	Rcpp::Rcout << "dependOnNestedOptions received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
+
+	Json::Value obj = getObjectFromNestedOption(nestedKey);
+	if (obj.isNull())
+	{
+		std::string flattenedKey = std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$"));
+		Rf_error(("nested key \"" + flattenedKey + "\"does not exist in the options!").c_str());
+	}
+
+	_nestedOptionMustBe[nestedKey] = obj;
+}
+
+void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nestedOptionName, Rcpp::RObject mustContainThis)
+{
+	if (mustContainThis.isNULL())
+		Rf_error("setOptionMustContainDependency expected not null!");
+
+	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
+
+	Rcpp::Rcout << "setNestedOptionMustContainDependency received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
+
+	Json::Value obj = getObjectFromNestedOption(nestedKey);
+	if (obj.isNull())
+	{
+		std::string flattenedKey = std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$"));
+		Rf_error(("nested key \"" + flattenedKey + "\"does not exist in the options!").c_str());
+	}
+
+	_nestedOptionMustContain[nestedKey] = RObject_to_JsonValue(mustContainThis);
+}
+
+
 void jaspObject::copyDependenciesFromJaspObject(jaspObject * other)
 {
 	for(auto fieldVal : other->_optionMustBe)
@@ -379,6 +438,22 @@ bool jaspObject::checkDependencies(Json::Value currentOptions)
 			bool foundIt = false;
 
 			for(auto & contains : currentOptions.get(keyval.first, Json::arrayValue))
+				if(contains == keyval.second)
+					foundIt = true;
+
+			if(!foundIt)
+				return false;
+		}
+
+		for(auto & keyval : _nestedOptionMustBe)
+			if(getObjectFromNestedOption(keyval.first) != keyval.second)
+				return false;
+
+		for(auto & keyval : _nestedOptionMustContain)
+		{
+			bool foundIt = false;
+
+			for(auto & contains : getObjectFromNestedOption(keyval.first, Json::arrayValue))
 				if(contains == keyval.second)
 					foundIt = true;
 

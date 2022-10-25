@@ -55,6 +55,8 @@ public:
 
 			void		setOptionMustBeDependency(std::string optionName, Rcpp::RObject mustBeThis);
 			void		setOptionMustContainDependency(std::string optionName, Rcpp::RObject mustContainThis);
+			void		dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName);
+			void		setNestedOptionMustContainDependency(Rcpp::CharacterVector nestedOptionName, Rcpp::RObject mustContainThis);
 			void		dependOnOptions(Rcpp::CharacterVector listOptions);
 			void		copyDependenciesFromJaspObject(jaspObject * other);
 
@@ -234,10 +236,12 @@ protected:
 	std::set<std::string>		_citations;
 	std::string					_name;
 
-	std::set<std::string>							nestedMustBes()			const;
-	std::map<std::string, std::set<std::string>>	nestedMustContains()	const;
-	std::map<std::string, Json::Value>				_optionMustContain;
-	std::map<std::string, Json::Value>				_optionMustBe;
+	std::set<std::string>								nestedMustBes()			const;
+	std::map<std::string, std::set<std::string>>		nestedMustContains()	const;
+	std::map<std::string, Json::Value>					_optionMustContain;
+	std::map<std::string, Json::Value>					_optionMustBe;
+	std::map<std::vector<std::string>, Json::Value>		_nestedOptionMustContain;
+	std::map<std::vector<std::string>, Json::Value>		_nestedOptionMustBe;
 
 
 //Should add dependencies somehow here?
@@ -256,6 +260,9 @@ protected:
 	static bool						_developerMode;
 
 private:
+
+	Json::Value getObjectFromNestedOption(std::vector<std::string> nestedKey, Json::Value ifNotFound = Json::nullValue) const;
+
 	bool					_finalizedAlready = false;
 };
 
@@ -334,11 +341,13 @@ public:
 	std::string	type()								{ return myJaspObject->type(); }
 	void		printHtml()							{ jaspPrint(myJaspObject->toHtml()); }
 
-	void		setOptionMustBeDependency(std::string optionName, Rcpp::RObject mustBeThis)				{ myJaspObject->setOptionMustBeDependency(optionName, mustBeThis);				}
-	void		setOptionMustContainDependency(std::string optionName, Rcpp::RObject mustContainThis)	{ myJaspObject->setOptionMustContainDependency(optionName, mustContainThis);	}
-	void		dependOnOptions(Rcpp::CharacterVector listOptions)										{ myJaspObject->dependOnOptions(listOptions);									}
-	void		copyDependenciesFromJaspObject(jaspObject_Interface * other)							{ myJaspObject->copyDependenciesFromJaspObject(other->myJaspObject);			}
-	void		addCitation(Rcpp::String fullCitation)													{ myJaspObject->addCitation(fullCitation);										}
+	void		setOptionMustBeDependency(std::string optionName, Rcpp::RObject mustBeThis)								{ myJaspObject->setOptionMustBeDependency(optionName, mustBeThis);					}
+	void		setOptionMustContainDependency(std::string optionName, Rcpp::RObject mustContainThis)					{ myJaspObject->setOptionMustContainDependency(optionName, mustContainThis);		}
+	void		dependOnNestedOptions(Rcpp::CharacterVector optionName)													{ myJaspObject->dependOnNestedOptions(optionName);									}
+	void		setNestedOptionMustContainDependency(Rcpp::CharacterVector optionName, Rcpp::RObject mustContainThis)	{ myJaspObject->setNestedOptionMustContainDependency(optionName, mustContainThis);	}
+	void		dependOnOptions(Rcpp::CharacterVector listOptions)														{ myJaspObject->dependOnOptions(listOptions);										}
+	void		copyDependenciesFromJaspObject(jaspObject_Interface * other)											{ myJaspObject->copyDependenciesFromJaspObject(other->myJaspObject);				}
+	void		addCitation(Rcpp::String fullCitation)																	{ myJaspObject->addCitation(fullCitation);											}
 
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NATIVE_STRING(jaspObject, _title,		Title)
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NATIVE_STRING(jaspObject, _info,		Info)

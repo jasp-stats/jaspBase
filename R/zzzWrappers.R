@@ -237,7 +237,7 @@ jaspObjR <- R6::R6Class(
   public    = list(
     initialize = function()	stop("You should not create a new jaspObject!", domain = NA),
     print      = function()	private$jaspObject$print(),
-    dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL) {
+    dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL, nestedOptions = NULL, nestedOptionsContainsValue = NULL) {
       if (!is.null(options)) {
         if (!is.character(options))
           stop("please provide a character vector in `options`", domain = NA)
@@ -268,6 +268,42 @@ jaspObjR <- R6::R6Class(
           private$jaspObject$setOptionMustContainDependency(name, value)
         }
       }
+
+      if (!is.null(nestedOptions)) {
+        # TODO: how are unnamed list elements treated? For example
+        # options <- list(model = list(list(option = TRUE),
+        #                              list(option = FALSE))
+        # how should we specify [["model"]][[2]][["option"]] as a dependency?
+        if (is.character(nestedOptions))
+          private$jaspObject$dependOnNestedOptions(nestedOptions)
+        else if (is.list(nestedOptions))
+          for (el in nestedOptions) {
+            if (is.character(el))
+              private$jaspObject$dependOnNestedOptions(el)
+            else
+              stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(el), collapse = ", "), domain = NA)
+          }
+        else
+          stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(nestedOptions), collapse = ", "), domain = NA)
+      }
+
+      if (!is.null(nestedOptionsContainsValue)) {
+        # TODO: flatten list into key - value pairs
+        if (!is.list(nestedOptionsContainsValue))
+          stop("Argument `nestedOptionsContainsValue` got something that was not a list but of class ", paste(class(el), collapse = ", "), domain = NA)
+        if (is.character(nestedOptions))
+          private$jaspObject$setNestedOptionMustContainDependency(nestedOptions)
+        else if (is.list(nestedOptions))
+          for (el in nestedOptions) {
+            if (is.character(el))
+              private$jaspObject$setNestedOptionMustContainDependency(el)
+            else
+              stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(el), collapse = ", "), domain = NA)
+          }
+        else
+          stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(nestedOptions), collapse = ", "), domain = NA)
+      }
+
     }
   ),
   private = list(
