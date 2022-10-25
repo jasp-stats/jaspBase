@@ -133,9 +133,9 @@ Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> neste
 	{
 		// NOTE: this fails if we have options which are an array where some elements are named, but not all.
 		// I think that would violate the Json spec for arrays, but I'm not 100% sure.
-		if (obj.isArray() && !key.empty() && std::all_of(key.begin(), key.end(), ::isdigit))
+		if (obj.isArray() && std::all_of(key.begin(), key.end(), ::isdigit))
 		{
-			int index = stoi(key);
+			int index = stoi(key) - 1; // So R users can use 1-based indexing
 			obj = obj.get(index, Json::nullValue);
 		}
 		else
@@ -143,10 +143,53 @@ Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> neste
 			obj = obj.get(key, Json::nullValue);
 		}
 
-		if (obj.isNull())
+		if (obj.isNull()) {
+//			Rcpp::Rcout << "getObjectFromNestedOption fid not find key: " << key << std::endl;
 			return ifNotFound;
+		}
+//		else {
+//			Rcpp::Rcout << "getObjectFromNestedOption found key: " << key << std::endl;
+//		}
 	}
 	return obj;
+}
+
+std::string jaspObject::nestedKeyToString(const std::vector<std::string> &nestedKey, const std::string &sep) const
+{
+
+	std::string joined;
+
+	for (int i = 0; i < nestedKey.size() - 1; i++)
+		joined += nestedKey[i] + sep;
+	joined += nestedKey[nestedKey.size() - 1];
+
+	return joined;
+
+}
+
+std::vector<std::string> jaspObject::stringToNestedKey(const std::string &str, const std::string &sep) const
+{
+	std::string::size_type pos = 0;
+	std::vector<std::string> nestedKey;
+	size_t noKeys = 1;
+
+	while ((pos = str.find(sep, pos )) != std::string::npos)
+	{
+		noKeys++;
+		pos += sep.length();
+	}
+
+	nestedKey.reserve(noKeys);
+	std::string token;
+	pos = 0;
+	std::string s = str; // explicit copy to avoi modifying str
+	while ((pos = s.find(sep)) != std::string::npos)
+	{
+		nestedKey.push_back(s.substr(0, pos));
+		s.erase(0, pos + sep.length());
+	}
+
+	return nestedKey;
 }
 
 void jaspObject::finalized()
@@ -259,6 +302,9 @@ Json::Value	jaspObject::constructMetaEntry(std::string type, std::string meta) c
 			for(const std::string & containThis : keyval.second)
 				obj["mustContain"][keyval.first].append(containThis);
 		}
+
+		// TODO: should we add the nestedOptions*** here too?
+
 	}
 
 	return obj;
@@ -323,6 +369,16 @@ Json::Value jaspObject::convertToJSON() const
 	for(auto & keyval : _optionMustContain)
 		obj["optionMustContain"][keyval.first] = keyval.second;
 
+	Rcpp::Rcout << "here" << std::endl;
+	obj["nestedOptionMustBe"]	= Json::objectValue;
+	for(auto & keyval : _nestedOptionMustBe)
+		obj["nestedOptionMustBe"][nestedKeyToString(keyval.first)] = keyval.second;
+
+	obj["nestedOptionMustContain"]	= Json::objectValue;
+	for(auto & keyval : _nestedOptionMustContain)
+		obj["nestedOptionMustContain"][nestedKeyToString(keyval.first)] = keyval.second;
+
+
 	return obj;
 }
 
@@ -354,6 +410,19 @@ void jaspObject::convertFromJSON_SetFields(Json::Value in)
 	for(auto & mustContainKey : mustContain.getMemberNames())
 		_optionMustContain[mustContainKey] = mustContain[mustContainKey];
 
+	Rcpp::Rcout << "there 0" << std::endl;
+	_nestedOptionMustBe.clear();
+	Json::Value nestedMustBe(in.get("nestedOptionMustBe", Json::objectValue));
+	for(auto & nestedMustBeKey : nestedMustBe.getMemberNames())
+		_nestedOptionMustBe[stringToNestedKey(nestedMustBeKey)] = nestedMustBe[nestedMustBeKey];
+
+	Rcpp::Rcout << "there 1" << std::endl;
+	_nestedOptionMustContain.clear();
+	Json::Value nestedMustContain(in.get("nestedOptionMustContain", Json::objectValue));
+	for(auto & nestedMustContainKey : nestedMustContain.getMemberNames())
+		_nestedOptionMustContain[stringToNestedKey(nestedMustContainKey)] = nestedMustContain[nestedMustContainKey];
+	Rcpp::Rcout << "there 2" << std::endl;
+
 }
 
 Json::Value jaspObject::currentOptions = Json::nullValue;
@@ -383,7 +452,7 @@ void jaspObject::dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName)
 {
 	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
 
-	Rcpp::Rcout << "dependOnNestedOptions received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
+//	Rcpp::Rcout << "dependOnNestedOptions received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
 
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
@@ -402,7 +471,7 @@ void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nest
 
 	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
 
-	Rcpp::Rcout << "setNestedOptionMustContainDependency received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
+//	Rcpp::Rcout << "setNestedOptionMustContainDependency received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
 
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
@@ -422,11 +491,17 @@ void jaspObject::copyDependenciesFromJaspObject(jaspObject * other)
 
 	for(auto fieldVal : other->_optionMustContain)
 		_optionMustContain[fieldVal.first] = fieldVal.second;
+
+	for(auto fieldVal : other->_nestedOptionMustBe)
+		_nestedOptionMustBe[fieldVal.first] = fieldVal.second;
+
+	for(auto fieldVal : other->_nestedOptionMustContain)
+		_nestedOptionMustContain[fieldVal.first] = fieldVal.second;
 }
 
 bool jaspObject::checkDependencies(Json::Value currentOptions)
 {
-	if((_optionMustBe.size() + _optionMustContain.size()) != 0)
+	if((_optionMustBe.size() + _optionMustContain.size() + _nestedOptionMustBe.size() + _nestedOptionMustContain.size()) != 0)
 	{
 
 		for(auto & keyval : _optionMustBe)
@@ -446,8 +521,11 @@ bool jaspObject::checkDependencies(Json::Value currentOptions)
 		}
 
 		for(auto & keyval : _nestedOptionMustBe)
+		{
+			Rcpp::Rcout << "Checking key " << nestedKeyToString(keyval.first) << std::endl;
 			if(getObjectFromNestedOption(keyval.first) != keyval.second)
 				return false;
+		}
 
 		for(auto & keyval : _nestedOptionMustContain)
 		{
