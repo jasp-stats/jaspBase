@@ -139,17 +139,11 @@ Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> neste
 			obj = obj.get(index, Json::nullValue);
 		}
 		else
-		{
 			obj = obj.get(key, Json::nullValue);
-		}
 
-		if (obj.isNull()) {
-//			Rcpp::Rcout << "getObjectFromNestedOption fid not find key: " << key << std::endl;
+		if (obj.isNull())
 			return ifNotFound;
-		}
-//		else {
-//			Rcpp::Rcout << "getObjectFromNestedOption found key: " << key << std::endl;
-//		}
+
 	}
 	return obj;
 }
@@ -169,25 +163,27 @@ std::string jaspObject::nestedKeyToString(const std::vector<std::string> &nested
 
 std::vector<std::string> jaspObject::stringToNestedKey(const std::string &str, const std::string &sep) const
 {
-	std::string::size_type pos = 0;
+
 	std::vector<std::string> nestedKey;
 	size_t noKeys = 1;
 
-	while ((pos = str.find(sep, pos )) != std::string::npos)
+	std::string::size_type pos = 0;
+	while ((pos = str.find(sep, pos)) != std::string::npos)
 	{
 		noKeys++;
 		pos += sep.length();
 	}
 
 	nestedKey.reserve(noKeys);
-	std::string token;
 	pos = 0;
-	std::string s = str; // explicit copy to avoi modifying str
+	std::string s = str; // explicit copy to avoid modifying str
+	// Could also be done with 2 positions, e.g., s.substr(start, stop);
 	while ((pos = s.find(sep)) != std::string::npos)
 	{
 		nestedKey.push_back(s.substr(0, pos));
 		s.erase(0, pos + sep.length());
 	}
+	nestedKey.push_back(s);
 
 	return nestedKey;
 }
@@ -521,11 +517,8 @@ bool jaspObject::checkDependencies(Json::Value currentOptions)
 		}
 
 		for(auto & keyval : _nestedOptionMustBe)
-		{
-			Rcpp::Rcout << "Checking key " << nestedKeyToString(keyval.first) << std::endl;
 			if(getObjectFromNestedOption(keyval.first) != keyval.second)
 				return false;
-		}
 
 		for(auto & keyval : _nestedOptionMustContain)
 		{
