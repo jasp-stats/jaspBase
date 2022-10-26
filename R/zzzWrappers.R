@@ -269,39 +269,86 @@ jaspObjR <- R6::R6Class(
         }
       }
 
+      # helper to test of a nested key is invalid, returns FALSE for valid keys and TRUE otherwise
+      invalidNestedKey <- function(x) {
+        !(is.character(x) && length(x) > 0L && !any(trimws(x) == ""))
+      }
+
       if (!is.null(nestedOptions)) {
-        # TODO: how are unnamed list elements treated? For example
-        # options <- list(model = list(list(option = TRUE),
-        #                              list(option = FALSE))
-        # how should we specify [["model"]][[2]][["option"]] as a dependency?
+        # For example,
+        # c("model", "3", "checkbox")
+        # to indicate options[["model"]][[3]][["checkbox"]]
+        # or "vectorized"
+        # list(
+        #   c("model", "3", "checkboxA"),
+        #   c("model", "3", "checkboxB"),
+        # )
+        # to specify multiple nested options at once.
+
         if (is.character(nestedOptions))
-          private$jaspObject$dependOnNestedOptions(nestedOptions)
+          if (invalidNestedKey(nestedOptions))
+            stop("Argument `nestedOptions` is an invalid key (non-character, length 0, or empty (\"\")).", domain = NA)
+          else
+            private$jaspObject$dependOnNestedOptions(nestedOptions)
         else if (is.list(nestedOptions))
-          for (el in nestedOptions) {
-            if (is.character(el))
-              private$jaspObject$dependOnNestedOptions(el)
+          for (el in nestedOptions)
+            if (invalidNestedKey(el))
+              stop("Argument `nestedOptions` has a subelement that is an invalid key (non-character, length 0, or empty (\"\")).", domain = NA)
             else
-              stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(el), collapse = ", "), domain = NA)
-          }
+              private$jaspObject$dependOnNestedOptions(el)
         else
-          stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(nestedOptions), collapse = ", "), domain = NA)
+          stop("Argument `nestedOptions` got something that was not character but of class ",
+               paste(class(nestedOptions), collapse = ", "), domain = NA)
       }
 
       if (!is.null(nestedOptionsContainsValue)) {
-        # TODO: flatten list into key - value pairs
+
+        # Input is given as a list of key value pairs where odd indices indicate keys and even indices indicate values
+        # Example:
+        # list(
+        #   c("model", "3", "variableField"), # key
+        #   "contNormal",                     # value
+        #   c("model", "3", "variableField"), # key
+        #  "contGamma"                        # value
+        # )
+        # For readability, please write this in two aligned columns:
+        # list(
+        # # keys                              values
+        #   c("model", "3", "variableField"), "contNormal",
+        #   c("model", "3", "variableField"), "contGamma"
+        # )
+
+        # Input checking
         if (!is.list(nestedOptionsContainsValue))
-          stop("Argument `nestedOptionsContainsValue` got something that was not a list but of class ", paste(class(el), collapse = ", "), domain = NA)
-        if (is.character(nestedOptions))
-          private$jaspObject$setNestedOptionMustContainDependency(nestedOptions)
-        else if (is.list(nestedOptions))
-          for (el in nestedOptions) {
-            if (is.character(el))
-              private$jaspObject$setNestedOptionMustContainDependency(el)
-            else
-              stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(el), collapse = ", "), domain = NA)
-          }
-        else
-          stop("Argument `nestedOptions` got something that was not a character but of class ", paste(class(nestedOptions), collapse = ", "), domain = NA)
+          stop("Argument `nestedOptionsContainsValue` got something that was not a list but of class ",
+               paste(class(el), collapse = ", "), domain = NA)
+
+        if (length(nestedOptionsContainsValue) %% 2 != 0)
+          stop("Argument `nestedOptionsContainsValue` got a list of length ",
+               length(nestedOptionsContainsValue),
+               " but the length should be divisible by 2!", domain = NA)
+
+        incorrectKeys <- vapply(nestedOptionsContainsValue[seq(1, length(nestedOptionsContainsValue), 2)],
+                              function(x) { !(is.character(x) && length(x) > 0L && !any(trimws(x) == "")) },
+                              FUN.VALUE = logical(1L))
+
+        if (any(incorrectKeys))
+          stop("Argument `nestedOptionsContainsValue` has invalid keys in positions ",
+               2 * which(incorrectKeys) - 1, # map 1, 2, 3 to 1, 3, 5
+               " (non-character, length 0, or empty (\"\")).", domain = NA)
+
+        incorrectValues <- vapply(nestedOptionsContainsValue[seq(2, length(nestedOptionsContainsValue), 2)],
+                                  is.null, FUN.VALUE = logical(1L))
+
+        if (any(incorrectValues))
+          stop("Argument `nestedOptionsContainsValue` has invalid NULL values in positions ",
+               2 * which(incorrectValues), # map 1, 2, 3 to 2, 4, 6
+               ".", domain = NA)
+
+        for (i in seq(1, length(nestedOptionsContainsValue), 2))
+          private$jaspObject$setNestedOptionMustContainDependency(
+            nestedOptionsContainsValue[[i]], nestedOptionsContainsValue[[i + 1L]]
+          )
       }
 
     }
