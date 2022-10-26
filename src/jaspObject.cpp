@@ -366,7 +366,6 @@ Json::Value jaspObject::convertToJSON() const
 	for(auto & keyval : _optionMustContain)
 		obj["optionMustContain"][keyval.first] = keyval.second;
 
-	Rcpp::Rcout << "here" << std::endl;
 	obj["nestedOptionMustBe"]	= Json::objectValue;
 	for(auto & keyval : _nestedOptionMustBe)
 		obj["nestedOptionMustBe"][nestedKeyToString(keyval.first)] = keyval.second;
@@ -407,18 +406,15 @@ void jaspObject::convertFromJSON_SetFields(Json::Value in)
 	for(auto & mustContainKey : mustContain.getMemberNames())
 		_optionMustContain[mustContainKey] = mustContain[mustContainKey];
 
-	Rcpp::Rcout << "there 0" << std::endl;
 	_nestedOptionMustBe.clear();
 	Json::Value nestedMustBe(in.get("nestedOptionMustBe", Json::objectValue));
 	for(auto & nestedMustBeKey : nestedMustBe.getMemberNames())
 		_nestedOptionMustBe[stringToNestedKey(nestedMustBeKey)] = nestedMustBe[nestedMustBeKey];
 
-	Rcpp::Rcout << "there 1" << std::endl;
 	_nestedOptionMustContain.clear();
 	Json::Value nestedMustContain(in.get("nestedOptionMustContain", Json::objectValue));
 	for(auto & nestedMustContainKey : nestedMustContain.getMemberNames())
 		_nestedOptionMustContain[stringToNestedKey(nestedMustContainKey)] = nestedMustContain[nestedMustContainKey];
-	Rcpp::Rcout << "there 2" << std::endl;
 
 }
 
