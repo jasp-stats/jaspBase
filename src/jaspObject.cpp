@@ -155,6 +155,7 @@ std::string jaspObject::nestedKeyToString(const std::vector<std::string> &nested
 
 	for (int i = 0; i < nestedKey.size() - 1; i++)
 		joined += nestedKey[i] + sep;
+
 	joined += nestedKey[nestedKey.size() - 1];
 
 	return joined;
@@ -447,15 +448,9 @@ void jaspObject::setOptionMustContainDependency(std::string optionName, Rcpp::RO
 void jaspObject::dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName)
 {
 	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
-
-//	Rcpp::Rcout << "dependOnNestedOptions received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
-
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
-	{
-		std::string flattenedKey = std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$"));
-		Rf_error(("nested key \"" + flattenedKey + "\"does not exist in the options!").c_str());
-	}
+		Rf_error(("nested key \"" + nestedKeyToString(nestedKey, "$") + "\"does not exist in the options!").c_str());
 
 	_nestedOptionMustBe[nestedKey] = obj;
 }
@@ -466,15 +461,9 @@ void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nest
 		Rf_error("setOptionMustContainDependency expected not null!");
 
 	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
-
-//	Rcpp::Rcout << "setNestedOptionMustContainDependency received " << std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$")) << std::endl;
-
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
-	{
-		std::string flattenedKey = std::accumulate(nestedKey.begin(), nestedKey.end(), std::string("$"));
-		Rf_error(("nested key \"" + flattenedKey + "\"does not exist in the options!").c_str());
-	}
+		Rf_error(("nested key \"" + nestedKeyToString(nestedKey, "$") + "\"does not exist in the options!").c_str());
 
 	_nestedOptionMustContain[nestedKey] = RObject_to_JsonValue(mustContainThis);
 }
