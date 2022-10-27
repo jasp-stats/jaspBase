@@ -156,7 +156,7 @@ formulaGetRandomEffects <- function(formula) {
     if(term == as.name("|") || term == as.name("||")) {
       return(formula)
     } else if(length(term) > 1) {
-      result <- c(result, getRandomEffects(term))
+      result <- c(result, formulaGetRandomEffects(term))
     }
   }
 
