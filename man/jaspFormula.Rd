@@ -16,7 +16,7 @@ A list of class "jaspFormula" is returned, with the following elements:
 \itemize{
 \item{\code{formula}}{ The original formula object.}
 \item{\code{lhs}}{ A vector of column names included on the left hand-side of the formula.}
-\item{\code{rhs}}{ A List of\code{fixed} and \code{random} terms that appear on the right hand-side of the formula.}
+\item{\code{rhs}}{ A List of \code{fixed} and \code{random} terms that appear on the right hand-side of the formula.}
 }
 The elements of the \code{fixed} terms are:
 \itemize{

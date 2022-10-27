@@ -9,7 +9,7 @@
 #' \itemize{
 #'   \item{\code{formula}}{ The original formula object.}
 #'   \item{\code{lhs}}{ A vector of column names included on the left hand-side of the formula.}
-#'   \item{\code{rhs}}{ A List of\code{fixed} and \code{random} terms that appear on the right hand-side of the formula.}
+#'   \item{\code{rhs}}{ A List of \code{fixed} and \code{random} terms that appear on the right hand-side of the formula.}
 #' }
 #' The elements of the \code{fixed} terms are:
 #' \itemize{
@@ -56,10 +56,10 @@ formulaCheckRequirements <- function(formula, data) {
     stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.")
   }
 
-  lhs <- all.names(rlang::f_lhs(formula))
+  lhs <- all.names(formulaExtractLhs(formula))
   anyLhsTransformed <- !all(lhs %in% c(colnames(data), "cbind", "(", ")"))
 
-  rhs <- all.names(rlang::f_rhs(formula))
+  rhs <- all.names(formulaExtractRhs(formula))
   anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
@@ -69,14 +69,14 @@ formulaCheckRequirements <- function(formula, data) {
 
 formulaGetLhs <- function(formula) {
   lhs <- list(
-    vars = all.vars(rlang::f_lhs(formula))
+    vars = all.vars(formulaExtractLhs(formula))
   )
   return(lhs)
 }
 
 formulaGetRhs <- function(formula) {
   rhs <- list(
-    fixed  = formulaFixedRhs(formula),
+    fixed  = formulaFixedRhs (formula),
     random = formulaRandomRhs(formula)
   )
 
@@ -153,4 +153,16 @@ formulaGetRandomEffects <- function(formula) {
   vars <- attr(terms(formula), "term.labels")
   vars <- vars[grep("\\|", vars)]
   return(vars)
+}
+
+formulaExtractLhs <- function(formula) {
+  if(length(formula) <= 2) { # only rhs specified
+    return(NULL)
+  } else {
+    return(formula[[2]])
+  }
+}
+
+formulaExtractRhs <- function(formula) {
+  return(formula[[length(formula)]])
 }
