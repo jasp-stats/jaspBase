@@ -26,7 +26,7 @@ The elements of the \code{fixed} terms are:
 The \code{random} is itself a list of length equal to the number of random factors.
 Each element is a list that contains the same elements as \code{fixed}, plus the following elements:
 \itemize{
-\item{\code{correlated}}{ Logical. Are the terms correlated?}
+\item{\code{correlated}}{ Logical. Are the terms correlated? Can contain an attribute named "correlations" that holds the entire correlation structure in case a mixture of correlated and uncorrelated terms is used.}
 \item{\code{group}}{ The name of the random group factor.}
 }
 }
@@ -40,7 +40,7 @@ Specifically, it is not possible to use \link[stats:offset]{stats::offset} in a 
 It is also not possible to use variable transformations in a formula. Thus, instead of transforming variables using formulas, transform the variables before entering them in the analysis.
 
 For specification of the random effects, \link[lme4:lme4-package]{lme4::lme4-package} syntax is used. There is a difference in how JASP parses whether or not are random effects correlated:
-Under each random grouping factor, all terms can be either correlated or uncorrelated, but it is not possible to correlate some random effects but hold some random effects uncorrelated.
+Under each random grouping factor, if some but not all terms are correlated, the output \code{correlated} is still set to \code{TRUE}. The "correlations" attribute contains the full correlation structure.
 }
 \examples{
 # standard lm-style formulas with interaction
@@ -65,7 +65,7 @@ jaspFormula(mpg ~ disp*hp + (0 + disp + hp | cyl) + (1 | carb), mtcars)
 # uncorrelated intercept and slopes
 # the following two lines give the same result
 jaspFormula(mpg ~ disp + (1 + disp + hp || cyl), mtcars)
-jaspFormula(mpg ~ disp + (1 | cyl) + (disp | cyl) + (hp | cyl), mtcars)
+jaspFormula(mpg ~ disp + (1 | cyl) + (0 + disp | cyl) + (0 + hp | cyl), mtcars)
 
 
 # THESE EXAMPLES SHOW HOW JASP FORMULA DEVIATES FROM THE STANDARD BEHAVIOR OF FORMULAS
@@ -77,7 +77,10 @@ jaspFormula(mpg ~ exp(disp),  mtcars)
 # It is not possible to use `offset`
 jaspFormula(mpg ~ offset(disp) + cyl, mtcars)
 
-# It is not possible to correlate random effects of `disp` and `hp` but hold the intercept uncorrelated.
-# in this case all random effects are assumed uncorrelated contrary to the typical use in lme4.
-jaspFormula(mpg ~ disp + (1 | cyl) + (0 + disp + hp | cyl), mtcars)
+# Specify mixture of correlated and uncorrelated random terms; disp and hp are allowed to covary, as well as the random intercept and drat.
+# In this case the output gives $rhs$random$cyl$correlated == TRUE, the actual correlation structure
+# can be accessed from the "correlations attribute"
+result <- jaspFormula(mpg ~ disp + (0 + disp + hp | cyl) + (1 + drat | cyl), mtcars)
+isTRUE(result$rhs$random$cyl$correlated)
+attr(result$rhs$random$cyl$correlated, "correlations")
 }

@@ -19,7 +19,7 @@
 #' The \code{random} is itself a list of length equal to the number of random factors.
 #' Each element is a list that contains the same elements as \code{fixed}, plus the following elements:
 #' \itemize{
-#'   \item{\code{correlated}}{ Logical. Are the terms correlated?}
+#'   \item{\code{correlated}}{ Logical. Are the terms correlated? Can contain an attribute named "correlations" that holds the entire correlation structure in case a mixture of correlated and uncorrelated terms is used.}
 #'   \item{\code{group}}{ The name of the random group factor.}
 #' }
 #'
@@ -28,8 +28,8 @@
 #' It is also not possible to use variable transformations in a formula. Thus, instead of transforming variables using formulas, transform the variables before entering them in the analysis.
 #'
 #' For specification of the random effects, [lme4::lme4-package] syntax is used. There is a difference in how JASP parses whether or not are random effects correlated:
-#' Under each random grouping factor, all terms can be either correlated or uncorrelated, but it is not possible to correlate some random effects but hold some random effects uncorrelated.
-#' @example inst/examples/formula.R
+#' Under each random grouping factor, if some but not all terms are correlated, the output `correlated` is still set to \code{TRUE}. The "correlations" attribute contains the full correlation structure.
+#' @example inst/examples/ex-formula.R
 #' @rdname jaspFormula
 #' @export
 jaspFormula <- function(formula, data) {
@@ -127,16 +127,52 @@ formulaRandomRhs <- function(formula) {
     if(sum(belongsToGroup) == 1) {
       output[[group]] <- results[[which(belongsToGroup)]]
     } else {
-      if(any(correlated[belongsToGroup]))
-        warning("JASP formulas cannot mix uncorrelated and correlated terms under a random factor. Coercing all random effects under ", group, " to be uncorrelated.")
-
       res <- results[belongsToGroup]
-      output[[group]] <- list(
-        vars       = unlist(lapply(res, "[[", "vars")),
-        intercept  = any(unlist(lapply(res, "[[", "intercept"))),
-        correlated = FALSE,
-        group      = group
-      )
+
+      if (any(correlated[belongsToGroup])) {
+        vars      <- unlist(lapply(res, "[[", "vars"))
+        intercept <- any(unlist(lapply(res, "[[", "intercept")))
+        if(intercept) allVars <- c("intercept", vars) else allVars <- vars
+
+        correlations <- expand.grid(var1 = allVars, var2 = allVars)
+        correlations <- subset(correlations, var1 != var2)
+        correlations$index <- 0
+
+        counter <- 0
+        for (r in res) {
+          if (r$correlated) {
+            if (r$intercept) vars <- c("intercept", r$vars) else vars <- r$vars
+            if (length(vars) > 1) {
+              counter <- counter + 1
+              correlations[correlations$var1 %in% vars & correlations$var2 %in% vars, "index"] <- counter
+            }
+          }
+        }
+
+        if(all(correlations$index == 0)) {
+          correlated <- FALSE
+        } else {
+          warning("A mixture of correlated and uncorrelated terms was detected under `", group, "`, are you sure the formula is correctly specified?")
+          correlated <- TRUE
+          attr(correlated, "correlations") <- correlations
+        }
+
+        output[[group]] <- list(
+          vars         = vars,
+          intercept    = intercept,
+          correlated   = correlated,
+          group        = group
+        )
+
+      } else {
+        output[[group]] <- list(
+          vars       = unlist(lapply(res, "[[", "vars")),
+          intercept  = any(unlist(lapply(res, "[[", "intercept"))),
+          correlated = FALSE,
+          group      = group
+        )
+      }
+
     }
   }
 
