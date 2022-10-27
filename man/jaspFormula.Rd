@@ -70,12 +70,14 @@ jaspFormula(mpg ~ disp + (1 | cyl) + (0 + disp | cyl) + (0 + hp | cyl), mtcars)
 
 # THESE EXAMPLES SHOW HOW JASP FORMULA DEVIATES FROM THE STANDARD BEHAVIOR OF FORMULAS
 
-# It is not possible to use variable transformations in the formula
-jaspFormula(mpg + disp ~ cyl, mtcars)
-jaspFormula(mpg ~ exp(disp),  mtcars)
+if(interactive()) {
+  # It is not possible to use variable transformations in the formula
+  jaspFormula(mpg + disp ~ cyl, mtcars)
+  jaspFormula(mpg ~ exp(disp),  mtcars)
 
-# It is not possible to use `offset`
-jaspFormula(mpg ~ offset(disp) + cyl, mtcars)
+  # It is not possible to use `offset`
+  jaspFormula(mpg ~ offset(disp) + cyl, mtcars)
+}
 
 # Specify mixture of correlated and uncorrelated random terms; disp and hp are allowed to covary, as well as the random intercept and drat.
 # In this case the output gives $rhs$random$cyl$correlated == TRUE, the actual correlation structure
