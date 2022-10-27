@@ -106,16 +106,15 @@ formulaRandomRhs <- function(formula) {
   }
 
   re <- formulaGetRandomEffects(formula)
-  correlated <- !grepl("\\|\\|", re)
-  re <- strsplit(re, "\\||\\|\\|")
+  correlated <- vapply(re, function(r) r[[1]] == as.name("|"), logical(1))
 
-  groupings <- vapply(re, "[[", character(1), 2)
-  groupings <- trimws(groupings)
+  groupings <- lapply(re, formulaExtractRhs)
 
   results <- list()
   for(i in seq_along(re)) {
-    form <- as.formula(paste("~", re[[i]][[1]]))
-    res <- formulaFixedRhs(form)
+    form      <- ~ 0
+    form[[2]] <- formulaExtractLhs(re[[i]])
+    res       <- formulaFixedRhs(form)
     res[["correlated"]] <- correlated[[i]]
     res[["group"]]      <- groupings[[i]]
 
@@ -149,10 +148,19 @@ formulaContainsRandomEffects <- function(formula) {
   any(c('|','||') %in% all.names(formula))
 }
 
+
 formulaGetRandomEffects <- function(formula) {
-  vars <- attr(terms(formula), "term.labels")
-  vars <- vars[grep("\\|", vars)]
-  return(vars)
+  result <- c()
+  for(i in seq_len(length(formula))) {
+    term <- formula[[i]]
+    if(term == as.name("|") || term == as.name("||")) {
+      return(formula)
+    } else if(length(term) > 1) {
+      result <- c(result, getRandomEffects(term))
+    }
+  }
+
+  return(result)
 }
 
 formulaExtractLhs <- function(formula) {
@@ -166,3 +174,4 @@ formulaExtractLhs <- function(formula) {
 formulaExtractRhs <- function(formula) {
   return(formula[[length(formula)]])
 }
+
