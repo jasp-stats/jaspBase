@@ -1,7 +1,10 @@
 #' @title JASP Formulas
 #'
-#' @description This function provides support to [stats::formula] in R syntax. It is used to internally parse formula objects.
-#' This function is not intended for direct use.
+#' @description These functions provide support to [stats::formula] in R syntax. They are used to internally parse formula objects.
+#' These functions are not intended for direct use.
+#'
+#'  [jaspFormula] is used to parse R formulas. [createJaspFormula] is a convenience function that is used for generating R formulas from list objects.
+#' [jaspFormulaRhs] is another convenience function that is used in tandem with [createJaspFormula].
 #'
 #' @param formula A formula object.
 #' @param data A data frame.
@@ -45,6 +48,73 @@ jaspFormula <- function(formula, data) {
   return(result)
 }
 
+#
+#' @rdname jaspFormula
+#' @export
+createJaspFormula <- function(..., response=NULL, data) {
+  if(!is.data.frame(data)) {
+    stop("`data` must be a data frame.")
+  }
+
+  if(!is.null(response) && !is.character(response)) {
+    stop("`response` must be a character.")
+  }
+
+  dots <- list(...)
+  if(!is.jaspRhs(dots))
+    stop("All terms on the rhs must be specified as a `jaspFormulaRhs` object.")
+
+  if(length(response) > 1) {
+    response <- paste0("cbind(", paste0(response, collapse = ","), ")")
+  }
+
+
+  rhs <- vapply(dots, createJaspFormulaRhs, character(1), data = data)
+
+  formula <- reformulate(rhs, response)
+  return(jaspFormula(formula, data))
+}
+
+
+#
+#' @rdname jaspFormula
+#' @export
+jaspFormulaRhs <- function(terms = NULL, group = NULL, intercept = TRUE, correlated = TRUE) {
+  result <- list(terms = terms, group = group, intercept = intercept, correlated = correlated)
+  class(result) <- "jaspFormulaRhs"
+  return(result)
+}
+
+#' @rdname jaspFormula
+#' @export
+as.character.jaspFormula <- function(x) {
+  deparse(x[["formula"]])
+}
+
+createJaspFormulaRhs <- function(rhs, data) {
+  allVarNames <- colnames(data)
+
+  result <- paste(rhs[["terms"]], collapse = "+")
+  if(!rhs[["intercept"]]) {
+    result <- paste("0", result, sep = "+")
+  } else if(is.null(rhs[["terms"]])) {
+    result <- "1"
+  }
+  if(!is.null(rhs[["group"]])) {
+    sep <- if(rhs[["correlated"]]) "|" else "||"
+    result <- sprintf("(%s %s %s)", result, sep, rhs[["group"]])
+  }
+  return(result)
+}
+
+is.jaspRhs <- function(x) {
+  if(inherits(x, "list")) {
+    all(vapply(x, is.jaspRhs, logical(1)))
+  } else {
+    inherits(x, "jaspFormulaRhs")
+  }
+}
+
 formulaCheckRequirements <- function(formula, data) {
   if (!inherits(formula, "formula")) {
     stop("`formula` argument must be object of class `formula`.")
@@ -60,7 +130,7 @@ formulaCheckRequirements <- function(formula, data) {
   anyLhsTransformed <- !all(lhs %in% c(colnames(data), "cbind", "(", ")"))
 
   rhs <- all.names(formulaExtractRhs(formula))
-  anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "1", "0", "(", ")", "|", "||"))
+  anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
     stop("JASP formulas do not allow variable transformations. Please transform your variables before running the analysis.")
