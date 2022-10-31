@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
 "POT-Creation-Date: 2022-10-06 09:38\n"
-"PO-Revision-Date: 2022-10-07 06:06+0000\n"
-"Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
+"PO-Revision-Date: 2022-10-16 10:38+0000\n"
+"Last-Translator: Johannes Keyser <joke@fsfe.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/>"
 "\n"
 "Language: de\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
-"X-Generator: Weblate 4.14.1\n"
+"X-Generator: Weblate 4.15-dev\n"
 
 msgid "registerFonts was called but resultsFont does not exist!"
 msgstr "registerFonts wurde aufgerufen, aber resultsFont existiert nicht!"
@@ -105,23 +105,20 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Unendlichkeit gefunden in %s"
 
-#, fuzzy
 msgid "Number of factor levels is %1$s in %2$s"
-msgstr "Anzahl Faktorstufen ist %s in %s"
+msgstr "Anzahl Faktorstufen ist %1$s in %2$s"
 
-#, fuzzy
 msgid "The variance in %1$s is equal to %2$s"
-msgstr "Die Varianz in %s ist gleich zu %s"
+msgstr "Die Varianz in %1$s is equal to %2$s"
 
-#, fuzzy
 msgid "Number of observations is %1$s in %2$s"
-msgstr "Anzahl Beobachtungen ist %s in %s"
+msgstr "Anzahl Beobachtungen ist %1$s in %2$s"
 
-#, fuzzy
 msgid ""
 "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
-"Kann Statistik nicht zuverlässig berechnen: Anzahl Beobachtungen ist %s in %s"
+"Kann Statistik nicht zuverlässig berechnen: Anzahl Beobachtungen ist %1$s in "
+"%2$s"
 
 msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "Werte in %1$s außerhalb Intervall [%2$s, %3$s]"
@@ -230,20 +227,19 @@ msgid "Your module is missing the 'inst/qml' directory!"
 msgstr "Ihrem Modul fehlt das Verzeichnis 'inst/qml'!"
 
 msgid "Can't find file '"
-msgstr ""
+msgstr "Nicht auffindbare Datei '"
 
 msgid "' in archive '"
-msgstr ""
+msgstr "' im Achiv '"
 
 msgid "'"
 msgstr "'"
 
-#, fuzzy
 msgid "Your module contains no"
-msgstr "Ihr Modul enthält keine DESCRIPTION-Datei"
+msgstr "Ihr Modul enthält kein"
 
 msgid "file"
-msgstr ""
+msgstr "Datei"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "Es sollte ein Cache bei '%s' sein, existiert aber nicht!"
