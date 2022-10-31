@@ -1,13 +1,20 @@
 #' @title JASP Formulas
 #'
 #' @description These functions provide support to [stats::formula] in R syntax. They are used to internally parse formula objects.
-#' These functions are not intended for direct use.
+#' These functions are **not** intended for direct use.
 #'
-#'  [jaspFormula] is used to parse R formulas. [createJaspFormula] is a convenience function that is used for generating R formulas from list objects.
-#' [jaspFormulaRhs] is another convenience function that is used in tandem with [createJaspFormula].
+#' [jaspFormula] is used to parse R formulas. [makeJaspFormula] is a convenience function that is used for generating R formulas from list objects.
+#' [jaspFormulaRhs] is another convenience function that is used in tandem with [makeJaspFormula].
 #'
 #' @param formula A formula object.
 #' @param data A data frame.
+#' @param ... Terms added to the rhs of the formula. Use [jaspFormulaRhs] to create the terms.
+#' @param response A character giving the names of response variables (on the lhs of the formula).
+#' @param terms A character giving the names or terms on the rhs of the formula.
+#' @param group A character giving the name of the grouping variable for the random effects.
+#' @param intercept Logical. Should intercept be included?
+#' @param correlated Logical. Should random effects be correlated?
+#' @param x Object of class "jaspFormula".
 #' @returns A list of class "jaspFormula" is returned, with the following elements:
 #' \itemize{
 #'   \item{\code{formula}}{ The original formula object.}
@@ -34,6 +41,7 @@
 #' Under each random grouping factor, if some but not all terms are correlated, the output `correlated` is still set to \code{TRUE}. The "correlations" attribute contains the full correlation structure.
 #' @example inst/examples/ex-formula.R
 #' @rdname jaspFormula
+#' @keywords internal
 #' @export
 jaspFormula <- function(formula, data) {
   formulaCheckRequirements(formula, data)
@@ -51,9 +59,9 @@ jaspFormula <- function(formula, data) {
 #
 #' @rdname jaspFormula
 #' @export
-createJaspFormula <- function(..., response=NULL, data) {
+makeJaspFormula <- function(..., response=NULL, data) {
   if(!is.data.frame(data)) {
-    stop("`data` must be a data frame.")
+    stop("`data` must be a data frame.", domain = NA)
   }
 
   if(!is.null(response) && !is.character(response)) {
@@ -62,16 +70,16 @@ createJaspFormula <- function(..., response=NULL, data) {
 
   dots <- list(...)
   if(!is.jaspRhs(dots))
-    stop("All terms on the rhs must be specified as a `jaspFormulaRhs` object.")
+    stop("All terms on the rhs must be specified as a `jaspFormulaRhs` object.", domain = NA)
 
   if(length(response) > 1) {
     response <- paste0("cbind(", paste0(response, collapse = ","), ")")
   }
 
 
-  rhs <- vapply(dots, createJaspFormulaRhs, character(1), data = data)
+  rhs <- vapply(dots, makeJaspFormulaRhs, character(1), data = data)
 
-  formula <- reformulate(rhs, response)
+  formula <- stats::reformulate(rhs, response)
   return(jaspFormula(formula, data))
 }
 
@@ -87,11 +95,11 @@ jaspFormulaRhs <- function(terms = NULL, group = NULL, intercept = TRUE, correla
 
 #' @rdname jaspFormula
 #' @export
-as.character.jaspFormula <- function(x) {
+as.character.jaspFormula <- function(x, ...) {
   deparse(x[["formula"]])
 }
 
-createJaspFormulaRhs <- function(rhs, data) {
+makeJaspFormulaRhs <- function(rhs, data) {
   allVarNames <- colnames(data)
 
   result <- paste(rhs[["terms"]], collapse = "+")
@@ -117,13 +125,13 @@ is.jaspRhs <- function(x) {
 
 formulaCheckRequirements <- function(formula, data) {
   if (!inherits(formula, "formula")) {
-    stop("`formula` argument must be object of class `formula`.")
+    stop("`formula` argument must be object of class `formula`.", domain = NA)
   }
 
-  attr <- attributes(terms(formula))
+  attr <- attributes(stats::terms(formula))
 
   if (!is.null(attr[["offset"]])) {
-    stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.")
+    stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.", domain = NA)
   }
 
   lhs <- all.names(formulaExtractLhs(formula))
@@ -133,7 +141,7 @@ formulaCheckRequirements <- function(formula, data) {
   anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
-    stop("JASP formulas do not allow variable transformations. Please transform your variables before running the analysis.")
+    stop("JASP formulas do not allow variable transformations. Please transform your variables before running the analysis.", domain = NA)
   }
 }
 
@@ -159,12 +167,12 @@ formulaFixedRhs <- function(formula) {
     re      <- formulaGetRandomEffects(formula)
     re      <- paste0("(", re, ")")
     upd     <- paste(c("~ . ", re), collapse = "-")
-    formula <- update.formula(formula, as.formula(upd))
+    formula <- stats::update.formula(formula, stats::as.formula(upd))
   }
 
   rhs <- list(
-    vars      = attr(terms(formula), "term.labels"),
-    intercept = attr(terms(formula), "intercept") != 0
+    vars      = attr(stats::terms(formula), "term.labels"),
+    intercept = attr(stats::terms(formula), "intercept") != 0
   )
 
   return(rhs)
@@ -222,7 +230,7 @@ formulaRandomRhs <- function(formula) {
         if(all(correlations$index == 0)) {
           correlated <- FALSE
         } else {
-          warning("A mixture of correlated and uncorrelated terms was detected under `", group, "`, are you sure the formula is correctly specified?")
+          warning("A mixture of correlated and uncorrelated terms was detected under `", group, "`, are you sure the formula is correctly specified?", domain = NA)
           correlated <- TRUE
           attr(correlated, "correlations") <- correlations
         }
