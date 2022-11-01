@@ -189,6 +189,33 @@ std::vector<std::string> jaspObject::stringToNestedKey(const std::string &str, c
 	return nestedKey;
 }
 
+bool jaspObject::isJsonSubArray(const Json::Value needles, const Json::Value haystack) const
+{
+	// all(needles %in% haystack) in R.
+
+	if (haystack.empty())
+		return false;
+
+	if (needles == haystack)
+		return true;
+
+	for (const auto & needle: needles)
+	{
+		bool foundIt = false;
+		for (const auto & hay : haystack)
+			if (needle == hay)
+			{
+				foundIt = true;
+				break;
+			}
+
+		if (!foundIt)
+			return false;
+	}
+
+	return true;
+}
+
 void jaspObject::finalized()
 {
 	//std::cout << "jaspObject::finalized() called on "<<objectTitleString()<<" " << (_finalizedAlready ? "again!" :"") << "\n" << std::flush;
@@ -454,7 +481,7 @@ void jaspObject::dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName)
 void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nestedOptionName, Rcpp::RObject mustContainThis)
 {
 	if (mustContainThis.isNULL())
-		Rf_error("setOptionMustContainDependency expected not null!");
+		Rf_error("setNestedOptionMustContainDependency expected not null!");
 
 	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
@@ -490,32 +517,17 @@ bool jaspObject::checkDependencies(Json::Value currentOptions)
 				return false;
 
 		for(auto & keyval : _optionMustContain)
-		{
-			bool foundIt = false;
-
-			for(auto & contains : currentOptions.get(keyval.first, Json::arrayValue))
-				if(contains == keyval.second)
-					foundIt = true;
-
-			if(!foundIt)
+			if (!isJsonSubArray(keyval.second, currentOptions.get(keyval.first, Json::arrayValue)))
 				return false;
-		}
 
 		for(auto & keyval : _nestedOptionMustBe)
 			if(getObjectFromNestedOption(keyval.first) != keyval.second)
 				return false;
 
 		for(auto & keyval : _nestedOptionMustContain)
-		{
-			bool foundIt = false;
-
-			for(auto & contains : getObjectFromNestedOption(keyval.first, Json::arrayValue))
-				if(contains == keyval.second)
-					foundIt = true;
-
-			if(!foundIt)
+			if (!isJsonSubArray(keyval.second, getObjectFromNestedOption(keyval.first, Json::arrayValue)))
 				return false;
-		}
+
 	}
 
 	checkDependenciesChildren(currentOptions);

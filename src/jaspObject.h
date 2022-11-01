@@ -264,6 +264,7 @@ private:
 	Json::Value					getObjectFromNestedOption(std::vector<std::string> nestedKey, Json::Value ifNotFound = Json::nullValue) const;
 	std::string					nestedKeyToString(const std::vector<std::string> & nestedKey, const std::string & sep = "$!_SEP_!$")	const;
 	std::vector<std::string>	stringToNestedKey(const std::string & nestedKey, const std::string & sep = "$!_SEP_!$")					const;
+	bool						isJsonSubArray(const Json::Value needle, const Json::Value haystack)									const;
 
 	bool					_finalizedAlready = false;
 };

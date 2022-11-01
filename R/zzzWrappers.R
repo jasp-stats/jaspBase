@@ -305,50 +305,58 @@ jaspObjR <- R6::R6Class(
 
         # Input is given as a list of key value pairs where odd indices indicate keys and even indices indicate values
         # Example:
+        # list(key = c("model", "3", "variableField"), value = "contNormal")
+        # Or when there are multiple key value pairs:
         # list(
-        #   c("model", "3", "variableField"), # key
-        #   "contNormal",                     # value
-        #   c("model", "3", "variableField"), # key
-        #  "contGamma"                        # value
+        #   c("model", "3", "variableField"),     "contNormal",
+        #   c("model", "3", "groupingVariables"), "contBinom"
         # )
-        # For readability, please write this in two aligned columns:
-        # list(
-        # # keys                              values
-        #   c("model", "3", "variableField"), "contNormal",
-        #   c("model", "3", "variableField"), "contGamma"
-        # )
+        # Note that it is possible to "nest" values that belong to the same key if their type allows for it, for example:
+        # list(key = c("model", "3", "variableField"), value = c("contNormal", "contGamma"))
 
         # Input checking
         if (!is.list(nestedOptionsContainsValue))
           stop("Argument `nestedOptionsContainsValue` got something that was not a list but of class ",
-               paste(class(el), collapse = ", "), domain = NA)
+               paste(class(nestedOptionsContainsValue), collapse = ", "), domain = NA)
 
-        if (length(nestedOptionsContainsValue) %% 2 != 0)
-          stop("Argument `nestedOptionsContainsValue` got a list of length ",
-               length(nestedOptionsContainsValue),
-               " but the length should be divisible by 2!", domain = NA)
+        # check for list that directly contains keys and values - if yes standardize to common format
+        if (!is.null(names(nestedOptionsContainsValue)) && all(names(nestedOptionsContainsValue) %in% c("key", "value")) )
+          nestedOptionsContainsValue <- list(nestedOptionsContainsValue)
 
-        incorrectKeys <- vapply(nestedOptionsContainsValue[seq(1, length(nestedOptionsContainsValue), 2)],
-                              function(x) { !(is.character(x) && length(x) > 0L && !any(trimws(x) == "")) },
-                              FUN.VALUE = logical(1L))
+        # check if the general structure follows key-value pairs
+        invalidKeyValuePairs <- vapply(nestedOptionsContainsValue, function(l) {
+          nms <- names(l)
+          # each sublist may contain only two entries with names 'key' and 'value'
+          length(nms) != 2L || nms[1L] == nms[2L] || !all(nms %in% c("key", "value"))
+        }, FUN.VALUE = logical(1L))
+
+        if (any(invalidKeyValuePairs))
+          stop("Argument `nestedOptionsContainsValue` contained invalid sublists in positions ",
+               paste(which(invalidKeyValuePairs), collapse = ", "),
+               ". Each sublist may contain only two entries with names 'key' and 'value'.", domain = NA)
+
+        # check if the nested keys are valid
+        incorrectKeys <- vapply(nestedOptionsContainsValue, function(x) {
+          x <- x[["key"]]
+          !(is.character(x) && length(x) > 0L && !any(trimws(x) == ""))
+        }, FUN.VALUE = logical(1L))
 
         if (any(incorrectKeys))
           stop("Argument `nestedOptionsContainsValue` has invalid keys in positions ",
-               2 * which(incorrectKeys) - 1, # map 1, 2, 3 to 1, 3, 5
+               paste(which(incorrectKeys), collapse = ", "),
                " (non-character, length 0, or empty (\"\")).", domain = NA)
 
-        incorrectValues <- vapply(nestedOptionsContainsValue[seq(2, length(nestedOptionsContainsValue), 2)],
-                                  is.null, FUN.VALUE = logical(1L))
+        # check if the values are valid (i.e., not NULL)
+        incorrectValues <- vapply(nestedOptionsContainsValue, function(x) is.null(x[["value"]]), FUN.VALUE = logical(1L))
 
         if (any(incorrectValues))
           stop("Argument `nestedOptionsContainsValue` has invalid NULL values in positions ",
-               2 * which(incorrectValues), # map 1, 2, 3 to 2, 4, 6
+               paste(which(incorrectValues), collapse = ", "),
                ".", domain = NA)
 
-        for (i in seq(1, length(nestedOptionsContainsValue), 2))
-          private$jaspObject$setNestedOptionMustContainDependency(
-            nestedOptionsContainsValue[[i]], nestedOptionsContainsValue[[i + 1L]]
-          )
+        for (subList in nestedOptionsContainsValue)
+          private$jaspObject$setNestedOptionMustContainDependency(subList[["key"]], subList[["value"]])
+
       }
 
     }
