@@ -44,6 +44,8 @@
 #' @keywords internal
 #' @export
 jaspFormula <- function(formula, data) {
+  formula <- formulaEncode(formula)
+  data    <- formulaCheckOrReadData(data)
   formulaCheckRequirements(formula, data)
 
   result <- list(
@@ -60,9 +62,7 @@ jaspFormula <- function(formula, data) {
 #' @rdname jaspFormula
 #' @export
 makeJaspFormula <- function(..., response=NULL, data) {
-  if(!is.data.frame(data)) {
-    stop("`data` must be a data frame.", domain = NA)
-  }
+  data <- formulaCheckOrReadData(data)
 
   if(!is.null(response) && !is.character(response)) {
     stop("`response` must be a character.")
@@ -121,6 +121,29 @@ is.jaspRhs <- function(x) {
   } else {
     inherits(x, "jaspFormulaRhs")
   }
+}
+
+formulaEncode <- function(formula) {
+  # formula encoding should happen in R as well
+  # but for now we do it only in JASP as the dataset passed in by the R user is not getting encoded yet.
+  if(jaspBase::jaspResultsCalledFromJasp()) {
+    formula <- deparse(formula)
+    formula <- jaspBase::encodeColNames(formula)
+    formula <- stats::as.formula(formula)
+  }
+
+  return(formula)
+}
+
+formulaCheckOrReadData <- function(data) {
+  # If we are in JASP and no data are supplied explicitly, we simply read the dataset from JASP.
+  if(jaspBase::jaspResultsCalledFromJasp() && (missing(data) || is.null(data)))
+    data <- jaspBase::readDataSetToEnd(all.columns = TRUE)
+
+  if(missing(data) || is.null(data) || !is.data.frame(data))
+    stop("`data` must be a data frame.", domain = NA)
+
+  return(data)
 }
 
 formulaCheckRequirements <- function(formula, data) {
