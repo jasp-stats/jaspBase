@@ -49,7 +49,7 @@ jaspFormula <- function(formula, data) {
   formulaCheckRequirements(formula, data)
 
   result <- list(
-    formula = formula,
+    formula = deparse(formula),
     lhs = formulaGetLhs(formula),
     rhs = formulaGetRhs(formula)
   )
@@ -91,12 +91,6 @@ jaspFormulaRhs <- function(terms = NULL, group = NULL, intercept = TRUE, correla
   result <- list(terms = terms, group = group, intercept = intercept, correlated = correlated)
   class(result) <- "jaspFormulaRhs"
   return(result)
-}
-
-#' @rdname jaspFormula
-#' @export
-as.character.jaspFormula <- function(x, ...) {
-  deparse(x[["formula"]])
 }
 
 makeJaspFormulaRhs <- function(rhs, data) {
@@ -210,6 +204,7 @@ formulaRandomRhs <- function(formula) {
   correlated <- vapply(re, function(r) r[[1]] == as.name("|"), logical(1))
 
   groupings <- lapply(re, formulaExtractRhs)
+  groupings <- lapply(groupings, as.character)
 
   results <- list()
   for(i in seq_along(re)) {
