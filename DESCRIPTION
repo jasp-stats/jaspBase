@@ -32,7 +32,8 @@ Imports:
   svglite,
   systemfonts,
   withr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
+Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 LinkingTo: Rcpp
 RcppModules: jaspResults
