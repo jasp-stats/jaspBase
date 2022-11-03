@@ -65,7 +65,7 @@ makeJaspFormula <- function(..., response=NULL, data) {
   data <- formulaCheckOrReadData(data)
 
   if(!is.null(response) && !is.character(response)) {
-    stop("`response` must be a character.")
+    stop("`response` must be a character.", domain = NA)
   }
 
   dots <- list(...)
