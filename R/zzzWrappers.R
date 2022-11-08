@@ -60,6 +60,14 @@ is.JaspResultsObj <- function(x) {
     inherits(x, c("jaspResultsR", "jaspContainerR", "jaspObjR", "jaspOutputObjR", "jaspPlotR", "jaspTableR", "jaspHtmlR", "jaspStateR", "jaspColumnR"))
 }
 
+is.jaspObjR <- function(x) {
+  inherits(x, "jaspObjR")
+}
+
+is.jaspStateR <- function(x) {
+  inherits(x, "jaspStateR")
+}
+
 # TODO: this function can probably be optimized!
 destroyAllAllocatedRObjects <- function() {
 
@@ -389,7 +397,9 @@ jaspStateR <- R6::R6Class(
       if (!is.null(object))
         stateObj$object <- object
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(stateObj, dependencies)
+      else if (!is.null(dependencies))
         stateObj$dependOnOptions(dependencies)
 
       private$jaspObject <-  stateObj
@@ -451,7 +461,9 @@ jaspHtmlR <- R6::R6Class(
       htmlObj$maxWidth    <- .jaspHtmlPixelizer(maxWidth)
       htmlObj$title       <- title
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(htmlObj, dependencies)
+      else if (!is.null(dependencies))
         htmlObj$dependOnOptions(dependencies)
 
       if (!is.null(info))
@@ -488,7 +500,9 @@ jaspContainerR <- R6::R6Class(
         container <- create_cpp_jaspContainer(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspContainer, title))
       }
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(container, dependencies)
+      else if (!is.null(dependencies))
         container$dependOnOptions(dependencies)
 
       if (is.numeric(position))
@@ -587,7 +601,9 @@ jaspPlotR <- R6::R6Class(
       if (!is.null(plot))
         jaspPlotObj$plotObject <- plot
 
-      if(!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(jaspPlotObj, dependencies)
+      else if (!is.null(dependencies))
         jaspPlotObj$dependOnOptions(dependencies)
 
       if (!is.null(info))
@@ -662,7 +678,9 @@ jaspTableR <- R6::R6Class(
       if (!is.null(rowTitles))
         jaspObj$setRowTitles(rowTitles)
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(jaspObj, dependencies)
+      else if (!is.null(dependencies))
         jaspObj$dependOnOptions(dependencies)
 
       if (!is.null(info))
@@ -795,7 +813,9 @@ jaspQmlSourceR <- R6::R6Class(
       if (!is.null(value))
         jaspObj$setValue(value)
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(jaspObj, dependencies)
+      else if (!is.null(dependencies))
         jaspObj$dependOnOptions(dependencies)
 
       private$jaspObject <- jaspObj
@@ -836,7 +856,9 @@ jaspColumnR <- R6::R6Class(
       if (!is.null(nominalTextData)) columnObj$setNominalText(nominalTextData)
       if (!is.null(info))            columnObj$info <- info
 
-      if (!is.null(dependencies))
+      if (is.jaspDeps(dependencies))
+        setJaspDeps(columnObj, dependencies)
+      else if (!is.null(dependencies))
         columnObj$dependOnOptions(dependencies)
 
       private$jaspObject <- columnObj
