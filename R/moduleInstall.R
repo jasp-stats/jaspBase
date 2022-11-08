@@ -39,14 +39,12 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   cmdConfigCC <- system2(c(renv:::R(),"CMD","config","CC"),stdout=TRUE,stderr=TRUE)
   if(length(cmdConfigCC) > 1)
     stop(
-      paste0(
 "R CMD config CC returns more than 1 line, this will break renv and thus your install. 
 Most likely you are on mac and you should run `xcode-select --install` in a terminal. 
 If that doesn't help or you aren't on a mac: feel free to open an issue at https://github.com/jasp-stats/jasp-issues/issues/new/choose
   
 The output was: 
-"     ), 
-      paste(cmdConfigCC, sep="", collapse="\n"))
+", paste0(cmdConfigCC, collapse="\n"), domain = NA)
 
   r <- getOption("repos")
   r["CRAN"] <- repos
