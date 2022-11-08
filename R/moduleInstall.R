@@ -34,6 +34,18 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
 
   assertValidJASPmodule(modulePkg)
 
+  # renv uses the following output without checking for length but assuming it is 1.
+  # if that isnt the case the (module) installation fails obscurely with an error like "Error in if (eval(cond, envir = environment(dot))) return(eval(expr, envir = environment(dot))): the condition has length > 1"
+  cmdConfigCC <- system2(c(renv:::R(),"CMD","config","CC"),stdout=TRUE,stderr=TRUE)
+  if(length(cmdConfigCC) > 1)
+    stop(
+"R CMD config CC returns more than 1 line, this will break renv and thus your install. 
+Most likely you are on mac and you should run `xcode-select --install` in a terminal. 
+If that doesn't help or you aren't on a mac: feel free to open an issue at https://github.com/jasp-stats/jasp-issues/issues/new/choose
+  
+The output was: 
+", paste0(cmdConfigCC, collapse="\n"), domain = NA)
+
   r <- getOption("repos")
   r["CRAN"] <- repos
   options(repos = r)
