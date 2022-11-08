@@ -44,24 +44,27 @@ RCPP_MODULE(jaspResults)
 
 	Rcpp::class_<jaspObject_Interface>("jaspObject")
 
-		.method("print",							&	jaspObject_Interface::print,											"Prints the contents of the jaspObject")
-		.method("toHtml",							&	jaspObject_Interface::toHtml,											"gives a string with the contents of the jaspObject nicely formatted as html")
-		.method("printHtml",						&	jaspObject_Interface::printHtml,										"Prints the contents of the jaspObject nicely formatted as html")
+		.method("print",								&	jaspObject_Interface::print,											"Prints the contents of the jaspObject")
+		.method("toHtml",								&	jaspObject_Interface::toHtml,											"gives a string with the contents of the jaspObject nicely formatted as html")
+		.method("printHtml",							&	jaspObject_Interface::printHtml,										"Prints the contents of the jaspObject nicely formatted as html")
 
-		.method("addMessage",						&	jaspObject_Interface::addMessage,										"Add a message to this object")
-		.method("addCitation",						&	jaspObject_Interface::addCitation,										"Add a citation to this object")
+		.method("addMessage",							&	jaspObject_Interface::addMessage,										"Add a message to this object")
+		.method("addCitation",							&	jaspObject_Interface::addCitation,										"Add a citation to this object")
 
-		.property("title",							&	jaspObject_Interface::getTitle,		&jaspObject_Interface::setTitle,	"Set the title of this object")
-		.property("info",							&	jaspObject_Interface::getInfo,		&jaspObject_Interface::setInfo,		"Set info aka help MD for this object")
-		.property("position",						&	jaspObject_Interface::getPosition,	&jaspObject_Interface::setPosition,	"Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.")
-		.property("type",							&	jaspObject_Interface::type,												"The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state")
+		.property("title",								&	jaspObject_Interface::getTitle,		&jaspObject_Interface::setTitle,	"Set the title of this object")
+		.property("info",								&	jaspObject_Interface::getInfo,		&jaspObject_Interface::setInfo,		"Set info aka help MD for this object")
+		.property("position",							&	jaspObject_Interface::getPosition,	&jaspObject_Interface::setPosition,	"Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.")
+		.property("type",								&	jaspObject_Interface::type,												"The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state")
 
-		.method("setOptionMustBeDependency",		&	jaspObject_Interface::setOptionMustBeDependency,						"Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.")
-		.method("setOptionMustContainDependency",	&	jaspObject_Interface::setOptionMustContainDependency,					"Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.")
-		.method("dependOnOptions",					&	jaspObject_Interface::dependOnOptions,									"Will make the object depend on the current values of the options specified in the charactervector.")
-		.method("copyDependenciesFromJaspObject",	&	jaspObject_Interface::copyDependenciesFromJaspObject,					"Will make the object depend on whatever the other jaspObject depends.")
-		.method("getError",							&	jaspObject_Interface::getError, 										"Get the error status of this object.")
-		.method("setError",							&	jaspObject_Interface::setError, 										"Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.")
+		.method("setOptionMustBeDependency",			&	jaspObject_Interface::setOptionMustBeDependency,						"Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.")
+		.method("setOptionMustContainDependency",		&	jaspObject_Interface::setOptionMustContainDependency,					"Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.")
+		.method("setNestedOptionMustContainDependency",	&	jaspObject_Interface::setNestedOptionMustContainDependency,				"Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.")
+
+		.method("dependOnOptions",						&	jaspObject_Interface::dependOnOptions,									"Will make the object depend on the current values of the options specified in the charactervector.")
+		.method("dependOnNestedOptions",				&	jaspObject_Interface::dependOnNestedOptions,							"Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.")
+		.method("copyDependenciesFromJaspObject",		&	jaspObject_Interface::copyDependenciesFromJaspObject,					"Will make the object depend on whatever the other jaspObject depends.")
+		.method("getError",								&	jaspObject_Interface::getError, 										"Get the error status of this object.")
+		.method("setError",								&	jaspObject_Interface::setError, 										"Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.")
 	;
 
 	Rcpp::class_<jaspContainer_Interface>("jaspContainer")

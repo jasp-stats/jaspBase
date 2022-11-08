@@ -237,7 +237,7 @@ jaspObjR <- R6::R6Class(
   public    = list(
     initialize = function()	stop("You should not create a new jaspObject!", domain = NA),
     print      = function()	private$jaspObject$print(),
-    dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL) {
+    dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL, nestedOptions = NULL, nestedOptionsContainsValue = NULL) {
       if (!is.null(options)) {
         if (!is.character(options))
           stop("please provide a character vector in `options`", domain = NA)
@@ -268,6 +268,97 @@ jaspObjR <- R6::R6Class(
           private$jaspObject$setOptionMustContainDependency(name, value)
         }
       }
+
+      # helper to test of a nested key is invalid, returns FALSE for valid keys and TRUE otherwise
+      invalidNestedKey <- function(x) {
+        !(is.character(x) && length(x) > 0L && !any(trimws(x) == ""))
+      }
+
+      if (!is.null(nestedOptions)) {
+        # For example,
+        # c("model", "3", "checkbox")
+        # to indicate options[["model"]][[3]][["checkbox"]]
+        # or "vectorized"
+        # list(
+        #   c("model", "3", "checkboxA"),
+        #   c("model", "3", "checkboxB"),
+        # )
+        # to specify multiple nested options at once.
+
+        if (is.character(nestedOptions))
+          if (invalidNestedKey(nestedOptions))
+            stop("Argument `nestedOptions` is an invalid key (non-character, length 0, or empty (\"\")).", domain = NA)
+          else
+            private$jaspObject$dependOnNestedOptions(nestedOptions)
+        else if (is.list(nestedOptions))
+          for (el in nestedOptions)
+            if (invalidNestedKey(el))
+              stop("Argument `nestedOptions` has a subelement that is an invalid key (non-character, length 0, or empty (\"\")).", domain = NA)
+            else
+              private$jaspObject$dependOnNestedOptions(el)
+        else
+          stop("Argument `nestedOptions` got something that was not character but of class ",
+               paste(class(nestedOptions), collapse = ", "), domain = NA)
+      }
+
+      if (!is.null(nestedOptionsContainsValue)) {
+
+        # Input is given as a list of key value pairs where odd indices indicate keys and even indices indicate values
+        # Example:
+        # list(key = c("model", "3", "variableField"), value = "contNormal")
+        # Or when there are multiple key value pairs:
+        # list(
+        #   c("model", "3", "variableField"),     "contNormal",
+        #   c("model", "3", "groupingVariables"), "contBinom"
+        # )
+        # Note that it is possible to "nest" values that belong to the same key if their type allows for it, for example:
+        # list(key = c("model", "3", "variableField"), value = c("contNormal", "contGamma"))
+
+        # Input checking
+        if (!is.list(nestedOptionsContainsValue))
+          stop("Argument `nestedOptionsContainsValue` got something that was not a list but of class ",
+               paste(class(nestedOptionsContainsValue), collapse = ", "), domain = NA)
+
+        # check for list that directly contains keys and values - if yes standardize to common format
+        if (!is.null(names(nestedOptionsContainsValue)) && all(names(nestedOptionsContainsValue) %in% c("key", "value")) )
+          nestedOptionsContainsValue <- list(nestedOptionsContainsValue)
+
+        # check if the general structure follows key-value pairs
+        invalidKeyValuePairs <- vapply(nestedOptionsContainsValue, function(l) {
+          nms <- names(l)
+          # each sublist may contain only two entries with names 'key' and 'value'
+          length(nms) != 2L || nms[1L] == nms[2L] || !all(nms %in% c("key", "value"))
+        }, FUN.VALUE = logical(1L))
+
+        if (any(invalidKeyValuePairs))
+          stop("Argument `nestedOptionsContainsValue` contained invalid sublists in positions ",
+               paste(which(invalidKeyValuePairs), collapse = ", "),
+               ". Each sublist may contain only two entries with names 'key' and 'value'.", domain = NA)
+
+        # check if the nested keys are valid
+        incorrectKeys <- vapply(nestedOptionsContainsValue, function(x) {
+          x <- x[["key"]]
+          !(is.character(x) && length(x) > 0L && !any(trimws(x) == ""))
+        }, FUN.VALUE = logical(1L))
+
+        if (any(incorrectKeys))
+          stop("Argument `nestedOptionsContainsValue` has invalid keys in positions ",
+               paste(which(incorrectKeys), collapse = ", "),
+               " (non-character, length 0, or empty (\"\")).", domain = NA)
+
+        # check if the values are valid (i.e., not NULL)
+        incorrectValues <- vapply(nestedOptionsContainsValue, function(x) is.null(x[["value"]]), FUN.VALUE = logical(1L))
+
+        if (any(incorrectValues))
+          stop("Argument `nestedOptionsContainsValue` has invalid NULL values in positions ",
+               paste(which(incorrectValues), collapse = ", "),
+               ".", domain = NA)
+
+        for (subList in nestedOptionsContainsValue)
+          private$jaspObject$setNestedOptionMustContainDependency(subList[["key"]], subList[["value"]])
+
+      }
+
     }
   ),
   private = list(
