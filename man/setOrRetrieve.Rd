@@ -88,10 +88,10 @@ result <- ctr[["state"]] \%setOrRetrieve\% (
     createJaspState()
 )
 
-result                       # the random number
-isRecomputed(result)         # intentional error
-isRecomputed(ctr[["state"]]) # true
-isRecomputed()               # true
+result                         # the random number
+\dontrun{isRecomputed(result)} # intentional error
+isRecomputed(ctr[["state"]])   # true
+isRecomputed()                 # true
 
 result2 <- ctr[["state"]] \%setOrRetrieve\% (
   computeFunction() |>
