@@ -2,56 +2,68 @@
 % Please edit documentation in R/setOrRetrieve.R
 \name{\%setOrRetrieve\%}
 \alias{\%setOrRetrieve\%}
+\alias{isRecomputed}
 \title{Set or retrieve a jaspObject}
 \usage{
 lhs \%setOrRetrieve\% rhs
+
+isRecomputed(x)
 }
 \arguments{
 \item{lhs}{an assignment into a jaspObject, e.g., \code{container[["table"]]}.}
 
 \item{rhs}{a function call that creates a jaspObject.}
+
+\item{x}{a jaspObject, or missing in which case the last created or retrieved jaspObject is considered.}
 }
 \description{
-Set or retrieve a jaspObject
+\verb{\%setOrRetrieve\%} is a useful shorthand for a common pattern.
+
+\link{isRecomputed} tests if a jaspObject was recomputed or not, if it was created with \link{\%setOrRetrieve\%}.
 }
 \details{
-This function exists as a shorthand for the following very common pattern:
-\preformatted{
-if (is.null(jaspContainer[[key]])) { # was this subelement already computed?
+\verb{\%setOrRetrieve\%} exists as a shorthand for the following very common pattern:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{if (is.null(jaspContainer[[key]])) \{ # was this subelement already computed?
   subContainer <- createJaspContainer(..., dependencies = ...) # no, so recreate it
-  jaspContainer[[key]] <- subContainer # store it in this position
-} else {
+  jaspContainer[[key]] <- subContainer # store it with this key
+\} else \{
   subContainer <- jaspContainer[[key]] # it was recomputed, retrieve it from the state.
-}
-}
+\}
+}\if{html}{\out{</div>}}
+
 The code above duplicates the phrase \code{jaspContainer[[key]]} quite a bit.
 When this is a string literal, this introduces a lot of room for copy-paste errors.
 with \verb{\%setOrRetrieve\%}, this becomes
-\preformatted{
-subContainer <- jaspContainer[[key]] \%setOrRetrieve\% createJaspContainer(..., dependencies = ...)
-}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{subContainer <- jaspContainer[[key]] \\\%setOrRetrieve\\\% createJaspContainer(..., dependencies = ...)
+}\if{html}{\out{</div>}}
 
 The same pattern can also be used to set and retrieve state objects.
 Consider the following code
-\preformatted{
-if (is.null(jaspContainer[[key]])) {
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{if (is.null(jaspContainer[[key]])) \{
   object <- expensiveComputeFunction()
   state <- createJaspState(object, dependencies = ...)
   jaspContainer[[key]] <- state
-} else {
+\} else \{
   object <- jaspContainer[[key]]$object
-}
-}
+\}
+}\if{html}{\out{</div>}}
+
 with \verb{\%setOrRetrieve\%}, this becomes
-\preformatted{
-object <- jaspContainer[[key]] \%setOrRetrieve\% (
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{object <- jaspContainer[[key]] \\\%setOrRetrieve\\\% (
   expensiveComputeFunction() |>
   createJaspState(dependencies = ...)
 )
-}
-Note that if the \code{rhs} passed to \verb{\%setOrRetrieve\%} returns an object of class \code{jaspStateR} then \verb{\%setOrRetrieve\%} returns the object it contains, rather than the jaspObject itself.
+}\if{html}{\out{</div>}}
+
+If the \code{rhs} passed to \verb{\%setOrRetrieve\%} returns an object of class \code{jaspStateR} then \verb{\%setOrRetrieve\%} returns the object it contains, rather than the jaspObject itself.
 In all other cases the jaspObject is returned.
 If the \code{rhs} does not return a jaspObject, an error is thrown.
+
+\code{isRecomputed} only works when \code{\link{\%setOrRetrieve\%}} is used to set or retrieve a jaspObject.
 }
 \examples{
 library(jaspBase)
@@ -63,6 +75,7 @@ jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
 
 ctr <- createJaspContainer("ctr1")
 
+debugonce(`\%setOrRetrieve\%`)
 result <- ctr[["ctr2"]] \%setOrRetrieve\%
   createJaspContainer("my name")
 
@@ -101,4 +114,8 @@ result2 <- ctr[["state"]] \%setOrRetrieve\% (
 identical(result, result2)   # the random number is identical, so retrieved from the state
 isRecomputed(ctr[["state"]]) # false
 isRecomputed()               # false
+
+# Note that only works when the left hand side indexes inside a jaspObject
+a <- 1
+\dontrun{a \%setOrRetrieve\% 2} # error
 }

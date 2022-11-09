@@ -7,6 +7,7 @@ jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
 
 ctr <- createJaspContainer("ctr1")
 
+debugonce(`%setOrRetrieve%`)
 result <- ctr[["ctr2"]] %setOrRetrieve%
   createJaspContainer("my name")
 
@@ -45,3 +46,7 @@ result2 <- ctr[["state"]] %setOrRetrieve% (
 identical(result, result2)   # the random number is identical, so retrieved from the state
 isRecomputed(ctr[["state"]]) # false
 isRecomputed()               # false
+
+# Note that only works when the left hand side indexes inside a jaspObject
+a <- 1
+\dontrun{a %setOrRetrieve% 2} # error
