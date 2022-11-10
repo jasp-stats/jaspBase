@@ -990,3 +990,24 @@ editImage <- function(name, optionsJson) {
   return(toJSON(response))
 }
 
+registerData <- function(data) {
+   #TODO
+}
+
+checkAnalysisOptions <- function(analysisName, options) {
+   #TODO
+   return(options)
+}
+
+runAnalysisWrapper <- function(analysisName, data, options) {
+   if (jaspResultsCalledFromJasp()) {
+      result <- list("options" = options, "analysis" = analysisName)
+      result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+      return(toString(result))
+   } else {
+      registerData(data)
+      options <- checkAnalysisOptions(analysisName, options)
+      return(jaspTools::runAnalysis(analysisName, data, options))
+   }
+}
+
