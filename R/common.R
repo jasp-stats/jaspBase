@@ -999,7 +999,7 @@ checkAnalysisOptions <- function(analysisName, options) {
    return(options)
 }
 
-runAnalysisWrapper <- function(analysisName, data, options) {
+runWrappedAnalysis <- function(analysisName, data, options) {
    if (jaspResultsCalledFromJasp()) {
       result <- list("options" = options, "analysis" = analysisName)
       result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
