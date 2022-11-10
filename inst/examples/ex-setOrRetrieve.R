@@ -7,7 +7,6 @@ jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
 
 ctr <- createJaspContainer("ctr1")
 
-debugonce(`%setOrRetrieve%`)
 result <- ctr[["ctr2"]] %setOrRetrieve%
   createJaspContainer("my name")
 
@@ -49,4 +48,4 @@ isRecomputed()               # false
 
 # Note that only works when the left hand side indexes inside a jaspObject
 a <- 1
-\dontrun{a %setOrRetrieve% 2} # error
+\dontrun{a %setOrRetrieve% 2} # intentional error
