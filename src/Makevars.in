@@ -1,6 +1,6 @@
-CXX_STD				= CXX11
+CXX_STD				= CXX17
 PKG_CXXFLAGS		= @cppflags@
-CXX11STD			= -std=c++11
+CXX17STD			= -std=c++17
 
 # Include all C++ files in src/ and jaspColumnEncoder
 SOURCES=@src_sources@ @jaspColumnEncoder_sources@
