@@ -1,5 +1,7 @@
 .internal <- list2env(list(
-  recomputedHashtab = hashtab(type = "address", NULL), # unclear if "address" is the correct choice here
+  # It's not 100% clear if "address" is the best choice here, but it should be a little bit faster than constructing hashes using identical.
+  #  See also https://github.com/wch/r-source/blob/trunk/src/library/utils/src/hashtab.c
+  recomputedHashtab = hashtab(type = "address", NULL),
   lastRecomputed    = TRUE
 ), parent = emptyenv())
 
@@ -9,6 +11,13 @@ saveHashOfJaspObject <- function(x) {
 
 setRecomputed <- function(x) {
   .internal[["lastRecomputed"]] <- x
+}
+
+emptyRecomputed <- function() {
+  # remove all stored hashes
+  clrhash(.internal[["recomputedHashtab"]])
+  # set lastRecomputed to TRUE
+  setRecomputed(TRUE)
 }
 
 #' Set or retrieve a jaspObject

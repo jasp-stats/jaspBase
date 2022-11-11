@@ -105,6 +105,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
+  # ensure an analysis always starts with a clean hashtable of computed jasp Objects
+  emptyRecomputed()
+
   analysisResult <-
     tryCatch(
       expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
