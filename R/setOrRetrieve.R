@@ -75,7 +75,7 @@ emptyRecomputed <- function() {
       stop("The left-hand side of %setOrRetrieve% did not return a jaspObject!", domain = NA)
 
     saveHashOfJaspObject(lhs)
-    setRecomputed(FALSE) # will be a global value inside jaspBase (without <<-)
+    setRecomputed(FALSE)
 
     if (is.jaspStateR(lhs))
       return(lhs$object)
