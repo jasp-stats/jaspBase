@@ -314,7 +314,7 @@ void jaspResults::checkForAnalysisChanged()
 	{
 		jaspPrint("Polling for analysis changes found a change, analysis should restart!");
 		setStatus("changed");
-		 static Rcpp::Function signalAnalysisAbort = Rcpp::Environment::namespace_env("jaspBase")["signalAnalysisAbort"];
+		static Rcpp::Function signalAnalysisAbort = Rcpp::Environment::namespace_env("jaspBase")["signalAnalysisAbort"];
 		signalAnalysisAbort();
 	}
 }

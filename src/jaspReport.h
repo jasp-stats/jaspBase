@@ -5,7 +5,7 @@ class jaspReport : public jaspObject
 {
 public:
   jaspReport(Rcpp::String text = "", bool report = false) 
-  : jaspObject(jaspObjectType::report, ""), _rawText(jaspNativeToUtf8(text)), _report(report)
+  : jaspObject(jaspObjectType::report, ""), _rawText(text), _report(report)
   {}
 
 	~jaspReport() {}
@@ -19,7 +19,7 @@ public:
 	Json::Value convertToJSON()								const	override;
 	void		convertFromJSON_SetFields(Json::Value in)			override;
 
-	void		setText(Rcpp::String newRawText) 					{ _rawText 	= jaspNativeToUtf8(newRawText);	}
+	void		setText(Rcpp::String newRawText) 					{ _rawText 	= newRawText;	}
 	std::string getText() 									const 	{ return _rawText;			}
 
 	std::string _rawText;
