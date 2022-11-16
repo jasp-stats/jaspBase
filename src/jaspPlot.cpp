@@ -249,7 +249,7 @@ void jaspPlot::convertFromJSON_SetFields(Json::Value in)
 	JASP_OBJECT_TIMEREND(converting from JSON)*/
 }
 
-std::string jaspPlot::toHtml()
+std::string jaspPlot::toHtml() const
 {
 	std::stringstream out;
 

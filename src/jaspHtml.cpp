@@ -6,11 +6,12 @@ std::string jaspHtml::dataToString(std::string prefix) const
     return convertTextToHtml(_rawText);
 }
 
-std::string jaspHtml::convertTextToHtml(std::string text) const
+
+std::string jaspHtml::sanitizeTextForHtml(std::string text)
 {
     // @vankesteren with help from https://stackoverflow.com/a/24315631 and @jorisgoosen
 
-    // First replace the newlines with <br/>
+    //Maybe we should also hold the analysiswriter's hand and replace '&' by '&amp;' etc?
     const std::string 	from	= "\n",
                         to		= "<br/>";
     size_t start_pos = 0;
@@ -19,6 +20,14 @@ std::string jaspHtml::convertTextToHtml(std::string text) const
         text.replace(start_pos, from.length(), to);
         start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
     }
+
+    return text;
+}
+
+std::string jaspHtml::convertTextToHtml(std::string text) const
+{
+    // first we replace \n by <br>
+    text = sanitizeTextForHtml(text);
 
     // Then add element tags
     std::stringstream out;
@@ -33,9 +42,8 @@ std::string jaspHtml::convertTextToHtml(std::string text) const
     return out.str();
 }
 
-std::string jaspHtml::toHtml()
+std::string jaspHtml::toHtml() const
 {
-
 	return (_elementType != "errorMsg" ? "<div class=\"jaspHtml\" style=\"max-width:" + _maxWidth + ";\">\n" : "<div class=\"analysis-error-message error-message-box ui-state-error\"><span class=\"ui-icon ui-icon-alert\" style=\"float: left; margin-right: .3em;\"/>\n" )
 			+ htmlTitle() + "\n" + dataToString() + "</div>" "\n";
 

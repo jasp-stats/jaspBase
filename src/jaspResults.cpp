@@ -31,6 +31,7 @@ void jaspResults::setPollMessagesFunc(Rcpp::XPtr<pollMessagesFuncDef> pollFunc)
 	_ipccPollFunc = *pollFunc;
 }
 
+
 void jaspResults::setBaseCitation(std::string baseCitation)
 {
 	_baseCitation = baseCitation;
@@ -608,6 +609,7 @@ jaspObject * jaspObject::convertFromJSON(Json::Value in)
 	case jaspObjectType::html:		newObject = new jaspHtml();			break;
 	case jaspObjectType::state:		newObject = new jaspState();		break;
 	case jaspObjectType::column:	newObject = new jaspColumn();		break;
+	case jaspObjectType::report:	newObject = new jaspReport();		break;
 	//case jaspObjectType::results:	newObject = new jaspResults();		break;
 	default:						throw std::runtime_error("Cant understand this type");
 	}

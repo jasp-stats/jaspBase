@@ -144,7 +144,7 @@ private:
 
 void JASPresultFinalizer(jaspResults * obj);
 
- Rcpp::RObject givejaspResultsModule();
+Rcpp::RObject givejaspResultsModule();
 
 
 class  jaspResults_Interface : public jaspContainer_Interface
@@ -160,7 +160,7 @@ public:
 	Rcpp::List	getPlotObjectsForState()			{ return ((jaspResults*)myJaspObject)->getPlotObjectsForState();	}
 	Rcpp::List	getKeepList()						{ return ((jaspResults*)myJaspObject)->getKeepList();				}
 	std::string getResults()						{ return ((jaspResults*)myJaspObject)->getResults();				}
-
+	
 	void		setErrorMessage(Rcpp::String msg, std::string errorStatus)			{ ((jaspResults*)myJaspObject)->setErrorMessage(msg, errorStatus);							}
 
 	void		setOptions(std::string opts)		{ ((jaspResults*)myJaspObject)->setOptions(opts); }
@@ -172,13 +172,13 @@ public:
 	void		prepareForWriting()					{ ((jaspResults*)myJaspObject)->prepareForWriting(); }
 
 	void	setCurrentColumnNames(Rcpp::CharacterVector names)
-	{
+	{ 
 		std::vector<std::string> vec;
 
 		for(int row=0; row<names.size(); row++)
 			vec.push_back((std::string)(names[row]));
 
-		((jaspResults*)myJaspObject)->setCurrentColumnNames(vec);
+		((jaspResults*)myJaspObject)->setCurrentColumnNames(vec); 
 	}
 
 	std::string encodeColumnName(	 const std::string & in) {return ((jaspResults*)myJaspObject)->encodeColumnName(in);	 }

@@ -134,7 +134,7 @@ public:
 
 	Json::Value	metaEntry()								const	override { return constructMetaEntry("table"); }
 	Json::Value	dataEntry(std::string & errorMessage)	const	override;
-	std::string	toHtml()										override;
+	std::string	toHtml()								const	override;
 
 	std::string defaultColName(size_t col)	const	{ return "col"+ std::to_string(col); }
 	std::string defaultRowName(size_t row)	const	{ return "row"+ std::to_string(row); }
@@ -159,7 +159,7 @@ protected:
 	std::vector<std::string>	getDisplayableColTitles(bool normalizeLengths = true, bool onlySpecifiedColumns = true)		const;
 	std::vector<std::string>	getDisplayableRowTitles(bool normalizeLengths = true)										const;
 	void						rectangularDataWithNamesToString(	std::stringstream & out, std::string prefix,	std::vector<std::vector<std::string>> vierkant, std::vector<std::string> sideNames, std::vector<std::string> topNames, std::map<std::string,std::string> sideOvertitles, std::map<std::string,std::string> topOvertitles) const;
-	void						rectangularDataWithNamesToHtml(		std::stringstream & out,						std::vector<std::vector<std::string>> vierkant, std::vector<std::string> sideNames, std::vector<std::string> topNames, std::map<std::string,std::string> sideOvertitles, std::map<std::string,std::string> topOvertitles);
+	void						rectangularDataWithNamesToHtml(		std::stringstream & out,						std::vector<std::vector<std::string>> vierkant, std::vector<std::string> sideNames, std::vector<std::string> topNames, std::map<std::string,std::string> sideOvertitles, std::map<std::string,std::string> topOvertitles) const;
 
 
 			std::map<std::string, std::string>				getOvertitlesMap()																					const;
