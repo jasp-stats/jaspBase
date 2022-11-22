@@ -87,7 +87,7 @@ location of the parent directory (e.g., the default is '-I\"../inst/include/jasp
 fi
 
 SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
-JASPCOLUMNENCODER_SOURCES="$(cd src/ && ls ${JASPCOLUMNENCODER_DIR}/*.cpp | tr '\n' ' ')"
+JASPCOLUMNENCODER_SOURCES="${JASPCOLUMNENCODER_DIR}/columnencoder.cpp ${JASPCOLUMNENCODER_DIR}/columntype.cpp"
 
 sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars.win
 
