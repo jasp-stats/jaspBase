@@ -46,24 +46,29 @@
   signalCondition(e)
 }
 
-.sendWarning <- function(w) {
-  # Sends warning w to an object `warnings` in the parent frame
-  warnings <<- c(warnings, list(w))
-}
-
 .appendOutputFromR <- function(container, warnings) {
+  # currently adds only warnings, do we also want messages or something?
   if(identical(warnings, list())) return()
-  
-  # Adds a warning element to a jaspContainer
-  warnings <- vapply(warnings, as.character, character(1))
-  warnings <- trimws(warnings)
-  text <- paste0("<li><div class='jasp-code'>", warnings, "</div></li>", collapse = "")
-  text <- paste0("<ul>", text, "</ul>")
 
   output <- createJaspContainer(title = gettext("Output from R"), initCollapsed = TRUE)
-  output[["__warnings__"]] <- createJaspHtml(title = gettext("Warnings"), text = text)
 
-  container[["__output__"]] <- output
+  # Adds a warning element to a jaspContainer
+  text <- vapply(warnings, function(w) {
+    # oh lord forgive me for the code I am about to write right now:
+    # as.character can produce special symbols that are used to render the text in a different format in the R console, so the warning may become unintelligible
+    # so instead we `cat()` the output which prints the formatted text
+    # and capture the output as text again (without formatting)
+    w <- capture.output(cat(as.character(w)))
+    w <- paste0(w, collapse = "<br>")
+    return(w)
+  }, character(1))
+
+  text <- paste0("<li><p class='jasp-code'>", text, "</p></li>", collapse = "")
+  text <- paste0("<ul>", text, "</ul>")
+
+  output[["warnings"]] <- createJaspHtml(title = gettext("Warnings"), text = text)
+
+  container[[".outputFromR"]] <- output
 }
 
 
