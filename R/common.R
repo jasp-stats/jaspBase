@@ -805,8 +805,15 @@ saveImage <- function(plotName, format, height, width)
   # adapted from https://github.com/dreamRs/esquisse/blob/626cbe584f43a6a13a6d5cce3192fcf912e08cb0/R/ggplot_to_ppt.R#L64
   ppt <- officer::read_pptx()
   ppt <- officer::add_slide(ppt, layout = "Title and Content", master = "Office Theme")
-  # plot.ggplot == print.ggplot but print.qgraph doesn't plot anything whereas plot.qgraph does so we use plot
-  ppt <- officer::ph_with(ppt, rvg::dml(code = plot(plt)), location = officer::ph_location_type(type = "body"))
+
+  value <- if (inherits(plt, "jaspGraphsPlot") && ("newpage" %in% methods::formalArgs(plt$plotFunction))) {
+    # fixes https://github.com/jasp-stats/jasp-issues/issues/1910, officer cannot handle `newpage = true` (which is necessary for other plot types)
+    rvg::dml(code = plot(plt, newpage = FALSE))
+  } else {
+    rvg::dml(code = plot(plt))
+  }
+
+  ppt <- officer::ph_with(ppt, value, location = officer::ph_location_type(type = "body"))
   print(ppt, target = relativePath) # officer:::print.rpptx
 }
 
