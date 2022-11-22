@@ -112,12 +112,14 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
 
+  warnings <- list()
   analysisResult <-
     tryCatch(
-      expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
+      expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace, warning = function(w) warnings <<- c(warnings, list(w))),
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
+  .appendOutputFromR(jaspResults, warnings)
 
   if (!jaspResultsCalledFromJasp()) {
 

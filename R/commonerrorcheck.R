@@ -46,6 +46,26 @@
   signalCondition(e)
 }
 
+.sendWarning <- function(w) {
+  # Sends warning w to an object `warnings` in the parent frame
+  warnings <<- c(warnings, list(w))
+}
+
+.appendOutputFromR <- function(container, warnings) {
+  if(identical(warnings, list())) return()
+  
+  # Adds a warning element to a jaspContainer
+  warnings <- vapply(warnings, as.character, character(1))
+  warnings <- trimws(warnings)
+  text <- paste0("<li><div class='jasp-code'>", warnings, "</div></li>", collapse = "")
+  text <- paste0("<ul>", text, "</ul>")
+
+  output <- createJaspContainer(title = gettext("Output from R"), initCollapsed = TRUE)
+  output[["__warnings__"]] <- createJaspHtml(title = gettext("Warnings"), text = text)
+
+  container[["__output__"]] <- output
+}
+
 
 .generateErrorMessage <- function(type, opening=FALSE, concatenate=NULL, grouping=NULL, ...) {
   # Generic function to create an error message (mostly used by .hasErrors() but it can be called directly).
