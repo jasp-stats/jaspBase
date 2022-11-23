@@ -46,9 +46,15 @@
   signalCondition(e)
 }
 
-.appendOutputFromR <- function(container, warnings) {
+.addWarnings <- function(w) {
+  .internal[["warnings"]] <- c(.internal[["warnings"]], list(w))
+}
+
+.appendOutputFromR <- function(container) {
+  warnings <- .internal[["warnings"]]
+  # display only in developer mode
   # currently adds only warnings, do we also want messages or something?
-  if(identical(warnings, list())) return()
+  if (!getDeveloperMode() || identical(warnings, list())) return()
 
   output <- createJaspContainer(title = gettext("Output from R"), initCollapsed = TRUE)
 
