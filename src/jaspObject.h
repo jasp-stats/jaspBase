@@ -16,6 +16,7 @@ void		jaspPrint(			std::string msg);
 
 DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource, report);
 DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
+DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite); //can be merged with columnType from CentralDatasetModel branch later on?
 
 jaspObjectType jaspObjectTypeStringToObjectType(std::string type);
 
@@ -100,6 +101,7 @@ public:
 			void		finalized();
 	virtual void		finalizedHandler() {}
 
+	virtual Rcpp::List toRObject() /*const*/ { return R_NilValue; };
 
 	template <typename RCPP_CLASS> static std::vector<std::string> extractElementOrColumnNames(RCPP_CLASS rObj)
 	{
@@ -358,6 +360,8 @@ public:
 
 	void		setError(Rcpp::String message)		{ myJaspObject->setError(message); }
 	bool		getError()							{ return myJaspObject->getError(); }
+
+	Rcpp::List	toRObject()							{ return myJaspObject->toRObject(); }
 
 	jaspObject * returnMyJaspObject() { return myJaspObject; }
 

@@ -25,6 +25,9 @@ public:
     void setText(std::string newRawText);
     std::string getText();
     std::string getHtml();
+
+	Rcpp::List toRObject() /*const*/ override;
+
 };
 
 

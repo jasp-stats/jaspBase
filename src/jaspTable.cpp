@@ -448,6 +448,88 @@ void jaspTable::calculateMaxColRow(size_t & maxCol, size_t & maxRow) const
 	maxCol = std::max(maxCol, _expectedColumnCount);
 }
 
+Rcpp::List jaspTable::toRObject()
+{
+	Rcpp::DataFrame df;
+
+	for (size_t col = 0; col < _data.size(); col++)
+	{
+
+		jaspTableColumnType type = deriveColumnType(col);
+
+		switch(type)
+		{
+
+		// this could be a templated or overloaded function?
+		case jaspTableColumnType::integer:
+		{
+			Rcpp::IntegerVector values(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+				values[row] = _data[col][row].asInt();
+
+			df[getColName(col)] = values;
+			break;
+		}
+		case jaspTableColumnType::number:
+		{
+			Rcpp::NumericVector values(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+				values[row] = _data[col][row].asDouble();
+
+			df[getColName(col)] = values;
+			break;
+		}
+		case jaspTableColumnType::logical:
+		{
+			Rcpp::LogicalVector values(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+				values[row] = _data[col][row].asBool();
+
+			df[getColName(col)] = values;
+
+			break;
+		}
+		case jaspTableColumnType::string:
+		case jaspTableColumnType::various:
+		case jaspTableColumnType::unknown:
+		case jaspTableColumnType::composite:
+		{
+			Rcpp::StringVector values(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+				values[row] = _data[col][row].asString();
+
+			df[getColName(col)] = values;
+			break;
+		}
+		// this case is probably unnecessary
+		case jaspTableColumnType::null:
+		{
+			df[getColName(col)] = R_NilValue;
+			break;
+		}
+
+		}
+	}
+
+	df.attr("footnotes")  = _footnotes.toRObject();
+	df.attr("title") = _title;
+	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
+
+	std::vector<std::string> rowNames;
+	rowNames.reserve(_data[0].size());
+	for (size_t i = 0; i < _data[0].size(); i++)
+		rowNames.push_back(_rowNames[i] != "" ? _rowNames[i] : std::to_string(i + 1)); // R numbers from 1 to n by default
+
+	df.attr("row.names") = rowNames;
+
+	// the reason this function is not const
+	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();
+	jaspObjectEnvironment.assign("jaspObject", Rcpp::as<Rcpp::RObject>(Rcpp::wrap(jaspTable_Interface(this))));
+	df.attr("jaspObjectEnvironment") = jaspObjectEnvironment;
+
+	return df;
+}
+
 std::vector<std::vector<std::string>> jaspTable::dataToRectangularVector(bool normalizeColLengths, bool normalizeRowLengths) const
 {
 	size_t	maxRow, maxCol;
@@ -1072,6 +1154,28 @@ void footnotes::convertToJSONOrdered(std::map<std::string, size_t> rowNames, std
 	mergedList	= jaspObject::VectorJson_to_ArrayJson(notesToOrderMerged);
 }
 
+Rcpp::List footnotes::toRObject() const
+{
+
+	// this is not very efficient
+	Rcpp::List	notes;
+
+	for (const auto & textRest : _data)
+		for(const auto & symbolRest : textRest.second)
+			for(const tableFields & fields : symbolRest.second)
+			{
+				Rcpp::List note = Rcpp::List::create(
+					Rcpp::Named("text")		= textRest.first,
+					Rcpp::Named("symbol")	= symbolRest.first
+//					TODO: I do not understand the data in here, or how to convert it to R...
+//					Rcpp::Named("rows")		= fields.rowsToJSON(),
+//					Rcpp::Named("cols")		= fields.colsToJSON()
+				);
+				notes.push_back(note);
+			}
+	return notes;
+}
+
 void footnotes::convertFromJSON_SetFields(Json::Value footnotes)
 {
 	if (footnotes.isArray())
@@ -1266,13 +1370,12 @@ Json::Value	jaspTable::rowsJson(Json::Value footnotes) const
 	return rows;
 }
 
-std::string jaspTable::deriveColumnType(int col) const
+jaspTableColumnType jaspTable::deriveColumnType(int col) const
 {
-	if(col >= _data.size())
-		return "null";
+	if(static_cast<size_t>(col) >= _data.size())
+		return jaspTableColumnType::null;
 
 	Json::ValueType workingType = Json::nullValue;
-	const std::string variousType = "various";
 
 	for(auto & cell : _data[col])
 		switch(workingType)
@@ -1284,7 +1387,7 @@ std::string jaspTable::deriveColumnType(int col) const
 		case Json::stringValue:
 		case Json::booleanValue:
 			if(cell.type() != workingType)
-				return variousType;
+				return jaspTableColumnType::various;
 			break;
 
 		case Json::intValue:
@@ -1292,27 +1395,27 @@ std::string jaspTable::deriveColumnType(int col) const
 			if(cell.type() == Json::realValue)
 				workingType = Json::realValue;
 			else if(cell.type() != workingType)
-				return variousType;
+				return jaspTableColumnType::various;
 			break;
 
 		case Json::realValue:
 			if(!(cell.type() == workingType || cell.type() == Json::intValue || cell.type() == Json::uintValue))
-				return variousType;
+				return jaspTableColumnType::various;
 			break;
 
 		default:
-			return "composite"; //arrays and objects are not really supported as cells at the moment but maybe we could add that in the future?
+			return jaspTableColumnType::composite; //arrays and objects are not really supported as cells at the moment but maybe we could add that in the future?
 		}
 
 	switch(workingType)
 	{
-	case Json::nullValue:		return "null";
-	case Json::stringValue:		return "string";
-	case Json::booleanValue:	return "logical";
+	case Json::nullValue:		return jaspTableColumnType::null;
+	case Json::stringValue:		return jaspTableColumnType::string;
+	case Json::booleanValue:	return jaspTableColumnType::logical;
 	case Json::intValue:
-	case Json::uintValue:		return "integer";
-	case Json::realValue:		return "number";
-	default:					return "unknown";
+	case Json::uintValue:		return jaspTableColumnType::integer;
+	case Json::realValue:		return jaspTableColumnType::number;
+	default:					return jaspTableColumnType::unknown;
 	}
 }
 
@@ -1323,7 +1426,7 @@ std::string jaspTable::getColType(size_t col) const
 	if(_colTypes[colName] != "")	return _colTypes[colName];
 	if(_colTypes[col] != "")		return _colTypes[col];
 
-	return deriveColumnType(col);
+	return jaspTableColumnTypeToString(deriveColumnType(col));
 }
 
 ///Going to assume it is called like addColumInfo(name=NULL, title=NULL, type=NULL, format=NULL, combine=NULL)

@@ -22,7 +22,7 @@ public:
 	///For safekeeping (aka state replacement?)
 	void setPlotObject(Rcpp::RObject plotSerialized);
 	void renderPlot();
-	Rcpp::RObject getPlotObject();
+	Rcpp::RObject getPlotObject()							const;
 
 	std::string dataToString(std::string prefix)			const	override;
 
@@ -37,6 +37,8 @@ public:
 
 	void		complete()	{ if(_status == "running" || _status == "waiting") _status = "complete"; }
 	void		letRun()	{ _status = "running"; }
+
+	Rcpp::List	toRObject()									/*const*/ override;
 
 private:
 	void initEnvName();

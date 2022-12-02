@@ -52,6 +52,7 @@ public:
 
 	bool		containsNonContainer();
 	bool		canShowErrorMessage()										const	override;
+	Rcpp::List	toRObject()													/*const*/ override;
 
 	bool		_initiallyCollapsed = false;
 
