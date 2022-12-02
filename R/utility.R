@@ -72,13 +72,12 @@ legacyRngWarning <- function() {
 
   cli::cli_warn(
     message = c(
-      "!" = "Legacy {default} is used by default.",
-      "i" = "To use the current {rngKind} setting instead, use {suggestion}."
+      "!" = "Legacy `{default}` is used by default.",
+      "i" = "To use the current `{rngKind}` setting instead, use `{suggestion}`."
     ),
     class = "jaspBaseWarning",
-    footer = cli::col_silver("This warning is displayed once every 8 hours."),
-    frequency    = "regularly", # show this warning once every 8 hours
-    frequency_id = "legacyRngWarning"
+    .frequency    = "regularly", # show this warning once every 8 hours
+    .frequency_id = "legacyRngWarning"
   )
   return()
 }
