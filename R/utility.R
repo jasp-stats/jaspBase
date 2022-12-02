@@ -45,9 +45,40 @@ setOptionsCleanupHook <- function() {
   oldGraphOptions <- jaspGraphs::graphOptions()
   oldOptions <- options()
 
-  withr::defer({
+  withr::defer_parent({
     restoreOptions(oldOptions)
     jaspGraphs::graphOptions(oldGraphOptions)
-  }, envir = parent.frame(2))
+  })
+}
 
+setLegacyRng <- function() {
+  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
+  # Unless we request to use the current method explicitly with options(jaspLegacyRngKind = FALSE)
+  if(isFALSE(.Options[["jaspLegacyRngKind"]])) return()
+
+
+  rngKind <- RNGkind()
+  suppressWarnings(RNGkind(sample.kind = "Rounding"))
+  legacyRngWarning() # give more informative warning which also does not make clutter if called repeatedly
+
+  # reset the method to the original one once the parent function finishes
+  withr::defer_parent(RNGkind(sample.kind = rngKind[[3]]))
+}
+
+legacyRngWarning <- function() {
+  default    <- cli::code_highlight("RNGkind(sample.kind = 'Rounding')")
+  rngKind    <- cli::code_highlight("RNGkind()")
+  suggestion <- cli::code_highlight("options(jaspLegacyRngKind = FALSE)")
+
+  cli::cli_warn(
+    message = c(
+      "!" = "Legacy {default} is used by default.",
+      "i" = "To use the current {rngKind} setting instead, use {suggestion}."
+    ),
+    class = "jaspBaseWarning",
+    footer = cli::col_silver("This warning is displayed once every 8 hours."),
+    frequency    = "regularly", # show this warning once every 8 hours
+    frequency_id = "legacyRngWarning"
+  )
+  return()
 }
