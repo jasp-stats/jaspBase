@@ -34,7 +34,9 @@ restoreOptions <- function(oldOptions) {
 
   newOptions <- options()
   oldOptions[setdiff(names(newOptions), names(oldOptions))] <- list(NULL)
-  options(oldOptions)
+  # resetting 'nwarnings' resets the collection of warnings, so it may remove warnings that occur in any parent function
+  # so we do not reset 'nwarnings'
+  options(oldOptions[setdiff(names(oldOptions), "nwarnings")])
 
 }
 
