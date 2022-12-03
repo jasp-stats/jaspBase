@@ -68,16 +68,14 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 #' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
+  # resets jaspGraphs::graphOptions & options after this function finishes
+  setOptionsCleanupHook()
 
   # let's disable this for now
   # if (identical(.Platform$OS.type, "windows"))
   #   compiler::enableJIT(0)
 
-  if(!isFALSE(.Options[["jaspLegacyRngKind"]])) {
-    rngKind <- RNGkind()
-    RNGkind(sample.kind = "Rounding")  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
-    on.exit(RNGkind(sample.kind = rngKind[[3]]), add = TRUE)
-  }
+  setLegacyRng()
 
   jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
@@ -93,7 +91,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     location              <- .fromRCPP(".requestStateFileNameNative")
     oldwd                 <- getwd()
     setwd(location$root)
-    on.exit(setwd(oldwd))
+    withr::defer(setwd(oldwd))
   }
 
   analysis    <- eval(parse(text=functionCall))
@@ -105,9 +103,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   registerFonts()
-
-  # resets jaspGraphs::graphOptions & options after this function finishes
-  setOptionsCleanupHook()
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
