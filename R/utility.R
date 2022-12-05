@@ -54,7 +54,7 @@ setOptionsCleanupHook <- function() {
 setLegacyRng <- function() {
   # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
   # Unless we request to use the current method explicitly with options(jaspLegacyRngKind = FALSE)
-  if(getOption("jaspLegacyRngKind", default = TRUE)) return()
+  if(!getOption("jaspLegacyRngKind", default = TRUE)) return()
 
 
   rngKind <- RNGkind()
