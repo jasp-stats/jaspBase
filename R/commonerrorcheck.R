@@ -372,7 +372,7 @@
   for (v in target) {
 
     if (is.factor(dataset[[v]])) { # Coerce factor to numeric.
-      dataset[[v]] <- as.numeric(as.character(dataset[[v]])
+      dataset[[v]] <- as.numeric(as.character(dataset[[v]]))
     }
 
     if (length(grouping) > 0 && length(groupingLevel) > 0) {
