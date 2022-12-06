@@ -357,7 +357,7 @@ isTryError <- function(obj){
   if (is.null(new.df))
     return (data.frame())
 
-  names(new.df) <- .v(namez)
+  names(new.df) <- namez
 
   new.df <- .excludeNaListwise(new.df, exclude.na.listwise)
 
@@ -370,7 +370,7 @@ isTryError <- function(obj){
 
     rows.to.exclude <- c()
 
-    for (col in .v(exclude.na.listwise))
+    for (col in exclude.na.listwise)
       rows.to.exclude <- c(rows.to.exclude, which(is.na(dataset[[col]])))
 
     rows.to.exclude <- unique(rows.to.exclude)
@@ -399,7 +399,7 @@ isTryError <- function(obj){
   f  <- rm.factors[[length(rm.factors)]]
   df <- data.frame(factor(unlist(f$levels), unlist(f$levels)))
 
-  names(df) <- .v(f$name)
+  names(df) <- f$name
 
   row.count <- dim(df)[1]
 
@@ -425,12 +425,12 @@ isTryError <- function(obj){
     cells <- factor(cells, unlist(f$levels))
 
     df <- cbind(cells, df)
-    names(df)[[1]] <- .v(f$name)
+    names(df)[[1]] <- f$name
 
     i <- i - 1
   }
 
-  ds <- subset(dataset, select=.v(rm.vars))
+  ds <- subset(dataset, select=rm.vars)
   ds <- t(as.matrix(ds))
 
   dependentDf <- data.frame(x = as.numeric(c(ds)))
@@ -439,9 +439,9 @@ isTryError <- function(obj){
 
   for (bt.var in bt.vars) {
 
-    cells <- rep(dataset[[.v(bt.var)]], each=row.count)
+    cells <- rep(dataset[[bt.var]], each=row.count)
     new.col <- list()
-    new.col[[.v(bt.var)]] <- cells
+    new.col[[bt.var]] <- cells
 
     df <- cbind(df, new.col)
   }

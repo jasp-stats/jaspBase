@@ -211,7 +211,7 @@
         # See if this check expects target variables and if they were provided, if not add all variables.
         funcTargetVars <- paste0(type[[i]], '.target')
         if (funcTargetVars %in% names(funcArgs) && !funcTargetVars %in% names(args))
-          args[[funcTargetVars]] <- .unv(names(dataset))
+          args[[funcTargetVars]] <- names(dataset)
 
         # Obtain an overview of required and optional check arguments.
         optArgs <- list()
@@ -332,14 +332,14 @@
       }, character(1))
     }
 
-    expr <- paste(.v(grouping), levels, sep='==', collapse='&')
+    expr <- paste(grouping, levels, sep='==', collapse='&')
     dataset <- subset(dataset, eval(parse(text=expr)))
-    result <- func(dataset[[.v(target)]])
+    result <- func(dataset[[target]])
 
   } else {
 
-    vgrouping <- .v(grouping)
-    vtarget   <- .v(target)
+    vgrouping <- grouping
+    vtarget   <- target
 
     result <- plyr::ddply(dataset, vgrouping,
       function(data, vtarget) {
@@ -371,14 +371,14 @@
 
   for (v in target) {
 
-    if (is.factor(dataset[[.v(v)]])) { # Coerce factor to numeric.
-      dataset[[.v(v)]] <- as.numeric(as.character(dataset[[.v(v)]]))
+    if (is.factor(dataset[[v]])) { # Coerce factor to numeric.
+      dataset[[v]] <- as.numeric(as.character(dataset[[v]])
     }
 
     if (length(grouping) > 0 && length(groupingLevel) > 0) {
       hasInf <- .applyOnGroups(findInf, dataset, v, grouping, groupingLevel)
     } else { # Makes no sense to check all subgroups for infinity rather than the entire variable at once.
-      hasInf <- findInf(dataset[[.v(v)]])
+      hasInf <- findInf(dataset[[v]])
     }
 
     if (hasInf) {
@@ -402,7 +402,7 @@
 
   for (v in target) {
 
-    levelsOfVar <- length(unique(na.omit(dataset[[.v(v)]])))
+    levelsOfVar <- length(unique(na.omit(dataset[[v]])))
     for (checkAmount in amount) {
       expr <- paste(levelsOfVar, checkAmount)
       if (eval(parse(text=expr))) {
@@ -442,7 +442,7 @@
     if (length(grouping) > 0) {
       variance <- .applyOnGroups(getVariance, dataset, v, grouping, groupingLevel)
     } else {
-      variance <- getVariance(dataset[[.v(v)]])
+      variance <- getVariance(dataset[[v]])
     }
 
     if (any(variance == equalTo)) {
@@ -475,7 +475,7 @@
     if (length(grouping) > 0) {
       obs <- .applyOnGroups(getObservations, dataset, v, grouping, groupingLevel)
     } else {
-      obs <- getObservations(dataset[[.v(v)]])
+      obs <- getObservations(dataset[[v]])
     }
 
     for (checkAmount in amount) {
@@ -501,7 +501,7 @@
   #   groupingLevel: Vector indicating the level of each of the grouping variables.
   result <- list(error=FALSE, errorVars=NULL)
 
-  dataPairs <- dataset[, .v(target)]
+  dataPairs <- dataset[, target]
 
   if (sum(!apply(dataPairs, 1, function(x){any(is.na(x))})) <= amount) { # See if any of the expressions is true.
     result$error <- TRUE
@@ -565,7 +565,7 @@
 
   for (v in target) {
 
-    rangeOfVar <- range(na.omit(dataset[[.v(v)]]))
+    rangeOfVar <- range(na.omit(dataset[[v]]))
 
     if (rangeOfVar[1] < min || rangeOfVar[2] > max) {
       result$error <- TRUE
@@ -592,10 +592,10 @@
     corFun <- stats::cor
 
   if (is.null(grouping)) {
-    dataset <- list(dataset[, .v(target)])
+    dataset <- list(dataset[, target])
   } else {
-    groupingData <- dataset[, .v(grouping)]
-    dataset <- dataset[, .v(target)]
+    groupingData <- dataset[, grouping]
+    dataset <- dataset[, target]
     dataset <- split(dataset, groupingData)
   }
   for (d in seq_along(dataset)) {
@@ -663,14 +663,14 @@
 
   for (v in target) {
 
-    if (is.factor(dataset[[.v(v)]])) { # Coerce factor to numeric.
-      dataset[[.v(v)]] <- as.numeric(as.character(dataset[[.v(v)]]))
+    if (is.factor(dataset[[v]])) { # Coerce factor to numeric.
+      dataset[[v]] <- as.numeric(as.character(dataset[[v]]))
     }
 
     if (length(grouping) > 0 && length(groupingLevel) > 0) {
       hasNegativeValues <- .applyOnGroups(findNegativeValues, dataset, v, grouping, groupingLevel)
     } else {
-      hasNegativeValues <- findNegativeValues(dataset[[.v(v)]])
+      hasNegativeValues <- findNegativeValues(dataset[[v]])
     }
 
     if (hasNegativeValues) {
@@ -702,7 +702,7 @@
     if (length(grouping) > 0 && length(groupingLevel) > 0) {
       hasMissingValues <- .applyOnGroups(findMissingValues, dataset, v, grouping, groupingLevel)
     } else {
-      hasMissingValues <- findMissingValues(dataset[[.v(v)]])
+      hasMissingValues <- findMissingValues(dataset[[v]])
     }
 
     if (hasMissingValues) {
@@ -744,7 +744,7 @@
   if (is.null(target)) {
     targetB64 <- colnames(dataset)
   } else {
-    targetB64 <- .v(target)
+    targetB64 <- target
   }
 
   if (length(target) > 1L) {
@@ -752,7 +752,7 @@
     if (is.null(grouping)) {
       dataset <- list(dataset[, targetB64])
     } else {
-      groupingData <- dataset[, .v(grouping)]
+      groupingData <- dataset[, grouping]
       dataset <- dataset[, targetB64]
       dataset <- split(dataset, groupingData)
     }
