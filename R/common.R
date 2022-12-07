@@ -92,6 +92,13 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     oldwd                 <- getwd()
     setwd(location$root)
     withr::defer(setwd(oldwd))
+  } 
+  
+  if (! jaspResultsCalledFromJasp()) { 
+    .numDecimals        <- 3
+    .fixedDecimals      <- FALSE
+    .normalizedNotation <- TRUE
+    .exactPValues       <- FALSE
   }
 
   analysis    <- eval(parse(text=functionCall))
