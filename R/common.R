@@ -92,7 +92,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     oldwd                 <- getwd()
     setwd(location$root)
     withr::defer(setwd(oldwd))
-  } else {
+  } 
+  
+  if (! jaspResultsCalledFromJasp()) { 
     .numDecimals        <- 3
     .fixedDecimals      <- FALSE
     .normalizedNotation <- TRUE
