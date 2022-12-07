@@ -1013,7 +1013,7 @@ runWrappedAnalysis <- function(analysisName, data, options, version) {
 
     result <- list("options" = options, "analysis" = analysisName, "version" = version)
     result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
-    return(toString(result))
+    return(as.character(result))
 
   } else {
 
