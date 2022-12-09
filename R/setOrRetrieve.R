@@ -87,7 +87,7 @@ emptyRecomputed <- function() {
   if (length(exprLhs) != 3L || !identical(as.character(exprLhs[[1L]]), "[["))
     stop("The parent of the left-hand side of %setOrRetrieve% is not indexing with `[[` in a jaspObject!", domain = NA)
 
-  parentObjectLhs <- eval(exprLhs[[2L]])
+  parentObjectLhs <- eval(exprLhs[[2L]], envir = parent.frame(2L))
   if (!is.jaspObjR(parentObjectLhs))
     stop("The parent of the left-hand side of %setOrRetrieve% (", as.character(exprLhs[[2L]]), ") did not return a jaspObject!", domain = NA)
 
@@ -99,7 +99,7 @@ emptyRecomputed <- function() {
          paste(class(result), collapse = ""), domain = NA)
 
   expr <- call("<-", exprLhs, as.name("result"))
-  eval(expr)
+  eval(expr, envir = parent.frame(2L))
 
   if (is.jaspStateR(result))
     return(result$object)
