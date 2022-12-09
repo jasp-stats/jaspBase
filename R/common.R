@@ -1010,20 +1010,22 @@ registerData <- function(data) {
    #TODO
 }
 
-checkAnalysisOptions <- function(analysisName, options) {
-   #TODO
-   return(options)
+checkAnalysisOptions <- function(analysisName, options, version) {
+  # TODO when QMLComponents can be linked to jaspBase
+  return(options)
 }
 
-runWrappedAnalysis <- function(analysisName, data, options) {
-   if (jaspResultsCalledFromJasp()) {
-      result <- list("options" = options, "analysis" = analysisName)
-      result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
-      return(toString(result))
-   } else {
-      registerData(data)
-      options <- checkAnalysisOptions(analysisName, options)
-      return(jaspTools::runAnalysis(analysisName, data, options))
-   }
-}
+runWrappedAnalysis <- function(analysisName, data, options, version) {
+  if (jaspResultsCalledFromJasp()) {
 
+    result <- list("options" = options, "analysis" = analysisName, "version" = version)
+    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+    return(as.character(result))
+
+  } else {
+
+    options <- checkAnalysisOptions(analysisName, options, version)
+    return(jaspTools::runAnalysis(analysisName, data, options))
+
+  }
+}
