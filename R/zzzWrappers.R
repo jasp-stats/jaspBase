@@ -250,6 +250,16 @@ jaspObjR <- R6::R6Class(
     initialize = function()	stop("You should not create a new jaspObject!", domain = NA),
     print      = function()	private$jaspObject$print(),
     dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL, nestedOptions = NULL, nestedOptionsContainsValue = NULL) {
+
+      if (is.jaspDeps(options)) {
+        jaspDeps <- options
+        options                    <- jaspDeps[["options"]]
+        optionsFromObject          <- jaspDeps[["optionsFromObject"]]
+        optionContainsValue        <- jaspDeps[["optionContainsValue"]]
+        nestedOptions              <- jaspDeps[["nestedOptions"]]
+        nestedOptionsContainsValue <- jaspDeps[["nestedOptionsContainsValue"]]
+      }
+
       if (!is.null(options)) {
         if (!is.character(options))
           stop("please provide a character vector in `options`", domain = NA)
@@ -397,16 +407,14 @@ jaspStateR <- R6::R6Class(
       } else {
         checkForJaspResultsInit()
         stateObj <- create_cpp_jaspState("")
+        private$jaspObject <-  stateObj
       }
+
       if (!is.null(object))
         stateObj$object <- object
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(stateObj, dependencies)
-      else if (!is.null(dependencies))
-        stateObj$dependOnOptions(dependencies)
+      super$dependOn(dependencies)
 
-      private$jaspObject <-  stateObj
       return()
     }
   ),
@@ -459,6 +467,7 @@ jaspHtmlR <- R6::R6Class(
       } else {
         checkForJaspResultsInit()
         htmlObj <- create_cpp_jaspHtml(text)
+        private$jaspObject <- htmlObj
       }
 
       htmlObj$elementType <- elementType
@@ -466,18 +475,14 @@ jaspHtmlR <- R6::R6Class(
       htmlObj$maxWidth    <- .jaspHtmlPixelizer(maxWidth)
       htmlObj$title       <- title
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(htmlObj, dependencies)
-      else if (!is.null(dependencies))
-        htmlObj$dependOnOptions(dependencies)
-
       if (!is.null(info))
         htmlObj$info <- info
 
       if (is.numeric(position))
         htmlObj$position = position
 
-      private$jaspObject <- htmlObj
+      super$dependOn(dependencies)
+
       return()
     }
   ),
@@ -490,42 +495,42 @@ jaspHtmlR <- R6::R6Class(
 )
 
 jaspReportR <- R6::R6Class(
-	classname = "jaspReportR",
-	inherit   = jaspOutputObjR,
-	cloneable = FALSE,
-	public    = list(
-	initialize = function(text="", report=FALSE, dependencies=NULL, title="", position=NULL , info=NULL, jaspObject = NULL) {
-			# if you change "hide me" here then also change it in Common.R and in HtmlNode.js or come up with a way to define it in such a way to make it show EVERYWHERE...
-			if (!is.null(jaspObject)) {
-			  private$jaspObject <- jaspObject
-			  return()
-			#} else if (jaspResultsCalledFromJasp()) {
-			#	reportObj <- jaspResultsModule$create_cpp_jaspReport(text)
-			} else {
-				checkForJaspResultsInit()
-				reportObj <- create_cpp_jaspReport(text)
-			}
+  classname = "jaspReportR",
+  inherit   = jaspOutputObjR,
+  cloneable = FALSE,
+  public    = list(
+    initialize = function(text="", report=FALSE, dependencies=NULL, title="", position=NULL , info=NULL, jaspObject = NULL) {
+      # if you change "hide me" here then also change it in Common.R and in HtmlNode.js or come up with a way to define it in such a way to make it show EVERYWHERE...
+      if (!is.null(jaspObject)) {
+        private$jaspObject <- jaspObject
+        return()
+        #} else if (jaspResultsCalledFromJasp()) {
+        #	reportObj <- jaspResultsModule$create_cpp_jaspReport(text)
+      } else {
+        checkForJaspResultsInit()
+        reportObj <- create_cpp_jaspReport(text)
+        private$jaspObject <- reportObj
+      }
 
-			reportObj$title  <- title
-			reportObj$report <- report
+      reportObj$title  <- title
+      reportObj$report <- report
 
-            if (!is.null(dependencies))
-			    reportObj$dependOnOptions(dependencies)
 
-            if (!is.null(info))
-			    reportObj$info <- info
+      if (!is.null(info))
+        reportObj$info <- info
 
-			if (is.numeric(position))
-				reportObj$position = position
+      if (is.numeric(position))
+        reportObj$position = position
 
-			private$jaspObject <- reportObj
-			return()
-		}
-	),
-	active = list(
-		text   = function(value) { if (missing(value)) private$jaspObject$text   else private$jaspObject$text   <- value },
-		report = function(value) { if (missing(value)) private$jaspObject$report else private$jaspObject$report <- value }
-	)
+      super$dependOn(dependencies)
+
+      return()
+    }
+  ),
+  active = list(
+    text   = function(value) { if (missing(value)) private$jaspObject$text   else private$jaspObject$text   <- value },
+    report = function(value) { if (missing(value)) private$jaspObject$report else private$jaspObject$report <- value }
+  )
 )
 
 jaspContainerR <- R6::R6Class(
@@ -542,12 +547,8 @@ jaspContainerR <- R6::R6Class(
       } else {
         checkForJaspResultsInit()
         container <- create_cpp_jaspContainer(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspContainer, title))
+        private$jaspObject <- container
       }
-
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(container, dependencies)
-      else if (!is.null(dependencies))
-        container$dependOnOptions(dependencies)
 
       if (is.numeric(position))
         container$position <- position
@@ -558,7 +559,8 @@ jaspContainerR <- R6::R6Class(
       if (!is.null(info))
         container$info <- info
 
-      private$jaspObject <- container
+      super$dependOn(dependencies)
+
       return()
     },
     length = function() private$jaspObject$length
@@ -646,16 +648,13 @@ jaspPlotR <- R6::R6Class(
       if (!is.null(plot))
         jaspPlotObj$plotObject <- plot
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(jaspPlotObj, dependencies)
-      else if (!is.null(dependencies))
-        jaspPlotObj$dependOnOptions(dependencies)
-
       if (!is.null(info))
         jaspPlotObj$info <- info
 
       if(is.numeric(position))
         jaspPlotObj$position = position
+
+      super$dependOn(dependencies)
 
       return()
     }
@@ -700,6 +699,7 @@ jaspTableR <- R6::R6Class(
       } else {
         checkForJaspResultsInit()
         jaspObj <- create_cpp_jaspTable(title) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspTable, title)
+        private$jaspObject <- jaspObj
       }
 
       if (!is.null(data))
@@ -723,11 +723,6 @@ jaspTableR <- R6::R6Class(
       if (!is.null(rowTitles))
         jaspObj$setRowTitles(rowTitles)
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(jaspObj, dependencies)
-      else if (!is.null(dependencies))
-        jaspObj$dependOnOptions(dependencies)
-
       if (!is.null(info))
         jaspObj$info <- info
 
@@ -735,10 +730,10 @@ jaspTableR <- R6::R6Class(
         jaspObj$position <- position
 
       if (!(is.null(expectedRows) & is.null(expectedColumns)))
-        .jaspTableSetExpectedSize(jaspObj, rows=expectedRows, cols=expectedColumns);
+        .jaspTableSetExpectedSize(jaspObj, rows=expectedRows, cols=expectedColumns)
 
+      super$dependOn(dependencies)
 
-      private$jaspObject <- jaspObj
       return()
     },
 
@@ -850,6 +845,7 @@ jaspQmlSourceR <- R6::R6Class(
       } else {
         checkForJaspResultsInit()
         jaspObj <- create_cpp_jaspQmlSource(sourceID) # If we use R's constructor it will garbage collect our objects prematurely.. #new(jaspResultsModule$jaspTable, title)
+        private$jaspObject <- jaspObj
       }
 
       if (sourceID != "")
@@ -858,12 +854,8 @@ jaspQmlSourceR <- R6::R6Class(
       if (!is.null(value))
         jaspObj$setValue(value)
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(jaspObj, dependencies)
-      else if (!is.null(dependencies))
-        jaspObj$dependOnOptions(dependencies)
+      super$dependOn(dependencies)
 
-      private$jaspObject <- jaspObj
       return()
     }
   ),
@@ -888,12 +880,9 @@ jaspColumnR <- R6::R6Class(
       if (columnName == "")
         stop("You MUST specify a name for the column you want to change the data of", domain = NA)
 
-      # if (jaspResultsCalledFromJasp()) {
-      #   columnObj <- jaspResultsModule$create_cpp_jaspColumn(columnName)
-      # } else {
-        checkForJaspResultsInit()
-        columnObj <- create_cpp_jaspColumn(columnName)
-      # }
+      checkForJaspResultsInit()
+      columnObj <- create_cpp_jaspColumn(columnName)
+      private$jaspObject <- columnObj
 
       if (!is.null(scalarData))      columnObj$setScale(scalarData)
       if (!is.null(ordinalData))     columnObj$setOrdinal(ordinalData)
@@ -901,12 +890,8 @@ jaspColumnR <- R6::R6Class(
       if (!is.null(nominalTextData)) columnObj$setNominalText(nominalTextData)
       if (!is.null(info))            columnObj$info <- info
 
-      if (is.jaspDeps(dependencies))
-        setJaspDeps(columnObj, dependencies)
-      else if (!is.null(dependencies))
-        columnObj$dependOnOptions(dependencies)
+      super$dependOn(dependencies)
 
-      private$jaspObject <- columnObj
       return()
     },
     setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
