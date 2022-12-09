@@ -87,6 +87,8 @@ emptyRecomputed <- function() {
   if (length(exprLhs) != 3L || !identical(as.character(exprLhs[[1L]]), "[["))
     stop("The parent of the left-hand side of %setOrRetrieve% is not indexing with `[[` in a jaspObject!", domain = NA)
 
+  # for nested objects, e.g., `container[["a"]][["b"]]` this will retrieve `container[["a"]]`
+  # requires `envir = parent.frame(2L)` because the parent jaspObject does not exist in this functions environment
   parentObjectLhs <- eval(exprLhs[[2L]], envir = parent.frame(2L))
   if (!is.jaspObjR(parentObjectLhs))
     stop("The parent of the left-hand side of %setOrRetrieve% (", as.character(exprLhs[[2L]]), ") did not return a jaspObject!", domain = NA)
@@ -98,7 +100,8 @@ emptyRecomputed <- function() {
     stop("The right hand side of `%setOrRetrieve%` should evaluate to a jaspObject but it got an object of class ",
          paste(class(result), collapse = ""), domain = NA)
 
-  expr <- call("<-", exprLhs, as.name("result"))
+  expr <- call("<-", exprLhs, result) # the literal result
+  # assign the result in the calling environment because otherwise the parent jaspObject cannot be found.
   eval(expr, envir = parent.frame(2L))
 
   if (is.jaspStateR(result))
