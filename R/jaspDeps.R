@@ -37,14 +37,3 @@ jaspDeps <- function(options = NULL, optionsFromObject = NULL, optionContainsVal
 is.jaspDeps <- function(x) {
   inherits(x, "jaspDeps")
 }
-
-setJaspDeps <- function(jaspObj, jaspDeps) {
-  jaspObj$dependOn(
-    options                    = jaspDeps[["options"]],
-    optionsFromObject          = jaspDeps[["optionsFromObject"]],
-    optionContainsValue        = jaspDeps[["optionContainsValue"]],
-    nestedOptions              = jaspDeps[["nestedOptions"]],
-    nestedOptionsContainsValue = jaspDeps[["nestedOptionsContainsValue"]]
-  )
-  return(jaspObj)
-}
