@@ -109,8 +109,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
-  registerFonts()
-
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
 
@@ -177,7 +175,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 }
 
+#' @export
 registerFonts <- function() {
+  # This gets called by JASPEngine when settings changes and on `initEnvironment`
 
   if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
 
@@ -700,11 +700,10 @@ saveImage <- function(plotName, format, height, width)
       # Where available use the cairo devices, because:
       # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
       # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
-
-      if (capabilities("cairo"))
-        type <- "cairo"
-      else if (capabilities("aqua"))
+      if (capabilities("aqua"))
         type <- "quartz"
+      else if (capabilities("cairo"))
+        type <- "cairo"
       else
         type <- "Xlib"
 
@@ -861,7 +860,7 @@ rewriteImages <- function(name, ppi, imageBackground) {
   })
 
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
-  registerFonts()
+
 
   for (i in seq_along(oldPlots)) {
     try({
