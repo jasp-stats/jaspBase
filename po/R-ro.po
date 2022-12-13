@@ -14,8 +14,8 @@ msgstr ""
 "20)) ? 1 : 2;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr "registerFonts a fost numit dar resultsFont nu există!"
+msgid "registerFonts was called but resultFont does not exist!"
+msgstr "registerFonts a fost numit dar resultFont nu există!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Notă.</em>"

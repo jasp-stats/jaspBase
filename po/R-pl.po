@@ -14,8 +14,8 @@ msgstr ""
 "|| n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 4.15-dev\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr "registerFonts został wywołany, ale resultsFont nie istnieje!"
+msgid "registerFonts was called but resultFont does not exist!"
+msgstr "registerFonts został wywołany, ale resultFont nie istnieje!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Uwaga.</em>"

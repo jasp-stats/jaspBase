@@ -189,10 +189,10 @@ registerFonts <- function() {
     # systemfonts::register_font(fontName, normalizePath(fontFile))
     # jaspGraphs::setGraphOption("family", fontName)
 
-    if (exists(".resultsFont"))
-      jaspGraphs::setGraphOption("family", .resultsFont)
+    if (exists(".resultFont"))
+      jaspGraphs::setGraphOption("family", .resultFont)
     else
-      warning("registerFonts was called but resultsFont does not exist!")
+      warning("registerFonts was called but resultFont does not exist!")
 
   } else {
     print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
