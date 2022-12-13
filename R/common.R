@@ -739,7 +739,7 @@ saveImage <- function(plotName, format, height, width)
 
       } else if (format == "pdf") {
 
-        if (type == "cairo" && try(capabilities("X11")))
+        if (type == "cairo")
           device <- grDevices::cairo_pdf
         else
           device <- grDevices::pdf
