@@ -711,9 +711,7 @@ saveImage <- function(plotName, format, height, width)
       # Open correct graphics device
       if (format == "eps") {
 
-        # The call to capabilities("X11") may throw an error. This error has for effect that ragg::agg_tiff cannot be called anymore wthout crashing the enigne.
-        # So the call to capabilities("X11") must be done only when the eps (or pdf) type is set.
-        if (type == "cairo" && try(capabilities("X11")))
+        if (type == "cairo")
           device <- grDevices::cairo_ps
         else
           device <- grDevices::postscript
