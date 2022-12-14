@@ -175,7 +175,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 }
 
-#' @export
 registerFonts <- function() {
   # This gets called by JASPEngine when settings changes and on `initEnvironment`
 
