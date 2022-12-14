@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
+msgid "registerFonts was called but resultFont does not exist!"
 msgstr ""
 
 msgid "<em>Note.</em>"

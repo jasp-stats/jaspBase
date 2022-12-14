@@ -17,7 +17,7 @@ msgstr ""
 "X-Source-Language: American English\n"
 "X-Qt-Contexts: true\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
+msgid "registerFonts was called but resultFont does not exist!"
 msgstr "registerFonts foi solicitado, mas resultadosFont não existe!"
 
 msgid "<em>Note.</em>"

@@ -13,8 +13,8 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr "registerFontsが呼び出されましたが、resultsFontが存在しません!"
+msgid "registerFonts was called but resultFont does not exist!"
+msgstr "registerFontsが呼び出されましたが、resultFontが存在しません!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>注</em>"

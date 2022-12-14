@@ -109,8 +109,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
-  registerFonts()
-
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
 
@@ -178,6 +176,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 }
 
 registerFonts <- function() {
+  # This gets called by JASPEngine when settings changes and on `initEnvironment`
 
   if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
 
@@ -189,10 +188,10 @@ registerFonts <- function() {
     # systemfonts::register_font(fontName, normalizePath(fontFile))
     # jaspGraphs::setGraphOption("family", fontName)
 
-    if (exists(".resultsFont"))
-      jaspGraphs::setGraphOption("family", .resultsFont)
+    if (exists(".resultFont"))
+      jaspGraphs::setGraphOption("family", .resultFont)
     else
-      warning("registerFonts was called but resultsFont does not exist!")
+      warning("registerFonts was called but resultFont does not exist!")
 
   } else {
     print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
@@ -700,20 +699,17 @@ saveImage <- function(plotName, format, height, width)
       # Where available use the cairo devices, because:
       # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
       # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
-
-      if (capabilities("cairo"))
-        type <- "cairo"
-      else if (capabilities("aqua"))
+      if (capabilities("aqua"))
         type <- "quartz"
+      else if (capabilities("cairo"))
+        type <- "cairo"
       else
         type <- "Xlib"
 
       # Open correct graphics device
       if (format == "eps") {
 
-        # The call to capabilities("X11") may throw an error. This error has for effect that ragg::agg_tiff cannot be called anymore wthout crashing the enigne.
-        # So the call to capabilities("X11") must be done only when the eps (or pdf) type is set.
-        if (type == "cairo" && try(capabilities("X11")))
+        if (type == "cairo")
           device <- grDevices::cairo_ps
         else
           device <- grDevices::postscript
@@ -739,7 +735,7 @@ saveImage <- function(plotName, format, height, width)
 
       } else if (format == "pdf") {
 
-        if (type == "cairo" && try(capabilities("X11")))
+        if (type == "cairo")
           device <- grDevices::cairo_pdf
         else
           device <- grDevices::pdf
@@ -863,7 +859,7 @@ rewriteImages <- function(name, ppi, imageBackground) {
   })
 
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
-  registerFonts()
+
 
   for (i in seq_along(oldPlots)) {
     try({

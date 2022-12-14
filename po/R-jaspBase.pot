@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
+msgid "registerFonts was called but resultFont does not exist!"
 msgstr ""
 
 msgid "<em>Note.</em>"

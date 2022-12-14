@@ -21,8 +21,8 @@ msgstr ""
 "X-Language: gl_ES\n"
 "X-Source-Language: C\n"
 
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr "chamouse por registerFonts pero resultsFont non existe!"
+msgid "registerFonts was called but resultFont does not exist!"
+msgstr "chamouse por registerFonts pero resultFont non existe!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Nota.</em>"
