@@ -210,15 +210,17 @@ msgstr ""
 msgid "'"
 msgstr ""
 
-#, fuzzy
 msgid "Your module contains no"
-msgstr "您的模块去缺少 DESCRIPTION 文件"
+msgstr "Your module contains no"
 
 msgid "file"
-msgstr ""
+msgstr "file"
 
 msgid "A cache is supposed to be at '%s' but it does not exist!"
 msgstr "缓存应该在 “%s”，但它不存在！"
 
 msgid "Expected not-null but got null"
 msgstr ""
+
+msgid "registerFonts was called but resultsFont does not exist!"
+msgstr "已调用 registerFonts 但 resultsFont 不存在！"
