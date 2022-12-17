@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -13,77 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "registerFontsが呼び出されましたが、resultFontが存在しません!"
-
 msgid "<em>Note.</em>"
 msgstr "<em>注</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "無効な型が .fromRCPP に指定されました。文字列が期待されています"
-
-msgid "Unknown RCPP object"
-msgstr "不明なRCPPオブジェクト"
-
-msgid "Could not locate"
-msgstr "見つかりませんでした"
-
-msgid "in environment (.fromRCPP)"
-msgstr "環境内（.fromRCPP）"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASPが誤った引数で呼び出されました。"
-
-msgid "The argument options should be the options list from QML."
-msgstr "引数のオプションは、QMLのオプションリストである必要があります。"
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"この分析では、SetSeed {} QMLコンポーネントがQMLファイルに存在することを確認し"
-"てください。"
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"誤反応やエラーの可能性がある別のセッションからプロットスナップショットを読み"
-"込んでいます。"
-
-msgid "no jasp plot found"
-msgstr "JASPプロットが見つかりません"
-
-msgid "no plot object found"
-msgstr "プロットオブジェクトが見つかりません"
-
 msgid "no plot object was found"
 msgstr "プロットオブジェクトが見つかりませんでした"
-
-msgid "This function should not be used. In for reference."
-msgstr "この機能は使用しないでください。ご参考まで。"
-
-msgid "Non-valid type argument provided"
-msgstr "無効な型引数が与えられました"
-
-msgid "Unknown check type provided: \""
-msgstr "不明なチェックタイプが提供されました： \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "必要な引数がありません： \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "各グループ化変数には、レベルを指定する必要があります"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr ""
-"モデル項リストには、名前付きアイテム `components`が含まれている必要があります"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "分析の実行中に次の問題が発生しました:"
@@ -188,54 +122,106 @@ msgstr "すべての検定において、対立仮説は比率が %s より大�
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "クラス %1$s およびタイプ %2$s のメッセージが見つかりませんでした"
 
-msgid "Missing required replacement(s): \""
-msgstr "必要な代替品がありません。\""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFontsが呼び出されましたが、resultFontが存在しません!"
 
-msgid "could not clean value"
-msgstr "値を消去できませんでした"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "無効な型が .fromRCPP に指定されました。文字列が期待されています"
 
-msgid "failed to create moduleLibrary!"
-msgstr "moduleLibraryの作成に失敗しました!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "不明なRCPPオブジェクト"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "モジュールのロックファイルを再作成できませんでした!"
+#~ msgid "Could not locate"
+#~ msgstr "見つかりませんでした"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "一時的なモジュールライブラリ を %s で削除できませんでした"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "環境内（.fromRCPP）"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "あなたのモジュールには DESCRIPTION ファイルがありません!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASPが誤った引数で呼び出されました。"
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "モジュールに 'inst/Description.qml' がありません!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "引数のオプションは、QMLのオプションリストである必要があります。"
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "モジュールに 'R' ディレクトリがありません!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "この分析では、SetSeed {} QMLコンポーネントがQMLファイルに存在することを確"
+#~ "認してください。"
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "モジュールに 'inst/qml' ディレクトリがありません!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "誤反応やエラーの可能性がある別のセッションからプロットスナップショットを読"
+#~ "み込んでいます。"
 
-msgid "Can't find file '"
-msgstr ""
+#~ msgid "no jasp plot found"
+#~ msgstr "JASPプロットが見つかりません"
 
-msgid "' in archive '"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "プロットオブジェクトが見つかりません"
 
-msgid "'"
-msgstr ""
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "この機能は使用しないでください。ご参考まで。"
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "無効な型引数が与えられました"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "不明なチェックタイプが提供されました： \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "必要な引数がありません： \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "各グループ化変数には、レベルを指定する必要があります"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr ""
+#~ "モデル項リストには、名前付きアイテム `components`が含まれている必要があり"
+#~ "ます"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "必要な代替品がありません。\""
+
+#~ msgid "could not clean value"
+#~ msgstr "値を消去できませんでした"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "moduleLibraryの作成に失敗しました!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "モジュールのロックファイルを再作成できませんでした!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "一時的なモジュールライブラリ を %s で削除できませんでした"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "あなたのモジュールには DESCRIPTION ファイルがありません!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "モジュールに 'inst/Description.qml' がありません!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "モジュールに 'R' ディレクトリがありません!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "モジュールに 'inst/qml' ディレクトリがありません!"
 
 #, fuzzy
-msgid "Your module contains no"
-msgstr "あなたのモジュールには DESCRIPTION ファイルがありません"
+#~ msgid "Your module contains no"
+#~ msgstr "あなたのモジュールには DESCRIPTION ファイルがありません"
 
-msgid "file"
-msgstr ""
-
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "キャッシュは '%s' に設定されていますが、存在しません!"
-
-msgid "Expected not-null but got null"
-msgstr ""
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "キャッシュは '%s' に設定されていますが、存在しません!"
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "書式が正しく指定されていません"

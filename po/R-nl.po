@@ -2,11 +2,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-11-01 11:33+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jaspbase/nl/>"
-"\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/jasp/jaspbase/nl/"
+">\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14,77 +14,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
 "X-Generator: Weblate 4.14.2-dev\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "registerFonts werd aangeroepen maar resultFont bestaat niet!"
-
 msgid "<em>Note.</em>"
 msgstr "<em>Opmerking.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
-"Invalide type geleverd aan .fromRCPP, er wordt een 'character' verwacht"
-
-msgid "Unknown RCPP object"
-msgstr "Onbekend RCPP object"
-
-msgid "Could not locate"
-msgstr "Kan niet worden gevonden"
-
-msgid "in environment (.fromRCPP)"
-msgstr "in omgeving (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASP werd aangeroepen met een incorrect argument."
-
-msgid "The argument options should be the options list from QML."
-msgstr "De argumentopties moeten de optielijst van QML zijn."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Zorg ervoor dat de SetSeed{} QML-component aanwezig is in het QML-bestand "
-"voor deze analyse."
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Momentopname grafiek laden van een andere sessie met mogelijke bijwerkingen "
-"of fouten."
-
-msgid "no jasp plot found"
-msgstr "geen JASP-plot gevonden"
-
-msgid "no plot object found"
-msgstr "geen plotobject gevonden"
-
 msgid "no plot object was found"
 msgstr "er werd geen plotobject gevonden"
-
-msgid "This function should not be used. In for reference."
-msgstr "Deze functie kan niet worden gebruikt. Erin voor referentie."
-
-msgid "Non-valid type argument provided"
-msgstr "Niet-valide argumenttype gegeven"
-
-msgid "Unknown check type provided: \""
-msgstr "Onbekende check type gegeven: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Verplicht(e) argument(en) ontbreken: \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Iedere groeperende variabele moet een gespecificeerd niveau hebben"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr "de modeltermenlijst moet een item hebben genaamd `componenten`"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "De volgende problemen deden zich voor tijdens de analyse:"
@@ -197,54 +131,111 @@ msgstr ""
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "Kon geen bericht vinden voor klasse %1$s en type %2$s"
 
-msgid "Missing required replacement(s): \""
-msgstr "De benodigde vervanging(en) ontbreken: \""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFonts werd aangeroepen maar resultFont bestaat niet!"
 
-msgid "could not clean value"
-msgstr "kon waarde niet opschonen"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr ""
+#~ "Invalide type geleverd aan .fromRCPP, er wordt een 'character' verwacht"
 
-msgid "failed to create moduleLibrary!"
-msgstr "Fout bij maken van moduleLibrary!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Onbekend RCPP object"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "Fout bij nieuw aanmaken van lock file van de module!"
+#~ msgid "Could not locate"
+#~ msgstr "Kan niet worden gevonden"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "Fout bij verwijderen tijdelijke modulebibliotheek bij %s"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "in omgeving (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "Uw module mist een 'DESCRIPTION'-bestand!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP werd aangeroepen met een incorrect argument."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "Uw module mist 'inst/Description.qml'!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "De argumentopties moeten de optielijst van QML zijn."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "Uw module mist een 'R'-map!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Zorg ervoor dat de SetSeed{} QML-component aanwezig is in het QML-bestand "
+#~ "voor deze analyse."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "Uw module mist de 'inst/qml'-map!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Momentopname grafiek laden van een andere sessie met mogelijke "
+#~ "bijwerkingen of fouten."
 
-msgid "Can't find file '"
-msgstr ""
+#~ msgid "no jasp plot found"
+#~ msgstr "geen JASP-plot gevonden"
 
-msgid "' in archive '"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "geen plotobject gevonden"
 
-msgid "'"
-msgstr "'"
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Deze functie kan niet worden gebruikt. Erin voor referentie."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Niet-valide argumenttype gegeven"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Onbekende check type gegeven: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Verplicht(e) argument(en) ontbreken: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Iedere groeperende variabele moet een gespecificeerd niveau hebben"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "de modeltermenlijst moet een item hebben genaamd `componenten`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "De benodigde vervanging(en) ontbreken: \""
+
+#~ msgid "could not clean value"
+#~ msgstr "kon waarde niet opschonen"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "Fout bij maken van moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Fout bij nieuw aanmaken van lock file van de module!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Fout bij verwijderen tijdelijke modulebibliotheek bij %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "Uw module mist een 'DESCRIPTION'-bestand!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "Uw module mist 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "Uw module mist een 'R'-map!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "Uw module mist de 'inst/qml'-map!"
+
+#~ msgid "'"
+#~ msgstr "'"
 
 #, fuzzy
-msgid "Your module contains no"
-msgstr "Uw module bevat geen DESCRIPTION-bestand"
+#~ msgid "Your module contains no"
+#~ msgstr "Uw module bevat geen DESCRIPTION-bestand"
 
-msgid "file"
-msgstr ""
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Er moet een cache zijn bij '%s', maar is er niet!"
 
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "Er moet een cache zijn bij '%s', maar is er niet!"
-
-msgid "Expected not-null but got null"
-msgstr "Verwacht niet-nul maar kreeg nul"
+#~ msgid "Expected not-null but got null"
+#~ msgstr "Verwacht niet-nul maar kreeg nul"
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "Format incorrect gespecificeerd"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: JASP 0.9.2\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-07 18:17+0000\n"
 "Last-Translator: ecadrian <ecadrian@hotmail.com>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/jasp/jaspbase/es/"
@@ -13,79 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "se invocó registerFonts pero resultFont no existe!"
-
 msgid "<em>Note.</em>"
 msgstr "<em>Nota.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "Indicado un tipo incorrecto para .fromRCPP, se esperaba un carácter"
-
-msgid "Unknown RCPP object"
-msgstr "Objeto RCPP desconocido"
-
-msgid "Could not locate"
-msgstr "No pudo localizarse"
-
-msgid "in environment (.fromRCPP)"
-msgstr "en el entorno (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr "Se invocó .getSeedJASP con un argumento incorrecto."
-
-msgid "The argument options should be the options list from QML."
-msgstr ""
-"Las opciones de los argumentos deben ser las de la lista de opciones de QML."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Asegurarse de que el componente SetSeed{} de QML está presente en el archivo "
-"QML para este análisis."
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Cargando la captura del gráfico de una sesión diferente con posibles efectos "
-"secundarios o fallos."
-
-msgid "no jasp plot found"
-msgstr "no se encontró un gráfico jasp"
-
-msgid "no plot object found"
-msgstr "no se encuentra ningún objeto gráfico"
-
 msgid "no plot object was found"
 msgstr "no se encontró ningún objeto gráfico"
-
-msgid "This function should not be used. In for reference."
-msgstr "Esta función no debe utilizarse. Para referencia."
-
-msgid "Non-valid type argument provided"
-msgstr "Se proporcionó un argumento de tipo incorrecto"
-
-msgid "Unknown check type provided: \""
-msgstr "Se proporcionó un tipo de comprobación desconocido: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Falta(n) argumento(s) requerido(s):\""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Cada variable de agrupación debe tener un nivel determinado"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr ""
-"la lista de elementos del modelo debe contener el elemento denominado "
-"`componentes`"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Surgieron los siguientes problemas al ejecutar el análisis:"
@@ -201,50 +133,119 @@ msgstr ""
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "No se pudo encontrar el mensaje para la clase %1$s y el tipo %2$s"
 
-msgid "Missing required replacement(s): \""
-msgstr "Falta(n) la(s) sustitución(s) requerida(s):\""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "se invocó registerFonts pero resultFont no existe!"
 
-msgid "could not clean value"
-msgstr "no se puede borrar el valor"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "Indicado un tipo incorrecto para .fromRCPP, se esperaba un carácter"
 
-msgid "failed to create moduleLibrary!"
-msgstr "falló la creación de moduleLibrary!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Objeto RCPP desconocido"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "Fallo al rehacer el archivo de bloqueo del módulo!"
+#~ msgid "Could not locate"
+#~ msgstr "No pudo localizarse"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "Fallo al eliminar la biblioteca temporal del módulo en %s"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "en el entorno (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "Tu módulo no tiene un archivo de 'DESCRIPCIÓN'!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr "Se invocó .getSeedJASP con un argumento incorrecto."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "Tu módulo no tiene el 'inst/Description.qml'!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr ""
+#~ "Las opciones de los argumentos deben ser las de la lista de opciones de "
+#~ "QML."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "Tu módulo no tiene un directorio de 'R'!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Asegurarse de que el componente SetSeed{} de QML está presente en el "
+#~ "archivo QML para este análisis."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "Tu módulo no tiene el directorio 'inst/qml'!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Cargando la captura del gráfico de una sesión diferente con posibles "
+#~ "efectos secundarios o fallos."
 
-msgid "Can't find file '"
-msgstr "No se puede encontrar el archivo '"
+#~ msgid "no jasp plot found"
+#~ msgstr "no se encontró un gráfico jasp"
 
-msgid "' in archive '"
-msgstr "' en el archivo '"
+#~ msgid "no plot object found"
+#~ msgstr "no se encuentra ningún objeto gráfico"
 
-msgid "'"
-msgstr "'"
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Esta función no debe utilizarse. Para referencia."
 
-msgid "Your module contains no"
-msgstr "Tu módulo no incluye"
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Se proporcionó un argumento de tipo incorrecto"
 
-msgid "file"
-msgstr "archivo"
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Se proporcionó un tipo de comprobación desconocido: \""
 
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "Se suponía que habría una caché en '%s', pero no existe!"
+#~ msgid "\""
+#~ msgstr "\""
 
-msgid "Expected not-null but got null"
-msgstr "Esperado no nulo, pero obtenido cero"
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Falta(n) argumento(s) requerido(s):\""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Cada variable de agrupación debe tener un nivel determinado"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr ""
+#~ "la lista de elementos del modelo debe contener el elemento denominado "
+#~ "`componentes`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Falta(n) la(s) sustitución(s) requerida(s):\""
+
+#~ msgid "could not clean value"
+#~ msgstr "no se puede borrar el valor"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "falló la creación de moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Fallo al rehacer el archivo de bloqueo del módulo!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Fallo al eliminar la biblioteca temporal del módulo en %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "Tu módulo no tiene un archivo de 'DESCRIPCIÓN'!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "Tu módulo no tiene el 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "Tu módulo no tiene un directorio de 'R'!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "Tu módulo no tiene el directorio 'inst/qml'!"
+
+#~ msgid "Can't find file '"
+#~ msgstr "No se puede encontrar el archivo '"
+
+#~ msgid "' in archive '"
+#~ msgstr "' en el archivo '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Your module contains no"
+#~ msgstr "Tu módulo no incluye"
+
+#~ msgid "file"
+#~ msgstr "archivo"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Se suponía que habría una caché en '%s', pero no existe!"
+
+#~ msgid "Expected not-null but got null"
+#~ msgstr "Esperado no nulo, pero obtenido cero"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Romanian <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -14,78 +14,11 @@ msgstr ""
 "20)) ? 1 : 2;\n"
 "X-Generator: Weblate 4.14.1\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "registerFonts a fost numit dar resultFont nu există!"
-
 msgid "<em>Note.</em>"
 msgstr "<em>Notă.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "Tip nevalid furnizat către .fromRCPP, caracter așteptat"
-
-msgid "Unknown RCPP object"
-msgstr "Obiect RCPP necunoscut"
-
-msgid "Could not locate"
-msgstr "Nu poate fi localizat"
-
-msgid "in environment (.fromRCPP)"
-msgstr "în mediu (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ",getSeedJASP a fost numit printr-un argument incorect."
-
-msgid "The argument options should be the options list from QML."
-msgstr ""
-"Opțiunile argumentului ar trebui să coincidă cu opțiunile din lista de la "
-"QML."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Asigurați-vă de existența componentei QML SetSeed{} în fișierul QML pentru "
-"această analiză."
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Se încarcă un instantaneu al graficului dintr-o sesiune diferită cu posibile "
-"efecte secundare sau erori."
-
-msgid "no jasp plot found"
-msgstr "nu a fost găsit un grafic jasp"
-
-msgid "no plot object found"
-msgstr "nu a fost găsit un obiect al graficului"
-
 msgid "no plot object was found"
 msgstr "nu a fost găsit un obiect al graficului"
-
-msgid "This function should not be used. In for reference."
-msgstr "Această funcție nu ar trebui utilizată. Pentru referință."
-
-msgid "Non-valid type argument provided"
-msgstr "A fost furnizat un argument de tip nevalid"
-
-msgid "Unknown check type provided: \""
-msgstr "A fost furnizat un tip de verificare necunoscut: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Lipsesc argumentele necesare: \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Fiecare variabilă de grupare trebuie să aibă un nivel specificat"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr "lista modelterms trebuie să conțină obiectul denumit `components`"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Următoarele probleme au apărut în timpul executării analizei:"
@@ -199,51 +132,103 @@ msgstr ""
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "Nu a putut fi găsit mesajul pentru clasa %1$s și tipul %2$s"
 
-msgid "Missing required replacement(s): \""
-msgstr "Lipsesc înlocuiri necesare: \""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFonts a fost numit dar resultFont nu există!"
 
-msgid "could not clean value"
-msgstr "valoarea nu a putut fi curățată"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "Tip nevalid furnizat către .fromRCPP, caracter așteptat"
 
-msgid "failed to create moduleLibrary!"
-msgstr "nu s-a putut crea moduleLibrary!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Obiect RCPP necunoscut"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "Nu s-a putut recrea fișierul de blocare a modulului!"
+#~ msgid "Could not locate"
+#~ msgstr "Nu poate fi localizat"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "Eroare la eliminarea bibliotecii temporare de module la %s"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "în mediu (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "Modulului tău îi lipsește un fișier 'DESCRIERE'!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ",getSeedJASP a fost numit printr-un argument incorect."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "Modulului tău îi lipsește 'inst/Description.qml'!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr ""
+#~ "Opțiunile argumentului ar trebui să coincidă cu opțiunile din lista de la "
+#~ "QML."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "Modulului tău îi lipsește un director 'R'!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Asigurați-vă de existența componentei QML SetSeed{} în fișierul QML "
+#~ "pentru această analiză."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "Modulului tău îi lipsește directorul 'inst/qml'!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Se încarcă un instantaneu al graficului dintr-o sesiune diferită cu "
+#~ "posibile efecte secundare sau erori."
 
-msgid "Can't find file '"
-msgstr ""
+#~ msgid "no jasp plot found"
+#~ msgstr "nu a fost găsit un grafic jasp"
 
-msgid "' in archive '"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "nu a fost găsit un obiect al graficului"
 
-msgid "'"
-msgstr ""
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Această funcție nu ar trebui utilizată. Pentru referință."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "A fost furnizat un argument de tip nevalid"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "A fost furnizat un tip de verificare necunoscut: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Lipsesc argumentele necesare: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Fiecare variabilă de grupare trebuie să aibă un nivel specificat"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "lista modelterms trebuie să conțină obiectul denumit `components`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Lipsesc înlocuiri necesare: \""
+
+#~ msgid "could not clean value"
+#~ msgstr "valoarea nu a putut fi curățată"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "nu s-a putut crea moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Nu s-a putut recrea fișierul de blocare a modulului!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Eroare la eliminarea bibliotecii temporare de module la %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "Modulului tău îi lipsește un fișier 'DESCRIERE'!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "Modulului tău îi lipsește 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "Modulului tău îi lipsește un director 'R'!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "Modulului tău îi lipsește directorul 'inst/qml'!"
 
 #, fuzzy
-msgid "Your module contains no"
-msgstr "Modulul tău nu conține fișierul DESCRIERE"
+#~ msgid "Your module contains no"
+#~ msgstr "Modulul tău nu conține fișierul DESCRIERE"
 
-msgid "file"
-msgstr ""
-
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "Un cache ar trebui să fie la '%s', dar nu există!"
-
-msgid "Expected not-null but got null"
-msgstr ""
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Un cache ar trebui să fie la '%s', dar nu există!"

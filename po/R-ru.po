@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-26 00:31+0000\n"
 "Last-Translator: fedder <fedor.derish@gmail.com>\n"
 "Language-Team: Russian <https://hosted.weblate.org/projects/jasp/jaspbase/ru/"
@@ -10,80 +10,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Weblate 4.14.2-dev\n"
-
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "Было вызвано registerFonts, но resultFont не существует!"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Примечание.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "В .fromRCPP указан недопустимый тип, ожидаемый символ"
-
-msgid "Unknown RCPP object"
-msgstr "Неизвестный объект RCPP"
-
-msgid "Could not locate"
-msgstr "Не удалось найти"
-
-msgid "in environment (.fromRCPP)"
-msgstr "в среде (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASP был вызван с неверным аргументом."
-
-msgid "The argument options should be the options list from QML."
-msgstr "Опции аргумента должны быть списком опций из QML."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Убедитесь, что компонент SetSeed{} QML присутствует в файле QML для этого "
-"анализа."
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Загрузка моментального снимка графика из другого сеанса с возможными "
-"побочными эффектами или ошибками."
-
-msgid "no jasp plot found"
-msgstr "Не найден график jasp"
-
-msgid "no plot object found"
-msgstr "не найден графический объект"
-
 msgid "no plot object was found"
 msgstr "графический объект был найден"
-
-msgid "This function should not be used. In for reference."
-msgstr "Эту функцию использовать не следует."
-
-msgid "Non-valid type argument provided"
-msgstr "Указан недопустимый тип аргумента"
-
-msgid "Unknown check type provided: \""
-msgstr "Указан неизвестный тип проверки: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Отсутствуют обязательные аргументы: \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Каждая группирующая переменная должна иметь указанный уровень"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr "список modelterms должен содержать именованный элемент `components`"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "При выполнении анализа возникли следующие проблемы:"
@@ -194,50 +129,115 @@ msgstr "По результатам всех статистических кри
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "Не удалось найти сообщение для класса %1$s и ввести %2$s"
 
-msgid "Missing required replacement(s): \""
-msgstr "Отсутствует требуемая(ые) замена(ы): \""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "Было вызвано registerFonts, но resultFont не существует!"
 
-msgid "could not clean value"
-msgstr "не удалось очистить значение"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "В .fromRCPP указан недопустимый тип, ожидаемый символ"
 
-msgid "failed to create moduleLibrary!"
-msgstr "не удалось создать moduleLibrary!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Неизвестный объект RCPP"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "Не удалось воссоздать файл блокировки модуля!"
+#~ msgid "Could not locate"
+#~ msgstr "Не удалось найти"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "Не удалось удалить временную библиотеку модулей в %s"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "в среде (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "В вашем модуле отсутствует файл 'DESCRIPTION'!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP был вызван с неверным аргументом."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "В вашем модуле отсутствует 'inst/Description.qml'!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "Опции аргумента должны быть списком опций из QML."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "В вашем модуле отсутствует каталог «R»!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Убедитесь, что компонент SetSeed{} QML присутствует в файле QML для этого "
+#~ "анализа."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "В вашем модуле отсутствует каталог «R»!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Загрузка моментального снимка графика из другого сеанса с возможными "
+#~ "побочными эффектами или ошибками."
 
-msgid "Can't find file '"
-msgstr "Не удается найти файл '"
+#~ msgid "no jasp plot found"
+#~ msgstr "Не найден график jasp"
 
-msgid "' in archive '"
-msgstr "' в архиве '"
+#~ msgid "no plot object found"
+#~ msgstr "не найден графический объект"
 
-msgid "'"
-msgstr "'"
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Эту функцию использовать не следует."
 
-msgid "Your module contains no"
-msgstr "Ваш модуль не содержит"
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Указан недопустимый тип аргумента"
 
-msgid "file"
-msgstr "файл"
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Указан неизвестный тип проверки: \""
 
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "Кэш должен быть в '%s', но он не существует!"
+#~ msgid "\""
+#~ msgstr "\""
 
-msgid "Expected not-null but got null"
-msgstr "Ожидалось ненулевое значение, но получено нулевое значение"
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Отсутствуют обязательные аргументы: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Каждая группирующая переменная должна иметь указанный уровень"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "список modelterms должен содержать именованный элемент `components`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Отсутствует требуемая(ые) замена(ы): \""
+
+#~ msgid "could not clean value"
+#~ msgstr "не удалось очистить значение"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "не удалось создать moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Не удалось воссоздать файл блокировки модуля!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Не удалось удалить временную библиотеку модулей в %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "В вашем модуле отсутствует файл 'DESCRIPTION'!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "В вашем модуле отсутствует 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "В вашем модуле отсутствует каталог «R»!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "В вашем модуле отсутствует каталог «R»!"
+
+#~ msgid "Can't find file '"
+#~ msgstr "Не удается найти файл '"
+
+#~ msgid "' in archive '"
+#~ msgstr "' в архиве '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Your module contains no"
+#~ msgstr "Ваш модуль не содержит"
+
+#~ msgid "file"
+#~ msgstr "файл"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Кэш должен быть в '%s', но он не существует!"
+
+#~ msgid "Expected not-null but got null"
+#~ msgstr "Ожидалось ненулевое значение, но получено нулевое значение"

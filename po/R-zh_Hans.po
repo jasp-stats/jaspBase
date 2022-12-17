@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-29 04:12+0000\n"
 "Last-Translator: Shun Wang <shuonwang@gmail.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
@@ -13,72 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 4.14.2-dev\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "已调用 registerFonts 但 resultFont 不存在！"
-
 msgid "<em>Note.</em>"
 msgstr "<em>注.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "提供给 .fromRCPP 的类型无效，预期是字符型"
-
-msgid "Unknown RCPP object"
-msgstr "未知的 RCPP 对象"
-
-msgid "Could not locate"
-msgstr "无法找到"
-
-msgid "in environment (.fromRCPP)"
-msgstr "在环境中 (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASP 使用了不正确的参数调用。"
-
-msgid "The argument options should be the options list from QML."
-msgstr "参数 options 应该是来自 QML 的选项列表。"
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr "确保此分析的 QML 文件中存在 SetSeed{} QML 组件。"
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr "从具有可能的副作用(side effect)或错误的不同会话中加载绘图截图。"
-
-msgid "no jasp plot found"
-msgstr "找不到 JASP 绘图"
-
-msgid "no plot object found"
-msgstr "找不到绘图对象"
-
 msgid "no plot object was found"
 msgstr "找不到绘图对象"
-
-msgid "This function should not be used. In for reference."
-msgstr "不应被使用此功能，仅供参考。"
-
-msgid "Non-valid type argument provided"
-msgstr "提供了无效的类型参数"
-
-msgid "Unknown check type provided: \""
-msgstr "提供了未知的检查类型：“"
-
-msgid "\""
-msgstr "”"
-
-msgid "Missing required argument(s): \""
-msgstr "缺少必要的参数：“"
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "每个分组变量必须指定一个水平"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr "modelterms (模型项)列表必须包含命名项`components`"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "运行分析时出现以下问题："
@@ -174,53 +113,105 @@ msgstr "对于所有检验，备择假设指定比例大于 %s"
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "找不到类 %1$s 和类型 %2$s 的消息"
 
-msgid "Missing required replacement(s): \""
-msgstr "缺少必需的替代(replacement)：“"
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "已调用 registerFonts 但 resultFont 不存在！"
 
-msgid "could not clean value"
-msgstr "无法清理值"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "提供给 .fromRCPP 的类型无效，预期是字符型"
 
-msgid "failed to create moduleLibrary!"
-msgstr "moduleLibrary 创建失败！"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "未知的 RCPP 对象"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "无法重新创建模块的锁定文件！"
+#~ msgid "Could not locate"
+#~ msgstr "无法找到"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "无法移除在 %s 的临时模块库"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "在环境中 (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "您的模块缺少一个“DESCRIPTION”文件！"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP 使用了不正确的参数调用。"
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "您的模块缺少 “inst/Description.qml”！"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "参数 options 应该是来自 QML 的选项列表。"
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "您的模块缺少 “R” 目录！"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr "确保此分析的 QML 文件中存在 SetSeed{} QML 组件。"
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "您的模块缺少 “inst/qml”目录！"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr "从具有可能的副作用(side effect)或错误的不同会话中加载绘图截图。"
 
-msgid "Can't find file '"
-msgstr "找不到文件\""
+#~ msgid "no jasp plot found"
+#~ msgstr "找不到 JASP 绘图"
 
-msgid "' in archive '"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "找不到绘图对象"
 
-msgid "'"
-msgstr ""
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "不应被使用此功能，仅供参考。"
 
-msgid "Your module contains no"
-msgstr "Your module contains no"
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "提供了无效的类型参数"
 
-msgid "file"
-msgstr "file"
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "提供了未知的检查类型：“"
 
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "缓存应该在 “%s”，但它不存在！"
+#~ msgid "\""
+#~ msgstr "”"
 
-msgid "Expected not-null but got null"
-msgstr ""
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "缺少必要的参数：“"
 
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr "已调用 registerFonts 但 resultsFont 不存在！"
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "每个分组变量必须指定一个水平"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "modelterms (模型项)列表必须包含命名项`components`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "缺少必需的替代(replacement)：“"
+
+#~ msgid "could not clean value"
+#~ msgstr "无法清理值"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "moduleLibrary 创建失败！"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "无法重新创建模块的锁定文件！"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "无法移除在 %s 的临时模块库"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "您的模块缺少一个“DESCRIPTION”文件！"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "您的模块缺少 “inst/Description.qml”！"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "您的模块缺少 “R” 目录！"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "您的模块缺少 “inst/qml”目录！"
+
+#~ msgid "Can't find file '"
+#~ msgstr "找不到文件\""
+
+#~ msgid "Your module contains no"
+#~ msgstr "Your module contains no"
+
+#~ msgid "file"
+#~ msgstr "file"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "缓存应该在 “%s”，但它不存在！"
+
+#~ msgid "registerFonts was called but resultsFont does not exist!"
+#~ msgstr "已调用 registerFonts 但 resultsFont 不存在！"

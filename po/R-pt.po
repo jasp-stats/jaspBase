@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2022-10-06 09:38\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -17,76 +17,11 @@ msgstr ""
 "X-Source-Language: American English\n"
 "X-Qt-Contexts: true\n"
 
-msgid "registerFonts was called but resultFont does not exist!"
-msgstr "registerFonts foi solicitado, mas resultadosFont não existe!"
-
 msgid "<em>Note.</em>"
 msgstr "<em>Nota.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "Tipo inválido fornecido para .fromRCPP, carácter esperado"
-
-msgid "Unknown RCPP object"
-msgstr "Objeto desconhecido do RCPP"
-
-msgid "Could not locate"
-msgstr "Não foi possível localizar"
-
-msgid "in environment (.fromRCPP)"
-msgstr "no ambiente (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASP foi solicitado com um argumento incorreto."
-
-msgid "The argument options should be the options list from QML."
-msgstr "As opções de argumento devem ser a lista de opções da QML."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Certifique-se de que o SetSeed{} O componente QML está presente no ficheiro "
-"QML para esta análise."
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Carregamento instantâneo de um gráfico de uma sessão diferente com possíveis "
-"efeitos secundários ou erros."
-
-msgid "no jasp plot found"
-msgstr "nenhum diagrama do jasp encontrado"
-
-msgid "no plot object found"
-msgstr "nenhum diagrama encontrado"
-
 msgid "no plot object was found"
 msgstr "nenhum objeto de diagrama encontrado"
-
-msgid "This function should not be used. In for reference."
-msgstr "Esta função não deve ser usada. Para referência."
-
-msgid "Non-valid type argument provided"
-msgstr "Fornecido tipo de argumento não-válido"
-
-msgid "Unknown check type provided: \""
-msgstr "Fornecido tipo de verificação desconhecido: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Faltam os argumentos necessários: \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Cada variável de agrupamento deve ter um nível especificado"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr "a lista de modelos deve conter o item nomeado `componentes'"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr ""
@@ -202,54 +137,104 @@ msgstr ""
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "Não foi possível encontrar mensagem para a classe %1$s e tipo %2$s"
 
-msgid "Missing required replacement(s): \""
-msgstr "Valores ausentes necessitam de substituição(ões): \""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFonts foi solicitado, mas resultadosFont não existe!"
 
-msgid "could not clean value"
-msgstr "não foi possível limpar o valor"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "Tipo inválido fornecido para .fromRCPP, carácter esperado"
 
-msgid "failed to create moduleLibrary!"
-msgstr "falhou na criação da biblioteca modular!"
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Objeto desconhecido do RCPP"
 
-msgid "Failed to recreate lock file of module!"
-msgstr "Falha em recriar ficheiro de bloqueio do módulo!"
+#~ msgid "Could not locate"
+#~ msgstr "Não foi possível localizar"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr "Falha na remoção da biblioteca temporária do módulo em %s"
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "no ambiente (.fromRCPP)"
 
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "Falta um ficheiro 'DESCRIÇÃO' para o seu módulo!"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP foi solicitado com um argumento incorreto."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr "Seu módulo está faltando 'inst/Descrição.qml'!"
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "As opções de argumento devem ser a lista de opções da QML."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr "Seu módulo está faltando um diretório 'R'!"
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Certifique-se de que o SetSeed{} O componente QML está presente no "
+#~ "ficheiro QML para esta análise."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr "Seu módulo está faltando o diretório 'inst/qml'!"
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Carregamento instantâneo de um gráfico de uma sessão diferente com "
+#~ "possíveis efeitos secundários ou erros."
 
-msgid "Can't find file '"
-msgstr ""
+#~ msgid "no jasp plot found"
+#~ msgstr "nenhum diagrama do jasp encontrado"
 
-msgid "' in archive '"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "nenhum diagrama encontrado"
 
-msgid "'"
-msgstr ""
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Esta função não deve ser usada. Para referência."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Fornecido tipo de argumento não-válido"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Fornecido tipo de verificação desconhecido: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Faltam os argumentos necessários: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Cada variável de agrupamento deve ter um nível especificado"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "a lista de modelos deve conter o item nomeado `componentes'"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Valores ausentes necessitam de substituição(ões): \""
+
+#~ msgid "could not clean value"
+#~ msgstr "não foi possível limpar o valor"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "falhou na criação da biblioteca modular!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Falha em recriar ficheiro de bloqueio do módulo!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Falha na remoção da biblioteca temporária do módulo em %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "Falta um ficheiro 'DESCRIÇÃO' para o seu módulo!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "Seu módulo está faltando 'inst/Descrição.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "Seu módulo está faltando um diretório 'R'!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "Seu módulo está faltando o diretório 'inst/qml'!"
 
 #, fuzzy
-msgid "Your module contains no"
-msgstr "O seu módulo não contém nenhum ficheiro DESCRIÇÃO"
+#~ msgid "Your module contains no"
+#~ msgstr "O seu módulo não contém nenhum ficheiro DESCRIÇÃO"
 
-msgid "file"
-msgstr ""
-
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr "Um cache é suposto estar em '%s' mas não existe!"
-
-msgid "Expected not-null but got null"
-msgstr ""
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Um cache é suposto estar em '%s' mas não existe!"
 
 #~ msgid "Format incorrectly specified"
 #~ msgstr "Formato incorretamente especificado"
