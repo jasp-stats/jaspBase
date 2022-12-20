@@ -49,7 +49,7 @@ jaspFormula <- function(formula, data) {
   formulaCheckRequirements(formula, data)
 
   result <- list(
-    formula = deparse(formula),
+    formula = paste(deparse(formula), collapse = ""),
     lhs = formulaGetLhs(formula),
     rhs = formulaGetRhs(formula)
   )
@@ -97,11 +97,12 @@ makeJaspFormulaRhs <- function(rhs, data) {
   allVarNames <- colnames(data)
 
   result <- paste(rhs[["terms"]], collapse = "+")
-  if(!rhs[["intercept"]]) {
+  if (is.null(rhs[["terms"]])) {
+    result <- if(rhs[["intercept"]]) "1" else "NULL"
+  } else if(!rhs[["intercept"]]) {
     result <- paste("0", result, sep = "+")
-  } else if(is.null(rhs[["terms"]])) {
-    result <- "1"
   }
+
   if(!is.null(rhs[["group"]])) {
     sep <- if(rhs[["correlated"]]) "|" else "||"
     result <- sprintf("(%s %s %s)", result, sep, rhs[["group"]])
