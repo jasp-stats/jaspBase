@@ -28,6 +28,7 @@ Imports:
   R6,
   Rcpp (>= 0.12.14),
   renv,
+  remotes,
   rjson,
   rvg,
   svglite,
