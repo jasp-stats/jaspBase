@@ -218,7 +218,7 @@ bool jaspObject::isJsonSubArray(const Json::Value needles, const Json::Value hay
 				return false;
 		}
 	}
-	else // haystack must be an array
+	else // haystack must be an array and needles a single value
 	{
 		bool foundIt = false;
 		for (const auto & hay : haystack)
