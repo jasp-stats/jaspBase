@@ -199,11 +199,30 @@ bool jaspObject::isJsonSubArray(const Json::Value needles, const Json::Value hay
 	if (needles == haystack)
 		return true;
 
-	for (const auto & needle: needles)
+	if (!(needles.isArray() || haystack.isArray()) || (needles.isArray() && !haystack.isArray()))
+		return false;
+
+	if (needles.isArray())
+	{
+		for (const auto & needle: needles)
+		{
+			bool foundIt = false;
+			for (const auto & hay : haystack)
+				if (needle == hay)
+				{
+					foundIt = true;
+					break;
+				}
+
+			if (!foundIt)
+				return false;
+		}
+	}
+	else // haystack must be an array and needles a single value
 	{
 		bool foundIt = false;
 		for (const auto & hay : haystack)
-			if (needle == hay)
+			if (needles == hay)
 			{
 				foundIt = true;
 				break;
