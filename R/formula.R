@@ -158,7 +158,7 @@ formulaCheckRequirements <- function(formula, data) {
   anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
-    stop("JASP formulas do not allow variable transformations. Please transform your variables before running the analysis.", domain = NA)
+    stop(paste0("Cannot parse the formula `", deparse(formula), "`: maybe a wrong variable name is used. Note that variable transformation is not allowed: in this case, please transform your variables before running the analysis."), domain = NA)
   }
 }
 
