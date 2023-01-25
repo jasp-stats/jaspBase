@@ -36,7 +36,8 @@ restoreOptions <- function(oldOptions) {
   oldOptions[setdiff(names(newOptions), names(oldOptions))] <- list(NULL)
   # resetting 'nwarnings' resets the collection of warnings, so it may remove warnings that occur in any parent function
   # so we do not reset 'nwarnings'
-  options(oldOptions[setdiff(names(oldOptions), "nwarnings")])
+  # jags.moddir needs to persist (see https://github.com/jasp-stats/jasp-test-release/issues/2248)
+  options(oldOptions[setdiff(names(oldOptions), c("nwarnings", "jags.moddir"))])
 
 }
 
