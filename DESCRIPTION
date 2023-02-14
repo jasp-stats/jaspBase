@@ -34,7 +34,7 @@ Imports:
   svglite,
   systemfonts,
   withr
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
 LinkingTo: Rcpp
