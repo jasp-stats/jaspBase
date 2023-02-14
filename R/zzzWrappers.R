@@ -532,18 +532,6 @@ jaspResultsR <- R6::R6Class(
       else
         stop("You should not create a new jaspResultsR object!", domain = NA)
     },
-
-    # addCitation = function(x) {
-    #   if (!is.character(x))
-    #     stop("Citation must be a character (vector)", domain = NA)
-    #   for (i in seq_along(x))
-    #     private$jaspObject$addCitation(x[i])
-    # },
-    # print                 = function()      private$jaspObject$print(),
-    # printHtml             = function()      private$jaspObject$printHtml(),
-    # setError              = function(x)     private$jaspObject$setError(x),
-    # getError              = function()      private$jaspObject$getError(),
-    # length                = function()      private$jaspObject$length,
     #The following functions for column encoding will fail hard when you run them inside JASP, only for R in other words
     setCurrentColumnNames = function(names) private$jaspObject$setCurrentColumnNames(names),
     encodeColumnName      = function(input) private$jaspObject$encodeColumnName(input),
@@ -554,37 +542,6 @@ jaspResultsR <- R6::R6Class(
   private = list(
     children    = list(),
     jaspObject  = NULL,
-    # jaspCppToR6 = function(cppObj) {
-    #   return(switch(
-    #     class(cppObj),
-    #     "Rcpp_jaspPlot"      = jaspPlotR$new(     jaspObject = cppObj),
-    #     "Rcpp_jaspTable"     = jaspTableR$new(    jaspObject = cppObj),
-    #     "Rcpp_jaspQmlSource" = jaspQmlSourceR$new(jaspObject = cppObj),
-    #     "Rcpp_jaspContainer" = jaspContainerR$new(jaspObject = cppObj),
-    #     "Rcpp_jaspColumn"    = jaspColumnR$new(   jaspObject = cppObj),
-    #     "Rcpp_jaspState"     = jaspStateR$new(    jaspObject = cppObj),
-    #     "Rcpp_jaspHtml"      = jaspHtmlR$new(     jaspObject = cppObj),
-    #     stop(sprintf("Invalid call to jaspCppToR6. Expected jaspResults object but got %s", class(cppObj)), domain = NA)
-    #   ))
-    # },
-    # #These two functions should be the exact same as those on jaspContainer
-    # setField    = function(field, value) {
-    #   field <- decodeName(field)
-    #   private$jaspObject[[field]] <- private$getJaspObject(value);
-    #   private$children[[field]]   <- value;
-    # },
-    # getField    = function(field) {
-    #   field <- decodeName(field)
-    #   #maybe changing the dependencies removed this object when we weren't looking!
-    #   if (is.null(private$jaspObject[[field]]) && !is.null(private$children[[field]]))
-    #     private$children[[field]] <- NULL
-    #
-    #   #other way 'round is also quite possible, we just regenerated jaspResults from state/json and now the R6 class doesn't know anything about it...
-    #   if (!is.null(private$jaspObject[[field]]) && is.null(private$children[[field]]))
-    #     private$children[[field]] <- private$jaspCppToR6(private$jaspObject[[field]])
-    #
-    #   return(private$children[[field]])
-    # },
     getJaspObject           = function(R6obj)   R6obj$.__enclos_env__$private$jaspObject,
     getResults              = function()        private$jaspObject$getResults(),
     setOptions              = function(options) private$jaspObject$setOptions(options),
@@ -599,7 +556,7 @@ jaspResultsR <- R6::R6Class(
   active = list(
     status = function(x) { if (missing(x)) private$jaspObject$status else private$jaspObject$status <- x },
     info   = function(x) { if (missing(x)) private$jaspObject$info   else private$jaspObject$info   <- x },
-    # overwrite method of jaspContainer
+    # overwrite method of jaspContainerR
     initCollapsed  = function(...) { warning("setting 'initCollapsed' on jaspResults has no effect!", domain = NA) }
   )
 )
