@@ -92,9 +92,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     oldwd                 <- getwd()
     setwd(location$root)
     withr::defer(setwd(oldwd))
-  } 
-  
-  if (! jaspResultsCalledFromJasp()) { 
+  }
+
+  if (! jaspResultsCalledFromJasp()) {
     .numDecimals        <- 3
     .fixedDecimals      <- FALSE
     .normalizedNotation <- TRUE
@@ -1011,6 +1011,7 @@ checkAnalysisOptions <- function(analysisName, options, version) {
   return(options)
 }
 
+#' @export
 runWrappedAnalysis <- function(analysisName, data, options, version) {
   if (jaspResultsCalledFromJasp()) {
 
