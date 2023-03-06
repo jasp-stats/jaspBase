@@ -350,6 +350,9 @@ void jaspContainer::letChildrenRun()
 
 void jaspContainer::completeChildren()
 {
+
+	jaspReport::totalWarningsClear();
+
 	for(auto keyval : _data)
 	{
 		jaspObject * obj = keyval.second;
@@ -370,6 +373,10 @@ void jaspContainer::completeChildren()
 
 		case jaspObjectType::qmlSource:
 			static_cast<jaspQmlSource*>(obj)->complete();
+			break;
+
+		case jaspObjectType::report:
+			static_cast<jaspReport*>(obj)->totalWarningsInc();
 			break;
 
 		default:
