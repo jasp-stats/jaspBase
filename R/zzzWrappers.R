@@ -484,6 +484,7 @@ jaspContainerR <- R6::R6Class(
         "Rcpp_jaspColumn"    = jaspColumnR$new(    jaspObject = cppObj ),
         "Rcpp_jaspState"     = jaspStateR$new(     jaspObject = cppObj ),
         "Rcpp_jaspHtml"      = jaspHtmlR$new(      jaspObject = cppObj ),
+        "Rcpp_jaspQmlSource" = jaspQmlSourceR$new(jaspObject = cppObj  ),
 		    "Rcpp_jaspReport"    = jaspReportR$new(    jaspObject = cppObj ),
         stop(sprintf("Invalid call to jaspCppToR6. Expected jaspResults object but got %s", class(cppObj)), domain = NA)
       ))
