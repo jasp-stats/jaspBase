@@ -54,7 +54,7 @@ jaspFormula <- function(formula, data) {
     rhs = formulaGetRhs(formula)
   )
 
-  class(result) <- c("jaspFormula")
+  class(result) <- c("jaspFormula", class(result))
   return(result)
 }
 
@@ -89,7 +89,7 @@ makeJaspFormula <- function(..., response=NULL, data) {
 #' @export
 jaspFormulaRhs <- function(terms = NULL, group = NULL, intercept = TRUE, correlated = TRUE) {
   result <- list(terms = terms, group = group, intercept = intercept, correlated = correlated)
-  class(result) <- "jaspFormulaRhs"
+  class(result) <- c("jaspFormulaRhs", class(result))
   return(result)
 }
 
