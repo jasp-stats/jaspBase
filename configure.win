@@ -89,6 +89,11 @@ fi
 SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
 JASPCOLUMNENCODER_SOURCES="${JASPCOLUMNENCODER_DIR}/columnencoder.cpp ${JASPCOLUMNENCODER_DIR}/columntype.cpp"
 
+#add the define if JASP_R_INTERFACE_LIBRARY env var says anything at all
+if [ "${JASP_R_INTERFACE_LIBRARY}" != "" ]; then
+	PKG_CXXFLAGS=-DJASP_R_INTERFACE_LIBRARY\ -DRCPP_NO_SUGAR\ ${PKG_CXXFLAGS}
+fi
+
 sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars.win
 
 exit 0
