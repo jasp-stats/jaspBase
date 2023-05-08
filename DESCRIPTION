@@ -1,7 +1,7 @@
 Package: jaspBase
 Type: Package
 Title: JASP Base
-Version: 0.17.0
+Version: 0.17.2
 Author: JASP Team
 Maintainer: Bruno Boutin <B.Boutin@uva.nl>
 Description: Package contains the JASP Bayesian and Frequentist analyses.
