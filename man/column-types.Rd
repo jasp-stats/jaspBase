@@ -5,6 +5,9 @@
 \alias{jaspScale}
 \alias{isJaspScale}
 \alias{asJaspScale}
+\alias{jaspOrdinal}
+\alias{isJaspOrdinal}
+\alias{asJaspOrdinal}
 \title{JASP Column Types}
 \usage{
 jaspScale(x = double())
@@ -12,6 +15,12 @@ jaspScale(x = double())
 isJaspScale(x)
 
 asJaspScale(x, ...)
+
+jaspOrdinal(x = integer(), values = sort(unique(x)), labels = values)
+
+isJaspOrdinal(x)
+
+asJaspOrdinal(x, ...)
 }
 \arguments{
 \item{x}{the main object for which the operation is done}

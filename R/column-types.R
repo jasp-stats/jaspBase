@@ -1,6 +1,6 @@
 #' @name column-types
 #' @rdname column-types
-#' @importFrom vctrs vec_ptype2 vec_cast vec_ptype_abbr
+#' @importFrom vctrs vec_ptype2 vec_cast vec_ptype_abbr obj_print_footer
 #' @title JASP Column Types
 #'
 #' @description Columns types in JASP.
@@ -79,3 +79,97 @@ vec_cast.double.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.doubl
 vec_cast.jaspScale.integer <- function(x, to, ...) jaspScale(x)
 #' @export
 vec_cast.integer.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
+
+
+newJaspOrdinal <- function(x = integer(), values = integer(), labels = character()) {
+  if (!rlang::is_integer(x) || !rlang::is_integer(values) || !rlang::is_character(labels)) {
+    rlang::abort("`x` and `values` must be integer vectors, `labels` must be a character vector.")
+  }
+
+  if (!all(x %in% values)) {
+    rlang::abort("`values` must be a superset of `x`.")
+  }
+
+  if (length(values) != length(labels)) {
+    rlangs::abort("`values` and `labels` must be of equal length.")
+  }
+
+  vctrs::new_vctr(x, values = values, labels = labels, class = "jaspOrdinal")
+}
+
+#' @rdname column-types
+#' @export
+jaspOrdinal <- function(x = integer(), values = sort(unique(x)), labels = values) {
+  x <- vctrs::vec_cast(x, integer())
+  values <- vctrs::vec_cast(values, integer())
+  labels <- as.character(labels)
+
+  newJaspOrdinal(x, values, labels)
+}
+
+#' @rdname column-types
+#' @export
+isJaspOrdinal <- function(x) {
+  inherits(x, "jaspOrdinal")
+}
+
+#' @export
+vec_ptype_abbr.jaspOrdinal <- function(x, ...) {
+  return("jspOrd")
+}
+
+#' @export
+format.jaspOrdinal <- function(x, ...) {
+  values <- attr(x, "values")
+  labels <- attr(x, "labels")
+  x <- vctrs::vec_data(x)
+
+
+  valid <- !is.na(x)
+
+  out        <- rep(NA_character_, vctrs::vec_size(x))
+  out[valid] <- sprintf("%s(%i)", labels[values[x[valid]]], x[valid])
+
+  return(out)
+}
+
+#' @export
+obj_print_footer.jaspOrdinal <- function(x, ...) {
+  val <- attr(x, "values")
+  lab <- attr(x, "labels")
+
+  out <- paste(sprintf("%s(%i)", lab, val), collapse = " < ")
+  cat("Labels(Values):", out)
+}
+
+#' @rdname column-types
+#' @export
+asJaspOrdinal <- function(x, ...) {
+  vctrs::vec_cast(x, newJaspOrdinal())
+}
+
+
+
+## Coercion
+#' @export
+vec_ptype2.jaspOrdinal.jaspOrdinal <- function(x, y, ...) newJaspOrdinal()
+#' @export
+vec_ptype2.jaspOrdinal.double <- function(x, y, ...) numeric()
+#' @export
+vec_ptype2.double.jaspOrdinal <- function(x, y, ...) numeric()
+#' @export
+vec_ptype2.jaspOrdinal.integer <- function(x, y, ...) numeric()
+#' @export
+vec_ptype2.integer.jaspOrdinal <- function(x, y, ...) numeric()
+
+## Casting
+#' @export
+vec_cast.jaspOrdinal.jaspOrdinal <- function(x, to, ...) x
+#' @export
+vec_cast.jaspOrdinal.double <- function(x, to, ...) jaspOrdinal(x, ...)
+#' @export
+vec_cast.double.jaspOrdinal <- function(x, to, ...) vctrs::vec_data(x) |> as.double()
+#' @export
+vec_cast.jaspOrdinal.integer <- function(x, to, ...) jaspOrdinal(x, ...)
+#' @export
+vec_cast.integer.jaspOrdinal <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
