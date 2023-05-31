@@ -8,6 +8,9 @@
 \alias{jaspOrdinal}
 \alias{isJaspOrdinal}
 \alias{asJaspOrdinal}
+\alias{jaspNominal}
+\alias{isJaspNominal}
+\alias{asJaspNominal}
 \title{JASP Column Types}
 \usage{
 jaspScale(x = double())
@@ -21,6 +24,12 @@ jaspOrdinal(x = integer(), values = sort(unique(x)), labels = values)
 isJaspOrdinal(x)
 
 asJaspOrdinal(x, ...)
+
+jaspNominal(x = integer(), values = sort(unique(x)), labels = values)
+
+isJaspNominal(x)
+
+asJaspNominal(x, ...)
 }
 \arguments{
 \item{x}{the main object for which the operation is done}
