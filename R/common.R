@@ -592,7 +592,7 @@ jaspResultsStrings <- function() {
 
 .setSeedJASP <- function(options) {
 
-  if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
+  if (is.list(options) && all(c("setSeed", "seed") %in% names(options))) {
     if (isTRUE(options[["setSeed"]]))
       set.seed(options[["seed"]])
   } else {
@@ -604,8 +604,8 @@ jaspResultsStrings <- function() {
 }
 
 .getSeedJASP <- function(options) {
-  
-  if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
+
+  if (is.list(options) && all(c("setSeed", "seed") %in% names(options))) {
     if (isTRUE(options[["setSeed"]]))
       return(options[["seed"]])
   } else {
@@ -816,7 +816,7 @@ rewriteImages <- function(name, ppi, imageBackground) {
     jaspResultsCPP$send()
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
   })
-  
+
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
   registerFonts()
 
