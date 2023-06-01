@@ -69,3 +69,10 @@ void jaspReport::convertFromJSON_SetFields(Json::Value in)
 	_totalWarnings	= in.get("warnings",		0).		asUInt();
 }
 
+void	jaspReport::totalWarningsInc() 	
+{ 
+	if(_report) 
+		_warningIndex = _totalWarnings++; 	
+
+	//std::cerr << toString() << ( _report ? " is report" : " is info") << " and warningIndex=" << _warningIndex << " while _totalWarnings is now: " << _totalWarnings << std::endl;
+}

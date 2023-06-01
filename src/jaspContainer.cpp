@@ -350,12 +350,10 @@ void jaspContainer::letChildrenRun()
 
 void jaspContainer::completeChildren()
 {
-
-	jaspReport::totalWarningsClear();
-
-	for(auto keyval : _data)
+	//Go in order, otherwise reports are topnotified in the wrong order
+	for(const auto & key : getSortedDataFields())
 	{
-		jaspObject * obj = keyval.second;
+		jaspObject * obj = _data[key];
 
 		switch(obj->getType())
 		{

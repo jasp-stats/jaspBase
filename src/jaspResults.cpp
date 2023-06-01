@@ -175,6 +175,7 @@ bool jaspResults::lastWriteWorked() const
 
 void jaspResults::complete()
 {
+	jaspReport::totalWarningsClear();
 	completeChildren();
 
 	_oldResults = nullptr; //It will get destroyed in DestroyAllAllocatedObjects

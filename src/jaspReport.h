@@ -27,7 +27,7 @@ public:
 	bool			_report;
 
 	static	void	totalWarningsClear() { _totalWarnings = 0; 	}
-			void	totalWarningsInc() 	{ if(_report) _warningIndex = _totalWarnings++; 	}
+			void	totalWarningsInc();
 
 private:
 	size_t			_warningIndex = 0;
