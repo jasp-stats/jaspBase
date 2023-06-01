@@ -79,7 +79,13 @@ vec_cast.double.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.doubl
 vec_cast.jaspScale.integer <- function(x, to, ...) jaspScale(x)
 #' @export
 vec_cast.integer.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
-
+#' @export
+vec_cast.jaspScale.ordered <- function(x, to, ...) jaspScale(as.numeric(as.character(x)))
+#' @export
+vec_cast.ordered.jaspScale <- function(x, to, ...) {
+  print("hallo1")
+  vctrs::vec_data(x) |> as.ordered()
+}
 
 # jaspOrdinal ----
 newJaspOrdinal <- function(x = integer(), values = integer(), labels = character()) {
@@ -87,15 +93,11 @@ newJaspOrdinal <- function(x = integer(), values = integer(), labels = character
     rlang::abort("`x` and `values` must be integer vectors, `labels` must be a character vector.")
   }
 
-  if (!all(x %in% values)) {
-    rlang::abort("`values` must be a superset of `x`.")
-  }
-
-  if (length(values) != length(labels)) {
-    rlangs::abort("`values` and `labels` must be of equal length.")
-  }
-
-  vctrs::new_vctr(x, values = values, labels = labels, class = "jaspOrdinal")
+  ord <- ordered(x, levels = values, labels = labels)
+  attr(ord, "values") <- values
+  class(ord) <- c("jaspOrdinal", "vctrs_vctr", class(ord))
+  return(ord)
+  #vctrs::new_vctr(ordered(x, levels = values, labels = labels), values = values, class = "jaspOrdinal")
 }
 
 #' @rdname column-types
@@ -121,15 +123,14 @@ vec_ptype_abbr.jaspOrdinal <- function(x, ...) {
 
 #' @export
 format.jaspOrdinal <- function(x, ...) {
-  values <- attr(x, "values")
-  labels <- attr(x, "labels")
+  labels <- attr(x, "levels")
   x <- vctrs::vec_data(x)
 
 
   valid <- !is.na(x)
 
   out        <- rep(NA_character_, vctrs::vec_size(x))
-  out[valid] <- sprintf("%s(%i)", labels[values[x[valid]]], x[valid])
+  out[valid] <- labels[x[valid]]
 
   return(out)
 }
@@ -137,7 +138,7 @@ format.jaspOrdinal <- function(x, ...) {
 #' @export
 obj_print_footer.jaspOrdinal <- function(x, ...) {
   val <- attr(x, "values")
-  lab <- attr(x, "labels")
+  lab <- attr(x, "levels")
 
   out <- paste(sprintf("%s(%i)", lab, val), collapse = " < ")
   cat("Labels(Values):", out)
@@ -165,14 +166,28 @@ vec_ptype2.integer.jaspOrdinal <- function(x, y, ...) numeric()
 #' @export
 vec_cast.jaspOrdinal.jaspOrdinal <- function(x, to, ...) x
 #' @export
-vec_cast.jaspOrdinal.double <- function(x, to, ...) jaspOrdinal(x, ...)
+vec_cast.jaspOrdinal.double <- function(x, to, ...) jaspOrdinal(x)
 #' @export
-vec_cast.double.jaspOrdinal <- function(x, to, ...) vctrs::vec_data(x) |> as.double()
+vec_cast.double.jaspOrdinal <- function(x, to, ...) {
+  values <- attr(x, "values")
+  x <- vctrs::vec_data(x)
+  as.double(values[x])
+}
 #' @export
-vec_cast.jaspOrdinal.integer <- function(x, to, ...) jaspOrdinal(x, ...)
+vec_cast.jaspOrdinal.integer <- function(x, to, ...) jaspOrdinal(x)
 #' @export
-vec_cast.integer.jaspOrdinal <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
-
+vec_cast.integer.jaspOrdinal <- function(x, to, ...) {
+  vec_cast.double.jaspOrdinal(x, to, ...) |> as.integer()
+}
+#' @export
+vec_cast.jaspOrdinal.ordered <- function(x, to, ...) jaspOrdinal(x)
+#' @export
+vec_cast.ordered.jaspOrdinal <- function(x, to, ...) {
+  print("hole!")
+  attr(x, "values") <- NULL
+  class(x) <- c("ordered", "factor")
+  return(x)
+}
 
 # jaspNominal ----
 newJaspNominal <- function(x = integer(), values = integer(), labels = character()) {
