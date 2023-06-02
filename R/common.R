@@ -640,7 +640,7 @@ jaspResultsStrings <- function() {
 #' @export
 .getSeedJASP <- function(options) {
 
-  if (is.list(options) && c("setSeed", "seed") %in% names(options)) {
+  if (is.list(options) && all(c("setSeed", "seed") %in% names(options))) {
     if (isTRUE(options[["setSeed"]]))
       return(options[["seed"]])
   } else {
