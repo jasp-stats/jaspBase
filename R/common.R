@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#' @importFrom stats na.omit
+
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
@@ -168,7 +170,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     returnThis <- finishJaspResults(jaspResultsCPP)
 
     json <- try({ toJSON(returnThis) })
-    if (class(json) == "try-error")
+    if (isTryError(json))
       return(paste("{ \"status\" : \"error\", \"results\" : { \"error\" : 1, \"errorMessage\" : \"", "Unable to jsonify", "\" } }", sep=""))
     else
       return(json)
@@ -386,7 +388,7 @@ isTryError <- function(obj){
 
     new.dataset <- dataset[rows.to.keep,]
 
-    if (class(new.dataset) != "data.frame") {   # HACK! if only one column, R turns it into a factor (because it's stupid)
+    if (!is.data.frame(new.dataset)) {   # HACK! if only one column, R turns it into a factor (because it's stupid)
 
       dataset <- na.omit(dataset)
 
@@ -493,7 +495,7 @@ jaspResultsStrings <- function() {
   if (exists(x)) {
     obj <- eval(parse(text = x))
   } else {
-    location <- getAnywhere(x)
+    location <- utils::getAnywhere(x)
     if (length(location[["objs"]]) == 0) {
       stop(paste0("Could not locate ",x," in environment (.fromRCPP)"))
     }
@@ -653,9 +655,9 @@ jaspResultsStrings <- function() {
 .suppressGrDevice <- function(plotFunc) {
   plotFunc <- substitute(plotFunc)
   tmpFile <- tempfile()
-  png(tmpFile)
+  grDevices::png(tmpFile)
   on.exit({
-    dev.off()
+    grDevices::dev.off()
     if (file.exists(tmpFile))
       file.remove(tmpFile)
   })
@@ -687,14 +689,14 @@ saveImage <- function(plotName, format, height, width)
 
       # Get file size in inches by creating a mock file and closing it
       pngMultip <- .fromRCPP(".ppi") / 96
-      png(
+      grDevices::png(
         filename = "dpi.png",
         width = width * pngMultip,
         height = height * pngMultip,
         res = 72 * pngMultip
       )
-      insize <- dev.size("in")
-      dev.off()
+      insize <- grDevices::dev.size("in")
+      grDevices::dev.off()
 
       # Where available use the cairo devices, because:
       # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
@@ -781,7 +783,7 @@ saveImage <- function(plotName, format, height, width)
       } else {
         plot(plt)
       }
-      dev.off()
+      grDevices::dev.off()
 
     })
 

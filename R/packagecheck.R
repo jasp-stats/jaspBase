@@ -400,7 +400,7 @@
 {
   expected                <- .expectedPackages()
   expected.package.names  <- expected[,1]
-	installed               <- installed.packages()
+	installed               <- utils::installed.packages()
 	installed.package.names <- dimnames(installed)[[1]]
 	messages                <- c()
 

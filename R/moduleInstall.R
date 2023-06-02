@@ -253,7 +253,7 @@ getFileFromModule <- function(modulePkg, filename) {
 
     #The archive contains a folder first, which has the name of the package, which we could or could not guess here.
     #lets just look at all the files
-    files <- untar(tarfile=modulePkg, list=TRUE)
+    files <- utils::untar(tarfile=modulePkg, list=TRUE)
     found <- endsWith(files, filename)
 
     if(!any(found))
@@ -262,7 +262,7 @@ getFileFromModule <- function(modulePkg, filename) {
     #this will only work properly if the requested file is in there only once but for things like DESCRIPTION that should be no problem
     filename <- files[found]
 
-    untar(tarfile=modulePkg, files=filename, exdir=temp)
+    utils::untar(tarfile=modulePkg, files=filename, exdir=temp)
     hereItGoes <- file.path(temp, filename)
   }
 
@@ -312,7 +312,7 @@ renv_diagnostics_packages_as_df <- function(project) {
 libraryMatchesLockfile <- function(project = NULL) {
   project <- renv:::renv_project_resolve(project)
   df      <- renv_diagnostics_packages_as_df(project)
-  notNA   <- which(complete.cases(df[, c("Library", "Lockfile")]))
+  notNA   <- which(stats::complete.cases(df[, c("Library", "Lockfile")]))
   idxDiff <- which(df[notNA, "Library"] != df[notNA, "Lockfile"])
   hasDiff <- length(idxDiff) > 0L
 

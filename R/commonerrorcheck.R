@@ -36,9 +36,9 @@
   if (! is.null(sys.calls()) && length(sys.calls()) >= 9) {
 
     stack <- sys.calls()
-    stack <- head(stack[7:length(stack)], -2)
+    stack <- utils::head(stack[7:length(stack)], -2)
     if (length(stack) > 10) {
-      stack <- tail(stack, 10)
+      stack <- utils::tail(stack, 10)
     }
 
   }
@@ -541,7 +541,7 @@
   vars <- NULL
   # if not already a correlation matrix
   if (! all(diag(dataset) == 1)) {
-    dataset <- cov2cor(dataset)
+    dataset <- stats::cov2cor(dataset)
   }
   idx <- which(lower.tri(dataset, diag = FALSE), arr.ind = TRUE) # index for the lower triangle of the matrix
   bad <- (1 - abs(dataset[idx])) <= sqrt(.Machine$double.eps)    # check if correlations are awfully close to -1 or 1

@@ -82,7 +82,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   plot2draw <- decodeplot(plot)
 
   openGrDevice(file = relativePathpng, width = width, height = height, res = 72 * (ppi / 96), background = backgroundColor)#, dpi = ppi)
-  on.exit(dev.off(), add = TRUE)
+  on.exit(grDevices::dev.off(), add = TRUE)
 
   if (ggplot2::is.ggplot(plot2draw) || inherits(plot2draw, c("gtable", "gTree"))) {
 
@@ -95,9 +95,9 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
     if (is.function(plot2draw) && !isRecordedPlot) {
 
-      if (obj) dev.control('enable') # enable plot recording
+      if (obj) grDevices::dev.control('enable') # enable plot recording
       eval(plot())
-      if (obj) plot2draw <- recordPlot() # save plot to R object
+      if (obj) plot2draw <- grDevices::recordPlot() # save plot to R object
 
     } else if (isRecordedPlot) { # function was called from editImage to resize the plot
 
@@ -268,7 +268,7 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   if (!exists(name) || !is.function(obj)) {
 
     if ("jasptools" %in% loadedNamespaces())
-      return(getFromNamespace(name, asNamespace("jasptools")))
+      return(utils::getFromNamespace(name, asNamespace("jasptools")))
     return(get(name, .GlobalEnv)) # works for both JASP and jaspTools
   }
 
