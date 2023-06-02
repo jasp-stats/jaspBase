@@ -1,0 +1,243 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: jaspBase 0.15\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
+"PO-Revision-Date: 2022-10-26 00:31+0000\n"
+"Last-Translator: fedder <fedor.derish@gmail.com>\n"
+"Language-Team: Russian <https://hosted.weblate.org/projects/jasp/jaspbase/ru/"
+">\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.14.2-dev\n"
+
+msgid "<em>Note.</em>"
+msgstr "<em>Примечание.</em>"
+
+msgid "no plot object was found"
+msgstr "графический объект был найден"
+
+msgid "The following problem(s) occurred while running the analysis:"
+msgstr "При выполнении анализа возникли следующие проблемы:"
+
+msgid "after grouping on %s"
+msgstr "после группировки по %s"
+
+msgid ""
+"This analysis terminated unexpectedly. %s To receive assistance with this "
+"problem, please report the message above at: https://jasp-stats.org/bug-"
+"reports"
+msgstr ""
+"Этот анализ неожиданно завершился. %s Чтобы получить помощь в решении этой "
+"проблемы, сообщите о сообщении выше по адресу: https://jasp-stats.org/bug-"
+"reports"
+
+msgid "Infinity found in %s"
+msgstr "Найдена непрерывность в %s"
+
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "Количество уровней фактора: %1$s в %2$s"
+
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "Дисперсия в %1$s равна %2$s"
+
+msgid "Number of observations is %1$s in %2$s"
+msgstr "Количество наблюдений: %1$s в %2$s"
+
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr ""
+"Невозможно надежно вычислить статистику: количество наблюдений %1$s в %2$s"
+
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "Значения в %1$s вне интервала [%2$s, %3$s]"
+
+msgid ""
+"Dataset is not a proper variance-covariance matrix. Please load only a "
+"positive definite symmetrical matrix as your dataset."
+msgstr ""
+"Набор данных не является правильной матрицей дисперсии-ковариации. В "
+"качестве набора данных загружайте только положительно определенную "
+"симметричную матрицу."
+
+msgid ""
+"The variance-covariance matrix of the supplied data is not positive-"
+"definite. Please check if variables have many missings observations or are "
+"collinear"
+msgstr ""
+"Матрица дисперсии-ковариации предоставленных данных не является положительно "
+"определенной. Пожалуйста, проверьте, есть ли у переменных много "
+"отсутствующих наблюдений или они коллинеарны"
+
+msgid ""
+"Main effects and lower-order interactions must be included whenever the "
+"corresponding higher-order interaction is included"
+msgstr ""
+"Основные эффекты и взаимодействия более низкого порядка должны быть включены "
+"всякий раз, когда включается соответствующее взаимодействие более высокого "
+"порядка"
+
+msgid "Negative numbers found in %s"
+msgstr "Отрицательные числа найдены в %s"
+
+msgid "Missing values encountered in %s"
+msgstr "Отсутствующие значения обнаружены в %s"
+
+msgid "Duplicate variables encountered in %s"
+msgstr "Повторяющиеся переменные обнаружены в %s"
+
+msgid ""
+"Over %s%% of the rows consist entirely of missing values. Please remove "
+"these rows from the data set if you wish to continue."
+msgstr ""
+"Более %s%% строк полностью состоят из пропущенных значений. Если вы хотите "
+"продолжить, удалите эти строки из набора данных."
+
+msgid ""
+"Levene's test is significant (p < .05), suggesting a violation of the equal "
+"variance assumption"
+msgstr ""
+"Значение критерия Ливиня статистически значимо (p < 0,05), что "
+"свидетельствует о нарушении предположения об однородности (гомогенности)"
+
+msgid ""
+"Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
+"maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
+"log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgstr ""
+"Максимальное значение <em>p</em> критерия Вовк-Селлке: исходя из значения "
+"<em>p</em>, максимально возможные шансы в пользу H%1$s над H%2$s равны 1/ (-"
+"e <em>p</em> log(<em>p</em>)) для <em>p</em> %3$s .37 (Sellke, Bayarri, & "
+"Berger, 2001)."
+
+msgid "Proportions tested against value: %s"
+msgstr "Пропорции проверены на соответствие значению: %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"less than %s"
+msgstr "По результатам всех статистических критериев доля оказалась меньше %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"greater than %s"
+msgstr "По результатам всех статистических критериев доля больше, чем %s"
+
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Не удалось найти сообщение для класса %1$s и ввести %2$s"
+
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "Было вызвано registerFonts, но resultFont не существует!"
+
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "В .fromRCPP указан недопустимый тип, ожидаемый символ"
+
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Неизвестный объект RCPP"
+
+#~ msgid "Could not locate"
+#~ msgstr "Не удалось найти"
+
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "в среде (.fromRCPP)"
+
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP был вызван с неверным аргументом."
+
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "Опции аргумента должны быть списком опций из QML."
+
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Убедитесь, что компонент SetSeed{} QML присутствует в файле QML для этого "
+#~ "анализа."
+
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Загрузка моментального снимка графика из другого сеанса с возможными "
+#~ "побочными эффектами или ошибками."
+
+#~ msgid "no jasp plot found"
+#~ msgstr "Не найден график jasp"
+
+#~ msgid "no plot object found"
+#~ msgstr "не найден графический объект"
+
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Эту функцию использовать не следует."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Указан недопустимый тип аргумента"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Указан неизвестный тип проверки: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Отсутствуют обязательные аргументы: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Каждая группирующая переменная должна иметь указанный уровень"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "список modelterms должен содержать именованный элемент `components`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Отсутствует требуемая(ые) замена(ы): \""
+
+#~ msgid "could not clean value"
+#~ msgstr "не удалось очистить значение"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "не удалось создать moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Не удалось воссоздать файл блокировки модуля!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Не удалось удалить временную библиотеку модулей в %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "В вашем модуле отсутствует файл 'DESCRIPTION'!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "В вашем модуле отсутствует 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "В вашем модуле отсутствует каталог «R»!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "В вашем модуле отсутствует каталог «R»!"
+
+#~ msgid "Can't find file '"
+#~ msgstr "Не удается найти файл '"
+
+#~ msgid "' in archive '"
+#~ msgstr "' в архиве '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Your module contains no"
+#~ msgstr "Ваш модуль не содержит"
+
+#~ msgid "file"
+#~ msgstr "файл"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Кэш должен быть в '%s', но он не существует!"
+
+#~ msgid "Expected not-null but got null"
+#~ msgstr "Ожидалось ненулевое значение, но получено нулевое значение"

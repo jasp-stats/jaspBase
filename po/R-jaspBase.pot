@@ -1,79 +1,19 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2021-05-07 13:30\n"
+"Project-Id-Version: jaspBase 0.17.2\n"
+"POT-Creation-Date: 2023-05-13 03:38\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
-
 msgid "<em>Note.</em>"
 msgstr ""
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr ""
-
-msgid "Unknown RCPP object"
-msgstr ""
-
-msgid "Could not locate"
-msgstr ""
-
-msgid "in environment (.fromRCPP)"
-msgstr ""
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ""
-
-msgid "The argument options should be the options list from QML."
-msgstr ""
-
-msgid "Ensure that the SetSeed{} QML component is present in the QML file for this analysis."
-msgstr ""
-
-msgid "Format incorrectly specified"
-msgstr ""
-
-msgid "Loading plot snapshot from a different session with possible side effects or errors."
-msgstr ""
-
-msgid "no jasp plot found"
-msgstr ""
-
-msgid "no plot object found"
-msgstr ""
-
 msgid "no plot object was found"
-msgstr ""
-
-msgid "This function should not be used. In for reference."
-msgstr ""
-
-msgid "Non-valid type argument provided"
-msgstr ""
-
-msgid "Unknown check type provided: \""
-msgstr ""
-
-msgid "\""
-msgstr ""
-
-msgid "Missing required argument(s): \""
-msgstr ""
-
-msgid ","
-msgstr ""
-
-msgid "Each grouping variable must have a level specified"
-msgstr ""
-
-msgid "the modelterms list must contain the named item `components`"
 msgstr ""
 
 msgid "The following problem(s) occurred while running the analysis:"
@@ -88,19 +28,19 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr ""
 
-msgid "Number of factor levels is %s in %s"
+msgid "Number of factor levels is %1$s in %2$s"
 msgstr ""
 
-msgid "The variance in %s is equal to %s"
+msgid "The variance in %1$s is equal to %2$s"
 msgstr ""
 
-msgid "Number of observations is %s in %s"
+msgid "Number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
 
-msgid "Values in %s outside interval [%s, %s]"
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr ""
 
 msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."
@@ -139,41 +79,5 @@ msgstr ""
 msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
 msgstr ""
 
-msgid "Could not find message for class %s and type %s"
-msgstr ""
-
-msgid "Missing required replacement(s): \""
-msgstr ""
-
-msgid "could not clean value"
-msgstr ""
-
-msgid "failed to create moduleLibrary!"
-msgstr ""
-
-msgid "Failed to recreate lock file of module!"
-msgstr ""
-
-msgid "Failed to remove temporary module libary at %s"
-msgstr ""
-
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr ""
-
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
-
-msgid "Your module is missing an 'R' directory!"
-msgstr ""
-
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
-
-msgid "Your module contains no DESCRIPTION file"
-msgstr ""
-
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
-
-msgid "The description contains no data"
+msgid "Could not find message for class %1$s and type %2$s"
 msgstr ""

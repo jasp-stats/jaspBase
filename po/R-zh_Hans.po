@@ -1,0 +1,217 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: jaspBase 0.15\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
+"PO-Revision-Date: 2022-10-29 04:12+0000\n"
+"Last-Translator: Shun Wang <shuonwang@gmail.com>\n"
+"Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
+"jasp/jaspbase/zh_Hans/>\n"
+"Language: zh_Hans\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.14.2-dev\n"
+
+msgid "<em>Note.</em>"
+msgstr "<em>注.</em>"
+
+msgid "no plot object was found"
+msgstr "找不到绘图对象"
+
+msgid "The following problem(s) occurred while running the analysis:"
+msgstr "运行分析时出现以下问题："
+
+msgid "after grouping on %s"
+msgstr "按 %s 分组后"
+
+msgid ""
+"This analysis terminated unexpectedly. %s To receive assistance with this "
+"problem, please report the message above at: https://jasp-stats.org/bug-"
+"reports"
+msgstr ""
+"该分析意外终止。 %s 要获得有关此问题的帮助，请在以下位置报告上述消息："
+"https://jasp-stats.org/bug-reports"
+
+msgid "Infinity found in %s"
+msgstr "在 %s 中发现无穷值"
+
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "%2$s 中的因子水平数 %1$s"
+
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s 中的方差等于 %2$s"
+
+msgid "Number of observations is %1$s in %2$s"
+msgstr "%2$s 中的观测值数量为 %1$s"
+
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "无法可靠地计算统计数据：%2$s中观测值数量为 %1$s"
+
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "%1$s 中的值在区间 [%2$s, %3$s] 之外"
+
+msgid ""
+"Dataset is not a proper variance-covariance matrix. Please load only a "
+"positive definite symmetrical matrix as your dataset."
+msgstr ""
+"数据集不是一个合适的方差-协方差矩阵。请仅加载一个正定对称矩阵( definite "
+"symmetrical matrix)作为您的数据集。"
+
+msgid ""
+"The variance-covariance matrix of the supplied data is not positive-"
+"definite. Please check if variables have many missings observations or are "
+"collinear"
+msgstr ""
+"所提供数据的方差-协方差矩阵不是正定的。请检查变量是否有很多缺失的观测值或是否"
+"共线"
+
+msgid ""
+"Main effects and lower-order interactions must be included whenever the "
+"corresponding higher-order interaction is included"
+msgstr "要分析包含相应的高阶交互作用，就必须包括主效应和低阶交互作用"
+
+msgid "Negative numbers found in %s"
+msgstr "在 %s 中发现负数"
+
+msgid "Missing values encountered in %s"
+msgstr "在 %s 中遇到缺失值"
+
+msgid "Duplicate variables encountered in %s"
+msgstr "在 %s 中遇到重复的变量"
+
+msgid ""
+"Over %s%% of the rows consist entirely of missing values. Please remove "
+"these rows from the data set if you wish to continue."
+msgstr "超过 %s%% 的行完全由缺失值组成。如果您想继续，请从数据集中移除这些行。"
+
+msgid ""
+"Levene's test is significant (p < .05), suggesting a violation of the equal "
+"variance assumption"
+msgstr "Levene 检验显着 (p < .05)，表明违反了等方差假设"
+
+msgid ""
+"Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
+"maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
+"log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgstr ""
+
+msgid "Proportions tested against value: %s"
+msgstr "针对值: %s 进行比例检验"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"less than %s"
+msgstr "对于所有检验，备择假设指定比例小于 %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"greater than %s"
+msgstr "对于所有检验，备择假设指定比例大于 %s"
+
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "找不到类 %1$s 和类型 %2$s 的消息"
+
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "已调用 registerFonts 但 resultFont 不存在！"
+
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "提供给 .fromRCPP 的类型无效，预期是字符型"
+
+#~ msgid "Unknown RCPP object"
+#~ msgstr "未知的 RCPP 对象"
+
+#~ msgid "Could not locate"
+#~ msgstr "无法找到"
+
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "在环境中 (.fromRCPP)"
+
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP 使用了不正确的参数调用。"
+
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "参数 options 应该是来自 QML 的选项列表。"
+
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr "确保此分析的 QML 文件中存在 SetSeed{} QML 组件。"
+
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr "从具有可能的副作用(side effect)或错误的不同会话中加载绘图截图。"
+
+#~ msgid "no jasp plot found"
+#~ msgstr "找不到 JASP 绘图"
+
+#~ msgid "no plot object found"
+#~ msgstr "找不到绘图对象"
+
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "不应被使用此功能，仅供参考。"
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "提供了无效的类型参数"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "提供了未知的检查类型：“"
+
+#~ msgid "\""
+#~ msgstr "”"
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "缺少必要的参数：“"
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "每个分组变量必须指定一个水平"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "modelterms (模型项)列表必须包含命名项`components`"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "缺少必需的替代(replacement)：“"
+
+#~ msgid "could not clean value"
+#~ msgstr "无法清理值"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "moduleLibrary 创建失败！"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "无法重新创建模块的锁定文件！"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "无法移除在 %s 的临时模块库"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "您的模块缺少一个“DESCRIPTION”文件！"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "您的模块缺少 “inst/Description.qml”！"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "您的模块缺少 “R” 目录！"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "您的模块缺少 “inst/qml”目录！"
+
+#~ msgid "Can't find file '"
+#~ msgstr "找不到文件\""
+
+#~ msgid "Your module contains no"
+#~ msgstr "Your module contains no"
+
+#~ msgid "file"
+#~ msgstr "file"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "缓存应该在 “%s”，但它不存在！"
+
+#~ msgid "registerFonts was called but resultsFont does not exist!"
+#~ msgstr "已调用 registerFonts 但 resultsFont 不存在！"

@@ -47,3 +47,16 @@ po/*~
 # OSX files
 *.DS_Store
 Thumbs.db
+
+# build stuff for jaspresults on windows
+src-*
+.*
+!.gitignore
+
+inst/include/jaspColumnEncoder
+src/Makevars
+src/Makevars.win
+
+.Rproj.user
+!.github
+!.Rbuildignore

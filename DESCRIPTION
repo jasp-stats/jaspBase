@@ -1,18 +1,42 @@
 Package: jaspBase
 Type: Package
 Title: JASP Base
-Version: 0.15
+Version: 0.17.2
 Author: JASP Team
 Maintainer: Bruno Boutin <B.Boutin@uva.nl>
 Description: Package contains the JASP Bayesian and Frequentist analyses.
     See <https://jasp-stats.org> for more details.
 License: GPL2+
-Imports: 
-	modules,
-	pkgbuild,
-	renv,
-	remotes, 
-	jsonlite,
-	rjson,
-	Rcpp
-
+Imports:
+  cli,
+  codetools,
+  compiler,
+  ggplot2,
+  grDevices,
+  grid,
+  gridExtra,
+  gridGraphics,
+  jsonlite,
+  lifecycle,
+  methods,
+  modules,
+  officer,
+  pkgbuild,
+  plyr,
+  qgraph,
+  ragg,
+  R6,
+  Rcpp (>= 0.12.14),
+  renv,
+  remotes,
+  rjson,
+  rvg,
+  svglite,
+  systemfonts,
+  withr
+RoxygenNote: 7.2.3
+Roxygen: list(markdown = TRUE)
+Encoding: UTF-8
+LinkingTo: Rcpp
+RcppModules: jaspResults
+NeedsCompilation: yes

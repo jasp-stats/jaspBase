@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2021-05-07 13:30\n"
-"PO-Revision-Date: 2021-03-17 16:18+0000\n"
-"Last-Translator: Johannes Keyser <johanneskeyser@posteo.de>\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
+"PO-Revision-Date: 2022-10-16 10:38+0000\n"
+"Last-Translator: Johannes Keyser <joke@fsfe.org>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/jasp/jaspbase/de/"
 ">\n"
 "Language: de\n"
@@ -12,83 +12,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n==0 ? 0 : n==1 ? 0 : 1;\n"
-"X-Generator: Weblate 4.5.2-dev\n"
-
-msgid "registerFonts was called but resultsFont does not exist!"
-msgstr ""
+"X-Generator: Weblate 4.15-dev\n"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Hinweis.</em>"
 
-msgid "Invalid type supplied to .fromRCPP, expected character"
-msgstr "ungültiger Typ für .fromRCPP, habe einen Buchstaben erwartet"
-
-msgid "Unknown RCPP object"
-msgstr "Unbekanntes RCPP-Objekt"
-
-msgid "Could not locate"
-msgstr "Konnte nicht finden"
-
-msgid "in environment (.fromRCPP)"
-msgstr "in Umgebung (.fromRCPP)"
-
-msgid ".getSeedJASP was called with an incorrect argument."
-msgstr ".getSeedJASP wurde mit einem falschen Argument aufgerufen."
-
-msgid "The argument options should be the options list from QML."
-msgstr "Die Argument-Optionen sollten die Optionsliste von QML sein."
-
-msgid ""
-"Ensure that the SetSeed{} QML component is present in the QML file for this "
-"analysis."
-msgstr ""
-"Stelle sicher, dass die QML-Komponente SetSeed{} in der QML-Datei für diese "
-"Analyse vorhanden ist."
-
-msgid "Format incorrectly specified"
-msgstr "Format falsch angegeben"
-
-msgid ""
-"Loading plot snapshot from a different session with possible side effects or "
-"errors."
-msgstr ""
-"Lade Schnappschuss des Diagramms von einer anderen Sitzung mit potenziellen "
-"Nebenwirkungen oder Fehlern."
-
-msgid "no jasp plot found"
-msgstr "kein JASP-Plot gefunden"
-
-msgid "no plot object found"
-msgstr "kein Plot-Objekt gefunden"
-
 msgid "no plot object was found"
 msgstr "es wurde kein Plot-Objekt gefunden"
-
-msgid "This function should not be used. In for reference."
-msgstr "Diese Funktion sollte nicht verwendet werden. Existiert für Referenz."
-
-msgid "Non-valid type argument provided"
-msgstr "Ungültigen Argumenttyp übergeben"
-
-msgid "Unknown check type provided: \""
-msgstr "Unbekannten Checktyp übergeben: \""
-
-msgid "\""
-msgstr "\""
-
-msgid "Missing required argument(s): \""
-msgstr "Fehlende(s) benötigte(s) Argument(e): \""
-
-msgid ","
-msgstr ","
-
-msgid "Each grouping variable must have a level specified"
-msgstr "Jede Gruppierungsvariable muss eine spezifizierte Stufe haben"
-
-msgid "the modelterms list must contain the named item `components`"
-msgstr ""
-"die Liste der Modellterme muss ein mit `componenten` benanntes Item "
-"beinhalten"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Folgende(s) Problem(e) traten beim Ausführen der Analyse auf:"
@@ -108,28 +38,30 @@ msgstr ""
 msgid "Infinity found in %s"
 msgstr "Unendlichkeit gefunden in %s"
 
-msgid "Number of factor levels is %s in %s"
-msgstr "Anzahl Faktorstufen ist %s in %s"
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "Anzahl Faktorstufen ist %1$s in %2$s"
 
-msgid "The variance in %s is equal to %s"
-msgstr "Die Varianz in %s ist gleich zu %s"
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "Die Varianz in %1$s is equal to %2$s"
 
-msgid "Number of observations is %s in %s"
-msgstr "Anzahl Beobachtungen ist %s in %s"
+msgid "Number of observations is %1$s in %2$s"
+msgstr "Anzahl Beobachtungen ist %1$s in %2$s"
 
-msgid "Cannot compute statistic reliably: number of observations is %s in %s"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
-"Kann Statistik nicht zuverlässig berechnen: Anzahl Beobachtungen ist %s in %s"
+"Kann Statistik nicht zuverlässig berechnen: Anzahl Beobachtungen ist %1$s in "
+"%2$s"
 
-msgid "Values in %s outside interval [%s, %s]"
-msgstr "Werte in %s außerhalb Intervall [%s, %s]"
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "Werte in %1$s außerhalb Intervall [%2$s, %3$s]"
 
 msgid ""
 "Dataset is not a proper variance-covariance matrix. Please load only a "
 "positive definite symmetrical matrix as your dataset."
 msgstr ""
-"Datensatz ist keine korrekte Varianz-Kovarianz-Matrix. Bitte lade nur eine "
-"positiv definite symmetrische Matrix als deinen Datensatz."
+"Datensatz ist keine korrekte Varianz-Kovarianz-Matrix. Bitte laden Sie nur "
+"eine positiv-definite, symmetrische Matrix als Ihren Datensatz."
 
 msgid ""
 "The variance-covariance matrix of the supplied data is not positive-"
@@ -160,8 +92,8 @@ msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
 "these rows from the data set if you wish to continue."
 msgstr ""
-"Über %s%% der Zeilen bestehen vollständig aus fehlenden Werten. Entferne "
-"diese Zeilen aus dem Datensatz, wenn Du fortfahren möchtest."
+"Über %s%% der Zeilen bestehen vollständig aus fehlenden Werten. Bitte "
+"entfernen Sie diese Zeilen aus dem Datensatz, wenn Sie fortfahren möchten."
 
 msgid ""
 "Levene's test is significant (p < .05), suggesting a violation of the equal "
@@ -197,45 +129,130 @@ msgstr ""
 "Bei allen Tests gibt die Alternativhypothese an, dass das Verhältnisgrößer "
 "als %s ist"
 
-msgid "Could not find message for class %s and type %s"
-msgstr "Konnte keine Nachricht für Klasse %s und Typ %s finden"
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Konnte keine Nachricht für Klasse %1$s und Typ %2$s finden"
 
-msgid "Missing required replacement(s): \""
-msgstr "Es fehlen benötigte Ersatzwerte: \""
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFonts wurde aufgerufen, aber resultFont existiert nicht!"
 
-msgid "could not clean value"
-msgstr "konnte den Wert nicht bereinigen"
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "ungültiger Typ für .fromRCPP, habe einen Buchstaben erwartet"
 
-msgid "failed to create moduleLibrary!"
-msgstr ""
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Unbekanntes RCPP-Objekt"
 
-msgid "Failed to recreate lock file of module!"
-msgstr ""
+#~ msgid "Could not locate"
+#~ msgstr "Konnte nicht finden"
 
-msgid "Failed to remove temporary module libary at %s"
-msgstr ""
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "in Umgebung (.fromRCPP)"
 
-#, fuzzy
-msgid "Your module is missing a 'DESCRIPTION' file!"
-msgstr "Dein Modul enthält keine DESCRIPTION-Datei"
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP wurde mit einem falschen Argument aufgerufen."
 
-msgid "Your module is missing 'inst/Description.qml'!"
-msgstr ""
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "Die Argument-Optionen sollten die Optionsliste von QML sein."
 
-msgid "Your module is missing an 'R' directory!"
-msgstr ""
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Stelle sicher, dass die QML-Komponente SetSeed{} in der QML-Datei für "
+#~ "diese Analyse vorhanden ist."
 
-msgid "Your module is missing the 'inst/qml' directory!"
-msgstr ""
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Lade Schnappschuss des Diagramms von einer anderen Sitzung mit "
+#~ "potenziellen Nebenwirkungen oder Fehlern."
 
-msgid "Your module contains no DESCRIPTION file"
-msgstr "Dein Modul enthält keine DESCRIPTION-Datei"
+#~ msgid "no jasp plot found"
+#~ msgstr "kein JASP-Plot gefunden"
 
-msgid "A cache is supposed to be at '%s' but it does not exist!"
-msgstr ""
+#~ msgid "no plot object found"
+#~ msgstr "kein Plot-Objekt gefunden"
 
-msgid "The description contains no data"
-msgstr "Die Beschreibung enthält keine Daten"
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr ""
+#~ "Diese Funktion sollte nicht verwendet werden. Existiert für Referenz."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Ungültigen Argumenttyp übergeben"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Unbekannten Checktyp übergeben: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Fehlende(s) benötigte(s) Argument(e): \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Jede Gruppierungsvariable muss eine spezifizierte Stufe haben"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr ""
+#~ "die Liste der Modellterme muss ein mit `componenten` benanntes Item "
+#~ "beinhalten"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Es fehlen benötigte Ersatzwerte: \""
+
+#~ msgid "could not clean value"
+#~ msgstr "konnte den Wert nicht bereinigen"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "Fehler beim Erstellen von moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Fehler beim Neuerstellen einer Lock-Datei des Moduls!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Fehler beim Entfernen der temporären Modulbibliothek bei %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "Ihr Modul enthält keine 'DESCRIPTION'-Datei!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "Ihrem Modul fehlt 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "Ihrem Modul fehlt ein 'R'-Verzeichnis!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "Ihrem Modul fehlt das Verzeichnis 'inst/qml'!"
+
+#~ msgid "Can't find file '"
+#~ msgstr "Nicht auffindbare Datei '"
+
+#~ msgid "' in archive '"
+#~ msgstr "' im Achiv '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Your module contains no"
+#~ msgstr "Ihr Modul enthält kein"
+
+#~ msgid "file"
+#~ msgstr "Datei"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "Es sollte ein Cache bei '%s' sein, existiert aber nicht!"
+
+#~ msgid "Expected not-null but got null"
+#~ msgstr "Not-null erwartet, aber null erhalten"
+
+#~ msgid "Format incorrectly specified"
+#~ msgstr "Format falsch angegeben"
+
+#~ msgid "The description contains no data"
+#~ msgstr "Die Beschreibung enthält keine Daten"
 
 #~ msgid ""
 #~ "No items to show, please add a results description or set init to true"
@@ -322,9 +339,6 @@ msgstr "Die Beschreibung enthält keine Daten"
 #~ msgstr ""
 #~ "Versuche die Spalten des Datensatzes zu lesen, einige Optionen scheinen "
 #~ "zu fehlen: '"
-
-#~ msgid "'"
-#~ msgstr "'"
 
 #~ msgid "Provide a numeric value to the progress updater"
 #~ msgstr "Übergib der Fortschrittsanzeige eine Zahl"

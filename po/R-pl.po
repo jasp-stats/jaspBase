@@ -1,0 +1,250 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: jaspBase 0.15\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
+"PO-Revision-Date: 2022-12-03 03:38+0000\n"
+"Last-Translator: Tomasz Misiuro <tomaszmisiuro@gmail.com>\n"
+"Language-Team: Polish <https://hosted.weblate.org/projects/jasp/jaspbase/pl/"
+">\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.15-dev\n"
+
+msgid "<em>Note.</em>"
+msgstr "<em>Uwaga.</em>"
+
+msgid "no plot object was found"
+msgstr "nie znaleziono wykresu"
+
+msgid "The following problem(s) occurred while running the analysis:"
+msgstr "Podczas wykonywania analizy wystąpił następujący problem(y):"
+
+msgid "after grouping on %s"
+msgstr "po pogrupowaniu wg %s"
+
+msgid ""
+"This analysis terminated unexpectedly. %s To receive assistance with this "
+"problem, please report the message above at: https://jasp-stats.org/bug-"
+"reports"
+msgstr ""
+"Nieoczekiwane zakończenie analizy. %s Aby uzyskać pomoc w rozwiązaniu tego "
+"problemu, należy zgłosić powyższy komunikat na stronie: https://jasp-stats."
+"org/bug-reports"
+
+msgid "Infinity found in %s"
+msgstr "W %s znaleziono wartości nieskończone"
+
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "Liczba poziomów czynnika w %2$s wynosi %1$s"
+
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "Wariancja w %1$s jest równa %2$s"
+
+msgid "Number of observations is %1$s in %2$s"
+msgstr "Liczba obserwacji w %2$s wynosi %1$s"
+
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr ""
+"Nie można wiarygodnie obliczyć statystyki: liczba obserwacji w %2$s wynosi "
+"%1$s"
+
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "Wartości w %1$s są poza przedziałem [%2$s, %3$s]"
+
+msgid ""
+"Dataset is not a proper variance-covariance matrix. Please load only a "
+"positive definite symmetrical matrix as your dataset."
+msgstr ""
+"Zbiór danych nie jest prawidłową macierzą wariancji-kowariancji. Jako zbiór "
+"danych należy wczytać dodatnio określoną macierz symetryczną."
+
+msgid ""
+"The variance-covariance matrix of the supplied data is not positive-"
+"definite. Please check if variables have many missings observations or are "
+"collinear"
+msgstr ""
+"Macierz wariancji-kowariancji dla dostarczonych danych nie jest określona "
+"dodatnia. Możliwe, że zmienne zawierają wiele braków danych lub występuje "
+"współliniowość"
+
+msgid ""
+"Main effects and lower-order interactions must be included whenever the "
+"corresponding higher-order interaction is included"
+msgstr ""
+"Efekty główne i interakcyjne niższego rzędu muszą być uwzględnione zawsze, "
+"gdy uwzględniona jest odpowiadająca im interakcja wyższego rzędu"
+
+msgid "Negative numbers found in %s"
+msgstr "W %s znaleziono liczby ujemne"
+
+msgid "Missing values encountered in %s"
+msgstr "W %s napotkano braki danych"
+
+msgid "Duplicate variables encountered in %s"
+msgstr "W %s napotkano powtórzone zmienne"
+
+msgid ""
+"Over %s%% of the rows consist entirely of missing values. Please remove "
+"these rows from the data set if you wish to continue."
+msgstr ""
+"Ponad %s%% wierszy składa się wyłącznie z braków danych. Usuń te wiersze ze "
+"zbioru danych jeśli chcesz kontynuować."
+
+msgid ""
+"Levene's test is significant (p < .05), suggesting a violation of the equal "
+"variance assumption"
+msgstr ""
+"Test Levene'a jest istotny statystycznie (p < .05), co sugeruje naruszenie "
+"założenia o równości wariancji"
+
+msgid ""
+"Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
+"maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
+"log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgstr ""
+"Maksymalna wartość <em>p</em> Vovka-Sellkego: Na podstawie wartości <em>p</"
+"em> maksymalne możliwe szanse na korzyść H%1$s nad H%2$s wynoszą 1/(-e "
+"<em>p</em> log(<em>p</em>)) dla <em>p</em> %3$s .37 (Sellke, Bayarri i "
+"Berger, 2001)."
+
+msgid "Proportions tested against value: %s"
+msgstr "Proporcje testowane względem wartości: %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"less than %s"
+msgstr ""
+"Dla każdego z testów hipoteza alternatywna wskazuje, że proporcja jest "
+"mniejsza niż %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"greater than %s"
+msgstr ""
+"Dla każdego z testów hipoteza alternatywna wskazuje, że proporcja jest "
+"większa niż %s"
+
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "Nie można znaleźć wiadomości dla klasy %1$s i typu %2$s"
+
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "registerFonts został wywołany, ale resultFont nie istnieje!"
+
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "Nieprawidłowy typ dostarczony do .fromRCPP; oczekiwano typ znakowy"
+
+#~ msgid "Unknown RCPP object"
+#~ msgstr "Nieznany obiekt RCPP"
+
+#~ msgid "Could not locate"
+#~ msgstr "Nie można zlokalizować"
+
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "w środowisku (.fromRCPP)"
+
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP został wywołany z nieprawidłowym argumentem."
+
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "Opcje argumentów powinny być listą opcji z QML."
+
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr ""
+#~ "Upewnij się, że komponent SetSeed{} Komponent QML jest obecny w pliku QML "
+#~ "dla tej analizy."
+
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr ""
+#~ "Ładowanie wykresów z innej sesji może być obarczone efektami ubocznymi "
+#~ "lub błędami."
+
+#~ msgid "no jasp plot found"
+#~ msgstr "nie znaleziono wykresu jasp"
+
+#~ msgid "no plot object found"
+#~ msgstr "nie znaleziono wykresu"
+
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "Ta funkcja nie powinna być używana."
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "Podano nieprawidłowy argument typu"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "Podano nieznany typ kontroli: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "Brak wymaganego argumentu(ów): \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "Każda zmienna grupująca musi mieć określony poziom"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr ""
+#~ "lista modelterms musi zawierać element `components` posiadający nazwę"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "Brak wymaganego zamiennika(ów): \""
+
+#~ msgid "could not clean value"
+#~ msgstr "nie można wyczyścić wartości"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "nie udało się utworzyć moduleLibrary!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "Nie udało się odtworzyć pliku blokady modułu!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "Nie udało się usunąć tymczasowej biblioteki modułów w %s"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "W wybranym module brakuje pliku 'DESCRIPTION'!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "W wybranym module brakuje pliku 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "W wybranym module brakuje katalogu 'R'!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "W wybranym module brakuje katalogu 'inst/qml'!"
+
+#~ msgid "Can't find file '"
+#~ msgstr "Nie można znaleźć pliku '"
+
+#~ msgid "' in archive '"
+#~ msgstr "' w archiwum '"
+
+#~ msgid "'"
+#~ msgstr "'"
+
+#~ msgid "Your module contains no"
+#~ msgstr "Wybrany moduł nie zawiera"
+
+#~ msgid "file"
+#~ msgstr "plik"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr ""
+#~ "Pamięć podręczna powinna znajdować się w '%s', ale nie została "
+#~ "odnaleziona!"
+
+#~ msgid "Expected not-null but got null"
+#~ msgstr ""
+#~ "Oczekiwano odpowiedzi w postaci wartości, ale otrzymano brak wartości"

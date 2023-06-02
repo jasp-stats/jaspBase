@@ -15,31 +15,43 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#' @export
 .v <- function(x, ...) {
-  if (.automaticColumnEncDecoding)
-    x
-  else
-    encodeColNames(x, ...)
+  lifecycle::deprecate_warn(
+    "0.15",
+    "jaspBase::.v()",
+    "jaspBase::encodeColNames()",
+    details = "JASP handles encoding automatically. If you are sure you want to encode column names manually, use `jaspBase::encodeColNames()`. The call to `.v()` has no effect anymore and should be removed."
+  )
+  x
 }
 
+#' @export
 .unv <- function(x, ...) {
-  if (.automaticColumnEncDecoding)
-    x
-  else
-    decodeColNames(x, ...)
+  lifecycle::deprecate_warn(
+    "0.15",
+    "jaspBase::.unv()",
+    "jaspBase::decodeColNames()",
+    details = "JASP handles decoding automatically. If you are sure you want to decode column names manually, use `jaspBase::decodeColNames()`. The call to `.unv()` has no effect anymore and should be removed."
+  )
+  x
 }
 
+#' @export
 interactionSymbol <- "\u2009\u273B\u2009"
 base::Encoding(interactionSymbol) <- "UTF-8"
 
+#' @export
 gsubInteractionSymbol <- function(x, ...) {
   UseMethod("gsubInteractionSymbol", x)
 }
 
+#' @export
 gsubInteractionSymbol.list <- function(x, how = "replace", ...) {
   rapply(x, gsubInteractionSymbol, classes = "character", how = how, ...)
 }
 
+#' @export
 gsubInteractionSymbol.character <- function(x, ...) {
   # assumes the input consists of encoded column names, which never contain ':'
   gsub(":", interactionSymbol, x, fixed = TRUE, ...)

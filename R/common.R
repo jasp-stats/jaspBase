@@ -14,11 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+
+#' @importFrom stats na.omit
+
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
+# This is a temporary fix
+# TODO: remove it when R will solve this problem!
+gettextf <- function(fmt, ..., domain = NULL)  {
+  return(sprintf(gettext(fmt, domain = domain), ...))
+}
+
 loadJaspResults <- function(name) {
-  jaspResultsModule$create_cpp_jaspResults(name, .retrieveState())
+  create_cpp_jaspResults(name, .retrieveState())
 }
 
 finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
@@ -48,12 +57,27 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
   return(returnThis)
 }
 
+
+sendFatalErrorMessage <- function(name, title, msg)
+{
+  jaspResultsCPP        <- loadJaspResults(name)
+  jaspResultsCPP$title  <- title
+
+  jaspResultsCPP$setErrorMessage(msg, "fatalError")
+  jaspResultsCPP$send()
+}
+
+
+#' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
+  # resets jaspGraphs::graphOptions & options after this function finishes
+  setOptionsCleanupHook()
 
-  if (identical(.Platform$OS.type, "windows"))
-    compiler::enableJIT(0)
+  # let's disable this for now
+  # if (identical(.Platform$OS.type, "windows"))
+  #   compiler::enableJIT(0)
 
-  suppressWarnings(RNGkind(sample.kind = "Rounding"))  # R 3.6.0 changed its rng; this ensures that for the time being the results do not change
+  setLegacyRng()
 
   jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
@@ -69,7 +93,14 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     location              <- .fromRCPP(".requestStateFileNameNative")
     oldwd                 <- getwd()
     setwd(location$root)
-    on.exit(setwd(oldwd))
+    withr::defer(setwd(oldwd))
+  }
+
+  if (! jaspResultsCalledFromJasp()) {
+    .numDecimals        <- 3
+    .fixedDecimals      <- FALSE
+    .normalizedNotation <- TRUE
+    .exactPValues       <- FALSE
   }
 
   analysis    <- eval(parse(text=functionCall))
@@ -80,9 +111,8 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     dataset <- do.call(.readDataSetToEnd, cols)
   }
 
-  registerFonts()
-  oldGraphOptions <- jaspGraphs::graphOptions()
-  on.exit(jaspGraphs::graphOptions(oldGraphOptions), add = TRUE)
+  # ensure an analysis always starts with a clean hashtable of computed jasp Objects
+  emptyRecomputed()
 
   analysisResult <-
     tryCatch(
@@ -90,6 +120,30 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
+
+  if (!jaspResultsCalledFromJasp()) {
+
+    if (inherits(analysisResult, "error")) {
+
+      if (inherits(analysisResult, "validationError")) {
+        errorStatus  <- "validationError"
+        errorMessage <- analysisResult$message
+      } else {
+        errorStatus  <- "fatalError"
+        error        <- .sanitizeForJson(analysisResult)
+        stackTrace   <- .sanitizeForJson(analysisResult$stackTrace)
+        stackTrace   <- paste(stackTrace, collapse="<br><br>")
+        errorMessage <- .generateErrorMessage(type=errorStatus, error=error, stackTrace=stackTrace)
+      }
+
+      jaspResultsCPP$setErrorMessage(errorMessage, errorStatus)
+      jaspResultsCPP$send()
+
+    }
+
+    finishJaspResults(jaspResultsCPP)
+    return(jaspResults)
+  }
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
     jaspResultsCPP$send()
@@ -116,7 +170,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     returnThis <- finishJaspResults(jaspResultsCPP)
 
     json <- try({ toJSON(returnThis) })
-    if (class(json) == "try-error")
+    if (isTryError(json))
       return(paste("{ \"status\" : \"error\", \"results\" : { \"error\" : 1, \"errorMessage\" : \"", "Unable to jsonify", "\" } }", sep=""))
     else
       return(json)
@@ -124,6 +178,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 }
 
 registerFonts <- function() {
+  # This gets called by JASPEngine when settings changes and on `initEnvironment`
 
   if (requireNamespace("ragg") && requireNamespace("systemfonts")) {
 
@@ -135,18 +190,18 @@ registerFonts <- function() {
     # systemfonts::register_font(fontName, normalizePath(fontFile))
     # jaspGraphs::setGraphOption("family", fontName)
 
-    if (exists(".resultsFont"))
-      jaspGraphs::setGraphOption("family", .resultsFont)
+    if (exists(".resultFont"))
+      jaspGraphs::setGraphOption("family", .resultFont)
     else
-      warning("registerFonts was called but resultsFont does not exist!")
+      warning("registerFonts was called but resultFont does not exist!")
 
   } else {
     print("R packages 'ragg' and/ or 'systemfonts' are unavailable, falling back to R's default fonts.")
   }
 }
 
+#' @export
 initEnvironment <- function() {
-#Sys.setlocale("LC_CTYPE", "UTF-8") let's change the environment only in one place! EngineSync::startSlaveProcess
   packages <- c("BayesFactor") # Add any package that needs pre-loading
 
   if (identical(.Platform$OS.type, "windows"))
@@ -169,49 +224,6 @@ checkPackages <- function() {
   toJSON(.checkPackages())
 }
 
-checkLavaanModel <- function(model, availableVars) {
-  # function returns informative printable string if there is an error, else ""
-  if (model == "") return("Enter a model")
-
-  # translate to base64 - function from semsimple.R
-  vvars <- .v(availableVars)
-  usedvars <- .getUsedVars(model, vvars);
-  vmodel <- .translateModel(model, usedvars);
-
-  unvvars <- availableVars
-  names(unvvars) <- vvars
-
-
-
-  # Check model syntax
-  parsed <- try(lavaan::lavParseModelString(vmodel, TRUE), silent = TRUE)
-  if (inherits(parsed, "try-error")) {
-    msg <- attr(parsed, "condition")$message
-    if (msg == "NA/NaN argument") {
-      return("Enter a model")
-    }
-    return(stringr::str_replace_all(msg, unvvars))
-  }
-
-  # Check variable names
-  if (!missing(availableVars)) {
-    latents <- unique(parsed[parsed$op == "=~",]$lhs)
-    modelVars <- setdiff(unique(c(parsed$lhs, parsed$rhs)), latents)
-    modelVars <- modelVars[modelVars != ""] # e.g., x1 ~ 1 yields an empty rhs entry
-
-    modelVarsInAvailableVars <- (modelVars %in% vvars)
-    if (!all(modelVarsInAvailableVars)) {
-      notRecognized <- modelVars[!modelVarsInAvailableVars]
-      return(paste("Variable(s) in model syntax not recognized:",
-                   paste(stringr::str_replace_all(notRecognized, unvvars),
-                         collapse = ", ")))
-    }
-  }
-
-  # if checks pass, return empty string
-  return("")
-}
-
 .sanitizeForJson <- function(obj) {
   # Removes elements that are not translatable to json
   #
@@ -228,17 +240,18 @@ checkLavaanModel <- function(model, availableVars) {
   return(str)
 }
 
+#' @export
 isTryError <- function(obj){
-    if (is.list(obj)){
-        return(any(sapply(obj, function(obj) {
-            inherits(obj, "try-error")
-        }))
-        )
-    } else {
-        return(any(sapply(list(obj), function(obj){
-            inherits(obj, "try-error")
-        })))
-    }
+  if (is.list(obj)){
+    return(any(sapply(obj, function(obj) {
+      inherits(obj, "try-error")
+    }))
+    )
+  } else {
+    return(any(sapply(list(obj), function(obj){
+      inherits(obj, "try-error")
+    })))
+  }
 }
 
 .readDataSetCleanNAs <- function(cols) {
@@ -249,6 +262,7 @@ isTryError <- function(obj){
   return(cols);
 }
 
+#' @export
 .readDataSetToEnd <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
 
   columns              <- .readDataSetCleanNAs(columns)
@@ -266,6 +280,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .readDataSetHeader <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
 
   columns              <- .readDataSetCleanNAs(columns)
@@ -281,6 +296,7 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .vdf <- function(df, columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
   new.df <- NULL
   namez <- NULL
@@ -349,7 +365,7 @@ isTryError <- function(obj){
   if (is.null(new.df))
     return (data.frame())
 
-  names(new.df) <- .v(namez)
+  names(new.df) <- namez
 
   new.df <- .excludeNaListwise(new.df, exclude.na.listwise)
 
@@ -362,7 +378,7 @@ isTryError <- function(obj){
 
     rows.to.exclude <- c()
 
-    for (col in .v(exclude.na.listwise))
+    for (col in exclude.na.listwise)
       rows.to.exclude <- c(rows.to.exclude, which(is.na(dataset[[col]])))
 
     rows.to.exclude <- unique(rows.to.exclude)
@@ -372,7 +388,7 @@ isTryError <- function(obj){
 
     new.dataset <- dataset[rows.to.keep,]
 
-    if (class(new.dataset) != "data.frame") {   # HACK! if only one column, R turns it into a factor (because it's stupid)
+    if (!is.data.frame(new.dataset)) {   # HACK! if only one column, R turns it into a factor (because it's stupid)
 
       dataset <- na.omit(dataset)
 
@@ -385,12 +401,13 @@ isTryError <- function(obj){
   dataset
 }
 
+#' @export
 .shortToLong <- function(dataset, rm.factors, rm.vars, bt.vars, dependentName = "dependent", subjectName = "subject") {
 
   f  <- rm.factors[[length(rm.factors)]]
   df <- data.frame(factor(unlist(f$levels), unlist(f$levels)))
 
-  names(df) <- .v(f$name)
+  names(df) <- f$name
 
   row.count <- dim(df)[1]
 
@@ -416,12 +433,12 @@ isTryError <- function(obj){
     cells <- factor(cells, unlist(f$levels))
 
     df <- cbind(cells, df)
-    names(df)[[1]] <- .v(f$name)
+    names(df)[[1]] <- f$name
 
     i <- i - 1
   }
 
-  ds <- subset(dataset, select=.v(rm.vars))
+  ds <- subset(dataset, select=rm.vars)
   ds <- t(as.matrix(ds))
 
   dependentDf <- data.frame(x = as.numeric(c(ds)))
@@ -430,9 +447,9 @@ isTryError <- function(obj){
 
   for (bt.var in bt.vars) {
 
-    cells <- rep(dataset[[.v(bt.var)]], each=row.count)
+    cells <- rep(dataset[[bt.var]], each=row.count)
     new.col <- list()
-    new.col[[.v(bt.var)]] <- cells
+    new.col[[bt.var]] <- cells
 
     df <- cbind(df, new.col)
   }
@@ -453,6 +470,7 @@ jaspResultsStrings <- function() {
   gettext("<em>Note.</em>")
 }
 
+#' @export
 .fromRCPP <- function(x, ...) {
 
   if (length(x) != 1 || ! is.character(x)) {
@@ -477,7 +495,7 @@ jaspResultsStrings <- function() {
   if (exists(x)) {
     obj <- eval(parse(text = x))
   } else {
-    location <- getAnywhere(x)
+    location <- utils::getAnywhere(x)
     if (length(location[["objs"]]) == 0) {
       stop(paste0("Could not locate ",x," in environment (.fromRCPP)"))
     }
@@ -526,13 +544,23 @@ jaspResultsStrings <- function() {
   state
 }
 
+#' @export
 .extractErrorMessage <- function(error) {
+  stopifnot(length(error) == 1)
 
-  split <- base::strsplit(as.character(error), ":")[[1]]
-  last <- split[[length(split)]]
-  stringr::str_trim(last)
+  if (isTryError(error)) {
+    msg <- attr(error, "condition")$message
+    return(trimws(msg))
+  } else if (is.character(error)){
+    split <- base::strsplit(error, ":")[[1]]
+    last <- split[[length(split)]]
+    return(trimws(last))
+  } else {
+    stop("Do not know what to do with an object of class `", class(error)[1], "`; The class of the `error` object should be `try-error` or `character`!", domain = NA)
+  }
 }
 
+#' @export
 .recodeBFtype <- function(bfOld, newBFtype = c("BF10", "BF01", "LogBF10"), oldBFtype = c("BF10", "BF01", "LogBF10")) {
 
   # Arguments:
@@ -551,6 +579,7 @@ jaspResultsStrings <- function() {
   else                          {	if (newBFtype == "BF10") { return(exp(bfOld)); } else { return(1 / exp(bfOld));	} } # log(BF10)
 }
 
+#' @export
 .parseAndStoreFormulaOptions <- function(jaspResults, options, names) {
   for (i in seq_along(names)) {
     name <- names[[i]]
@@ -567,22 +596,26 @@ jaspResultsStrings <- function() {
   return(options)
 }
 
+#' @export
 .parseRCodeInOptions <- function(option) {
   if (.RCodeInOptionsIsOk(option)) {
-     if (length(option) > 1L)
-        return(eval(parse(text = option[[1L]])))
-     else
-        return(eval(parse(text = option)))
-     }
+    if (length(option) > 1L)
+      return(eval(parse(text = option[[1L]])))
+    else
+      return(eval(parse(text = option)))
+  }
   else
     return(NA)
 }
 
+#' @export
 .RCodeInOptionsIsOk <- function(option) UseMethod(".RCodeInOptionsIsOk", option)
 
+#' @export
 .RCodeInOptionsIsOk.default <- function(option)
   return (length(option) == 1L) || (length(option) > 1L && identical(option[[2L]], "T"))
 
+#' @export
 .RCodeInOptionsIsOk.list <- function(option) {
   for (i in seq_along(option))
     if (!.RCodeInOptionsIsOk(option[[i]]))
@@ -590,6 +623,7 @@ jaspResultsStrings <- function() {
   return(TRUE)
 }
 
+#' @export
 .setSeedJASP <- function(options) {
 
   if (is.list(options) && all(c("setSeed", "seed") %in% names(options))) {
@@ -603,6 +637,7 @@ jaspResultsStrings <- function() {
   }
 }
 
+#' @export
 .getSeedJASP <- function(options) {
 
   if (is.list(options) && all(c("setSeed", "seed") %in% names(options))) {
@@ -616,23 +651,17 @@ jaspResultsStrings <- function() {
 }
 
 # PLOT RELATED FUNCTION ----
+#' @export
 .suppressGrDevice <- function(plotFunc) {
   plotFunc <- substitute(plotFunc)
   tmpFile <- tempfile()
-  png(tmpFile)
+  grDevices::png(tmpFile)
   on.exit({
-    dev.off()
+    grDevices::dev.off()
     if (file.exists(tmpFile))
       file.remove(tmpFile)
   })
   eval(plotFunc, parent.frame())
-}
-
-openGrDevice <- function(...) {
-  #if (jaspResultsCalledFromJasp())
-  #  svglite::svglite(...)
-  #else
-  grDevices::png(..., type = ifelse(Sys.info()["sysname"] == "Darwin", "quartz", "cairo"))
 }
 
 # not .saveImage() because RInside (interface to CPP) cannot handle that
@@ -660,18 +689,18 @@ saveImage <- function(plotName, format, height, width)
 
       # Get file size in inches by creating a mock file and closing it
       pngMultip <- .fromRCPP(".ppi") / 96
-      png(
+      grDevices::png(
         filename = "dpi.png",
         width = width * pngMultip,
         height = height * pngMultip,
         res = 72 * pngMultip
       )
-      insize <- dev.size("in")
-      dev.off()
+      insize <- grDevices::dev.size("in")
+      grDevices::dev.off()
 
-      # Even though OSX is usually cairo able, the cairo devices should not be used as plot fonts are not scaled well.
-      # On the other hand, Windows should use a cairo (eps/pdf) device as the standard devices use a wrong R_HOME for some reason.
-      # Consequently on Windows you will get encoding/font errors because the devices cannot find their resources.
+      # Where available use the cairo devices, because:
+      # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
+      # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
       if (capabilities("aqua"))
         type <- "quartz"
       else if (capabilities("cairo"))
@@ -697,14 +726,13 @@ saveImage <- function(plotName, format, height, width)
       } else if (format == "tiff") {
 
         hiResMultip <- 300 / 72
-        grDevices::tiff(
+        ragg::agg_tiff(
           filename    = relativePath,
           width       = width * hiResMultip,
           height      = height * hiResMultip,
           res         = 300,
-          bg          = backgroundColor,
-          compression = "lzw",
-          type        = type
+          background  = backgroundColor,
+          compression = "lzw"
         )
 
       } else if (format == "pdf") {
@@ -724,18 +752,26 @@ saveImage <- function(plotName, format, height, width)
       } else if (format == "png") {
 
         # Open graphics device and plot
-        grDevices::png(
-          filename = relativePath,
-          width    = width * pngMultip,
-          height   = height * pngMultip,
-          bg       = backgroundColor,
-          res      = 72 * pngMultip,
-          type     = type
+        ragg::agg_png(
+          filename   = relativePath,
+          width      = width * pngMultip,
+          height     = height * pngMultip,
+          background = backgroundColor,
+          res        = 72 * pngMultip
         )
+
+      } else if (format == "svg") {
+
+        # convert width & height from pixels to inches. ppi = pixels per inch. 72 is a magic number inherited from the past.
+        # originally, this number was 96 but svglite scales this by (72/96 = 0.75). 0.75 * 96 = 72.
+        # for reference see https://cran.r-project.org/web/packages/svglite/vignettes/scaling.html
+        width  <- width  / 72
+        height <- height / 72
+        svglite::svglite(file = relativePath, width = width, height = height)
 
       } else { # add optional other formats here in "else if"-statements
 
-        stop("Format incorrectly specified")
+        stop("Unknown image format '", format, "'", domain = NA)
 
       }
 
@@ -747,7 +783,7 @@ saveImage <- function(plotName, format, height, width)
       } else {
         plot(plt)
       }
-      dev.off()
+      grDevices::dev.off()
 
     })
 
@@ -769,8 +805,15 @@ saveImage <- function(plotName, format, height, width)
   # adapted from https://github.com/dreamRs/esquisse/blob/626cbe584f43a6a13a6d5cce3192fcf912e08cb0/R/ggplot_to_ppt.R#L64
   ppt <- officer::read_pptx()
   ppt <- officer::add_slide(ppt, layout = "Title and Content", master = "Office Theme")
-  # plot.ggplot == print.ggplot but print.qgraph doesn't plot anything whereas plot.qgraph does so we use plot
-  ppt <- officer::ph_with(ppt, rvg::dml(code = plot(plt)), location = officer::ph_location_type(type = "body"))
+
+  value <- if (inherits(plt, "jaspGraphsPlot") && ("newpage" %in% methods::formalArgs(plt$plotFunction))) {
+    # fixes https://github.com/jasp-stats/jasp-issues/issues/1910, officer cannot handle `newpage = true` (which is necessary for other plot types)
+    rvg::dml(code = plot(plt, newpage = FALSE))
+  } else {
+    rvg::dml(code = plot(plt))
+  }
+
+  ppt <- officer::ph_with(ppt, value, location = officer::ph_location_type(type = "body"))
   print(ppt, target = relativePath) # officer:::print.rpptx
 }
 
@@ -783,9 +826,9 @@ saveImage <- function(plotName, format, height, width)
     #@jeroenooms
     for (i in 1:length(rec_plot[[1]]))
       if ('NativeSymbolInfo' %in% class(rec_plot[[1]][[i]][[2]][[1]]))
-          rec_plot[[1]][[i]][[2]][[1]] <- getNativeSymbolInfo(rec_plot[[1]][[i]][[2]][[1]]$name)
+        rec_plot[[1]][[i]][[2]][[1]] <- getNativeSymbolInfo(rec_plot[[1]][[i]][[2]][[1]]$name)
   } else
-  #@jjallaire
+    #@jjallaire
     for (i in 1:length(rec_plot[[1]]))
     {
       symbol <- rec_plot[[1]][[i]][[2]][[1]]
@@ -818,7 +861,7 @@ rewriteImages <- function(name, ppi, imageBackground) {
   })
 
   oldPlots <- jaspResultsCPP$getPlotObjectsForState()
-  registerFonts()
+
 
   for (i in seq_along(oldPlots)) {
     try({
@@ -906,6 +949,8 @@ editImage <- function(name, optionsJson) {
         # ensures the JSON response matches the plot
         width  <- oldWidth
         height <- oldHeight
+      } else {
+        jaspPlotCPP$resizedByUser <- TRUE
       }
 
     } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
@@ -942,7 +987,8 @@ editImage <- function(name, optionsJson) {
       width    = width,
       height   = height,
       revision = revision,
-      error    = FALSE
+      error    = FALSE,
+      editOptions = jaspGraphs::plotEditingOptions(plot)
     )
   )
 
@@ -958,3 +1004,27 @@ editImage <- function(name, optionsJson) {
   return(toJSON(response))
 }
 
+registerData <- function(data) {
+   #TODO
+}
+
+checkAnalysisOptions <- function(analysisName, options, version) {
+  # TODO when QMLComponents can be linked to jaspBase
+  return(options)
+}
+
+#' @export
+runWrappedAnalysis <- function(analysisName, data, options, version) {
+  if (jaspResultsCalledFromJasp()) {
+
+    result <- list("options" = options, "analysis" = analysisName, "version" = version)
+    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+    return(as.character(result))
+
+  } else {
+
+    options <- checkAnalysisOptions(analysisName, options, version)
+    return(jaspTools::runAnalysis(analysisName, data, options))
+
+  }
+}

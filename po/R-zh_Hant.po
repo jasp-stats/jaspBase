@@ -1,0 +1,208 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: jaspBase 0.15\n"
+"POT-Creation-Date: 2022-12-17 03:40\n"
+"PO-Revision-Date: 2022-12-31 15:07+0000\n"
+"Last-Translator: Sau-chin Chen <pmsp96@gmail.com>\n"
+"Language-Team: Chinese (Traditional) <https://hosted.weblate.org/projects/"
+"jasp/jaspbase/zh_Hant/>\n"
+"Language: zh_Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.15.1-dev\n"
+
+msgid "<em>Note.</em>"
+msgstr "<em> 附註 </em>"
+
+msgid "no plot object was found"
+msgstr "找不到繪圖物件"
+
+msgid "The following problem(s) occurred while running the analysis:"
+msgstr "進行分析時出現以下問題:"
+
+msgid "after grouping on %s"
+msgstr "根據 %s 分群後"
+
+msgid ""
+"This analysis terminated unexpectedly. %s To receive assistance with this "
+"problem, please report the message above at: https://jasp-stats.org/bug-"
+"reports"
+msgstr ""
+"分析無預期停止。 %s 若要獲得協助修正錯誤，請將錯誤訊息回報到JASP網站 https"
+"://jasp-stats.org/bug-reports"
+
+msgid "Infinity found in %s"
+msgstr "%s 出現無限值"
+
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "在 %1$s 的因素個數為 %2$s"
+
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s 的變異量為 %2$s"
+
+msgid "Number of observations is %1$s in %2$s"
+msgstr "在 %1$s 的樣本數為 %2$s"
+
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "無法計算穩定的統計數: 因為在 %1$s 的樣本數為 %2$s"
+
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "%1$s 裡有數值在 [%2$s, %3$s] 此區間之外"
+
+msgid ""
+"Dataset is not a proper variance-covariance matrix. Please load only a "
+"positive definite symmetrical matrix as your dataset."
+msgstr "資料的變異數-共變數矩陣有問題。上傳資料必須為對稱的正定矩陣。"
+
+msgid ""
+"The variance-covariance matrix of the supplied data is not positive-"
+"definite. Please check if variables have many missings observations or are "
+"collinear"
+msgstr "資料的變異數-共變數矩陣非正定.請檢查資料是否有許多遺漏值或共線性"
+
+msgid ""
+"Main effects and lower-order interactions must be included whenever the "
+"corresponding higher-order interaction is included"
+msgstr "分析高階交互作用時，模式中須包含其所有主要效果與所有低階交互作用"
+
+msgid "Negative numbers found in %s"
+msgstr "在 %s 中發現負值"
+
+msgid "Missing values encountered in %s"
+msgstr "在 %s 中發現遺漏值"
+
+msgid "Duplicate variables encountered in %s"
+msgstr "在 %s 中發現重複的變數"
+
+msgid ""
+"Over %s%% of the rows consist entirely of missing values. Please remove "
+"these rows from the data set if you wish to continue."
+msgstr "超過 %s%%的資料其整列皆為遺漏值。若想繼續分析，請刪除這些資料。"
+
+msgid ""
+"Levene's test is significant (p < .05), suggesting a violation of the equal "
+"variance assumption"
+msgstr "Levene 考驗達顯著 (p < .05), 表示變異數相同之假設不成立"
+
+msgid ""
+"Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
+"maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
+"log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgstr ""
+"Vovk-Sellke Maximum <em>p</em>- 比率: 根據 <em>p</em>-值, H%1$s 對 H%2$s勝率"
+"比為1/(-e <em>p</em> log(<em>p</em>)), 此時 <em>p</em> %3$s .37 (Sellke, "
+"Bayarri, & Berger, 2001)."
+
+msgid "Proportions tested against value: %s"
+msgstr "假設檢驗之比例為: %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"less than %s"
+msgstr "所有考驗中，對立假設為比例低於 %s"
+
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"greater than %s"
+msgstr "所有考驗中，對立假設為比例高於 %s"
+
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "無法找到 %1$s 群與 %2$s類的訊息"
+
+#~ msgid "registerFonts was called but resultFont does not exist!"
+#~ msgstr "此字型不存在!"
+
+#~ msgid "Invalid type supplied to .fromRCPP, expected character"
+#~ msgstr "用於.fromRCPP的字體類型無效"
+
+#~ msgid "Unknown RCPP object"
+#~ msgstr "未知的 RCPP 物件"
+
+#~ msgid "Could not locate"
+#~ msgstr "找不到該物件"
+
+#~ msgid "in environment (.fromRCPP)"
+#~ msgstr "在環境中 (.fromRCPP)"
+
+#~ msgid ".getSeedJASP was called with an incorrect argument."
+#~ msgstr ".getSeedJASP 收到錯誤指令。"
+
+#~ msgid "The argument options should be the options list from QML."
+#~ msgstr "此指定設定應在QML的設定選單中。"
+
+#~ msgid ""
+#~ "Ensure that the SetSeed{} QML component is present in the QML file for "
+#~ "this analysis."
+#~ msgstr "請確認 SetSeed{} QML 元件在此分析的 QML 檔案中。"
+
+#~ msgid ""
+#~ "Loading plot snapshot from a different session with possible side effects "
+#~ "or errors."
+#~ msgstr "從其他分析歷程中載入圖表截圖時可能出現一些問題。"
+
+#~ msgid "no jasp plot found"
+#~ msgstr "找不到 JASP 圖"
+
+#~ msgid "no plot object found"
+#~ msgstr "找不到繪圖物件"
+
+#~ msgid "This function should not be used. In for reference."
+#~ msgstr "不可使用此功能，輸入「In」來 查找參考資料。"
+
+#~ msgid "Non-valid type argument provided"
+#~ msgstr "未提供有效引數"
+
+#~ msgid "Unknown check type provided: \""
+#~ msgstr "未知的檢查類型: \""
+
+#~ msgid "\""
+#~ msgstr "\""
+
+#~ msgid "Missing required argument(s): \""
+#~ msgstr "缺少必要的引數: \""
+
+#~ msgid ","
+#~ msgstr ","
+
+#~ msgid "Each grouping variable must have a level specified"
+#~ msgstr "每個分群變項需要有明確的群組"
+
+#~ msgid "the modelterms list must contain the named item `components`"
+#~ msgstr "模式選單需要包括所指名的 '元件'"
+
+#~ msgid "Missing required replacement(s): \""
+#~ msgstr "缺乏所需的替代數"
+
+#~ msgid "could not clean value"
+#~ msgstr "無法清除數值"
+
+#~ msgid "failed to create moduleLibrary!"
+#~ msgstr "無法建立模組函式庫!"
+
+#~ msgid "Failed to recreate lock file of module!"
+#~ msgstr "無法重新建立模組的鎖定檔案!"
+
+#~ msgid "Failed to remove temporary module libary at %s"
+#~ msgstr "無法移除在 %s 的臨時模組函式庫"
+
+#~ msgid "Your module is missing a 'DESCRIPTION' file!"
+#~ msgstr "模組缺少'描述' 檔!"
+
+#~ msgid "Your module is missing 'inst/Description.qml'!"
+#~ msgstr "模組缺少 'inst/Description.qml'!"
+
+#~ msgid "Your module is missing an 'R' directory!"
+#~ msgstr "模組缺少'R' 目錄!"
+
+#~ msgid "Your module is missing the 'inst/qml' directory!"
+#~ msgstr "模組缺少'inst/qml' 目錄!"
+
+#, fuzzy
+#~ msgid "Your module contains no"
+#~ msgstr "模組缺少描述檔"
+
+#~ msgid "A cache is supposed to be at '%s' but it does not exist!"
+#~ msgstr "缺少 '%s' 的快取!"

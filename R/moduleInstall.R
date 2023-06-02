@@ -1,27 +1,56 @@
 postInstallFixes <- function(folderToFix) {
-  if(length(ls(all.names=TRUE,pattern="\\..postProcessLibraryModule")) > 0 ) #We seem to be running in JASP
+  if(length(ls(all.names=TRUE,pattern="\\.postProcessLibraryModule")) > 0 ) #We seem to be running in JASP (but this won't be used because renv starts a separate R process)
   {
     #print("we are *in* jasp, so we use .postProcessLibraryModule!")
     .postProcessLibraryModule(folderToFix)
   }
-  else 
+  else
   {
     #We do not have that function available so we will need to start JASPEngine ourselves, but where is it?
+    old_PATH <- Sys.getenv("PATH")
+
+    #sometimes R.dll is not in the path on windows, despite this being called from R...
+    if(getOS() == "windows")
+        Sys.setenv("PATH"=paste(R.home(component='bin'), ';', old_PATH, sep="", collapse=""))
+
     jaspEngineLocation <- Sys.getenv("JASPENGINE_LOCATION", unset = file.path(getwd(), "..", "JASPEngine"))
     jaspEngineCall     <- paste0(jaspEngineLocation, ' "', folderToFix ,'"')
-    #print(paste0("Calling JASPEngine as: '", jaspEngineCall ,"'"))
-    system(jaspEngineCall)
+    #print(paste0("Not *in* JASP so calling JASPEngine as: '", jaspEngineCall ,"'"))
+
+    if(getOS() == "osx")
+      system(jaspEngineCall)
+
+    if(getOS() == "windows")
+        Sys.setenv("PATH"=old_PATH);
   }
 }
 
-installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE) {
+isModulePkgArchive <- function(modulePkg) { return(any(endsWith(modulePkg, c(".tar.gz", ".zip", ".tgz")))) }
+
+#' @export
+installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, force = FALSE, cacheAble=TRUE, frameworkLibrary=NULL) {
+
+  isPkgArchive <- isModulePkgArchive(modulePkg)
+
   assertValidJASPmodule(modulePkg)
+
+  # renv uses the following output without checking for length but assuming it is 1.
+  # if that isnt the case the (module) installation fails obscurely with an error like "Error in if (eval(cond, envir = environment(dot))) return(eval(expr, envir = environment(dot))): the condition has length > 1"
+  cmdConfigCC <- system2(c(renv:::R(),"CMD","config","CC"),stdout=TRUE,stderr=TRUE)
+  if(length(cmdConfigCC) > 1)
+    stop(
+"R CMD config CC returns more than 1 line, this will break renv and thus your install.
+Most likely you are on mac and you should run `xcode-select --install` in a terminal.
+If that doesn't help or you aren't on a mac: feel free to open an issue at https://github.com/jasp-stats/jasp-issues/issues/new/choose
+
+The output was:
+", paste0(cmdConfigCC, collapse="\n"), domain = NA)
 
   r <- getOption("repos")
   r["CRAN"] <- repos
   options(repos = r)
 
-  if (!(force || md5SumsChanged(modulePkg, moduleLibrary))) {
+  if (!isPkgArchive && !(force || md5SumsChanged(modulePkg, moduleLibrary))) {
     moduleName <- getModuleInfo(modulePkg)[["Package"]]
     if (dir.exists(file.path(moduleLibrary, moduleName))) {
       print(sprintf("Nothing changed according to md5sums, not reinstalling %s.", moduleName))
@@ -31,19 +60,24 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     }
   }
 
-  return(
-    pkgbuild::with_build_tools( 
-    {
-      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
-      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg)
-    }, 
-    required=FALSE )
-  )
+  result <- tryCatch({
+    pkgbuild::with_build_tools({
+      if (hasRenvLockFile(modulePkg)) installJaspModuleFromRenv(       modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble)
+      else                            installJaspModuleFromDescription(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, cacheAble=cacheAble, frameworkLibrary=frameworkLibrary)
+    },
+    required = FALSE)
+  }, error = function(e) {
+    if (is.null(e[["output"]])) {
+      stop(e, domain = NA)
+    } else {
+      return(stop(e[["output"]], domain = NA))
+    }
+  })
+
+  return(result)
 }
 
-
-
-installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
+installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), cacheAble=TRUE) {
 
   print(sprintf("Installing module with renv. installJaspModuleFromRenv('%s', c(%s), '%s', '%s', %s)",
                 modulePkg, paste0("'", libPathsToUse, "'", collapse = ", "), moduleLibrary, repos, onlyModPkg))
@@ -62,11 +96,11 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   if (!dir.exists(file.path(moduleLibraryTemp, "renv")))
     dir.create(   file.path(moduleLibraryTemp, "renv"), recursive = TRUE)
 
-  lockFileModule <- file.path(modulePkg,         "renv.lock")
-  lockFileTemp   <- file.path(moduleLibraryTemp, "renv.lock")
+  lockFileModule <- getFileFromModule(modulePkg,  "renv.lock")
+  lockFileTemp   <- file.path(moduleLibraryTemp,  "renv.lock")
   file.copy(from = lockFileModule, to = lockFileTemp, overwrite = TRUE)
 
-  setupRenv(moduleLibrary)
+  setupRenv(moduleLibrary, modulePkg)
 
   # TODO: unclear whether this is necessary within JASP, or just within Rstudio.
   # renv must be unaware of any other libPaths than the cache and the directory designated for the module.
@@ -74,9 +108,9 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   # it does copy those pkg to the cache before symlinking them
   # inspired by https://stackoverflow.com/a/36873741/4917834
   # it does appear to be necessary within rstudio and when the pkgs from jasp-required-files are present in a libPath
-  old.lib.loc <- .libPaths()
-  on.exit(assign(".lib.loc", old.lib.loc,   envir = environment(.libPaths)))
-          assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
+  #old.lib.loc <- .libPaths()
+  #on.exit(assign(".lib.loc", old.lib.loc,   envir = environment(.libPaths)))
+  #        assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
 
 
   lib <- renv::paths[["library"]](project = moduleLibrary)
@@ -89,9 +123,9 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
                 prompt   = prompt)
 
   moduleInfo         <- getModuleInfo(modulePkg)
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, moduleInfo, cacheAble=cacheAble)
 
-  if (correctlyInstalled)
+  if (!isModulePkgArchive(modulePkg) && correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
   renv::snapshot(
@@ -125,7 +159,7 @@ installJaspModuleFromRenv <- function(modulePkg, libPathsToUse, moduleLibrary, r
   return("succes!")
 }
 
-installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive()) {
+installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg, prompt = interactive(), cacheAble=TRUE, frameworkLibrary=NULL) {
 
   print("Installing module with DESCRIPTION file")
 
@@ -138,20 +172,19 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
   if (!dir.exists(file.path(moduleLibraryTemp, "renv")))
     dir.create(file.path(moduleLibraryTemp, "renv"), recursive = TRUE)
 
-  setupRenv(moduleLibrary)
+  setupRenv(moduleLibrary, modulePkg)
 
   # make renv blind for other libPaths
-  old.lib.loc <- .libPaths()
-  on.exit(assign(".lib.loc", old.lib.loc, envir = environment(.libPaths)))
-  assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
+  #old.lib.loc <- .libPaths()
+  #on.exit(assign(".lib.loc", old.lib.loc, envir = environment(.libPaths)))
+  #assign(".lib.loc", moduleLibrary, envir = environment(.libPaths))
 
   # TODO: this is not very efficient because renv::install looks up the remotes on github...
   # there is a better way but it requires us to mess with renv's internals or to be more explicit about pkgs
-  renv::hydrate(library = moduleLibrary, project = modulePkg)
-  renv::install(project = modulePkg, library = moduleLibrary, prompt = prompt)
+  renv::hydrate(library = moduleLibrary, project = modulePkg, sources=c(moduleLibrary, frameworkLibrary))
 
-  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt)
-  if (correctlyInstalled)
+  correctlyInstalled <- installModulePkg(modulePkg, moduleLibrary, prompt, cacheAble=cacheAble)
+  if (!isModulePkgArchive(modulePkg) && correctlyInstalled)
     writeMd5Sums(modulePkg, moduleLibrary)
 
   if (unlink(moduleLibraryTemp, recursive = TRUE)) # 0/ FALSE for success
@@ -161,17 +194,23 @@ installJaspModuleFromDescription <- function(modulePkg, libPathsToUse, moduleLib
 
 }
 
-installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), moduleInfo = NULL) {
+installModulePkg <- function(modulePkg, moduleLibrary, prompt = interactive(), moduleInfo = NULL, cacheAble=TRUE) {
 
   if (is.null(moduleInfo))
     moduleInfo <- getModuleInfo(modulePkg)
-  record <- recordFromModule(modulePkg, moduleInfo)
+  record <- recordFromModule(modulePkg, moduleInfo, cacheAble=cacheAble)
+
+  print(paste0("Im telling renv to install to '", moduleLibrary, "' from '", modulePkg, "' which is a pkg", ifelse(isModulePkgArchive(modulePkg), "archive", "module")))
+
   renv::install(record, library = moduleLibrary, rebuild = TRUE, prompt = prompt)
   TRUE
 
 }
 
 assertValidJASPmodule <- function(modulePkg) {
+
+  if(isModulePkgArchive(modulePkg))
+    return() #Let R and JASP handle it
 
   if (!file.exists(file.path(modulePkg, "DESCRIPTION")))
     stop("Your module is missing a 'DESCRIPTION' file!")
@@ -191,27 +230,50 @@ hasRenvLockFile <- function(modulePkg) {
   return(file.exists(file.path(modulePkg, "renv.lock")))
 }
 
-recordFromModule <- function(modulePkg, moduleInfo) {
+recordFromModule <- function(modulePkg, moduleInfo, cacheAble=TRUE) {
 
   record <- list(list(
     Package   = moduleInfo[["Package"]],
     Version   = moduleInfo[["Version"]],
     Path      = modulePkg,
     Source    = "Local",
-    Cacheable = TRUE
+    Cacheable = cacheAble
   ))
   names(record) <- moduleInfo[["Package"]]
 
   return(record)
 }
 
+getFileFromModule <- function(modulePkg, filename) {
+  hereItGoes <- file.path(modulePkg, filename)
+
+  if(isModulePkgArchive(modulePkg))
+  {
+    temp <- tempdir()
+
+    #The archive contains a folder first, which has the name of the package, which we could or could not guess here.
+    #lets just look at all the files
+    files <- utils::untar(tarfile=modulePkg, list=TRUE)
+    found <- endsWith(files, filename)
+
+    if(!any(found))
+      stop(paste0("Can't find file '", filename, "' in archive '", modulePkg, "'"))
+
+    #this will only work properly if the requested file is in there only once but for things like DESCRIPTION that should be no problem
+    filename <- files[found]
+
+    utils::untar(tarfile=modulePkg, files=filename, exdir=temp)
+    hereItGoes <- file.path(temp, filename)
+  }
+
+    if (!file.exists(hereItGoes))
+      stop(paste("Your module contains no ",filename," file"))
+
+  return(hereItGoes)
+}
+
 getModuleInfo <- function(modulePkg) {
-  pkgDescr <- file.path(modulePkg, "DESCRIPTION")
-  if (!file.exists(pkgDescr))
-    stop("Your module contains no DESCRIPTION file")
-
-  return(read.dcf(file.path(modulePkg, "DESCRIPTION"))[1, ])
-
+  return(read.dcf(getFileFromModule(modulePkg, "DESCRIPTION"))[1, ])
 }
 
 renv_diagnostics_packages_as_df <- function(project) {
@@ -224,7 +286,7 @@ renv_diagnostics_packages_as_df <- function(project) {
                  names(recdeps))
 
   renv:::renv_scope_locale(category = "LC_COLLATE", locale = "C")
-  
+
   all                        <- sort(unique(all))
   deps                       <- rep.int(NA_character_, length(all))
   names(deps)                <- all
@@ -250,7 +312,7 @@ renv_diagnostics_packages_as_df <- function(project) {
 libraryMatchesLockfile <- function(project = NULL) {
   project <- renv:::renv_project_resolve(project)
   df      <- renv_diagnostics_packages_as_df(project)
-  notNA   <- which(complete.cases(df[, c("Library", "Lockfile")]))
+  notNA   <- which(stats::complete.cases(df[, c("Library", "Lockfile")]))
   idxDiff <- which(df[notNA, "Library"] != df[notNA, "Lockfile"])
   hasDiff <- length(idxDiff) > 0L
 
@@ -258,11 +320,12 @@ libraryMatchesLockfile <- function(project = NULL) {
     print("Found the following mismatches between Library and the lockfile!")
     print(df[notNA[idxDiff], ])
   }
-   
+
   return(!hasDiff)
 }
 
-addRenvBeforeAfterDispatch <- function() { 
+#' @export
+addRenvBeforeAfterDispatch <- function() {
 
   renBeforeAfterInstallStruct <- structure(list(
     before.install = function(x) {
@@ -270,20 +333,20 @@ addRenvBeforeAfterDispatch <- function() {
       #print(sprintf("Path = %s", mget("path", envir = parent.frame(1),
       #                                ifnotfound = "unknown path")))
       0 #do nothing
-    }, 
-    
-    after.install = function(x) 
+    },
+
+    after.install = function(x)
     {
       installPath <- mget("installpath", envir = parent.frame(1), ifnotfound = "unknown")
 
-      if(installPath != "unknown") 
+      if(installPath != "unknown")
       {
         print(sprintf("Installed %s to '%s', now running post install fixes.", x, installPath))
         postInstallFixes(installPath)
-      } 
+      }
       else
         print(sprintf("Installing %s did not work immediately, but renv might still look at remotes for this.", x))
-                                      
+
     }),
     class = "renvInstallHookOverride"
   )
@@ -291,11 +354,12 @@ addRenvBeforeAfterDispatch <- function() {
   options(renv.install.package.options = renBeforeAfterInstallStruct)
 }
 
+#' @export
 `[[.renvInstallHookOverride` <- function(x, ...) {
   return(unclass(x))
 }
 
-setupRenv <- function(moduleLibrary) {
+setupRenv <- function(moduleLibrary, modulePkg) {
 
   # renv adds e.g,. "R-3.6/x86_64-pc-linux-gnu" to all paths (R-version/os) and we don't need that
   assignFunctionInPackage(
@@ -304,9 +368,13 @@ setupRenv <- function(moduleLibrary) {
     package = "renv"
   )
 
+  # renv_package_find crashes when package is base.
+  # for some terrible reason, people explicitly do base:: even though this isn't necessary.
+  renv::settings$ignored.packages(project = modulePkg, value = "base", persist = FALSE)
+
   cachePaths <- strsplit(Sys.getenv("RENV_PATHS_CACHE"), .Platform$path.sep)
 
-  for(cachePath in cachePaths)
+  for(cachePath in cachePaths[[1]]) #strsplit is vectorized but we only give it a single string, so index to that single first one
     if (!dir.exists(cachePath))
      stop(sprintf("A cache is supposed to be at '%s' but it does not exist!", cachePath))
 
@@ -316,130 +384,11 @@ setupRenv <- function(moduleLibrary) {
   for(name in names(renv::paths))
     print(sprintf("%s:%s%s", name, paste0(rep(" ", 12 - nchar(name)), collapse=""), renv::paths[[name]]()))
 
-  options(install.opts = "--no-docs --no-test-load"); #make sure we do not do a test-load, because this will not work on mac. the rpaths still need to be fixed
+  options(install.opts = "--no-multiarch --no-docs --no-test-load"); #make sure we do not do a test-load, because this will not work on mac. the rpaths still need to be fixed
 
   #Try to nudge renv towards installing binaries when possible
-   if(getOS() == "windows" || getOS() == "osx")
-    options(pkgType = "binary");
-  
+  if(getOS() == "windows" || getOS() == "osx")
+    options(install.packages.compile.from.source = "never")
+
   addRenvBeforeAfterDispatch()
-}
-
-installJaspModuleFromDescriptionOld <- function(modulePkg, libPathsToUse, moduleLibrary, repos, onlyModPkg) {
-  pkgDescr <- file.path(modulePkg, "DESCRIPTION")
-  if (!file.exists(pkgDescr))
-    stop("Your module contains no DESCRIPTION file")
-
-  moduleInfo <- read.dcf(file.path(modulePkg, "DESCRIPTION"))[1, ]
-  pkgName    <- moduleInfo["Package"]
-  modulePkg  <- paste0(modulePkg, "/.")
-
-  if (!onlyModPkg) {
-    # Install dependencies:
-    withr::with_libpaths(
-      new  = libPathsToUse,
-      code = remotes::install_deps(pkg=modulePkg, lib=moduleLibrary,  INSTALL_opts=c("--no-test-load --no-multiarch"), upgrade="never", repos=repos)
-    )
-
-    # And fix Mac OS libraries of dependencies:
-    postInstallFixes(moduleLibrary)
-  }
-
-  # Remove old copy of library (because we might be reinstalling and want the find.package check on the end to fail if something went wrong)
-  tryCatch(
-    expr = {
-      withr::with_libpaths(
-        new = libPathsToUse,
-        code = {
-          find.package(package=pkgName)
-          remove.packages(pkg=pkgName, lib=moduleLibrary)
-        }
-      )
-    },
-    error=function(e) {}
-  )
-
-  print("Module library now looks like: ")
-  print(list.files(path=moduleLibrary, recursive=FALSE))
-
-  pkgPath <- sub("\\\\", "/", modulePkg, fixed=TRUE)
-  print(paste0("pkgPath: '", pkgPath, "'"))
-
-  strlibPathsToUse  <- paste0("c(", paste0("'", libPathsToUse, collapse = "', "), "')")
-  loadLog 			    <- .runSeparateR(paste0("withr::with_libpaths(new=", strlibPathsToUse, ", pkgbuild::with_build_tools(install.packages(pkgs='", pkgPath, "', lib='", moduleLibrary, "', type='source', repos=NULL, INSTALL_opts=c('--no-multiarch')), required=FALSE))"))
-
-  # Check if install worked and through loadlog as error otherwise
-  tryCatch(
-    expr = {
-      withr::with_libpaths(
-        new = moduleLibrary,
-        code = {
-          find.package(package=pkgName)
-          return("succes!")
-        }
-      )
-    },
-    error=function(e) {
-      .setLog(loadLog)
-      return('fail')
-    }
-  )
-
-  return(NULL)
-}
-
-# Retrieve package dependencies by parsing a DESCRIPTION file or a DESCRIPTION string
-#
-# Returns a named list, e.g.:
-# type         package      version               remote
-# Depends        R          >= 3.0.2
-# Imports       stringr     >= 0.5         svn::https://github.com/hadley/stringr
-# Imports       brew            *
-# Imports       digest          *          foo/digest
-# Imports       methods         *
-# Imports       Rcpp         >= 0.11.0
-# Suggests      testthat     >= 0.8.0      local::/pkgs/testthat
-# Suggests      knitr           *
-# LinkingTo     Rcpp
-#
-# Or a json string, e.g.:
-# [{"type":"Depends","package":"R","version":">= 3.0.2","remote":""},
-#  {"type":"Imports","package":"stringr","version":">= 0.5","remote":"svn::https://github.com/hadley/stringr"},
-#  {"type":"Imports","package":"brew","version":"*","remote":""},
-#  {"type":"Imports","package":"digest","version":"*","remote":"foo/digest"},
-# etc]
-getDepsFromDescription <- function(unparsedDescr, asJson = TRUE) {
-  deps  <- NULL
-  descr <- .parseDescription(unparsedDescr)
-
-  if (any(descr$has_fields(c("Imports", "Depends", "LinkingTo")))) {
-    deps         <- descr$get_deps()
-    pkgs         <- deps[["package"]]
-    remotePerPkg <- character(length(pkgs))
-
-    if (descr$has_fields("Remotes")) {
-      remotes <- descr$get_remotes()
-
-      for (i in seq_along(remotePerPkg)) {
-        isRemoteForPkg <- endsWith(remotes, paste0("/", pkgs[i]))
-
-        if (any(isRemoteForPkg))
-          remotePerPkg[i] <- remotes[isRemoteForPkg]
-      }
-    }
-    deps[["remote"]] <- remotePerPkg
-  }
-
-  if (asJson)
-    deps <- jsonlite::toJSON(deps)
-
-  return(deps)
-}
-
-.parseDescription <- function(unparsedDescr) {
-  if (!nzchar(unparsedDescr))
-    stop("The description contains no data")
-
-  if (file.exists(unparsedDescr)) return(desc::description$new(file = unparsedDescr))
-  else                            return(desc::description$new(text = unparsedDescr))
 }
