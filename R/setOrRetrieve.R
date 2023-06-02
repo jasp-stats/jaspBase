@@ -15,7 +15,7 @@ setRecomputed <- function(x) {
 
 emptyRecomputed <- function() {
   # remove all stored hashes
-  clrhash(.internal[["recomputedHashtab"]])
+  utils::clrhash(.internal[["recomputedHashtab"]])
   # set lastRecomputed to TRUE
   setRecomputed(TRUE)
 }

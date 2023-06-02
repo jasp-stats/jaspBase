@@ -86,7 +86,7 @@ destroyAllAllocatedRObjects <- function() {
         # check if externalpoint of object is invalid
         if (isTRUE(try(silent = TRUE, identical(
           env[[n]]$.pointer,
-          new("externalptr")
+          methods::new("externalptr")
         )))) {
           nms2rm <- c(nms2rm, n)
         }

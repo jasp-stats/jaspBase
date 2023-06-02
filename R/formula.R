@@ -109,12 +109,12 @@ makeJaspFormulaRhs <- function(rhs, data) {
   return(result)
 }
 
+is.jaspFormulaRhs <- function(x) {
+  inherits(x, "jaspFormulaRhs")
+}
+
 is.jaspRhs <- function(x) {
-  if(inherits(x, "list")) {
-    all(vapply(x, is.jaspRhs, logical(1)))
-  } else {
-    inherits(x, "jaspFormulaRhs")
-  }
+  is.jaspFormulaRhs(x) || (is.list(x) && all(vapply(x, is.jaspRhs, logical(1))))
 }
 
 formulaEncode <- function(formula) {
