@@ -114,7 +114,7 @@ is.jaspFormulaRhs <- function(x) {
 }
 
 is.jaspRhs <- function(x) {
-  is.jaspFormulaRhs(x) || all(vapply(x, is.jaspRhs, logical(1)))
+  is.jaspFormulaRhs(x) || (is.list(x) && all(vapply(x, is.jaspRhs, logical(1))))
 }
 
 formulaEncode <- function(formula) {
