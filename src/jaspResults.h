@@ -83,6 +83,7 @@ public:
 	static Rcpp::RObject	getObjectFromEnv(std::string envName);
 	static void				setObjectInEnv(std::string envName, Rcpp::RObject obj);
 	static bool				objectExistsInEnv(std::string envName);
+    static int              analysisId() { return _analysisId; } ///< To pass analysisId to jaspReport easily
 
 	jaspContainer *			getOldResults()		const	{ return _oldResults; }
 
@@ -127,19 +128,21 @@ private:
 	void fillEnvironmentWithStateObjects(Rcpp::List state);
 	void storeOldResults();
 
+    static void  setAnalysisId(int analysisId);
+
 
 	int		_progressbarExpectedTicks		= 100,
 			_progressbarLastUpdateTime		= -1,
 			_progressbarTicks				= 0,
 			_sendingFeedbackLastTime		= -1,
-			_progressbarBetweenUpdatesTime	= 500,
-			_sendingFeedbackInterval		= 1000;
+            _progressbarBetweenUpdatesTime	= 500,
+            _sendingFeedbackInterval		= 1000;
+
+    static int _analysisId;
 
 #ifdef INCLUDE_COLUMN_ENCODING_ETC
 	ColumnEncoder	* _extraEncodings		= nullptr;
 #endif
-
-
 };
 
 void JASPresultFinalizer(jaspResults * obj);

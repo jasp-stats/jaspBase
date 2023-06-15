@@ -350,9 +350,10 @@ void jaspContainer::letChildrenRun()
 
 void jaspContainer::completeChildren()
 {
-	for(auto keyval : _data)
+	//Go in order, otherwise reports are topnotified in the wrong order
+	for(const auto & key : getSortedDataFields())
 	{
-		jaspObject * obj = keyval.second;
+		jaspObject * obj = _data[key];
 
 		switch(obj->getType())
 		{
@@ -370,6 +371,10 @@ void jaspContainer::completeChildren()
 
 		case jaspObjectType::qmlSource:
 			static_cast<jaspQmlSource*>(obj)->complete();
+			break;
+
+		case jaspObjectType::report:
+			static_cast<jaspReport*>(obj)->totalWarningsInc();
 			break;
 
 		default:
