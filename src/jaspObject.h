@@ -13,6 +13,7 @@ void		setJaspLogFunction( Rcpp::XPtr<logFuncDef> func );
 void		jaspPrint(			std::string msg);
 
 #define JASPOBJECT_DEFAULT_POSITION 9999
+//#define JASP_RESULTS_DEBUG_TRACES
 
 DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource, report);
 DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
@@ -36,9 +37,9 @@ public:
 						jaspObject(const jaspObject& that) = delete;
 	virtual				~jaspObject();
 
-			std::string objectTitleString(std::string prefix)	const { return prefix + jaspObjectTypeToString(_type) + " " + _title; }
-	virtual	std::string dataToString(std::string)				const { return ""; }
-			std::string toString(std::string prefix = "")		const;
+			std::string objectTitleString(std::string prefix="")	const { return prefix + jaspObjectTypeToString(_type) + " " + _title; }
+	virtual	std::string dataToString(std::string)					const { return ""; }
+			std::string toString(std::string prefix = "")			const;
 
 	virtual std::string toHtml()	const { return ""; }
 			std::string htmlTitle() const { return "<h2>" + _title + "</h2>"; }

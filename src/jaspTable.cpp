@@ -30,6 +30,9 @@ size_t jaspTable::lengthFromRObject(Rcpp::RObject rObj)
 
 void jaspTable::setData(Rcpp::RObject newData)
 {
+#ifdef JASP_RESULTS_DEBUG_TRACES
+	jaspPrint("jaspTable::setData");
+#endif
 	if(newData.isNULL())
 	{
 		_data.clear();

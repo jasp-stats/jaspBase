@@ -304,7 +304,7 @@ Json::Value jaspContainer::dataEntry(jaspObject * oldResult, std::string & error
 void jaspContainer::childFinalizedHandler(jaspObject *child)
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	std::cout << "JASPcontainer " << title << " removes child " << child->title << " from data etc!\n" << std::flush;
+	std::cout << "JASPcontainer " << _title << " removes child " << child->_title << " from data etc!\n" << std::flush;
 #endif
 
 	std::list<std::string> fieldsToRemove;

@@ -307,7 +307,7 @@ void jaspResults::pruneInvalidatedData()
 void jaspResults::send(std::string otherMsg)
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	JASPprint("send was called!");
+	jaspPrint("send was called!");
 #endif
 
 	if(_ipccSendFunc != nullptr)
@@ -332,7 +332,7 @@ void jaspResults::checkForAnalysisChanged()
 void jaspResults::childrenUpdatedCallbackHandler(bool ignoreSendTimer)
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	JASPprint("One of jaspResults children was updated!\n");
+	jaspPrint("One of jaspResults children was updated!\n");
 #endif
 
 	checkForAnalysisChanged(); //can "throw" Rf_error

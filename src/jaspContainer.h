@@ -17,7 +17,7 @@ public:
 	jaspContainer(Rcpp::String title = "", jaspObjectType type = jaspObjectType::container) : jaspObject(type, title)
 	{
 #ifdef JASP_RESULTS_DEBUG_TRACES
-		std::cout << "JASPcontainer constructor for title: " << title << std::endl;
+		std::cout << "JASPcontainer constructor for title: " << _title << std::endl;
 #endif
 	}
 

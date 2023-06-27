@@ -5,7 +5,7 @@
 jaspPlot::~jaspPlot()
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	JASPprint("Destructor of JASPplot("+title+") is called! ");
+	jaspPrint("Destructor of JASPplot("+_title+") is called! ");
 #endif
 
 	finalizedHandler();

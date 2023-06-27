@@ -99,7 +99,7 @@ void jaspObject::destroyAllAllocatedObjects()
 void jaspObject::addChild(jaspObject * child)
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	std::cout << title << " adds Child " << child->title << "\n" << std::flush;
+	std::cout << _title << " adds Child " << child->_title << "\n" << std::flush;
 #endif
 
 	if(child->parent == this)
@@ -265,7 +265,7 @@ void jaspObject::childFinalized(jaspObject * child)
 void jaspObject::notifyParentOfChanges()
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	std::cout << "notifyParentOfChanges()! parent is " << ( parent == NULL ? "NULL" : parent->title) << "\n" << std::flush;
+	std::cout << "notifyParentOfChanges()! parent is " << ( parent == NULL ? "NULL" : parent->_title) << "\n" << std::flush;
 #endif
 
 	if(parent != NULL)
@@ -275,7 +275,7 @@ void jaspObject::notifyParentOfChanges()
 void jaspObject::childrenUpdatedCallback(bool ignoreSendTimer)
 {
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	std::cout << "childrenUpdatedCallback()! parent is " << ( parent == NULL ? "NULL" : parent->title) << "\n" << std::flush;
+	std::cout << "childrenUpdatedCallback()! parent is " << ( parent == NULL ? "NULL" : parent->_title) << "\n" << std::flush;
 #endif
 
 	childrenUpdatedCallbackHandler(ignoreSendTimer);
@@ -378,7 +378,7 @@ void jaspObjectFinalizer(jaspObject * obj)
 		return;
 
 #ifdef JASP_RESULTS_DEBUG_TRACES
-	std::cout << "JASPobjectFinalizer is run on: " << obj->title << "\n" << std::flush;
+	std::cout << "JASPobjectFinalizer is run on: " << obj->_title << "\n" << std::flush;
 #endif
 
 	obj->finalized();
