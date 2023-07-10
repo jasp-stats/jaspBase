@@ -16,6 +16,7 @@ Imports:
   grid,
   gridExtra,
   gridGraphics,
+  jaspGraphs,
   jsonlite,
   lifecycle,
   methods,
@@ -34,6 +35,8 @@ Imports:
   svglite,
   systemfonts,
   withr
+Remotes:
+  jasp-stats/jaspGraphs
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Encoding: UTF-8
