@@ -517,7 +517,9 @@ jaspResultsStrings <- function() {
 
   # when run through jaspTools do not save the state, but store it internally
   if ("jaspTools" %in% loadedNamespaces()) {
-    jaspTools:::.setInternal("state", state)
+    # fool renv so it does not try to install jaspTools
+    .setInternal <- utils::getFromNamespace(".setInternal", asNamespace("jaspTools"))
+    .setInternal("state", state)
     return(list(relativePath = relativePath))
   }
 
@@ -1024,7 +1026,9 @@ runWrappedAnalysis <- function(analysisName, data, options, version) {
   } else {
 
     options <- checkAnalysisOptions(analysisName, options, version)
-    return(jaspTools::runAnalysis(analysisName, data, options))
+    # fool renv so it does not try to install jaspTools
+    jaspToolsRunAnalysis <- utils::getFromNamespace("runAnalysis", asNamespace("jaspTools"))
+    return(jaspToolsRunAnalysis(analysisName, data, options))
 
   }
 }
