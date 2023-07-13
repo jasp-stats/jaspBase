@@ -391,4 +391,7 @@ setupRenv <- function(moduleLibrary, modulePkg) {
     options(install.packages.compile.from.source = "never")
 
   addRenvBeforeAfterDispatch()
+  
+  renv::install("Matrix", type="source")
+
 }
