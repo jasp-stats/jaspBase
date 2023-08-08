@@ -270,3 +270,37 @@ vec_cast.double.jaspNominal <- function(x, to, ...) vctrs::vec_data(x) |> as.dou
 vec_cast.jaspNominal.integer <- function(x, to, ...) jaspNominal(x, ...)
 #' @export
 vec_cast.integer.jaspNominal <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
+
+#' @export
+jasp2R <- function(x) {
+  UseMethod("jasp2R")
+}
+
+#' @export
+jasp2R.default <- function(x) {
+  warning("Object is not of JASP type, no conversion done")
+  return(x)
+}
+
+#' @export
+jasp2R.jaspScale <- function(x) {
+  as.numeric(x)
+}
+
+#' @export
+jasp2R.jaspOrdinal <- function(x) {
+  values <- attr(x, "values")
+  labels <- attr(x, "levels")
+  ordered(vctrs::vec_data(x), levels = values, labels = labels)
+}
+
+#' @export
+jasp2R.jaspNominal <- function(x) {
+  values <- attr(x, "values")
+  labels <- attr(x, "levels")
+  factor(vctrs::vec_data(x), levels = values, labels = labels)
+}
+
+r2jasp <- function(x) {
+  UseMethod("r2jasp")
+}
