@@ -538,8 +538,8 @@ jaspResultsStrings <- function() {
 
     base::tryCatch(
       base::load(location$relativePath),
-      error=function(e) e,
-      warning=function(w) w
+      error=function(e) e
+      #,warning=function(w) w #Commented out because if there *is* a warning, which there of course shouldnt be, the state wont be loaded *at all*. 
     )
   }
 
