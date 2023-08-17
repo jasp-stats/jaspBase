@@ -41,7 +41,11 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
     stop(
 "R CMD config CC returns more than 1 line, this will break renv and thus your install.
 Most likely you are on mac and you should run `xcode-select --install` in a terminal.
-If that doesn't help or you aren't on a mac: feel free to open an issue at https://github.com/jasp-stats/jasp-issues/issues/new/choose
+
+If you are one windows and see something about 'sh' missing you might want to try installing RTools.
+If you have that installed you can check whether you have (another) MingW earlier in your PATH environment variable.
+
+If that doesn't help: feel free to open an issue at https://github.com/jasp-stats/jasp-issues/issues/new/choose
 
 The output was:
 ", paste0(cmdConfigCC, collapse="\n"), domain = NA)
