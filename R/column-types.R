@@ -56,7 +56,7 @@ asJaspScale <- function(x, ...) {
   vctrs::vec_cast(x, newJaspScale())
 }
 
-## Coercion
+## Coercion ----
 #' @export
 vec_ptype2.jaspScale.jaspScale <- function(x, y, ...) newJaspScale()
 #' @export
@@ -68,7 +68,7 @@ vec_ptype2.jaspScale.integer <- function(x, y, ...) numeric()
 #' @export
 vec_ptype2.integer.jaspScale <- function(x, y, ...) numeric()
 
-## Casting
+## Casting ----
 #' @export
 vec_cast.jaspScale.jaspScale <- function(x, to, ...) x
 #' @export
@@ -79,13 +79,6 @@ vec_cast.double.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.doubl
 vec_cast.jaspScale.integer <- function(x, to, ...) jaspScale(x)
 #' @export
 vec_cast.integer.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
-#' @export
-vec_cast.jaspScale.ordered <- function(x, to, ...) jaspScale(as.numeric(as.character(x)))
-#' @export
-vec_cast.ordered.jaspScale <- function(x, to, ...) {
-  print("hallo1")
-  vctrs::vec_data(x) |> as.ordered()
-}
 
 # jaspOrdinal ----
 newJaspOrdinal <- function(x = integer(), values = integer(), labels = character()) {
@@ -150,17 +143,6 @@ asJaspOrdinal <- function(x, ...) {
   vctrs::vec_cast(x, newJaspOrdinal())
 }
 
-## Coercion
-#' @export
-vec_ptype2.jaspOrdinal.jaspOrdinal <- function(x, y, ...) newJaspOrdinal()
-#' @export
-vec_ptype2.jaspOrdinal.double <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.double.jaspOrdinal <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.jaspOrdinal.integer <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.integer.jaspOrdinal <- function(x, y, ...) numeric()
 
 ## Casting
 #' @export
@@ -271,6 +253,7 @@ vec_cast.jaspNominal.integer <- function(x, to, ...) jaspNominal(x, ...)
 #' @export
 vec_cast.integer.jaspNominal <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
 
+# S3 conversions ----
 #' @export
 jasp2R <- function(x) {
   UseMethod("jasp2R")
@@ -303,4 +286,30 @@ jasp2R.jaspNominal <- function(x) {
 
 r2jasp <- function(x) {
   UseMethod("r2jasp")
+}
+
+#' @export
+r2jasp.default <- function(x) {
+  warning("Object is not of type that can be explicitly converted to a JASP type, try converting your column into `numeric` or `factor`.")
+  return(x)
+}
+
+#' @export
+r2jasp.numeric <- function(x) {
+  asJaspScale(x)
+}
+
+#' @export
+r2jasp.ordered <- function(x) {
+  asJaspOrdinal(x)
+}
+
+#' @export
+r2jasp.factor <- function(x) {
+  asJaspNominal(x)
+}
+
+#' @export
+r2jasp.character <- function(x) {
+  asJaspNominal(x)
 }
