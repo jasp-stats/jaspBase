@@ -9,4 +9,4 @@
 library(testthat)
 library(jaspBase)
 
-test_check("jaspBase")
+test_check("jaspBase", reporter = NULL)
