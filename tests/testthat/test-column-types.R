@@ -59,6 +59,11 @@ test_that("Converting jaspNominal to R types works", {
   expect_error(as.logical(nom),   regexp = "Can't convert `x` <jaspNominal> to <logical>")
 })
 
+test_that("Converting R types to jaspScale works", {
+  expect_vector(asJaspNominal(integer()),   jaspNominal(integer()))
+  expect_vector(asJaspNominal(character()), jaspNominal(character()))
+})
+
 
 test_that("jasp2r works", {
   expect_vector(jaspScale()   |> jasp2r(), numeric())
