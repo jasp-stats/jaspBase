@@ -59,26 +59,33 @@ asJaspScale <- function(x, ...) {
 ## Coercion ----
 #' @export
 vec_ptype2.jaspScale.jaspScale <- function(x, y, ...) newJaspScale()
-#' @export
-vec_ptype2.jaspScale.double <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.double.jaspScale <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.jaspScale.integer <- function(x, y, ...) numeric()
-#' @export
-vec_ptype2.integer.jaspScale <- function(x, y, ...) numeric()
 
 ## Casting ----
+### to jaspScale ----
 #' @export
 vec_cast.jaspScale.jaspScale <- function(x, to, ...) x
 #' @export
 vec_cast.jaspScale.double <- function(x, to, ...) jaspScale(x)
 #' @export
-vec_cast.double.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.double()
-#' @export
 vec_cast.jaspScale.integer <- function(x, to, ...) jaspScale(x)
 #' @export
+vec_cast.jaspScale.character <- function(x, to, ...) jaspScale(as.double(x))
+#' @export
+vec_cast.jaspScale.logical <- function(x, to, ...) jaspScale(as.double(x))
+#' @export
+vec_cast.jaspScale.factor <- function(x, to, ...) x |> as.character() |> as.double() |> jaspScale()
+#' @export
+vec_cast.jaspScale.ordered <- function(x, to, ...) x |> as.character() |> as.double() |> jaspScale()
+
+### to R types----
+#' @export
+vec_cast.double.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.double()
+#' @export
 vec_cast.integer.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.integer()
+#' @export
+vec_cast.character.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.character()
+#' @export
+vec_cast.logical.jaspScale <- function(x, to, ...) vctrs::vec_data(x) |> as.logical()
 
 # jaspOrdinal ----
 newJaspOrdinal <- function(x = integer(), values = integer(), labels = character()) {
