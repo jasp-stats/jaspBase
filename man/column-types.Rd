@@ -10,7 +10,10 @@
 \alias{asJaspOrdinal}
 \alias{jaspNominal}
 \alias{isJaspNominal}
+\alias{isJaspText}
 \alias{asJaspNominal}
+\alias{jasp2r}
+\alias{r2jasp}
 \title{JASP Column Types}
 \usage{
 jaspScale(x = double())
@@ -29,11 +32,25 @@ jaspNominal(x = integer(), values = sort(unique(x)), labels = values)
 
 isJaspNominal(x)
 
+isJaspText(x)
+
 asJaspNominal(x, ...)
+
+jasp2r(x)
+
+r2jasp(x)
 }
 \arguments{
-\item{x}{the main object for which the operation is done}
+\item{x}{object to be coerced or tested.}
+
+\item{...}{not used.}
+
+\item{values}{set of possible values (similar to \code{levels} in \code{\link[=factor]{factor()}}).}
+
+\item{labels}{set of labels of the values (similar to \code{labels} in \code{\link[=factor]{factor()}}).}
 }
 \description{
-Columns types in JASP.
+Columns types in JASP. JASP recognizes 3 main types (Scale, Ordinal, Nominal),
+with Nominal being further split between basic Nominal and Text.
+These types roughly correspond to \code{\link[=numeric]{numeric()}}, \code{\link[=ordered]{ordered()}}, and \code{\link[=factor]{factor()}}.
 }

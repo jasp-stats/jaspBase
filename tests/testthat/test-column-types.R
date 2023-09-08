@@ -42,3 +42,19 @@ test_that("Converting R types to jaspScale works", {
       suppressWarnings(x |> as.character() |> as.double())
     )
 })
+
+
+test_that("jasp2r works", {
+  expect_vector(jaspScale()   |> jasp2r(), numeric())
+  expect_vector(jaspOrdinal() |> jasp2r(), factor(ordered=TRUE))
+  expect_vector(jaspNominal() |> jasp2r(), factor())
+})
+
+test_that("r2jasp works", {
+  expect_vector(numeric()           |> r2jasp(), jaspScale())
+  expect_vector(integer()           |> r2jasp(), jaspScale())
+  expect_vector(double()            |> r2jasp(), jaspScale())
+  expect_vector(logical()           |> r2jasp(), jaspNominal())
+  expect_vector(factor()            |> r2jasp(), jaspNominal())
+  expect_vector(character()         |> r2jasp(), newJaspText())
+})
