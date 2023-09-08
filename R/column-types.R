@@ -198,7 +198,7 @@ newJaspText <- function(x = integer(), values = character(), labels = character(
 #' @rdname column-types
 #' @export
 jaspNominal <- function(x = integer(), values = sort(unique(x)), labels = values) {
-  if (!all(x %in% values)) {
+  if (!all(na.omit(x) %in% values)) {
     rlang::abort("`values` must be a superset of `x`.")
   }
   if (length(values) != length(labels)) {
@@ -258,15 +258,6 @@ format.jaspNominal <- function(x, ...) {
 
 #' @export
 obj_print_footer.jaspNominal <- function(x, ...) {
-  val <- attr(x, "values")
-  lab <- attr(x, "labels")
-
-  out <- paste(sprintf("%s(%i)", lab, val), collapse = ", ")
-  cat("Labels(Values):", out)
-}
-
-#' @export
-obj_print_footer.jaspText <- function(x, ...) {
   val <- attr(x, "values")
   lab <- attr(x, "labels")
 

@@ -44,6 +44,22 @@ test_that("Converting R types to jaspScale works", {
 })
 
 
+test_that("Converting jaspNominal to R types works", {
+  x <- c(4, 6, 2, 2, 6, NA)
+  values <- c(2, 6, 4)
+  labels <- c("two", "six", "four")
+  nom <- jaspNominal(x, values = values, labels = labels)
+
+  expect_equal(as.numeric(nom),   x)
+  expect_equal(as.integer(nom),   x)
+  expect_equal(as.double(nom),    x)
+  expect_equal(as.character(nom), labels[match(x, values)])
+  expect_equal(as.factor(nom),    factor(x, levels = values, labels = labels))
+  expect_equal(as.ordered(nom),   ordered(x, levels = values, labels = labels))
+  expect_error(as.logical(nom),   regexp = "Can't convert `x` <jaspNominal> to <logical>")
+})
+
+
 test_that("jasp2r works", {
   expect_vector(jaspScale()   |> jasp2r(), numeric())
   expect_vector(jaspOrdinal() |> jasp2r(), factor(ordered=TRUE))
