@@ -149,5 +149,5 @@ test_that("from jaspText works", {
   expect_equal  (suppressWarnings(txt |> asJaspScale() |> as.double()), suppressWarnings(as.double(x)))
   expect_error  (txt |> asJaspOrdinal(),    regexp = "Can't convert `x` <jaspText> to <jaspOrdinal>.")
   expect_equal  (txt |> asJaspNominal(),    txt)
-
 })
+

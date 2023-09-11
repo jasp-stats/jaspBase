@@ -369,6 +369,15 @@ r2jasp.default <- function(x) {
 }
 
 #' @export
+r2jasp.jaspScale <- function(x) x
+#' @export
+r2jasp.jaspOrdinal <- function(x) x
+#' @export
+r2jasp.jaspNominal <- function(x) x
+#' @export
+r2jasp.jaspText <- function(x) x
+
+#' @export
 r2jasp.numeric <- function(x) {
   asJaspScale(x)
 }
