@@ -64,8 +64,6 @@ asJaspScale <- function(x, ...) {
 ## Casting ----
 ### to jaspScale ----
 #' @export
-vec_cast.jaspScale.jaspScale <- function(x, to, ...) { x }
-#' @export
 vec_cast.jaspScale.double <- function(x, to, ...) { jaspScale(x) }
 #' @export
 vec_cast.jaspScale.integer <- function(x, to, ...) { jaspScale(x) }
@@ -290,8 +288,6 @@ asJaspNominal <- function(x, ...) {
 ## Casting ----
 ### to jaspNominal ----
 #' @export
-vec_cast.jaspNominal.jaspNominal <- function(x, to, ...) x
-#' @export
 vec_cast.jaspNominal.double <- function(x, to, ...) { jaspNominal(x) }
 #' @export
 vec_cast.jaspNominal.integer <- function(x, to, ...) { jaspNominal(x) }
@@ -400,6 +396,8 @@ r2jasp.logical <- function(x) {
 # Casting between JASP types ----
 
 #' @export
+vec_cast.jaspScale.jaspScale <- function(x, to, ...) { x }
+#' @export
 vec_cast.jaspScale.jaspOrdinal <- function(x, to, ...) { x |> as.double() |> asJaspScale() }
 #' @export
 vec_cast.jaspScale.jaspNominal <- function(x, to, ...) { x |> as.double() |> asJaspScale() }
@@ -408,6 +406,8 @@ vec_cast.jaspScale.jaspText <- function(x, to, ...) { x |> as.character() |> asJ
 
 #' @export
 vec_cast.jaspOrdinal.jaspScale <- function(x, to, ...) { x |> as.double() |> asJaspOrdinal() }
+#' @export
+vec_cast.jaspOrdinal.jaspOrdinal <- function(x, to, ...) { x }
 #' @export
 vec_cast.jaspOrdinal.jaspNominal <- function(x, to, ...) {
   class(x) <- c("jaspOrdinal", "vctrs_vctr")
@@ -421,3 +421,7 @@ vec_cast.jaspNominal.jaspOrdinal <- function(x, to, ...) {
   class(x) <- c("jaspNominal", "vctrs_vctr")
   x
 }
+#' @export
+vec_cast.jaspNominal.jaspNominal <- function(x, to, ...) { x }
+#' @export
+vec_cast.jaspNominal.jaspText <- function(x, to, ...) { x }

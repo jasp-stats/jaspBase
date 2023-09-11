@@ -88,7 +88,7 @@ test_that("Converting R types to jaspNominal works", {
   expect_vector(asJaspNominal(character()), jaspNominal(character()))
 })
 
-
+# auto converting ----
 test_that("jasp2r works", {
   expect_vector(jaspScale()   |> jasp2r(), numeric())
   expect_vector(jaspOrdinal() |> jasp2r(), factor(ordered=TRUE))
@@ -102,4 +102,52 @@ test_that("r2jasp works", {
   expect_vector(logical()           |> r2jasp(), jaspNominal())
   expect_vector(factor()            |> r2jasp(), jaspNominal())
   expect_vector(character()         |> r2jasp(), newJaspText())
+})
+
+# JASP to JASP ----
+test_that("from jaspScale works", {
+  x <- jaspScale(rnorm(3))
+  y <- jaspScale(1:3)
+
+  expect_equal(x |> asJaspScale(), x)
+  expect_equal(y |> asJaspScale(), y)
+
+  expect_error (x |> asJaspOrdinal(), regexp = "Can't convert from `x` <double> to <integer> due to loss of precision.")
+  expect_equal(y |> asJaspOrdinal(), jaspOrdinal(1:3))
+
+  expect_equal(x |> asJaspNominal(), x |> as.double() |> jaspNominal())
+  expect_equal(y |> asJaspNominal(), y |> as.integer() |> jaspNominal())
+})
+
+test_that("from jaspOrdinal works", {
+  x <- c(2, 6, 4, 2, 2, 6, 4)
+  values <- c(4, 6, 2)
+  labels <- letters[1:3]
+  ord <- jaspOrdinal(x = x, values = values, labels = labels)
+
+  expect_equal(ord |> asJaspScale(), jaspScale(x))
+  expect_equal(ord |> asJaspOrdinal(), ord)
+  expect_equal(ord |> asJaspNominal(), jaspNominal(x, values, labels))
+})
+
+test_that("from jaspNominal works", {
+  x <- c(2, 6, 4, 2, 2, 6, 4)
+  values <- c(4, 6, 2)
+  labels <- letters[1:3]
+  nom <- jaspNominal(x = x, values = values, labels = labels)
+
+  expect_equal(nom |> asJaspScale(), jaspScale(x))
+  expect_equal(nom |> asJaspOrdinal(), jaspOrdinal(x, values, labels))
+  expect_equal(nom |> asJaspNominal(), nom)
+})
+
+test_that("from jaspText works", {
+  x <- c("a", "b", "c", "1", "2.4")
+  txt <- jaspNominal(x)
+
+  expect_warning(txt |> asJaspScale(),      regexp = "NAs introduced by coercion")
+  expect_equal  (suppressWarnings(txt |> asJaspScale() |> as.double()), suppressWarnings(as.double(x)))
+  expect_error  (txt |> asJaspOrdinal(),    regexp = "Can't convert `x` <jaspText> to <jaspOrdinal>.")
+  expect_equal  (txt |> asJaspNominal(),    txt)
+
 })
