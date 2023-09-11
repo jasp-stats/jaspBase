@@ -3,13 +3,31 @@
 #' @importFrom vctrs vec_ptype2 vec_cast vec_ptype_abbr obj_print_footer
 #' @title JASP Column Types
 #'
-#' @description Columns types in JASP. JASP recognizes 3 main types (Scale, Ordinal, Nominal),
-#' with Nominal being further split between basic Nominal and Text.
-#' These types roughly correspond to [numeric()], [ordered()], and [factor()].
+#' @description Columns types in JASP.
 #' @param x object to be coerced or tested.
 #' @param values set of possible values (similar to `levels` in [factor()]).
 #' @param labels set of labels of the values (similar to `labels` in [factor()]).
 #' @param ... not used.
+#' @param dataset Data frame or tibble that contains data.
+#'
+#' @details
+#' JASP recognizes 3 main data types (Scale, Ordinal, Nominal),
+#' with Nominal being further split between basic Nominal and Text.
+#' These types roughly correspond to [numeric()], [ordered()], and [factor()].
+#'
+#' However, the correspondence between the base R types is not 100%. Thus, when passing a dataset from R to a JASP analysis,
+#' JASP converts columns to these JASP types. Information from these columns is used for validating the input of the analysis
+#' to ensure that the behavior is identical between R syntax and JASP application.
+#'
+#' The conversion uses simple heuristics (e.g., [`numeric()`] columns are converted to [`jaspScale()`]). For overriding
+#' these heuristics, it is possible to convert a column to a specific JASP type before passing it to an analysis.
+#'
+#' To make it easier to reason how are these column conversion rules used within JASP, use [`jasp2r()`] and [`r2jasp()`]
+#' functions that implement the implicit conversion rules using S3 dispatch.
+#' Alternatively, it is possible to use functions [`setDataSet()`], [`getDataSet()`], and [`dataSetColumnSpecification()`],
+#' that allow you to explicitly pass the data set to JASP, retrieve it, and check the column meta-data.
+#'
+#' @example inst/examples/ex-column-types.R
 NULL
 
 
@@ -344,16 +362,18 @@ jasp2r.jaspScale <- function(x) {
 
 #' @export
 jasp2r.jaspOrdinal <- function(x) {
+  idx <- vctrs::vec_data(x)
   values <- attr(x, "values")
-  labels <- attr(x, "levels")
-  ordered(vctrs::vec_data(x), levels = values, labels = labels)
+  labels <- attr(x, "labels")
+  ordered(values[idx], levels = values, labels = labels)
 }
 
 #' @export
 jasp2r.jaspNominal <- function(x) {
+  idx <- vctrs::vec_data(x)
   values <- attr(x, "values")
-  labels <- attr(x, "levels")
-  factor(vctrs::vec_data(x), levels = values, labels = labels)
+  labels <- attr(x, "labels")
+  factor(values[idx], levels = values, labels = labels)
 }
 
 #' @rdname column-types

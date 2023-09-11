@@ -6,7 +6,7 @@ setDataSet <- function(dataset) {
 
 #' @rdname column-types
 #' @export
-getDataSet <- function(dataset) {
+getDataSet <- function() {
   return(.internal[["dataset"]])
 }
 
