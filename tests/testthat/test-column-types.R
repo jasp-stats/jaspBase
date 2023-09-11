@@ -1,3 +1,4 @@
+# jaspScale ----
 test_that("Converting jaspScale to R types works", {
   x <- rnorm(10)
   z <- jaspScale(x)
@@ -43,7 +44,30 @@ test_that("Converting R types to jaspScale works", {
     )
 })
 
+# jaspOrdinal ----
+test_that("Converting jaspOrdinal to R types works", {
+  x <- c(4, 6, 2, 2, 6, NA)
+  values <- c(2, 6, 4)
+  labels <- c("two", "six", "four")
+  nom <- jaspOrdinal(x, values = values, labels = labels)
 
+  expect_equal(as.numeric(nom),   x)
+  expect_equal(as.integer(nom),   x)
+  expect_equal(as.double(nom),    x)
+  expect_equal(as.character(nom), labels[match(x, values)])
+  expect_equal(as.factor(nom),    factor(x, levels = values, labels = labels))
+  expect_equal(as.ordered(nom),   ordered(x, levels = values, labels = labels))
+  expect_error(as.logical(nom),   regexp = "Can't convert `x` <jaspOrdinal> to <logical>")
+})
+
+test_that("Converting R types to jaspOrdinal works", {
+  expect_vector (asJaspOrdinal(integer()),     jaspOrdinal(integer()))
+  expect_error  (rnorm(10) |> asJaspOrdinal(), regexp = "Can't convert from `x` <double> to <integer> due to loss of precision.")
+  expect_error  (letters   |> jaspOrdinal(),   regexp = "Can't convert `x` <character> to <integer>.")
+  expect_warning(letters   |> asJaspOrdinal(), regexp = "NAs introduced by coercion")
+})
+
+# jaspNominal -----
 test_that("Converting jaspNominal to R types works", {
   x <- c(4, 6, 2, 2, 6, NA)
   values <- c(2, 6, 4)
@@ -59,7 +83,7 @@ test_that("Converting jaspNominal to R types works", {
   expect_error(as.logical(nom),   regexp = "Can't convert `x` <jaspNominal> to <logical>")
 })
 
-test_that("Converting R types to jaspScale works", {
+test_that("Converting R types to jaspNominal works", {
   expect_vector(asJaspNominal(integer()),   jaspNominal(integer()))
   expect_vector(asJaspNominal(character()), jaspNominal(character()))
 })
