@@ -86,7 +86,6 @@ df <- mtcars
 str(df)
 
 # by default numeric columns are converted to jaspScale
-lapply(df, r2jasp)
 r2jasp(df) |> str()
 
 # change cyl to an ordinal variable
@@ -111,5 +110,5 @@ getDataSet() |> str()
 dataSetColumnSpecification()
 
 # check how are these columns converted back to R types
-getDataSet() |> lapply(jasp2r)
+getDataSet() |> jasp2r() |> str()
 }

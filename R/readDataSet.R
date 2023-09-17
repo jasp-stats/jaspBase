@@ -46,6 +46,7 @@ dataSetColumnSpecification <- function() {
     dataset <- dataset[, unique(c(columns, columns.as.numeric, columns.as.ordinal, columns.as.factor)), drop = FALSE]
   }
 
+  dataset <- .recodeColumns(dataset, columns,            jasp2r)
   dataset <- .recodeColumns(dataset, columns.as.numeric, as.numeric)
   dataset <- .recodeColumns(dataset, columns.as.ordinal, as.ordered)
   dataset <- .recodeColumns(dataset, columns.as.factor,  as.factor )
