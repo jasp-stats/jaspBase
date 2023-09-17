@@ -356,6 +356,11 @@ jasp2r.default <- function(x) {
 }
 
 #' @export
+jasp2r.data.frame <- function(x) {
+  as.data.frame(lapply(x, jasp2r))
+}
+
+#' @export
 jasp2r.jaspScale <- function(x) {
   as.numeric(x)
 }
@@ -386,6 +391,11 @@ r2jasp <- function(x) {
 r2jasp.default <- function(x) {
   warning("Object is not of type that can be automatically converted to a JASP type.")
   return(x)
+}
+
+#' @export
+r2jasp.data.frame <- function(x) {
+  as.data.frame(lapply(x, r2jasp))
 }
 
 #' @export

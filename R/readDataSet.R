@@ -1,7 +1,7 @@
 #' @rdname column-types
 #' @export
 setDataSet <- function(dataset) {
-  .internal[["dataset"]] <- as.data.frame(lapply(dataset, r2jasp))
+  .internal[["dataset"]] <- r2jasp(dataset)
 }
 
 #' @rdname column-types

@@ -3,8 +3,7 @@ df <- mtcars
 str(df)
 
 # by default numeric columns are converted to jaspScale
-lapply(df, r2jasp)
-
+r2jasp(df) |> str()
 
 # change cyl to an ordinal variable
 df$cyl <- jaspOrdinal(df$cyl, values = c(2, 4, 6, 8), labels = c("two", "four", "six", "eight"))
@@ -28,4 +27,4 @@ getDataSet() |> str()
 dataSetColumnSpecification()
 
 # check how are these columns converted back to R types
-getDataSet() |> lapply(jasp2r)
+getDataSet() |> jasp2r() |> str()
