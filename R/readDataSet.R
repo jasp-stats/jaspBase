@@ -48,22 +48,22 @@ dataSetColumnSpecification <- function() {
     dataset <- jasp2r(dataset)
   }
 
-  dataset <- .recodeColumns(dataset, columns,            jasp2r)
-  dataset <- .recodeColumns(dataset, columns.as.numeric, as.numeric)
-  dataset <- .recodeColumns(dataset, columns.as.ordinal, as.ordered)
-  dataset <- .recodeColumns(dataset, columns.as.factor,  as.factor )
+  dataset <- .convertColumns(dataset, columns,            jasp2r)
+  dataset <- .convertColumns(dataset, columns.as.numeric, as.numeric)
+  dataset <- .convertColumns(dataset, columns.as.ordinal, as.ordered)
+  dataset <- .convertColumns(dataset, columns.as.factor,  as.factor )
 
   return(dataset)
 }
 
-.recodeColumns <- function(dataset, which, type) {
-  if(!is.null(which)) {
-    dataset[, which] <- .coerceColumnType(dataset[, which, drop = FALSE], type)
+.convertColumns <- function(dataset, columns, type) {
+  for(column in columns) {
+    data <- dataset[[column]]
+    if(!is.null(data)) {
+      dataset[[column]] <- type(data)
+    } else {
+      warning("Variable ", column, " not found!")
+    }
   }
   return(dataset)
-}
-.coerceColumnType <- function(columns, type) {
-  as.data.frame(
-    lapply(columns, function(col) type(col))
-  )
 }
