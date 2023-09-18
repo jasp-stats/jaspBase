@@ -44,6 +44,8 @@ dataSetColumnSpecification <- function() {
 .dataSetSubsetColumns <- function(dataset, columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
   if(!all.columns) {
     dataset <- dataset[, unique(c(columns, columns.as.numeric, columns.as.ordinal, columns.as.factor)), drop = FALSE]
+  } else {
+    dataset <- jasp2r(dataset)
   }
 
   dataset <- .recodeColumns(dataset, columns,            jasp2r)
