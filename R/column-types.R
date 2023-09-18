@@ -357,7 +357,9 @@ jasp2r.default <- function(x) {
 
 #' @export
 jasp2r.data.frame <- function(x) {
-  as.data.frame(lapply(x, jasp2r))
+  out <- as.data.frame(lapply(x, jasp2r))
+  colnames(out) <- colnames(x)
+  return(out)
 }
 
 #' @export
@@ -395,7 +397,9 @@ r2jasp.default <- function(x) {
 
 #' @export
 r2jasp.data.frame <- function(x) {
-  as.data.frame(lapply(x, r2jasp))
+  out <- as.data.frame(lapply(x, r2jasp))
+  colnames(out) <- colnames(x)
+  return(out)
 }
 
 #' @export
