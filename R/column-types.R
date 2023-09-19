@@ -33,17 +33,21 @@ NULL
 
 # jaspScale -----
 newJaspScale <- function(x = double()) {
-  if (!rlang::is_double(x)) {
-    rlang::abort("`x` must be a double vector.")
+  if (!rlang::is_double(x) && !rlang::is_integer(x)) {
+    rlang::abort("`x` must be a double or integer vector.")
   }
-  vctrs::new_vctr(x, class = "jaspScale")
+  type <- typeof(x)
+  vctrs::new_vctr(x, class = c("jaspScale", type))
 }
 
 
 #' @rdname column-types
 #' @export
 jaspScale <- function(x = double()) {
-  x <- vctrs::vec_cast(x, double())
+  x <- tryCatch(
+    expr  =             vctrs::vec_cast(x, integer()),
+    error = function(e) vctrs::vec_cast(x, double())
+  )
   newJaspScale(x)
 }
 
@@ -340,6 +344,10 @@ vec_cast.character.jaspNominal <- function(x, to, ...) {
   return(labels[data])
 }
 #' @export
+vec_cast.double.jaspText <- vec_cast.double.jaspNominal
+#' @export
+vec_cast.integer.jaspText <- vec_cast.integer.jaspNominal
+#' @export
 vec_cast.character.jaspText <- vec_cast.character.jaspNominal
 
 # S3 conversions ----
@@ -364,7 +372,7 @@ jasp2r.data.frame <- function(x) {
 
 #' @export
 jasp2r.jaspScale <- function(x) {
-  as.numeric(x)
+  as.numeric2(x)
 }
 
 #' @export
@@ -468,3 +476,20 @@ vec_cast.jaspNominal.jaspOrdinal <- function(x, to, ...) {
 vec_cast.jaspNominal.jaspNominal <- function(x, to, ...) { x }
 #' @export
 vec_cast.jaspNominal.jaspText <- function(x, to, ...) { x }
+
+# Corner cases ----
+# as.numeric2() preserves integers instead of converting them to doubles
+#' @export
+as.numeric2 <- function(x, ...) {
+  UseMethod("as.numeric2")
+}
+
+#' @export
+as.numeric2.default <- function(x, ...) {
+  as.numeric(x, ...)
+}
+
+#' @export
+as.numeric2.integer <- function(x, ...) {
+  as.integer(x, ...)
+}

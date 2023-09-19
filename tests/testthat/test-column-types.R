@@ -151,3 +151,9 @@ test_that("from jaspText works", {
   expect_equal  (txt |> asJaspNominal(),    txt)
 })
 
+test_that("as.numeric2 works as expected", {
+  num <- rnorm(3)
+  int <- 1L:3L
+  expect_vector(num |> as.numeric2(), double(),  size = 3)
+  expect_vector(int |> as.numeric2(), integer(), size = 3)
+})

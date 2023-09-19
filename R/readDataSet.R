@@ -51,7 +51,7 @@ dataSetColumnSpecification <- function() {
   }
 
   dataset <- .convertColumns(dataset, columns,            jasp2r)
-  dataset <- .convertColumns(dataset, columns.as.numeric, as.numeric)
+  dataset <- .convertColumns(dataset, columns.as.numeric, as.numeric2)
   dataset <- .convertColumns(dataset, columns.as.ordinal, as.ordered)
   dataset <- .convertColumns(dataset, columns.as.factor,  as.factor )
 
