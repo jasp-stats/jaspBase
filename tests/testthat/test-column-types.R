@@ -14,7 +14,7 @@ test_that("Converting jaspScale to R types works", {
 
 test_that("Converting R types to jaspScale works", {
   expect_vector(asJaspScale(rnorm(10)),   jaspScale(rnorm(10)))
-  expect_vector(asJaspScale(integer()),   jaspScale())
+  expect_vector(asJaspScale(integer()),   jaspScale(integer()))
   expect_vector(asJaspScale(character()), jaspScale())
 
   # these types should coerce to jaspScale the same way as to a double
@@ -97,7 +97,7 @@ test_that("jasp2r works", {
 
 test_that("r2jasp works", {
   expect_vector(numeric()           |> r2jasp(), jaspScale())
-  expect_vector(integer()           |> r2jasp(), jaspScale())
+  expect_vector(integer()           |> r2jasp(), jaspScale(integer()))
   expect_vector(double()            |> r2jasp(), jaspScale())
   expect_vector(logical()           |> r2jasp(), jaspNominal())
   expect_vector(factor()            |> r2jasp(), jaspNominal())

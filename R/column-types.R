@@ -44,10 +44,12 @@ newJaspScale <- function(x = double()) {
 #' @rdname column-types
 #' @export
 jaspScale <- function(x = double()) {
-  x <- tryCatch(
-    expr  =             vctrs::vec_cast(x, integer()),
-    error = function(e) vctrs::vec_cast(x, double())
-  )
+  if (!rlang::is_bare_double(x)) {
+    x <- tryCatch(
+      expr  =             vctrs::vec_cast(x, integer()),
+      error = function(e) vctrs::vec_cast(x, double())
+    )
+  }
   newJaspScale(x)
 }
 
