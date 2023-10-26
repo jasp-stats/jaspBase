@@ -89,7 +89,7 @@ emptyRecomputed <- function() {
 
   # for nested objects, e.g., `container[["a"]][["b"]]` this will retrieve `container[["a"]]`
   # requires `envir = parent.frame(2L)` because the parent jaspObject does not exist in this functions environment
-  parentObjectLhs <- eval(exprLhs[[2L]], envir = parent.frame(2L))
+  parentObjectLhs <- eval(exprLhs[[2L]], envir = parent.frame(1L))
   if (!is.jaspObjR(parentObjectLhs))
     stop("The parent of the left-hand side of %setOrRetrieve% (", as.character(exprLhs[[2L]]), ") did not return a jaspObject!", domain = NA)
 
@@ -102,7 +102,7 @@ emptyRecomputed <- function() {
 
   expr <- call("<-", exprLhs, result) # the literal result
   # assign the result in the calling environment because otherwise the parent jaspObject cannot be found.
-  eval(expr, envir = parent.frame(2L))
+  eval(expr, envir = parent.frame(1L))
 
   if (is.jaspStateR(result))
     return(result$object)
