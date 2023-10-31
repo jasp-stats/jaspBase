@@ -1,43 +1,12 @@
 #include "jaspColumn.h"
+#include "jaspResults.h"
 
 getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
+getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsOrdinalFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalTextFunc		= nullptr;
-
-void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colgetTF colType)
-{
-	_getColumnTypeFunc 				= * colType;
-	_setColumnDataAsScaleFunc 		= * scalar;
-	_setColumnDataAsOrdinalFunc 	= * ordinal;
-	_setColumnDataAsNominalFunc 	= * nominal;
-	_setColumnDataAsNominalTextFunc = * nominalText;
-}
-
-#define SET_COLUMN_DATA_BASE(FUNC)									\
-{																	\
-	if ( FUNC == nullptr ) 											\
-	{																\
-		jaspPrint("jaspColumn does nothing in R stand-alone!"); 	\
-		return false;												\
-	} 																\
-	else 															\
-		return (*FUNC)(columnName, data);							\
-}																	\
-
-bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
-bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
-bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
-bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalTextFunc)
-
-columnType jaspColumn::getColumnType(const std::string & columnName)
-{ 
-	if(!_getColumnTypeFunc) 
-		return columnType::unknown;
-	else
-		return (*_getColumnTypeFunc)(columnName); 
-}
 
 jaspColumn::jaspColumn(std::string columnName)
 	: jaspObject(jaspObjectType::column, "jaspColumn for " + columnName)
@@ -53,6 +22,61 @@ jaspColumn::jaspColumn(std::string columnName)
 	}
 }
 
+
+void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnId)
+{
+	_getColumnTypeFunc 				= * colType;
+	_getColumnAnalysisIdFunc		= * colAnId;
+	_setColumnDataAsScaleFunc 		= * scalar;
+	_setColumnDataAsOrdinalFunc 	= * ordinal;
+	_setColumnDataAsNominalFunc 	= * nominal;
+	_setColumnDataAsNominalTextFunc = * nominalText;
+}
+
+#define SET_COLUMN_DATA_BASE(FUNC)												\
+{																				\
+	if ( !FUNC || !columnIsMine(columnName))									\
+	{																			\
+		jaspPrint(!FUNC															\
+			? "jaspColumn does nothing in R stand-alone!"						\
+			: "Column '" + columnName + "' does not belong to this analysis"); 	\
+		return false;															\
+	} 																			\
+	else 																		\
+		return (*FUNC)(columnName, data);										\
+}																				\
+
+bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
+bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
+bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalTextFunc)
+
+columnType jaspColumn::getColumnType(const std::string & columnName)
+{ 
+	if(!_getColumnTypeFunc) 
+		return columnType::unknown;
+	else
+		return (*_getColumnTypeFunc)(columnName); 
+}
+
+int jaspColumn::getColumnAnalysisId(const std::string & columnName)
+{ 
+	if(!_getColumnAnalysisIdFunc) 
+		return -1;
+	else
+		return (*_getColumnAnalysisIdFunc)(columnName); 
+}
+
+bool jaspColumn::columnIsMine(	const std::string & columnName)
+{
+	if(jaspResults::analysisId() == -1)
+		return true;
+
+	jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
+	jaspPrint("getColumnAnalysisId("+columnName+"): " + std::to_string(getColumnAnalysisId(columnName)));
+
+	return jaspResults::analysisId() == getColumnAnalysisId(columnName);
+}
 
 Json::Value jaspColumn::convertToJSON() const
 {

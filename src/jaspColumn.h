@@ -7,9 +7,11 @@
 
 typedef bool			(*setColumnDataFuncDef)	(std::string, Rcpp::RObject);
 typedef columnType		(*getColumnTypeFuncDef)	(std::string);
+typedef int				(*getColumnAnIdFuncDef)	(std::string);
 
 typedef  Rcpp::XPtr<setColumnDataFuncDef> colDataF;
-typedef  Rcpp::XPtr<getColumnTypeFuncDef> colgetTF;
+typedef  Rcpp::XPtr<getColumnTypeFuncDef> colGetTF;
+typedef  Rcpp::XPtr<getColumnAnIdFuncDef> colGetAIF;
 
 class jaspColumn : public jaspObject
 {
@@ -29,9 +31,10 @@ public:
 	void setOrdinal(	Rcpp::RObject ordinalData);
 	void setNominal(	Rcpp::RObject nominalData);
 	void setNominalText(Rcpp::RObject nominalData);
+	bool columnIsMine(	const std::string & columnName);
 
 
-	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colgetTF colType);
+	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId);
 
 private:
 	std::string		_columnName		= "";
@@ -39,20 +42,19 @@ private:
 					_typeChanged	= false;
 	jaspColumnType	_columnType		= jaspColumnType::unknown;
 
-	bool			setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data);
-	bool			setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data);
-	bool			setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data);
-	bool			setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data);
-	columnType		getColumnType(				const std::string & columnName							);
-
+	columnType		getColumnType(				const std::string & columnName						);
+	int				getColumnAnalysisId(		const std::string & columnName						);
+	bool			setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data	);
+	bool			setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data	);
+	bool			setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data	);
+	bool			setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data	);
+	
+	static getColumnTypeFuncDef		_getColumnTypeFunc;
+	static getColumnAnIdFuncDef		_getColumnAnalysisIdFunc;
 	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
 									_setColumnDataAsOrdinalFunc,
 									_setColumnDataAsNominalFunc,
 									_setColumnDataAsNominalTextFunc;
-	static getColumnTypeFuncDef		_getColumnTypeFunc;
-
-
-
 };
 
 
