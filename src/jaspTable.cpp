@@ -156,6 +156,7 @@ void jaspTable::setColumn(std::string columnName, Rcpp::RObject column)
 	else if(Rcpp::is<Rcpp::IntegerVector>(column))		setColumnFromVector<INTSXP>((Rcpp::IntegerVector)	column, colIndex);
 	else if(Rcpp::is<Rcpp::StringVector>(column))		setColumnFromVector<STRSXP>((Rcpp::StringVector)	column, colIndex);
 	else if(Rcpp::is<Rcpp::CharacterVector>(column))	setColumnFromVector<STRSXP>((Rcpp::CharacterVector)	column, colIndex);
+	else if(isMixedRObject(column))						setColumnFromMixedVector((Rcpp::List)				column, colIndex);
 	else if(Rcpp::is<Rcpp::List>(column))				setColumnFromList((Rcpp::List)						column,	colIndex);
 	else Rf_error("Did not get a vector or list as column..");
 
@@ -169,6 +170,8 @@ void jaspTable::addColumns(Rcpp::RObject newData)
 
 	//Maybe this is overkill?
 	if(Rcpp::is<Rcpp::DataFrame>(newData))				addColumnsFromList(convertFactorsToCharacters((Rcpp::DataFrame)	newData));
+	// TODO: not sure what to do here!
+//	else if(isMixedRObject(newData))					addColumnsFromList((Rcpp::List)									newData);
 	else if(Rcpp::is<Rcpp::List>(newData))				addColumnsFromList((Rcpp::List)									newData);
 
 	else if(Rcpp::is<Rcpp::NumericMatrix>(newData))		addColumnsFromMatrix<REALSXP>((Rcpp::NumericMatrix)	newData);
@@ -333,7 +336,11 @@ Json::Value jaspTable::getCell(size_t col, size_t row, size_t maxCol, size_t max
 			amIExpected		= col < _expectedColumnCount	&& row < _expectedRowCount;
 
 	if(col < _data.size() && row < _data[col].size())
+	{
+		Rcpp::Rcout << "colFormats[" << col << "]: " << _colFormats[col] << std::endl;
+//		return _colFormats[col] == "mixed" ? _data[col][row]["value"] : _data[col][row];
 		return _data[col][row];
+	}
 
 	return !amIWithinBounds || !amIExpected ? Json::nullValue : Json::Value(".");
 }
@@ -343,9 +350,20 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 {
 	Json::Value val(getCell(col, row, maxCol, maxRow));
 
+	Rcpp::Rcout << "val: " << val.toStyledString() << std::endl;
+
 	std::string format = "";
 	if(_colFormats.containsField(getColName(col)))	format = _colFormats[getColName(col)];
 	else if(_colFormats.rowCount() > col)			format = _colFormats[col];
+
+	if(isMixedJson(val))
+	{
+		format  = val["format"].isNull() ? "" : val["format"].asString();
+		val		= val["value"];
+	}
+
+	Rcpp::Rcout << "format: " << format << std::endl;
+
 
 	if(val.isNull())	return "";
 	if(val.isString())	return val.asString();
@@ -1375,6 +1393,7 @@ Json::Value	jaspTable::rowsJson(Json::Value footnotes) const
 
 jaspTableColumnType jaspTable::deriveColumnType(int col) const
 {
+	Rcpp::Rcout << "Inside deriveColumnType" << std::endl;
 	if(static_cast<size_t>(col) >= _data.size())
 		return jaspTableColumnType::null;
 
@@ -1441,6 +1460,8 @@ void jaspTable::addColumnInfo(Rcpp::RObject name, Rcpp::RObject title, Rcpp::ROb
 	_colNames.add(colName);
 
 	std::string lastAddedColName = getColName(_colNames.rowCount() - 1);
+
+	Rcpp::Rcout << "Inside addColumnInfo" << std::endl;
 
 	if(!title.isNULL())		_colTitles[		lastAddedColName ] = Rcpp::String(title);
 	if(!type.isNULL())		_colTypes[		lastAddedColName ] = Rcpp::String(type);

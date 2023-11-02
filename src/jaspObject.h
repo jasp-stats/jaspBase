@@ -147,12 +147,58 @@ public:
 		else if(Rcpp::is<Rcpp::IntegerVector>(obj))		return RcppVector_to_VectorJson<INTSXP>((Rcpp::IntegerVector)		obj);
 		else if(Rcpp::is<Rcpp::StringVector>(obj))		return RcppVector_to_VectorJson<STRSXP>((Rcpp::StringVector)		obj);
 		else if(Rcpp::is<Rcpp::CharacterVector>(obj))	return RcppVector_to_VectorJson<STRSXP>((Rcpp::CharacterVector)		obj);
+		else if(isMixedRObject(obj))					return MixedRcppVector_to_VectorJson(	(Rcpp::List)				obj);
 		else if(Rcpp::is<Rcpp::List>(obj))				return RList_to_VectorJson((Rcpp::List)								obj);
 		else if(throwError) Rf_error("JASPjson::RcppVector_to_VectorJson received an SEXP that is not a Vector of some kind.");
 
 		return std::vector<Json::Value>({""});
 	}
 
+	std::vector<Json::Value> MixedRcppVector_to_VectorJson(Rcpp::List obj)
+	{
+		std::vector<Json::Value> vec;
+		Rcpp::Rcout << "MixedRcppVector_to_VectorJson" << std::endl;
+
+		for(int i=0; i<obj.length(); i++)
+		{
+
+			Json::Value value = MixedRObject_to_JsonValue(Rcpp::as<Rcpp::List>(obj[i]));
+			Rcpp::Rcout << value.toStyledString() << std::endl;
+
+			vec.push_back(value);
+
+//			Rcpp::List row = obj[i];
+//			Json::Value value(Json::objectValue);
+//			value["value"] = RObject_to_JsonValue((Rcpp::RObject)	obj[i]);
+
+//			if (!Rcpp::is<Rcpp::CharacterVector>(obj[i][0]))
+//				throw(std::runtime_error("MixedRObject type should be character but it is not!"));
+
+//			Rcpp::CharacterVector type = obj[i+1];
+
+//			if (type.length() != 1)
+//				throw(std::runtime_error("MixedRObject type has length > 1!"));
+
+//			value["type"] = RObject_to_JsonValue(type);
+
+//			if (!Rcpp::is<Rcpp::CharacterVector>(obj[i+2]))
+//				throw(std::runtime_error("MixedRObject format should be character but it is not!"));
+
+//			Rcpp::CharacterVector format = obj[i+2];
+
+//			if (format.length() != 1)
+//				throw(std::runtime_error("MixedRObject format has length > 1!"));
+
+//			value["format"] = RObject_to_JsonValue(format);
+
+//			Rcpp::Rcout << value.toStyledString() << std::endl;
+
+//			vec.push_back(value);
+
+		}
+
+		return vec;
+	}
 
 	template<int RTYPE>	 std::vector<Json::Value> RcppVector_to_VectorJson(Rcpp::Vector<RTYPE> obj)
 	{
@@ -185,9 +231,11 @@ public:
 		return vecvec;
 	}
 
-	Json::Value RObject_to_JsonValue(Rcpp::RObject		obj);
-	Json::Value RObject_to_JsonValue(Rcpp::List 		obj);
+	Json::Value RObject_to_JsonValue(		Rcpp::RObject	obj);
+	Json::Value RObject_to_JsonValue(		Rcpp::List 		obj);
+	Json::Value MixedRObject_to_JsonValue(	Rcpp::List		obj);
 
+	bool	isMixedRObject(Rcpp::RObject obj) const { return Rcpp::is<Rcpp::List>(obj) && obj.inherits("mixed"); }
 
 	template<int RTYPE>	 Json::Value RObject_to_JsonValue(Rcpp::Matrix<RTYPE>	obj)
 	{
