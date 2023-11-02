@@ -27,10 +27,10 @@ public:
 	Json::Value	dataEntry(std::string & errorMessage)			const	override;
 
 
-	void setScale(		Rcpp::RObject scalarData);
-	void setOrdinal(	Rcpp::RObject ordinalData);
-	void setNominal(	Rcpp::RObject nominalData);
-	void setNominalText(Rcpp::RObject nominalData);
+	bool setScale(		Rcpp::RObject scalarData);
+	bool setOrdinal(	Rcpp::RObject ordinalData);
+	bool setNominal(	Rcpp::RObject nominalData);
+	bool setNominalText(Rcpp::RObject nominalData);
 	bool columnIsMine(	const std::string & columnName);
 
 
@@ -64,10 +64,10 @@ class jaspColumn_Interface : public jaspObject_Interface
 public:
 	jaspColumn_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
 
-	void setScale(		Rcpp::RObject scalarData)	{ static_cast<jaspColumn*>(myJaspObject)->setScale(scalarData);			}
-	void setOrdinal(	Rcpp::RObject ordinalData)	{ static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
-	void setNominal(	Rcpp::RObject nominalData)	{ static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
-	void setNominalText(Rcpp::RObject nominalData)	{ static_cast<jaspColumn*>(myJaspObject)->setNominalText(nominalData);	}
+	bool setScale(		Rcpp::RObject scalarData)	{ return static_cast<jaspColumn*>(myJaspObject)->setScale(scalarData);			}
+	bool setOrdinal(	Rcpp::RObject ordinalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
+	bool setNominal(	Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
+	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominalText(nominalData);	}
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspColumn_Interface)

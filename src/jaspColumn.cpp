@@ -106,7 +106,7 @@ std::string jaspColumn::dataToString(std::string prefix) const
 	return out.str();
 }
 
-void jaspColumn::setScale(Rcpp::RObject scalarData)
+bool jaspColumn::setScale(Rcpp::RObject scalarData)
 {
 	_dataChanged	= setColumnDataAsScale(_columnName, scalarData);
 	_typeChanged	= _columnType != jaspColumnType::scale;
@@ -114,9 +114,11 @@ void jaspColumn::setScale(Rcpp::RObject scalarData)
 
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
+
+	return _dataChanged || _typeChanged;
 }
 
-void jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
+bool jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 {
 	_dataChanged	= setColumnDataAsOrdinal(_columnName, ordinalData);
 	_typeChanged	= _columnType != jaspColumnType::ordinal;
@@ -124,9 +126,11 @@ void jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
+
+	return _dataChanged || _typeChanged;
 }
 
-void jaspColumn::setNominal(Rcpp::RObject nominalData)
+bool jaspColumn::setNominal(Rcpp::RObject nominalData)
 {
 	_dataChanged	= setColumnDataAsNominal(_columnName, nominalData);
 	_typeChanged	= _columnType != jaspColumnType::nominal;
@@ -134,9 +138,11 @@ void jaspColumn::setNominal(Rcpp::RObject nominalData)
 
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
+
+	return _dataChanged || _typeChanged;
 }
 
-void jaspColumn::setNominalText(Rcpp::RObject nominalData)
+bool jaspColumn::setNominalText(Rcpp::RObject nominalData)
 {
 	_dataChanged	= setColumnDataAsNominalText(_columnName, nominalData);
 	_typeChanged	= _columnType != jaspColumnType::nominalText;
@@ -144,6 +150,8 @@ void jaspColumn::setNominalText(Rcpp::RObject nominalData)
 
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
+
+	return _dataChanged || _typeChanged;
 }
 
 
