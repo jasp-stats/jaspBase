@@ -260,6 +260,9 @@ void jaspTable::addRowsFromList(Rcpp::List newData, Rcpp::CharacterVector newRow
 
 		std::vector<std::string> localColNames;
 
+		Rcpp::Rcout << "addRowsFromList is this object" << std::endl;
+		Rcpp::print(rij);
+
 		if(Rcpp::is<Rcpp::List>(rij))
 			 localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
 

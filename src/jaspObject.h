@@ -158,43 +158,27 @@ public:
 	{
 		std::vector<Json::Value> vec;
 		Rcpp::Rcout << "MixedRcppVector_to_VectorJson" << std::endl;
+		Rcpp::print(obj);
 
-		for(int i=0; i<obj.length(); i++)
+		if (obj.inherits("row"))
 		{
-
-			Json::Value value = MixedRObject_to_JsonValue(Rcpp::as<Rcpp::List>(obj[i]));
+			// obj == list(value = ..., type = ..., format = ...)
+			Json::Value value = MixedRObject_to_JsonValue(obj);
 			Rcpp::Rcout << value.toStyledString() << std::endl;
 
 			vec.push_back(value);
+		}
+		else
+		{
+			// obj == list(list(value = ..., type = ..., format = ...), list(value = ..., type = ..., format = ...))
+			for(int i=0; i<obj.length(); i++)
+			{
 
-//			Rcpp::List row = obj[i];
-//			Json::Value value(Json::objectValue);
-//			value["value"] = RObject_to_JsonValue((Rcpp::RObject)	obj[i]);
+				Json::Value value = MixedRObject_to_JsonValue(Rcpp::as<Rcpp::List>(obj[i]));
+				Rcpp::Rcout << value.toStyledString() << std::endl;
 
-//			if (!Rcpp::is<Rcpp::CharacterVector>(obj[i][0]))
-//				throw(std::runtime_error("MixedRObject type should be character but it is not!"));
-
-//			Rcpp::CharacterVector type = obj[i+1];
-
-//			if (type.length() != 1)
-//				throw(std::runtime_error("MixedRObject type has length > 1!"));
-
-//			value["type"] = RObject_to_JsonValue(type);
-
-//			if (!Rcpp::is<Rcpp::CharacterVector>(obj[i+2]))
-//				throw(std::runtime_error("MixedRObject format should be character but it is not!"));
-
-//			Rcpp::CharacterVector format = obj[i+2];
-
-//			if (format.length() != 1)
-//				throw(std::runtime_error("MixedRObject format has length > 1!"));
-
-//			value["format"] = RObject_to_JsonValue(format);
-
-//			Rcpp::Rcout << value.toStyledString() << std::endl;
-
-//			vec.push_back(value);
-
+				vec.push_back(value);
+			}
 		}
 
 		return vec;
