@@ -143,7 +143,11 @@ tb
 # col and col2
 tb <- createJaspTable()
 tb$addRows(rows = rowList[[1]])
+tb$addRows(rows = rowList[[2]])
+tb$addRows(rows = rowList[[3]])
+tb$addRows(rows = rowList[[4]])
 tb
+
 
 tb <- createJaspTable()
 tb$addRows(rows = list(
@@ -178,3 +182,60 @@ jaspResults[["table"]] <- tb
 returnThis <- jaspResultsCPP$getResults()
 structure <- jsonlite::fromJSON(returnThis)
 structure$results$table$data
+
+
+
+tb <- createJaspTable()
+
+data <- createMixedColumn(
+  values = list(1.23, 0.04, "hoi", 123),
+  types  = c("number", "pvalue", "string", "integer")
+)
+
+tb[["m"]] <- data
+tb[["i"]] <- seq(length(data))
+tb
+
+
+jaspResultsCPP        <- jaspBase:::loadJaspResults("a name")
+jaspResultsCPP$title  <- "a title"
+jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
+
+jaspResults[["table"]] <- tb
+
+jaspResultsCPP$send()
+
+returnThis <- jaspResultsCPP$getResults()
+structure <- jsonlite::fromJSON(returnThis)
+structure$results$table$data
+structure$results$table$schema
+
+
+
+
+tb <- createJaspTable(title = "Mixed Table Test")
+
+df <- data.frame(
+  col  = createMixedColumn(
+    values = list(1.23, 0.04, "hoi", 123),
+    types  = c("number", "pvalue", "string", "integer")
+  ),
+  col2 = 1:4
+)
+
+tb$setData(df)
+print(tb)
+
+jaspResultsCPP        <- jaspBase:::loadJaspResults("a name")
+jaspResultsCPP$title  <- "a title"
+jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
+
+
+jaspResults[["mixedTestTableTest"]] <- tb
+
+
+returnThis <- jaspResultsCPP$getResults()
+structure <- jsonlite::fromJSON(returnThis)
+structure$results$table$data
+structure$results$table$schema
+

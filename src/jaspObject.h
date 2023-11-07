@@ -17,7 +17,7 @@ void		jaspPrint(			std::string msg);
 
 DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource, report);
 DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
-DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite); //can be merged with columnType from CentralDatasetModel branch later on?
+DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite, mixed); //can be merged with columnType from CentralDatasetModel branch later on?
 
 jaspObjectType jaspObjectTypeStringToObjectType(std::string type);
 

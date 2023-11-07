@@ -525,6 +525,16 @@ Rcpp::List jaspTable::toRObject()
 			df[getColName(col)] = values;
 			break;
 		}
+		case jaspTableColumnType::mixed:
+		{
+			// TODO: implement this!
+			Rcpp::StringVector values(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+				values[row] = _data[col][row].asString();
+
+			df[getColName(col)] = values;
+			break;
+		}
 		// this case is probably unnecessary
 		case jaspTableColumnType::null:
 		{
@@ -1428,6 +1438,13 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 				return jaspTableColumnType::various;
 			break;
 
+		case Json::objectValue:
+		{
+			if (cell.isMember("value") && cell.isMember("type") && cell.isMember("format"))
+				return jaspTableColumnType::mixed;
+			break;
+		}
+
 		default:
 			return jaspTableColumnType::composite; //arrays and objects are not really supported as cells at the moment but maybe we could add that in the future?
 		}
@@ -1440,6 +1457,7 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 	case Json::intValue:
 	case Json::uintValue:		return jaspTableColumnType::integer;
 	case Json::realValue:		return jaspTableColumnType::number;
+	case Json::arrayValue:		return jaspTableColumnType::mixed;
 	default:					return jaspTableColumnType::unknown;
 	}
 }
