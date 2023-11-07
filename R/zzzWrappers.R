@@ -50,6 +50,11 @@ decodeName <- function(name) {
   else                               return(name)
 }
 
+#' @export
+createColumns <- function(names) {
+  jaspBase:::createColumnsCPP(names)
+}
+
 # TODO: this won't work?
 checkForJaspResultsInit <- function() {
   if (!exists("jaspResults", .GlobalEnv)) .onAttach()
@@ -819,7 +824,8 @@ jaspColumnR <- R6::R6Class(
   inherit   = jaspOutputObjR,
   cloneable = FALSE,
   public    = list(
-    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL) {
+    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL) 
+    {
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
         return()
