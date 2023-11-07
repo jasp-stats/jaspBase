@@ -1,6 +1,7 @@
 #include "jaspColumn.h"
 #include "jaspResults.h"
 
+createColumnFuncDef		jaspColumn::_createColumnFunc					= nullptr;
 getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
 getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
@@ -23,8 +24,9 @@ jaspColumn::jaspColumn(std::string columnName)
 }
 
 
-void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnId)
+void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnId, colCreateF colCreate)
 {
+	_createColumnFunc				= * colCreate;
 	_getColumnTypeFunc 				= * colType;
 	_getColumnAnalysisIdFunc		= * colAnId;
 	_setColumnDataAsScaleFunc 		= * scalar;
@@ -60,7 +62,7 @@ columnType jaspColumn::getColumnType(const std::string & columnName)
 }
 
 int jaspColumn::getColumnAnalysisId(const std::string & columnName)
-{ 
+{
 	if(!_getColumnAnalysisIdFunc) 
 		return -1;
 	else
@@ -72,8 +74,8 @@ bool jaspColumn::columnIsMine(	const std::string & columnName)
 	if(jaspResults::analysisId() == -1)
 		return true;
 
-	jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
-	jaspPrint("getColumnAnalysisId("+columnName+"): " + std::to_string(getColumnAnalysisId(columnName)));
+	//jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
+	//jaspPrint("getColumnAnalysisId("+columnName+"): " + std::to_string(getColumnAnalysisId(columnName)));
 
 	return jaspResults::analysisId() == getColumnAnalysisId(columnName);
 }
@@ -104,6 +106,32 @@ std::string jaspColumn::dataToString(std::string prefix) const
 	out << prefix << "column " << _columnName << " has type " << jaspColumnTypeToString(_columnType) << " and had " << (_dataChanged? "" : "no ") << "changes!\n";
 
 	return out.str();
+}
+
+Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
+{
+	Rcpp::StringVector result;
+
+	if(!_createColumnFunc)
+	{
+		jaspPrint("jaspColumn does nothing in R stand-alone!");
+		return result;
+	}
+
+	for(const Rcpp::String columnName : columnNames)
+		try
+		{
+			if(getColumnAnalysisId(columnName) != -1)
+				return result;
+		}
+		catch(std::runtime_error & E)
+		{} //If it gets caught it means the column didnt exist, so thats good
+
+	
+	for(const Rcpp::String columnName : columnNames)
+		result.push_back((*_createColumnFunc)(columnName));
+
+	return result;
 }
 
 bool jaspColumn::setScale(Rcpp::RObject scalarData)

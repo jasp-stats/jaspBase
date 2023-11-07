@@ -41,6 +41,7 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("setWriteSealLocation",				jaspResults::setWriteSealLocation);
 
 	Rcpp::function("setColumnFuncs",					jaspColumn::setColumnFuncs);
+	Rcpp::function("createColumnsCPP",					jaspColumn::createColumnsCPP);
 	Rcpp::function("setJaspLogFunction",				setJaspLogFunction);
 
 
@@ -202,6 +203,7 @@ RCPP_MODULE(jaspResults)
 		.method("setOrdinal",			&jaspColumn_Interface::setOrdinal,		"Overwrite the contents of the specified column with ordinal data.")
 		.method("setNominal",			&jaspColumn_Interface::setNominal,		"Overwrite the contents of the specified column with nominal data.")
 		.method("setNominalText",		&jaspColumn_Interface::setNominalText,	"Overwrite the contents of the specified column with nominal text data.")
+	
 	;
 
 	Rcpp::class_<jaspResults_Interface>("jaspResultsClass")

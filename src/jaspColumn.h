@@ -8,10 +8,12 @@
 typedef bool			(*setColumnDataFuncDef)	(std::string, Rcpp::RObject);
 typedef columnType		(*getColumnTypeFuncDef)	(std::string);
 typedef int				(*getColumnAnIdFuncDef)	(std::string);
+typedef std::string		(*createColumnFuncDef)	(std::string);
 
-typedef  Rcpp::XPtr<setColumnDataFuncDef> colDataF;
-typedef  Rcpp::XPtr<getColumnTypeFuncDef> colGetTF;
-typedef  Rcpp::XPtr<getColumnAnIdFuncDef> colGetAIF;
+typedef  Rcpp::XPtr<setColumnDataFuncDef> 	colDataF;
+typedef  Rcpp::XPtr<getColumnTypeFuncDef> 	colGetTF;
+typedef  Rcpp::XPtr<getColumnAnIdFuncDef> 	colGetAIF;
+typedef  Rcpp::XPtr<createColumnFuncDef> 	colCreateF;
 
 class jaspColumn : public jaspObject
 {
@@ -27,14 +29,16 @@ public:
 	Json::Value	dataEntry(std::string & errorMessage)			const	override;
 
 
-	bool setScale(		Rcpp::RObject scalarData);
-	bool setOrdinal(	Rcpp::RObject ordinalData);
-	bool setNominal(	Rcpp::RObject nominalData);
-	bool setNominalText(Rcpp::RObject nominalData);
-	bool columnIsMine(	const std::string & columnName);
+	bool 				setScale(		Rcpp::RObject 		scalarData);
+	bool 				setOrdinal(		Rcpp::RObject 		ordinalData);
+	bool 				setNominal(		Rcpp::RObject		nominalData);
+	bool 				setNominalText(	Rcpp::RObject 		nominalData);
+	bool 				columnIsMine(	const std::string & columnName);
+
+	static Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
 
 
-	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId);
+	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate);
 
 private:
 	std::string		_columnName		= "";
@@ -42,13 +46,15 @@ private:
 					_typeChanged	= false;
 	jaspColumnType	_columnType		= jaspColumnType::unknown;
 
-	columnType		getColumnType(				const std::string & columnName						);
-	int				getColumnAnalysisId(		const std::string & columnName						);
-	bool			setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data	);
-	bool			setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data	);
-	bool			setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data	);
-	bool			setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data	);
 	
+	static columnType	getColumnType(				const std::string & columnName						);
+	static int			getColumnAnalysisId(		const std::string & columnName						);
+	bool				setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data	);
+	bool				setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data	);
+	bool				setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data	);
+	bool				setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data	);
+	
+	static createColumnFuncDef		_createColumnFunc;
 	static getColumnTypeFuncDef		_getColumnTypeFunc;
 	static getColumnAnIdFuncDef		_getColumnAnalysisIdFunc;
 	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
