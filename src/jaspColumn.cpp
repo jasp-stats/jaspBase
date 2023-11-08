@@ -3,6 +3,7 @@
 
 createColumnFuncDef		jaspColumn::_createColumnFunc					= nullptr;
 getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
+getColumnExistsFDef		jaspColumn::_getColumnExistsFunc				= nullptr;
 getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsOrdinalFunc			= nullptr;
@@ -24,7 +25,8 @@ jaspColumn::jaspColumn(std::string columnName)
 }
 
 
-void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnId, colCreateF colCreate)
+void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, 
+	colGetTF colType, colGetAIF colAnId, colCreateF colCreate, colExistsF colExists)
 {
 	_createColumnFunc				= * colCreate;
 	_getColumnTypeFunc 				= * colType;
@@ -33,6 +35,7 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 	_setColumnDataAsOrdinalFunc 	= * ordinal;
 	_setColumnDataAsNominalFunc 	= * nominal;
 	_setColumnDataAsNominalTextFunc = * nominalText;
+	_getColumnExistsFunc			= * colExists;
 }
 
 #define SET_COLUMN_DATA_BASE(FUNC)												\
@@ -80,32 +83,15 @@ bool jaspColumn::columnIsMine(	const std::string & columnName)
 	return jaspResults::analysisId() == getColumnAnalysisId(columnName);
 }
 
-Json::Value jaspColumn::convertToJSON() const
+bool jaspColumn::getColumnExists(const std::string & columnName)
 {
-	Json::Value obj		= jaspObject::convertToJSON();
-
-	obj["columnName"]	= _columnName;
-	obj["columnType"]	= jaspColumnTypeToString(_columnType);
-
-	return obj;
-}
-
-void jaspColumn::convertFromJSON_SetFields(Json::Value in)
-{
-	jaspObject::convertFromJSON_SetFields(in);
-
-	_columnName = in["columnName"].asString();
-	_columnType	= jaspColumnTypeFromString(in["columnType"].asString());
-	_dataChanged	= false;
-}
-
-std::string jaspColumn::dataToString(std::string prefix) const
-{
-	std::stringstream out;
-
-	out << prefix << "column " << _columnName << " has type " << jaspColumnTypeToString(_columnType) << " and had " << (_dataChanged? "" : "no ") << "changes!\n";
-
-	return out.str();
+	if(!_getColumnExistsFunc) 
+	{
+		jaspPrint("jaspColumn::getColumnExists doesnt do anything if no functions have been passed on");
+		return false;
+	}
+	else
+		return (*_getColumnExistsFunc)(columnName); 
 }
 
 Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
@@ -119,8 +105,8 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 	}
 
 	for(const Rcpp::String columnName : columnNames)
-			if(getColumnAnalysisId(columnName) != -1)
-				return result;
+		if(getColumnExists(columnName))
+			return result;
 
 	
 	for(const Rcpp::String columnName : columnNames)
@@ -188,4 +174,33 @@ Json::Value jaspColumn::dataEntry(std::string & errorMessage) const
 	data["typeChanged"]	= _typeChanged;
 
 	return data;
+}
+
+
+Json::Value jaspColumn::convertToJSON() const
+{
+	Json::Value obj		= jaspObject::convertToJSON();
+
+	obj["columnName"]	= _columnName;
+	obj["columnType"]	= jaspColumnTypeToString(_columnType);
+
+	return obj;
+}
+
+void jaspColumn::convertFromJSON_SetFields(Json::Value in)
+{
+	jaspObject::convertFromJSON_SetFields(in);
+
+	_columnName = in["columnName"].asString();
+	_columnType	= jaspColumnTypeFromString(in["columnType"].asString());
+	_dataChanged	= false;
+}
+
+std::string jaspColumn::dataToString(std::string prefix) const
+{
+	std::stringstream out;
+
+	out << prefix << "column " << _columnName << " has type " << jaspColumnTypeToString(_columnType) << " and had " << (_dataChanged? "" : "no ") << "changes!\n";
+
+	return out.str();
 }
