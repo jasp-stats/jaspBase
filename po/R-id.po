@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2022-12-17 03:40\n"
-"PO-Revision-Date: 2022-02-17 15:13+0000\n"
-"Last-Translator: Reza Almanda <rezaalmanda27@gmail.com>\n"
+"PO-Revision-Date: 2023-11-13 11:11+0000\n"
+"Last-Translator: rania rahida <raniarahida3@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "id/>\n"
 "Language: id\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.11-dev\n"
+"X-Generator: Weblate 5.2-dev\n"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Catatan.</em>"
@@ -20,19 +20,24 @@ msgid "no plot object was found"
 msgstr "objek plot tidak ditemukan"
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr ""
+msgstr "Masalah berikut ini terjadi saat menjalankan analisis:"
 
+#, fuzzy
 msgid "after grouping on %s"
-msgstr ""
+msgstr "setelah pengelompokan pada %s"
 
 msgid ""
 "This analysis terminated unexpectedly. %s To receive assistance with this "
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
+"Analisis ini dihentikan secara tidak terduga. Untuk mendapatkan bantuan atas "
+"masalah ini, silakan laporkan pesan di atas di: https://jasp-stats.org/bug-"
+"reports"
 
+#, fuzzy
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "Tak terhingga ditemukan dalam %s"
 
 msgid "Number of factor levels is %1$s in %2$s"
 msgstr ""
@@ -66,14 +71,17 @@ msgid ""
 "corresponding higher-order interaction is included"
 msgstr ""
 
+#, fuzzy
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "Bilangan negatif ditemukan dalam %s"
 
+#, fuzzy
 msgid "Missing values encountered in %s"
-msgstr ""
+msgstr "Nilai yang hilang ditemukan dalam %s"
 
+#, fuzzy
 msgid "Duplicate variables encountered in %s"
-msgstr ""
+msgstr "Variabel duplikat yang ditemukan dalam %s"
 
 msgid ""
 "Over %s%% of the rows consist entirely of missing values. Please remove "
@@ -91,18 +99,25 @@ msgid ""
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
 
+#, fuzzy
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "Proporsi yang diuji terhadap nilai: %s"
 
+#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
 msgstr ""
+"Untuk semua pengujian, hipotesis alternatif menetapkan bahwa proporsinya "
+"kurang dari %s"
 
+#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
 msgstr ""
+"Untuk semua pengujian, hipotesis alternatif menetapkan bahwa proporsinya "
+"lebih besar dari %s"
 
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr ""
