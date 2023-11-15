@@ -149,3 +149,94 @@ hasSubstring <- function(string, substring) {
 
   return(v)
 }
+
+#' @export
+rowMean <- function(...) {
+  apply(data.frame(...), 1, mean, na.rm=FALSE)
+}
+
+#' @export
+rowMeanNaRm <- function(...) {
+  apply(data.frame(...), 1, mean, na.rm=TRUE)
+}
+
+#' @export
+rowSum <- function(...) {
+  apply(data.frame(...), 1, sum, na.rm=FALSE)
+}
+
+#' @export
+rowSumNaRm <- function(...) {
+  apply(data.frame(...), 1, sum, na.rm=TRUE)
+}
+
+#' @export
+rowSD <- function(...) {
+  apply(data.frame(...), 1, sd, na.rm=FALSE)
+}
+
+#' @export
+rowSDNaRm <- function(...) {
+  apply(data.frame(...), 1, sd, na.rm=TRUE)
+}
+
+#' @export
+rowVariance <- function(...) {
+  apply(data.frame(...), 1, var, na.rm=FALSE)
+}
+
+#' @export
+rowVarianceNaRm <- function(...) {
+  apply(data.frame(...), 1, var, na.rm=TRUE)
+}
+
+#' @export
+rowCovariance <- function(...) {
+  apply(data.frame(...), 1, cov, na.rm=FALSE)
+}
+
+#' @export
+rowCovarianceNaRm <- function(...) {
+  apply(data.frame(...), 1, cov, na.rm=TRUE)
+}
+
+#' @export
+rowCorrelation <- function(...) {
+  apply(data.frame(...), 1, cor, na.rm=FALSE)
+}
+
+#' @export
+rowCorrelationNaRm <- function(...) {
+  apply(data.frame(...), 1, cor, na.rm=TRUE)
+}
+
+#' @export
+rowMedian <- function(...) {
+  apply(data.frame(...), 1, median, na.rm=FALSE)
+}
+
+#' @export
+rowMedianNaRm <- function(...) {
+  apply(data.frame(...), 1, median, na.rm=TRUE)
+}
+
+#' @export
+rowMin <- function(...) {
+  apply(data.frame(...), 1, min, na.rm=FALSE)
+}
+
+#' @export
+rowMinNaRm <- function(...) {
+  apply(data.frame(...), 1, min, na.rm=TRUE)
+}
+
+
+#' @export
+rowMax <- function(...) {
+  apply(data.frame(...), 1, max, na.rm=FALSE)
+}
+
+#' @export
+rowMaxNaRm <- function(...) {
+  apply(data.frame(...), 1, max, na.rm=TRUE)
+}
