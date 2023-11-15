@@ -192,22 +192,12 @@ rowVarianceNaRm <- function(...) {
 
 #' @export
 rowCovariance <- function(...) {
-  apply(data.frame(...), 1, cov, na.rm=FALSE)
-}
-
-#' @export
-rowCovarianceNaRm <- function(...) {
-  apply(data.frame(...), 1, cov, na.rm=TRUE)
+  apply(data.frame(...), 1, cov)
 }
 
 #' @export
 rowCorrelation <- function(...) {
-  apply(data.frame(...), 1, cor, na.rm=FALSE)
-}
-
-#' @export
-rowCorrelationNaRm <- function(...) {
-  apply(data.frame(...), 1, cor, na.rm=TRUE)
+  apply(data.frame(...), 1, cor)
 }
 
 #' @export
