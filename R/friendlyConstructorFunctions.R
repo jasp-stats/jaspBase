@@ -149,3 +149,73 @@ hasSubstring <- function(string, substring) {
 
   return(v)
 }
+
+#' @export
+rowMean <- function(...) {
+  rowMeans(matrix(c(...), ncol = ...length()), na.rm = FALSE)
+}
+
+#' @export
+rowMeanNaRm <- function(...) {
+  rowMeans(matrix(c(...), ncol = ...length()), na.rm = TRUE)
+}
+
+#' @export
+rowSum <- function(...) {
+  rowSums(matrix(c(...), ncol = ...length()), na.rm = FALSE)
+}
+
+#' @export
+rowSumNaRm <- function(...) {
+  rowSums(matrix(c(...), ncol = ...length()), na.rm = TRUE)
+}
+
+#' @export
+rowSD <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = FALSE)
+}
+
+#' @export
+rowSDNaRm <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = TRUE)
+}
+
+#' @export
+rowVariance <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = FALSE)
+}
+
+#' @export
+rowVarianceNaRm <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = TRUE)
+}
+
+#' @export
+rowMedian <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = FALSE)
+}
+
+#' @export
+rowMedianNaRm <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = TRUE)
+}
+
+#' @export
+rowMin <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = FALSE)
+}
+
+#' @export
+rowMinNaRm <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = TRUE)
+}
+
+#' @export
+rowMax <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = FALSE)
+}
+
+#' @export
+rowMaxNaRm <- function(...) {
+  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = TRUE)
+}
