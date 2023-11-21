@@ -152,81 +152,70 @@ hasSubstring <- function(string, substring) {
 
 #' @export
 rowMean <- function(...) {
-  apply(data.frame(...), 1, mean, na.rm=FALSE)
+  rowMeans(matrix(c(...), ncol = ...length()), na.rm = FALSE)
 }
 
 #' @export
 rowMeanNaRm <- function(...) {
-  apply(data.frame(...), 1, mean, na.rm=TRUE)
+  rowMeans(matrix(c(...), ncol = ...length()), na.rm = TRUE)
 }
 
 #' @export
 rowSum <- function(...) {
-  apply(data.frame(...), 1, sum, na.rm=FALSE)
+  rowSums(matrix(c(...), ncol = ...length()), na.rm = FALSE)
 }
 
 #' @export
 rowSumNaRm <- function(...) {
-  apply(data.frame(...), 1, sum, na.rm=TRUE)
+  rowSums(matrix(c(...), ncol = ...length()), na.rm = TRUE)
 }
 
 #' @export
 rowSD <- function(...) {
-  apply(data.frame(...), 1, sd, na.rm=FALSE)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = FALSE)
 }
 
 #' @export
 rowSDNaRm <- function(...) {
-  apply(data.frame(...), 1, sd, na.rm=TRUE)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = TRUE)
 }
 
 #' @export
 rowVariance <- function(...) {
-  apply(data.frame(...), 1, var, na.rm=FALSE)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = FALSE)
 }
 
 #' @export
 rowVarianceNaRm <- function(...) {
-  apply(data.frame(...), 1, var, na.rm=TRUE)
-}
-
-#' @export
-rowCovariance <- function(...) {
-  apply(data.frame(...), 1, cov)
-}
-
-#' @export
-rowCorrelation <- function(...) {
-  apply(data.frame(...), 1, cor)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = TRUE)
 }
 
 #' @export
 rowMedian <- function(...) {
-  apply(data.frame(...), 1, median, na.rm=FALSE)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = FALSE)
 }
 
 #' @export
 rowMedianNaRm <- function(...) {
-  apply(data.frame(...), 1, median, na.rm=TRUE)
+  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = TRUE)
 }
 
 #' @export
 rowMin <- function(...) {
-  apply(data.frame(...), 1, min, na.rm=FALSE)
+  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = FALSE)
 }
 
 #' @export
 rowMinNaRm <- function(...) {
-  apply(data.frame(...), 1, min, na.rm=TRUE)
+  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = TRUE)
 }
-
 
 #' @export
 rowMax <- function(...) {
-  apply(data.frame(...), 1, max, na.rm=FALSE)
+  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = FALSE)
 }
 
 #' @export
 rowMaxNaRm <- function(...) {
-  apply(data.frame(...), 1, max, na.rm=TRUE)
+  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = TRUE)
 }
