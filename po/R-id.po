@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
 "POT-Creation-Date: 2022-12-17 03:40\n"
-"PO-Revision-Date: 2023-11-13 11:11+0000\n"
+"PO-Revision-Date: 2023-11-20 23:04+0000\n"
 "Last-Translator: rania rahida <raniarahida3@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/jasp/jaspbase/"
 "id/>\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.2-dev\n"
+"X-Generator: Weblate 5.2\n"
 
 msgid "<em>Note.</em>"
 msgstr "<em>Catatan.</em>"
@@ -22,7 +22,6 @@ msgstr "objek plot tidak ditemukan"
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Masalah berikut ini terjadi saat menjalankan analisis:"
 
-#, fuzzy
 msgid "after grouping on %s"
 msgstr "setelah pengelompokan pada %s"
 
@@ -71,7 +70,6 @@ msgid ""
 "corresponding higher-order interaction is included"
 msgstr ""
 
-#, fuzzy
 msgid "Negative numbers found in %s"
 msgstr "Bilangan negatif ditemukan dalam %s"
 
@@ -79,7 +77,6 @@ msgstr "Bilangan negatif ditemukan dalam %s"
 msgid "Missing values encountered in %s"
 msgstr "Nilai yang hilang ditemukan dalam %s"
 
-#, fuzzy
 msgid "Duplicate variables encountered in %s"
 msgstr "Variabel duplikat yang ditemukan dalam %s"
 
@@ -99,11 +96,9 @@ msgid ""
 "log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
 
-#, fuzzy
 msgid "Proportions tested against value: %s"
 msgstr "Proporsi yang diuji terhadap nilai: %s"
 
-#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "less than %s"
@@ -111,7 +106,6 @@ msgstr ""
 "Untuk semua pengujian, hipotesis alternatif menetapkan bahwa proporsinya "
 "kurang dari %s"
 
-#, fuzzy
 msgid ""
 "For all tests, the alternative hypothesis specifies that the proportion is "
 "greater than %s"
