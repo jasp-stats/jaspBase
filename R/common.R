@@ -703,10 +703,10 @@ saveImage <- function(plotName, format, height, width)
       # Where available use the cairo devices, because:
       # - On Windows the standard devices use a wrong R_HOME causing encoding/font errors (INTERNAL-jasp/issues/682)
       # - On MacOS the standard pdf device can't deal with custom fonts (jasp-test-release/issues/1370) -- historically cairo could not display the default font well (INTERNAL-jasp/issues/186), but that seems fixed
-      if (capabilities("aqua"))
-        type <- "quartz"
-      else if (capabilities("cairo"))
+      if (capabilities("cairo"))
         type <- "cairo"
+      else if (capabilities("aqua"))
+        type <- "quartz"
       else
         type <- "Xlib"
 
