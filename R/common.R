@@ -620,7 +620,6 @@ jaspResultsStrings <- function() {
     ".readDatasetToEndNative",
     ".readDataSetHeaderNative",
     ".readDataSetRequestedNative",
-    ".callbackNative",
     ".requestStateFileNameNative",
     ".baseCitation",
     ".ppi",
