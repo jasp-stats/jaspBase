@@ -1024,7 +1024,7 @@ runWrappedAnalysis <- function(analysisName, data, options, version) {
     return(as.character(result))
 
   } else {
-
+    return("OK")
     options <- checkAnalysisOptions(analysisName, options, version)
     # fool renv so it does not try to install jaspTools
     jaspToolsRunAnalysis <- utils::getFromNamespace("runAnalysis", asNamespace("jaspTools"))

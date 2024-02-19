@@ -45,4 +45,5 @@ RcppModules: jaspResults
 NeedsCompilation: yes
 Suggests: 
     testthat (>= 3.0.0)
+    jasp-stats/jaspQmlR
 Config/testthat/edition: 3
