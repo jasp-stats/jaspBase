@@ -2,7 +2,8 @@
   # It's not 100% clear if "address" is the best choice here, but it should be a little bit faster than constructing hashes using identical.
   #  See also https://github.com/wch/r-source/blob/trunk/src/library/utils/src/hashtab.c
   recomputedHashtab = hashtab(type = "address", NULL),
-  lastRecomputed    = TRUE
+  lastRecomputed    = TRUE,
+  dataset           = NULL
 ), parent = emptyenv())
 
 saveHashOfJaspObject <- function(x) {

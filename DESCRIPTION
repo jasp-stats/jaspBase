@@ -24,6 +24,7 @@ Imports:
   officer,
   pkgbuild,
   plyr,
+  pillar,
   qgraph,
   ragg,
   R6,
@@ -34,6 +35,7 @@ Imports:
   rvg,
   svglite,
   systemfonts,
+  vctrs,
   withr
 Remotes:
   jasp-stats/jaspGraphs
