@@ -5,22 +5,30 @@
 #include "columntype.h"
 #include <Rcpp.h>
 
-typedef bool			(*setColumnDataFuncDef)	(std::string, Rcpp::RObject);
-typedef columnType		(*getColumnTypeFuncDef)	(std::string);
-typedef int				(*getColumnAnIdFuncDef)	(std::string);
-typedef bool			(*getColumnExistsFDef)	(std::string);
-typedef std::string		(*createColumnFuncDef)	(std::string);
+typedef bool			(*shouldEnDecodeFuncDef)	(std::string);
+typedef bool			(*setColumnDataFuncDef)		(std::string, Rcpp::RObject);
+typedef columnType		(*getColumnTypeFuncDef)		(std::string);
+typedef int				(*getColumnAnIdFuncDef)		(std::string);
+typedef bool			(*getColumnExistsFDef)		(std::string);
+typedef std::string		(*createColumnFuncDef)		(std::string);
+typedef std::string		(*enDecodeFuncDef)			(std::string);
 
-typedef  Rcpp::XPtr<setColumnDataFuncDef> 	colDataF;
-typedef  Rcpp::XPtr<getColumnTypeFuncDef> 	colGetTF;
-typedef  Rcpp::XPtr<getColumnAnIdFuncDef> 	colGetAIF;
-typedef  Rcpp::XPtr<createColumnFuncDef> 	colCreateF;
-typedef  Rcpp::XPtr<getColumnExistsFDef> 	colExistsF;
+typedef  Rcpp::XPtr<shouldEnDecodeFuncDef>			shouldEncDecodeF;
+typedef  Rcpp::XPtr<setColumnDataFuncDef>			colDataF;
+typedef  Rcpp::XPtr<getColumnTypeFuncDef>			colGetTF;
+typedef  Rcpp::XPtr<getColumnAnIdFuncDef>			colGetAIF;
+typedef  Rcpp::XPtr<createColumnFuncDef>			colCreateF;
+typedef  Rcpp::XPtr<getColumnExistsFDef>			colExistsF;
+typedef  Rcpp::XPtr<enDecodeFuncDef>				encDecodeF;
+
 
 class jaspColumn : public jaspObject
 {
 public:
 	jaspColumn(std::string columnName="");
+	
+	const std::string & nameDecoded() const { return _columnName;	}
+	const std::string & nameEncoded() const { return _encoded;		}
 
 
 	Json::Value		convertToJSON()								const	override;
@@ -30,31 +38,39 @@ public:
 	Json::Value	metaEntry()										const	override { return constructMetaEntry("column"); }
 	Json::Value	dataEntry(std::string & errorMessage)			const	override;
 
-
 	bool 				setScale(		Rcpp::RObject 		scalarData);
 	bool 				setOrdinal(		Rcpp::RObject 		ordinalData);
 	bool 				setNominal(		Rcpp::RObject		nominalData);
 	bool 				setNominalText(	Rcpp::RObject 		nominalData);
-	bool 				columnIsMine(	const std::string & columnName);
+	void				removeFromData() { throw std::runtime_error("jaspColumn::removeFromData not implemented!"); }
+	static bool			columnIsMine(	const std::string & columnName);
 
 	static Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
 
 
-	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colExistsF colExists);
+	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
 
 private:
-	std::string		_columnName		= "";
+	std::string		_columnName		= "",
+					_encoded		= "";
 	bool			_dataChanged	= false,
 					_typeChanged	= false;
 	jaspColumnType	_columnType		= jaspColumnType::unknown;
 
-	static columnType	getColumnType(				const std::string & columnName						);
-	static bool			getColumnExists(			const std::string & columnName						);
-	static int			getColumnAnalysisId(		const std::string & columnName						);
-	bool				setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data	);
-	bool				setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data	);
-	bool				setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data	);
-	bool				setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data	);
+	
+	static std::string	encode(						const std::string & columnName								);
+	static std::string	decode(						const std::string & columnName								);
+	static bool			shouldEncode(				const std::string & columnName								);
+	static bool			shouldDecode(				const std::string & columnName								);
+	static std::string	createColumn(				const std::string & columnName								); ///< Returns encoded columnname
+	static columnType	getColumnType(				const std::string & encodedColumnName						);
+	static bool			getColumnExists(			const std::string & encodedColumnName						);
+	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
+	void				setColumnName(				const std::string & name									);
+	bool				setColumnDataAsScale(		const std::string & encodedColumnName, Rcpp::RObject data	);
+	bool				setColumnDataAsOrdinal(		const std::string & encodedColumnName, Rcpp::RObject data	);
+	bool				setColumnDataAsNominal(		const std::string & encodedColumnName, Rcpp::RObject data	);
+	bool				setColumnDataAsNominalText(	const std::string & encodedColumnName, Rcpp::RObject data	);
 	
 	static createColumnFuncDef		_createColumnFunc;
 	static getColumnExistsFDef		_getColumnExistsFunc;
@@ -64,6 +80,12 @@ private:
 									_setColumnDataAsOrdinalFunc,
 									_setColumnDataAsNominalFunc,
 									_setColumnDataAsNominalTextFunc;
+	static enDecodeFuncDef			_encodeFunc,
+									_decodeFunc;
+	static shouldEnDecodeFuncDef	_shouldEncodeFunc,
+									_shouldDecodeFunc;
+	
+	
 };
 
 
@@ -77,6 +99,7 @@ public:
 	bool setOrdinal(	Rcpp::RObject ordinalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
 	bool setNominal(	Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
 	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominalText(nominalData);	}
+	void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspColumn_Interface)

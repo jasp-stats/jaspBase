@@ -203,7 +203,7 @@ RCPP_MODULE(jaspResults)
 		.method("setOrdinal",			&jaspColumn_Interface::setOrdinal,		"Overwrite the contents of the specified column with ordinal data.")
 		.method("setNominal",			&jaspColumn_Interface::setNominal,		"Overwrite the contents of the specified column with nominal data.")
 		.method("setNominalText",		&jaspColumn_Interface::setNominalText,	"Overwrite the contents of the specified column with nominal text data.")
-	
+		.method("removeFromData",		&jaspColumn_Interface::removeFromData,	"Remove the column from the dataset..") 
 	;
 
 	Rcpp::class_<jaspResults_Interface>("jaspResultsClass")

@@ -848,9 +848,11 @@ jaspColumnR <- R6::R6Class(
 
       return()
     },
+    
     setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
     setOrdinal      = function(ordinalData) private$jaspObject$setOrdinal(ordinalData),
     setNominal      = function(nominalData) private$jaspObject$setNominal(nominalData),
-    setNominalText  = function(nominalData) private$jaspObject$setNominalText(nominalData)
+    setNominalText  = function(nominalData) private$jaspObject$setNominalText(nominalData),
+    removeFromData  = function(scalarData)  private$jaspObject$removeFromData()
   )
 )
