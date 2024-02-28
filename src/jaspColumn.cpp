@@ -2,6 +2,7 @@
 #include "jaspResults.h"
 
 createColumnFuncDef		jaspColumn::_createColumnFunc					= nullptr;
+deleteColumnFuncDef		jaspColumn::_deleteColumnFunc					= nullptr;
 getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
 getColumnExistsFDef		jaspColumn::_getColumnExistsFunc				= nullptr;
 getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
@@ -39,7 +40,7 @@ void jaspColumn::setColumnName(const std::string & name)
 		_columnName = name;
 		_encoded	= createColumn(_columnName);
 	}
-	
+		
 	switch(getColumnType(_columnName))
 	{
 	case columnType::scale:			_columnType = jaspColumnType::scale;		break;
@@ -49,14 +50,16 @@ void jaspColumn::setColumnName(const std::string & name)
 	default:						_columnType = jaspColumnType::unknown;		break;
 	}
 	
-	_title = "jaspColumn for " + _columnName;
+	_title		= "jaspColumn for " + _columnName;
+	_removed	= false;
 }
 
 void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, 
-	colGetTF colType, colGetAIF colAnId, colCreateF colCreate, colExistsF colExists,
+	colGetTF colType, colGetAIF colAnId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists,
 	encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode)
 {
 	_createColumnFunc				= * colCreate;
+	_deleteColumnFunc				= * colDelete;
 	_getColumnTypeFunc 				= * colType;
 	_getColumnAnalysisIdFunc		= * colAnId;
 	_setColumnDataAsScaleFunc 		= * scalar;
@@ -189,8 +192,33 @@ std::string jaspColumn::createColumn(const std::string & columnName)
 		return (*_createColumnFunc)(columnName); 
 }
 
+void jaspColumn::removeFromData()
+{ 
+	assert(!_removed);
+	
+	deleteColumn(_columnName);
+	_removed = true;
+}
+
+bool jaspColumn::deleteColumn(const std::string &columnName)
+{
+	if(!_deleteColumnFunc) 
+	{
+		jaspPrint("jaspColumn::deleteColumn doesnt do anything if no functions have been passed on");
+		return "";
+	}
+	else if(!getColumnExists(columnName))
+		throw std::runtime_error("jaspColumn::deleteColumn cant delete column '"+columnName+"' because it does not exist"); //Given that jaspColumn creates a column when you set a name this should be rather unlikely
+	else if(!columnIsMine(columnName))
+		throw std::runtime_error("jaspColumn::deleteColumn cant delete column '"+columnName+"' because it is not created by this analysis");
+	else
+		return (*_deleteColumnFunc)(columnName); 
+}
+
 Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 {
+	jaspPrint("jaspBase::createColumns aka jaspColumn::createColumnsCPP is deprecated. jaspColumn is all you need!");
+	
 	Rcpp::StringVector result;
 
 	if(!_createColumnFunc)
@@ -268,7 +296,6 @@ bool jaspColumn::setNominalText(Rcpp::RObject nominalData)
 	return _dataChanged || _typeChanged;
 }
 
-
 Json::Value jaspColumn::dataEntry(std::string & errorMessage) const
 {
 	Json::Value data(jaspObject::dataEntry(errorMessage));
@@ -277,6 +304,7 @@ Json::Value jaspColumn::dataEntry(std::string & errorMessage) const
 	data["columnType"]	= jaspColumnTypeToString(_columnType);
 	data["dataChanged"]	= _dataChanged;
 	data["typeChanged"]	= _typeChanged;
+	data["removed"]		= _removed;
 
 	return data;
 }
