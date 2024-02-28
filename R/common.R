@@ -91,7 +91,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   if (base::exists(".requestStateFileNameNative")) {
     location              <- .fromRCPP(".requestStateFileNameNative")
-    print(location)
     oldwd                 <- getwd()
     setwd(location$root)
     withr::defer(setwd(oldwd))
@@ -516,16 +515,7 @@ jaspResultsStrings <- function() {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
 
-  # when run through jaspTools do not save the state, but store it internally
-  if ("jaspTools" %in% loadedNamespaces()) {
-    # fool renv so it does not try to install jaspTools
-    .setInternal <- utils::getFromNamespace(".setInternal", asNamespace("jaspTools"))
-    .setInternal("state", state)
-    return(list(relativePath = relativePath))
-  }
-
-  try(suppressWarnings(base::save(state, file=relativePath, compress=FALSE)), silent = FALSE)
-
+  .setInternal("state", state)
   return(list(relativePath = relativePath))
 }
 
@@ -1013,69 +1003,13 @@ registerData <- function(data) {
 
 checkAnalysisOptions <- function(qmlFile, options, version) {
     args <- list("options" = options, "qmlFile" = qmlFile, "version" = version)
-    args <- jsonlite::toJSON(args, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+    args <- toJSON(args)
     args <- as.character(args)
 
     options <- jaspQmlR::checkOptions(args)
     return(fromJSON(options)$options)
 }
 
-
-#' Run a JASP analysis in R.
-#'
-#' \code{runAnalysis} makes it possible to execute a JASP analysis in R. Usually this
-#' process is a bit cumbersome as there are a number of objects unique to the
-#' JASP environment. Think .ppi, data-reading, etc. These (rcpp) objects are
-#' replaced in the jaspTools so you do not have to deal with them. Note that
-#' \code{runAnalysis} sources JASP analyses every time it runs, so any change in
-#' analysis code between calls is incorporated. The output of the analysis is
-#' shown automatically through a call to \code{view} and returned
-#' invisibly.
-#'
-#'
-#' @param name String indicating the name of the analysis to run. This name is
-#' identical to that of the main function in a JASP analysis.
-#' @param dataset Data.frame, matrix, string name or string path; if it's a string then jaspTools
-#' first checks if it's valid path and if it isn't if the string matches one of the JASP datasets (e.g., "debug.csv").
-#' By default the directory in Resources is checked first, unless called within a testthat environment, in which case tests/datasets is checked first.
-#' @param options List of options to supply to the analysis (see also
-#' \code{analysisOptions}).
-#' @param view Boolean indicating whether to view the results in a webbrowser.
-#' @param quiet Boolean indicating whether to suppress messages from the
-#' analysis.
-#' @param makeTests Boolean indicating whether to create testthat unit tests and print them to the terminal.
-#' @examples
-#'
-#' options <- analysisOptions("BinomialTest")
-#' options[["variables"]] <- "contBinom"
-#' runAnalysis("BinomialTest", "debug", options)
-#'
-#' # Above and below are identical (below is taken from the Qt terminal)
-#'
-#' options <- analysisOptions('{
-#'    "id" : 6,
-#'    "name" : "BinomialTest",
-#'    "options" : {
-#'       "VovkSellkeMPR" : false,
-#'       "confidenceInterval" : false,
-#'       "confidenceIntervalInterval" : 0.950,
-#'       "descriptivesPlots" : false,
-#'       "descriptivesPlotsConfidenceInterval" : 0.950,
-#'       "hypothesis" : "notEqualToTestValue",
-#'       "plotHeight" : 300,
-#'       "plotWidth" : 160,
-#'       "testValue" : 0.50,
-#'       "variables" : [ "contBinom" ]
-#'    },
-#'    "perform" : "run",
-#'    "revision" : 1,
-#'    "settings" : {
-#'       "ppi" : 192
-#'    }
-#' }')
-#' runAnalysis("BinomialTest", "debug.csv", options)
-#'
-#'
 #' @export runAnalysis
 runAnalysis <- function(name, dataset, options, view = TRUE) {
   if (is.list(options) && is.null(names(options)) && any(names(unlist(lapply(options, attributes))) == "analysisName"))
@@ -1100,9 +1034,7 @@ runAnalysis <- function(name, dataset, options, view = TRUE) {
     Sys.setenv(LANGUAGE = oldLanguage)
   }, add = TRUE)
 
-  initAnalysisRuntime(dataset = dataset)
-
-  returnVal <- runJaspResults(name, "", "null", jsonlite::toJSON(options), "null", paste0(name, "Internal"))
+  returnVal <- runJaspResults(name, "", "null", toJSON(options), "null", paste0(name, "Internal"))
 
   # always TRUE after jaspResults is merged into jaspBase
   jsonResults <- if (inherits(returnVal, c("jaspResultsR", "R6"))) {
@@ -1139,7 +1071,7 @@ runAnalysis <- function(name, dataset, options, view = TRUE) {
   return(.pkgenv[["internal"]][[name]])
 }
 
-initAnalysisRuntime <- function(dataset, ...) {
+initAnalysisRuntime <- function(dataset) {
   # dataset to be found in the analysis when it needs to be read
   .setInternal("dataset", dataset)
 }
@@ -1211,14 +1143,14 @@ runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
   if (jaspResultsCalledFromJasp()) {
 
     result <- list("options" = options, "analysis" = analysisName, "version" = version)
-    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+    result <- toJSON(result)
     return(as.character(result))
 
   } else {
     .initOutputDirs()
+    initAnalysisRuntime(dataset = data)
     moduleName <- base::strsplit(analysisName, "::")[[1]][[1]]
     qmlFile <- paste(.libPaths(), moduleName, "qml", qmlFile, sep="/")
-    print(qmlFile)
     options <- checkAnalysisOptions(qmlFile, options, version)
     print(options)
     .insertRbridgeIntoEnv(.GlobalEnv)
@@ -1317,7 +1249,7 @@ getColumnCount <- function() {
 getColumnNames <- function() {
 
     dataset <- .getInternal("dataset")
-    return(colnames(dataset))
+    return(as.array(colnames(dataset)))
 }
 
 #' @export
@@ -1346,13 +1278,14 @@ getColumnType <- function(colName) {
 getColumnValues <- function(colName) {
 
     dataset <- .getInternal("dataset")
-    return(dataset[[colName]])
+    return(as.array(dataset[[colName]]))
 }
 
 #' @export
 getColumnLabels <- function(colName) {
 
     dataset <- .getInternal("dataset")
-    return(unique(dataset[[colName]]))
+    labels <- unique(dataset[[colName]])
+    return(as.array(labels))
 }
 
