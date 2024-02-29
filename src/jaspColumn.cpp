@@ -16,31 +16,20 @@ shouldEnDecodeFuncDef 	jaspColumn::_shouldEncodeFunc					= nullptr;
 shouldEnDecodeFuncDef	jaspColumn::_shouldDecodeFunc					= nullptr;
 
 jaspColumn::jaspColumn(std::string columnName)
-	: jaspObject(jaspObjectType::column, "jaspColumn for " + columnName)
+	: jaspObject(jaspObjectType::column, "jaspColumn for " + columnName),
+	  _columnName(columnName)
 {
-	if(!columnName.empty())
-		setColumnName(columnName);
-}
-
-void jaspColumn::setColumnName(const std::string & name)
-{
-	if(name.empty())
-		throw std::runtime_error("jaspColumn::setColumnName called with empty columnName, this is not allowed.");
-	
-	if(name == _columnName)
-		return;
-	
-	if(shouldDecode(name))
+	if(shouldDecode(columnName))
 	{
-		_encoded	= name;
+		_encoded	= columnName;
 		_columnName = decode(_encoded);
+		_title		= "jaspColumn for " + _columnName;
 	}
-	else
+	else //It isnt an encoded name of an existing column, so it should be a normal human columnname
 	{
-		_columnName = name;
-		_encoded	= createColumn(_columnName);
+		_encoded = !getColumnExists(_columnName) ? createColumn(columnName) : encode(_columnName);
 	}
-		
+	
 	switch(getColumnType(_columnName))
 	{
 	case columnType::scale:			_columnType = jaspColumnType::scale;		break;
@@ -49,9 +38,12 @@ void jaspColumn::setColumnName(const std::string & name)
 	case columnType::nominalText:	_columnType = jaspColumnType::nominalText;	break;
 	default:						_columnType = jaspColumnType::unknown;		break;
 	}
-	
-	_title		= "jaspColumn for " + _columnName;
-	_removed	= false;
+}
+
+jaspColumn::jaspColumn()
+	: jaspObject(jaspObjectType::column, "jaspColumn without columnName")
+{
+	//This one will load from JSON
 }
 
 void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, 
@@ -112,8 +104,8 @@ bool jaspColumn::columnIsMine(	const std::string & encodedColumnName)
 	if(jaspResults::analysisId() == -1)
 		return true;
 
-	jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
-	jaspPrint("getColumnAnalysisId("+encodedColumnName+"): " + std::to_string(getColumnAnalysisId(encodedColumnName)));
+	//jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
+	//jaspPrint("getColumnAnalysisId("+encodedColumnName+"): " + std::to_string(getColumnAnalysisId(encodedColumnName)));
 
 	return jaspResults::analysisId() == getColumnAnalysisId(encodedColumnName);
 }
@@ -192,13 +184,13 @@ std::string jaspColumn::createColumn(const std::string & columnName)
 		return (*_createColumnFunc)(columnName); 
 }
 
-void jaspColumn::removeFromData()
+/*void jaspColumn::removeFromData()
 { 
 	assert(!_removed);
 	
 	deleteColumn(_columnName);
 	_removed = true;
-}
+}*/
 
 bool jaspColumn::deleteColumn(const std::string &columnName)
 {
@@ -315,6 +307,9 @@ Json::Value jaspColumn::convertToJSON() const
 	Json::Value obj		= jaspObject::convertToJSON();
 
 	obj["columnName"]	= _columnName;
+	obj["encoded"]		= _encoded;
+	obj["columnType"]	= jaspColumnTypeToString(_columnType);
+	
 
 	return obj;
 }
@@ -323,8 +318,10 @@ void jaspColumn::convertFromJSON_SetFields(Json::Value in)
 {
 	jaspObject::convertFromJSON_SetFields(in);
 
-	setColumnName(in["columnName"].asString());
-	
+	_columnName		=							in["columnName"].asString();
+	_encoded		=							in["encoded"].asString();
+	_columnType		= jaspColumnTypeFromString(	in["columnType"].asString());
+	_removed		= !getColumnExists(_columnName);
 	_dataChanged	= false;
 	_typeChanged	= false;
 }

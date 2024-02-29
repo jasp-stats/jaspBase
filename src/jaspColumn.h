@@ -27,7 +27,8 @@ typedef  Rcpp::XPtr<enDecodeFuncDef>				encDecodeF;
 class jaspColumn : public jaspObject
 {
 public:
-	jaspColumn(std::string columnName="");
+	jaspColumn();
+	jaspColumn(std::string columnName);
 	
 	const std::string & nameDecoded() const { return _columnName;	}
 	const std::string & nameEncoded() const { return _encoded;		}
@@ -44,13 +45,17 @@ public:
 	bool 				setOrdinal(		Rcpp::RObject 		ordinalData);
 	bool 				setNominal(		Rcpp::RObject		nominalData);
 	bool 				setNominalText(	Rcpp::RObject 		nominalData);
-	void				removeFromData();
-	static bool			columnIsMine(	const std::string & columnName);
+	//void				removeFromData();
+	static bool			columnIsMine(	const std::string & columnName); ///< "Mine" means of analysis that is running
+	static bool			columnExists(	const std::string & columnName) { return getColumnExists(columnName); }
+	
 
-	static Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
+	static 
+	Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
 
 
-	static void setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
+	static void			setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
+	static bool			deleteColumn(const std::string & columnName);
 
 private:
 	std::string		_columnName		= "",
@@ -66,11 +71,10 @@ private:
 	static bool			shouldEncode(				const std::string & columnName								);
 	static bool			shouldDecode(				const std::string & columnName								);
 	static std::string	createColumn(				const std::string & columnName								); ///< Returns encoded columnname
-	static bool			deleteColumn(				const std::string & columnName								);
+	static bool			getColumnExists(const std::string & columnName);
 	static columnType	getColumnType(				const std::string & encodedColumnName						);
-	static bool			getColumnExists(			const std::string & encodedColumnName						);
 	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
-	void				setColumnName(				const std::string & name									);
+	void				determineTypeTitle();
 	bool				setColumnDataAsScale(		const std::string & encodedColumnName, Rcpp::RObject data	);
 	bool				setColumnDataAsOrdinal(		const std::string & encodedColumnName, Rcpp::RObject data	);
 	bool				setColumnDataAsNominal(		const std::string & encodedColumnName, Rcpp::RObject data	);
@@ -104,7 +108,7 @@ public:
 	bool setOrdinal(	Rcpp::RObject ordinalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
 	bool setNominal(	Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
 	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominalText(nominalData);	}
-	void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
+	//void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspColumn_Interface)
