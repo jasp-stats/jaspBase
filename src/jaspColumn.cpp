@@ -236,6 +236,8 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 	for(const std::string & columnName : colNames)
 		if(!getColumnExists(columnName))
 			result.push_back((*_createColumnFunc)(columnName));
+		else
+			result.push_back(encode(columnName));
 
 	return result;
 }
