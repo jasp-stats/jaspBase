@@ -1007,7 +1007,7 @@ checkAnalysisOptions <- function(qmlFile, options, version) {
     args <- as.character(args)
 
     options <- jaspQmlR::checkOptions(args)
-    return(fromJSON(options)$options)
+    return(fromJSON(options))
 }
 
 #' @export runAnalysis
@@ -1049,7 +1049,7 @@ runAnalysis <- function(name, dataset, options, view = TRUE) {
 
 #  if (view)
 #    view(jsonResults)
-    return(returnVal$toRObject())
+    return(list(rObject = returnVal$toRObject(), jsonResults=jsonResults))
   #return(invisible(results))
 }
 
@@ -1151,14 +1151,15 @@ runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
     initAnalysisRuntime(dataset = data)
     moduleName <- base::strsplit(analysisName, "::")[[1]][[1]]
     qmlFile <- paste(.libPaths(), moduleName, "qml", qmlFile, sep="/")
-    options <- checkAnalysisOptions(qmlFile, options, version)
-    print(options)
+    checkResult <- checkAnalysisOptions(qmlFile, options, version)
     .insertRbridgeIntoEnv(.GlobalEnv)
-    return(runAnalysis(analysisName, data, options))
+    error <- as.character(checkResult$error)
+    if (error != "")
+        return(error)
+    return(runAnalysis(analysisName, data, checkResult$options))
 
   }
 }
-
 
 # functions / properties to replace JASP's rcpp functions / properties
 
@@ -1178,7 +1179,6 @@ runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
 
   env[[".allColumnNamesDataset"]]      <- function(...) {
     dataset <- .getInternal("dataset")
-    dataset <- loadCorrectDataset(dataset)
     return(colnames(dataset))
   }
 }
@@ -1192,7 +1192,6 @@ runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
                                     columns.as.factor = c(), all.columns = FALSE) {
 
   dataset <- .getInternal("dataset")
-  dataset <- loadCorrectDataset(dataset)
 
   if (all.columns) {
     columns <- colnames(dataset)
