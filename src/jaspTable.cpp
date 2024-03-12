@@ -519,9 +519,12 @@ Rcpp::List jaspTable::toRObject()
 	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
 
 	std::vector<std::string> rowNames;
-	rowNames.reserve(_data[0].size());
-	for (size_t i = 0; i < _data[0].size(); i++)
-		rowNames.push_back(_rowNames[i] != "" ? _rowNames[i] : std::to_string(i + 1)); // R numbers from 1 to n by default
+	if (_data.size() > 0)
+	{
+		rowNames.reserve(_data[0].size());
+		for (size_t i = 0; i < _data[0].size(); i++)
+			rowNames.push_back(_rowNames[i] != "" ? _rowNames[i] : std::to_string(i + 1)); // R numbers from 1 to n by default
+	}
 
 	df.attr("row.names") = rowNames;
 
@@ -777,7 +780,7 @@ void jaspTable::rectangularDataWithNamesToString(std::stringstream & out, std::s
 		else if(topNames[row].size() < vierkant[0][row].size())
 			stringExtend(topNames[row], vierkant[0][row].size());
 
-	size_t extraSpaceSide = sideNames[0].size() + sideOvertitleSpace;
+	size_t extraSpaceSide = sideOvertitleSpace + sideNames.size() > 0 ? sideNames[0].size() : 0;
 
 	//lets print the topOvertitles
 	{
@@ -826,16 +829,19 @@ void jaspTable::rectangularDataWithNamesToString(std::stringstream & out, std::s
 	colSep << "-|\n";
 
 	//then the actual columns X rows
-	for(size_t col=0; col<vierkant.size(); col++)
+	if (sideOvertitleRow.size() >= vierkant.size() && sideNames.size() >= vierkant.size() )
 	{
-		//put the side overtitle here
-		out << colSep.str();
-		out << prefix << sideOvertitleRow[col] << sideNames[col] << "  | ";
+		for(size_t col=0; col<vierkant.size(); col++)
+		{
+			//put the side overtitle here
+			out << colSep.str();
+			out << prefix << sideOvertitleRow[col] << sideNames[col] << "  | ";
 
-		for(size_t row=0; row<vierkant[col].size(); row++)
-			out << (row>0? " | " : "") << vierkant[col][row];
+			for(size_t row=0; row<vierkant[col].size(); row++)
+				out << (row>0? " | " : "") << vierkant[col][row];
 
-		out << " |\n";
+			out << " |\n";
+		}
 	}
 
 	out << colSep.str();

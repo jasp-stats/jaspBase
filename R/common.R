@@ -515,16 +515,7 @@ jaspResultsStrings <- function() {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
 
-  # when run through jaspTools do not save the state, but store it internally
-  if ("jaspTools" %in% loadedNamespaces()) {
-    # fool renv so it does not try to install jaspTools
-    .setInternal <- utils::getFromNamespace(".setInternal", asNamespace("jaspTools"))
-    .setInternal("state", state)
-    return(list(relativePath = relativePath))
-  }
-
-  try(suppressWarnings(base::save(state, file=relativePath, compress=FALSE)), silent = FALSE)
-
+  .setInternal("state", state)
   return(list(relativePath = relativePath))
 }
 
@@ -1010,25 +1001,306 @@ registerData <- function(data) {
    #TODO
 }
 
-checkAnalysisOptions <- function(analysisName, options, version) {
-  # TODO when QMLComponents can be linked to jaspBase
-  return(options)
+checkAnalysisOptions <- function(qmlFile, options, version) {
+    args <- list("options" = options, "qmlFile" = qmlFile, "version" = version)
+    args <- toJSON(args)
+    args <- as.character(args)
+
+    options <- jaspQmlR::checkOptions(args)
+    return(fromJSON(options))
 }
 
+#' @export runAnalysis
+runAnalysis <- function(name, dataset, options, view = TRUE) {
+  if (is.list(options) && is.null(names(options)) && any(names(unlist(lapply(options, attributes))) == "analysisName"))
+    stop("The provided list of options is not named. Did you mean to index in the options list (e.g., options[[1]])?")
+
+  if (!is.list(options) || is.null(names(options)))
+    stop("The options should be a named list")
+
+  if (missing(name)) {
+    name <- attr(options, "analysisName")
+    if (is.null(name))
+      stop("Please supply an analysis name")
+  }
+
+  oldWd       <- getwd()
+  oldLang     <- Sys.getenv("LANG")
+  oldLanguage <- Sys.getenv("LANGUAGE")
+  on.exit({
+    .resetRunTimeInternals()
+    setwd(oldWd)
+    Sys.setenv(LANG = oldLang)
+    Sys.setenv(LANGUAGE = oldLanguage)
+  }, add = TRUE)
+
+  returnVal <- runJaspResults(name, "", "null", toJSON(options), "null", paste0(name, "Internal"))
+
+  # always TRUE after jaspResults is merged into jaspBase
+  jsonResults <- if (inherits(returnVal, c("jaspResultsR", "R6"))) {
+    getJsonResultsFromJaspResults(returnVal)
+  } else {
+    getJsonResultsFromJaspResultsLegacy()
+  }
+
+  transferPlotsFromjaspResults()
+
+  results <- processJsonResults(jsonResults)
+
+#  if (view)
+#    view(jsonResults)
+    return(list(rObject = returnVal$toRObject(), jsonResults=jsonResults))
+  #return(invisible(results))
+}
+
+.pkgenv <- list2env(list(
+  internal   = list(jaspToolsPath     = "",
+                    dataset           = "",
+                    state             = list(),
+                    modulesMd5Sums    = list()
+               )
+  ), parent = emptyenv())
+
+.setInternal <- function(name, value) {
+  .pkgenv[["internal"]][[name]] <- value
+}
+
+.getInternal <- function(name) {
+  if (! name %in% names(.pkgenv[["internal"]]))
+    stop(paste("Could not locate internal variable", name))
+  return(.pkgenv[["internal"]][[name]])
+}
+
+initAnalysisRuntime <- function(dataset) {
+  # dataset to be found in the analysis when it needs to be read
+  .setInternal("dataset", dataset)
+}
+
+processJsonResults <- function(jsonResults) {
+  if (jsonlite::validate(jsonResults))
+    results <- jsonlite::fromJSON(jsonResults, simplifyVector=FALSE)
+  else
+    stop("Could not process json result from jaspResults")
+
+  results[["state"]] <- .getInternal("state")
+
+  figures <- results$state$figures
+  if (length(figures) > 1 && !is.null(names(figures)))
+    results$state$figures <- figures[order(as.numeric(tools::file_path_sans_ext(basename(names(figures)))))]
+
+  return(results)
+}
+
+transferPlotsFromjaspResults <- function() {
+  pathPlotsjaspResults <- file.path(tempdir(), "jaspResults", "plots") # as defined in jaspResults pkg
+  pathPlotsjaspTools <- getTempOutputLocation("html")
+  if (dir.exists(pathPlotsjaspResults)) {
+    plots <- list.files(pathPlotsjaspResults)
+    if (length(plots) > 0) {
+      file.copy(file.path(pathPlotsjaspResults, plots), pathPlotsjaspTools, overwrite=TRUE)
+    }
+  }
+}
+
+getTempOutputLocation <- function(dir = NULL) {
+  loc <- file.path(tempdir(), "jaspTools")
+  if (!is.null(dir)) {
+    if (!dir %in% c("state", "html"))
+      stop("Unknown output directory requested ", dir)
+
+    loc <- file.path(loc, dir)
+  }
+  return(loc)
+}
+
+.initOutputDirs <- function() {
+  htmlDir <- getTempOutputLocation("html")
+  if (!dir.exists(htmlDir))
+    dir.create(file.path(htmlDir, "plots"), recursive = TRUE)
+
+  stateDir <- getTempOutputLocation("state")
+  if (!dir.exists(stateDir))
+    dir.create(stateDir, recursive = TRUE)
+}
+
+getJsonResultsFromJaspResults <- function(jaspResults) {
+  return(jaspResults$.__enclos_env__$private$getResults())
+}
+
+getJsonResultsFromJaspResultsLegacy <- function() {
+  return(jaspResults$.__enclos_env__$private$getResults())
+}
+
+.resetRunTimeInternals <- function() {
+  .setInternal("state", list())
+  .setInternal("dataset", "")
+}
+
+
+
 #' @export
-runWrappedAnalysis <- function(analysisName, data, options, version) {
+runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
   if (jaspResultsCalledFromJasp()) {
 
     result <- list("options" = options, "analysis" = analysisName, "version" = version)
-    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
+    result <- toJSON(result)
     return(as.character(result))
 
   } else {
-
-    options <- checkAnalysisOptions(analysisName, options, version)
-    # fool renv so it does not try to install jaspTools
-    jaspToolsRunAnalysis <- utils::getFromNamespace("runAnalysis", asNamespace("jaspTools"))
-    return(jaspToolsRunAnalysis(analysisName, data, options))
+    .initOutputDirs()
+    initAnalysisRuntime(dataset = data)
+    moduleName <- base::strsplit(analysisName, "::")[[1]][[1]]
+    qmlFile <- paste(.libPaths(), moduleName, "qml", qmlFile, sep="/")
+    checkResult <- checkAnalysisOptions(qmlFile, options, version)
+    .insertRbridgeIntoEnv(.GlobalEnv)
+    error <- as.character(checkResult$error)
+    if (error != "")
+        return(error)
+    return(runAnalysis(analysisName, data, checkResult$options))
 
   }
 }
+
+# functions / properties to replace JASP's rcpp functions / properties
+
+# These are not used in combination with getAnywhere() in the code so they cannot be found
+.insertRbridgeIntoEnv <- function(env) {
+  env[[".automaticColumnEncDecoding"]] <- FALSE
+  env[[".encodeColNamesStrict"]]       <- function(x) return(x)
+  env[[".decodeColNamesStrict"]]       <- function(x) return(x)
+  env[[".encodeColNamesLax"]]          <- function(x) return(x)
+  env[[".decodeColNamesLax"]]          <- function(x) return(x)
+  env[[".encodeColNamesStrict"]]       <- function(x) return(x)
+
+  env[[".setColumnDataAsScale"]]       <- function(...) return(TRUE)
+  env[[".setColumnDataAsOrdinal"]]     <- function(...) return(TRUE)
+  env[[".setColumnDataAsNominal"]]     <- function(...) return(TRUE)
+  env[[".setColumnDataAsNominalText"]] <- function(...) return(TRUE)
+
+  env[[".allColumnNamesDataset"]]      <- function(...) {
+    dataset <- .getInternal("dataset")
+    return(colnames(dataset))
+  }
+}
+
+# These are used in combination with getAnywhere() and can stay in the jaspTools namespace
+.ppi <- 192
+
+.baseCitation <- "x"
+
+.readDatasetToEndNative <- function(columns = c(), columns.as.numeric = c(), columns.as.ordinal = c(),
+                                    columns.as.factor = c(), all.columns = FALSE) {
+
+  dataset <- .getInternal("dataset")
+
+  if (all.columns) {
+    columns <- colnames(dataset)
+    columns <- columns[columns != ""]
+  }
+  dataset <- jaspBase:::.vdf(dataset, columns, columns.as.numeric, columns.as.ordinal,
+                        columns.as.factor, all.columns, exclude.na.listwise = c())
+
+  return(dataset)
+}
+
+.readDataSetHeaderNative <- function(columns = c(), columns.as.numeric = c(), columns.as.ordinal = c(),
+                                     columns.as.factor = c(), all.columns = FALSE) {
+
+  dataset <- .readDatasetToEndNative(columns, columns.as.numeric, columns.as.ordinal,
+                                     columns.as.factor, all.columns)
+  dataset <- dataset[0, , drop = FALSE]
+
+  return(dataset)
+}
+
+.requestTempFileNameNative <- function(...) {
+  root <- getTempOutputLocation("html")
+  numPlots <- length(list.files(file.path(root, "plots")))
+  list(
+    root = root,
+    relativePath = file.path("plots", paste0(numPlots + 1, ".png"))
+  )
+}
+
+.requestStateFileNameNative <- function() {
+  root <- getTempOutputLocation("state")
+  name <- "state"
+  list(
+    root = root,
+    relativePath = name
+  )
+}
+
+.callbackNative <- function(...) {
+  list(status="ok")
+}
+
+.imageBackground <- function(...) return("white")
+
+#' @export
+getColumnCount <- function() {
+
+    dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(0)
+
+    return(length(colnames(dataset)))
+}
+
+#' @export
+getColumnNames <- function() {
+
+    dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset)) {
+        return(array())
+    }
+
+    return(as.array(colnames(dataset)))
+}
+
+#' @export
+getColumnType <- function(colName) {
+
+    dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return("unknown")
+
+    rawType <- sapply(myData, typeof)[[colName]]
+
+    diffValues <- length(unique(dataset[[colName]]))
+
+    if (rawType == "integer") {
+        if (diffValues < 10) return("nominal")
+        else return("scale")
+    } else if (rawType == "double") {
+        return("scale")
+    } else if (rawType == "character") {
+        return("nominalText")
+    } else if (rawType == "logical") {
+        return("scale")
+    }
+
+    return("nominalText")
+}
+
+#' @export
+getColumnValues <- function(colName) {
+
+    dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(array())
+
+    return(as.array(dataset[[colName]]))
+}
+
+#' @export
+getColumnLabels <- function(colName) {
+
+    dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(array())
+
+    labels <- unique(dataset[[colName]])
+    return(as.array(labels))
+}
+
