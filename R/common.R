@@ -1241,6 +1241,9 @@ runWrappedAnalysis <- function(analysisName, qmlFile, data, options, version) {
 getColumnCount <- function() {
 
     dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(0)
+
     return(length(colnames(dataset)))
 }
 
@@ -1248,6 +1251,10 @@ getColumnCount <- function() {
 getColumnNames <- function() {
 
     dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset)) {
+        return(array())
+    }
+
     return(as.array(colnames(dataset)))
 }
 
@@ -1255,6 +1262,9 @@ getColumnNames <- function() {
 getColumnType <- function(colName) {
 
     dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return("unknown")
+
     rawType <- sapply(myData, typeof)[[colName]]
 
     diffValues <- length(unique(dataset[[colName]]))
@@ -1277,6 +1287,9 @@ getColumnType <- function(colName) {
 getColumnValues <- function(colName) {
 
     dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(array())
+
     return(as.array(dataset[[colName]]))
 }
 
@@ -1284,6 +1297,9 @@ getColumnValues <- function(colName) {
 getColumnLabels <- function(colName) {
 
     dataset <- .getInternal("dataset")
+    if (!is.data.frame(dataset))
+        return(array())
+
     labels <- unique(dataset[[colName]])
     return(as.array(labels))
 }
