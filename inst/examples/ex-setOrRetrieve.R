@@ -33,7 +33,8 @@ result <- ctr[["state"]] %setOrRetrieve% (
 )
 
 result                         # the random number
-\dontrun{isRecomputed(result)} # intentional error
+#\dontrun{isRecomputed(result)} # intentional error
+#This is a nice intentional error but renv keeps messing up my builds because of this.
 isRecomputed(ctr[["state"]])   # true
 isRecomputed()                 # true
 
@@ -48,4 +49,4 @@ isRecomputed()               # false
 
 # Note that only works when the left hand side indexes inside a jaspObject
 a <- 1
-\dontrun{a %setOrRetrieve% 2} # intentional error
+#\dontrun{a %setOrRetrieve% 2} # intentional error
