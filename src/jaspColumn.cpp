@@ -9,7 +9,6 @@ getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsOrdinalFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalFunc			= nullptr;
-setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalTextFunc		= nullptr;
 enDecodeFuncDef			jaspColumn::_encodeFunc							= nullptr;
 enDecodeFuncDef			jaspColumn::_decodeFunc							= nullptr;
 shouldEnDecodeFuncDef 	jaspColumn::_shouldEncodeFunc					= nullptr;
@@ -46,7 +45,7 @@ jaspColumn::jaspColumn()
 	//This one will load from JSON
 }
 
-void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, 
+void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, 
 	colGetTF colType, colGetAIF colAnId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists,
 	encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode)
 {
@@ -57,7 +56,6 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 	_setColumnDataAsScaleFunc 		= * scalar;
 	_setColumnDataAsOrdinalFunc 	= * ordinal;
 	_setColumnDataAsNominalFunc 	= * nominal;
-	_setColumnDataAsNominalTextFunc = * nominalText;
 	_getColumnExistsFunc			= * colExists;
 	_encodeFunc						= * encode;
 	_decodeFunc						= * decode;
@@ -81,7 +79,8 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
 bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
 bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
-bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalTextFunc)
+bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+
 
 columnType jaspColumn::getColumnType(const std::string & columnName)
 { 

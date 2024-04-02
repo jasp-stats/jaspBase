@@ -54,7 +54,7 @@ public:
 	Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
 
 
-	static void			setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colDataF nominalText, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
+	static void			setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
 	static bool			deleteColumn(const std::string & columnName);
 
 private:
@@ -71,7 +71,7 @@ private:
 	static bool			shouldEncode(				const std::string & columnName								);
 	static bool			shouldDecode(				const std::string & columnName								);
 	static std::string	createColumn(				const std::string & columnName								); ///< Returns encoded columnname
-	static bool			getColumnExists(const std::string & columnName);
+	static bool			getColumnExists(			const std::string & columnName								);
 	static columnType	getColumnType(				const std::string & encodedColumnName						);
 	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
 	void				determineTypeTitle();
@@ -87,8 +87,7 @@ private:
 	static getColumnAnIdFuncDef		_getColumnAnalysisIdFunc;
 	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
 									_setColumnDataAsOrdinalFunc,
-									_setColumnDataAsNominalFunc,
-									_setColumnDataAsNominalTextFunc;
+									_setColumnDataAsNominalFunc;
 	static enDecodeFuncDef			_encodeFunc,
 									_decodeFunc;
 	static shouldEnDecodeFuncDef	_shouldEncodeFunc,
@@ -107,7 +106,7 @@ public:
 	bool setScale(		Rcpp::RObject scalarData)	{ return static_cast<jaspColumn*>(myJaspObject)->setScale(scalarData);			}
 	bool setOrdinal(	Rcpp::RObject ordinalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
 	bool setNominal(	Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
-	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominalText(nominalData);	}
+	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
 	//void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
 };
 
