@@ -33,8 +33,8 @@ jaspColumn::jaspColumn(std::string columnName)
 	{
 	case columnType::scale:			_columnType = jaspColumnType::scale;		break;
 	case columnType::ordinal:		_columnType = jaspColumnType::ordinal;		break;
-	case columnType::nominal:		_columnType = jaspColumnType::nominal;		break;
-	case columnType::nominalText:	_columnType = jaspColumnType::nominalText;	break;
+	case columnType::nominal:		[[fallthrough]];
+	case columnType::nominalText:	_columnType = jaspColumnType::nominal;		break;
 	default:						_columnType = jaspColumnType::unknown;		break;
 	}
 }
@@ -279,14 +279,7 @@ bool jaspColumn::setNominal(Rcpp::RObject nominalData)
 
 bool jaspColumn::setNominalText(Rcpp::RObject nominalData)
 {
-	_dataChanged	= setColumnDataAsNominalText(_encoded, nominalData);
-	_typeChanged	= _columnType != jaspColumnType::nominalText;
-	_columnType		= jaspColumnType::nominalText;
-
-	if(_dataChanged || _typeChanged)
-		notifyParentOfChanges();
-
-	return _dataChanged || _typeChanged;
+	return setNominal(nominalData);
 }
 
 Json::Value jaspColumn::dataEntry(std::string & errorMessage) const
