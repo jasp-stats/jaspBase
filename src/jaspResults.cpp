@@ -49,7 +49,7 @@ void jaspResults::setResponseData(int analysisID, int revision)
 
 	_response["id"]			= analysisID;
 	_response["revision"]	= revision;
-	
+
 	Json::Value progress;
 	progress["value"]		= -1;
 	progress["label"]		= "";
@@ -203,9 +203,7 @@ void jaspResults::saveResults()
 
 	if(!saveHere.good())
 	{
-		static std::string error;
-		error = "Could not open file for saving jaspResults! File: '" + _saveResultsRoot + _saveResultsHere + "'";
-		Rf_error(error.c_str());;
+		Rf_error("Could not open file for saving jaspResults! File: '%s%s'", _saveResultsRoot.c_str(), _saveResultsHere.c_str());;
 	}
 
 	Json::Value json = convertToJSON();
@@ -254,9 +252,7 @@ void jaspResults::loadResults()
 
 	if(!val.isObject())
 	{
-		static std::string error;
-		error = "loading jaspResults had a problem, '" + _saveResultsRoot + _saveResultsHere + "' wasn't a JSON object!";
-		Rf_error(error.c_str());;
+		Rf_error("loading jaspResults had a problem, '%s%s' wasn't a JSON object!", _saveResultsRoot.c_str(), _saveResultsHere.c_str());;
 	}
 
 	convertFromJSON_SetFields(val);
