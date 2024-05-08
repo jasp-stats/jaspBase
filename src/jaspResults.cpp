@@ -205,7 +205,7 @@ void jaspResults::saveResults()
 	{
 		static std::string error;
 		error = "Could not open file for saving jaspResults! File: '" + _saveResultsRoot + _saveResultsHere + "'";
-		Rf_error(error.c_str());;
+		Rf_error("%s", error.c_str());;
 	}
 
 	Json::Value json = convertToJSON();
@@ -256,7 +256,7 @@ void jaspResults::loadResults()
 	{
 		static std::string error;
 		error = "loading jaspResults had a problem, '" + _saveResultsRoot + _saveResultsHere + "' wasn't a JSON object!";
-		Rf_error(error.c_str());;
+		Rf_error("%s", error.c_str());;
 	}
 
 	convertFromJSON_SetFields(val);
