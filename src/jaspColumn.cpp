@@ -65,15 +65,15 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 
 #define SET_COLUMN_DATA_BASE(FUNC)														\
 {																						\
-	if ( !FUNC || !columnIsMine(columnName))										\
+	if ( !FUNC || !columnIsMine(columnName))											\
 	{																					\
 		jaspPrint(!FUNC																	\
 			? "jaspColumn does nothing in R stand-alone!"								\
-			: "Column '" + columnName + "' does not belong to this analysis"); 	\
+			: "Column '" + columnName + "' does not belong to this analysis");			\
 		return false;																	\
 	}																					\
 	else																				\
-		return (*FUNC)(columnName, data);										\
+		return (*FUNC)(columnName, data);												\
 }																						\
 
 bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
@@ -243,6 +243,9 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 
 bool jaspColumn::setScale(Rcpp::RObject scalarData)
 {
+	if(!columnIsMine(_columnName))
+		return false;
+	
 	_dataChanged	= setColumnDataAsScale(_encoded, scalarData);
 	_typeChanged	= _columnType != jaspColumnType::scale;
 	_columnType		= jaspColumnType::scale;
@@ -250,11 +253,14 @@ bool jaspColumn::setScale(Rcpp::RObject scalarData)
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
 
-	return _dataChanged || _typeChanged;
+	return true;
 }
 
 bool jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 {
+	if(!columnIsMine(_columnName))
+		return false;
+	
 	_dataChanged	= setColumnDataAsOrdinal(_encoded, ordinalData);
 	_typeChanged	= _columnType != jaspColumnType::ordinal;
 	_columnType		= jaspColumnType::ordinal;
@@ -262,11 +268,14 @@ bool jaspColumn::setOrdinal(Rcpp::RObject ordinalData)
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
 
-	return _dataChanged || _typeChanged;
+	return true;
 }
 
 bool jaspColumn::setNominal(Rcpp::RObject nominalData)
 {
+	if(!columnIsMine(_columnName))
+		return false;
+	
 	_dataChanged	= setColumnDataAsNominal(_encoded, nominalData);
 	_typeChanged	= _columnType != jaspColumnType::nominal;
 	_columnType		= jaspColumnType::nominal;
@@ -274,7 +283,7 @@ bool jaspColumn::setNominal(Rcpp::RObject nominalData)
 	if(_dataChanged || _typeChanged)
 		notifyParentOfChanges();
 
-	return _dataChanged || _typeChanged;
+	return true;
 }
 
 bool jaspColumn::setNominalText(Rcpp::RObject nominalData)
