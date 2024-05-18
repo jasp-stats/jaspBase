@@ -37,6 +37,7 @@ installJaspModule <- function(modulePkg, libPathsToUse, moduleLibrary, repos, on
   # renv uses the following output without checking for length but assuming it is 1.
   # if that isnt the case the (module) installation fails obscurely with an error like "Error in if (eval(cond, envir = environment(dot))) return(eval(expr, envir = environment(dot))): the condition has length > 1"
   cmdConfigCC <- suppressWarnings(system2(c(renv:::R(),"CMD","config","CC"),stdout=TRUE,stderr=TRUE))
+  cmdConfigCC <- cmdConfigCC[!grepl("^WARNING:", cmdConfigCC)]
   if(length(cmdConfigCC) > 1)
     stop(
 "R CMD config CC returns more than 1 line, this will break renv and thus your install.
