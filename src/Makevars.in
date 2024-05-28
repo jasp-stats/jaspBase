@@ -1,5 +1,6 @@
 CXX_STD = CXX20
 PKG_CXXFLAGS = @cppflags@
+MAKEFLAGS=-j
 
 # Include all C++ files in src/ and jaspColumnEncoder
 SOURCES=@src_sources@ @jaspColumnEncoder_sources@
