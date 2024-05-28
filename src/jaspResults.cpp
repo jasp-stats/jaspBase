@@ -123,6 +123,10 @@ jaspResults::~jaspResults()
 	_extraEncodings = nullptr;
 #endif
 
+	if(_RStorageEnv != nullptr)
+		delete _RStorageEnv;
+	
+	_RStorageEnv = nullptr;
 }
 
 void jaspResults::setStatus(std::string status)
@@ -208,19 +212,7 @@ void jaspResults::saveResults()
 		Rf_error("%s", error.c_str());;
 	}
 
-	Json::Value json = convertToJSON();
-
-    // JSONCPP_STRING          err;
-    // Json::StreamWriterBuilder jsonWriterBuilder;
-    // jsonWriterBuilder["indentation"] = '\t';
-    // std::unique_ptr<Json::StreamWriter> const jsonWriter(jsonWriterBuilder.newStreamWriter());
-
-    // TODO: I think this can be done better, probably using the writer to write it to the file
-	// saveHere << jsonWriter->write(json, &std::cout);
- 
- 	Json::StyledWriter styledWriter;
-	saveHere << styledWriter.write(json);
-
+	saveHere << convertToJSON() << std::flush;
 	saveHere.close();
 
 	JASP_OBJECT_TIMEREND(saveResults)
@@ -238,17 +230,8 @@ void jaspResults::loadResults()
 
 	if(!loadThis.is_open()) return;
 
-    // TODO: Check this, this is werid. I'm not sure if I read the file correctly
-    // std::stringstream resultsContents;
-    // resultsContents << loadThis.rdbuf();
-
 	Json::Value val;
 	Json::Reader().parse(loadThis, val);
-
-    // JSONCPP_STRING          err;
-    // Json::CharReaderBuilder jsonReaderBuilder;
-    // std::unique_ptr<Json::CharReader> const jsonReader(jsonReaderBuilder.newCharReader());
-	// jsonReader->parse(resultsContents.str().c_str(), resultsContents.str().c_str() + resultsContents.str().length(), &val, &err);
 
 	loadThis.close();
 
