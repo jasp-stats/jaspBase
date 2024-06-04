@@ -671,15 +671,8 @@ Json::Value jaspObject::RObject_to_JsonValue(Rcpp::RObject obj)
 
 Json::Value jaspObject::MixedRObject_to_JsonValue(Rcpp::List obj)
 {
-	/*
-	 *	R guarantees that obj has layout
-	 *	list(value, type, value, type)
-	 *  e.g.,
-	 *  list(1.0, "double", "hoi", "string") // TODO: outdated!
-	 */
-	Json::Value value(Json::objectValue);
 
-	Rcpp::Rcout << "MixedRObject_to_JsonValue" << std::endl;
+	Json::Value value(Json::objectValue);
 
 	if (obj.length() != 3)
 	{
@@ -692,34 +685,8 @@ Json::Value jaspObject::MixedRObject_to_JsonValue(Rcpp::List obj)
 	value["type"]   = RObject_to_JsonValue((Rcpp::RObject)obj[1]);
 	value["format"] = RObject_to_JsonValue((Rcpp::RObject)obj[2]);
 
-	Rcpp::Rcout << value.toStyledString() << std::endl;
 	return value;
 
-/*
-	for(int i = 0; i < obj.length(); i+=2)
-	{
-
-		values[i] = RObject_to_JsonValue((Rcpp::RObject)obj[i]);
-
-		if (!Rcpp::is<Rcpp::CharacterVector>(obj[i+1]))
-			throw(std::runtime_error("MixedRObject type should be character but it is not!"));
-
-		Rcpp::CharacterVector type = obj[i+1];
-
-		if (type.length() != 1)
-			throw(std::runtime_error("MixedRObject type has length > 1!"));
-
-		types[i]  = RObject_to_JsonValue(type);
-
-	}
-
-	Json::Value both(Json::objectValue);
-	both["values"] = values;
-	both["types"]  = types;
-
-	Rcpp::Rcout << both.toStyledString() << std::endl;
-	return both;
-*/
 }
 
 

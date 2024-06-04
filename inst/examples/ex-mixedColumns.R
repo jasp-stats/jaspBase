@@ -1,49 +1,6 @@
 library(jaspBase)
 
-validateCellTypes <- function(types) {
-  permittedTypes <- c("integer", "number", "pvalue", "string", "separator")
-  if (!all(types %in% permittedTypes)) {
-    badTypes <- unique(setdiff(types, permittedTypes))
-    stop(sprintf("Valid types are `%s` but got: %s",
-                 paste(permittedTypes, collapse = ", "),
-                 paste(badTypes,       collapse = ", ")))
-  }
-}
-
-validateCellFormats <- function(formats, types, lengthOfValues) {
-  if (is.null(formats)) {
-    formats <- vector("list", length(types))
-    if (any(types %in% c("number", "pvalue"))) {
-
-      formats[types == "number"] <- list("sf:4;dp:3")
-      formats[types == "pvalue"] <- list("dp:3;p:.001")
-
-    }
-  } else {
-    stopifnot(length(types) == length(formats))
-  }
-  stopifnot(lengthOfValues == length(types))
-  return(formats)
-}
-
-
-
-# Example 1.a: assign columns directy ----
-tb <- createJaspTable()
-
-data <- list(
-  # | value | type      | format
-      list(1.23,   "number",  "sf:4;dp:3"),
-      list(0.04, "number",  "dp:3;p:.001"),
-      list("hoi",  "string",  ""),
-      list(123,    "integer", ""))
-class(data) <- "mixed"
-
-tb[["col"]] <- data
-tb[["col2"]] <- seq(length(data))
-tb
-
-# Example 1.b: assign columns directy using convenience constructor ----
+# Example 1.a: assign columns directy using convenience constructor (recommended approach) ----
 tb <- createJaspTable()
 
 data <- createMixedColumn(
@@ -55,6 +12,20 @@ tb[["col"]] <- data
 tb[["col2"]] <- seq(length(data))
 tb
 
+# Example 1.b: assign columns directy (not recommended) ---
+tb <- createJaspTable()
+
+data <- list(
+  # | value | type      | format
+  list(1.23,   "number",  "sf:4;dp:3"),
+  list(0.04, "number",  "dp:3;p:.001"),
+  list("hoi",  "string",  ""),
+  list(123,    "integer", ""))
+class(data) <- "mixed"
+
+tb[["col"]] <- data
+tb[["col2"]] <- seq(length(data))
+tb
 
 # Example 2a, setData with helper ----
 tb <- createJaspTable()

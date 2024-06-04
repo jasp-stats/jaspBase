@@ -157,15 +157,11 @@ public:
 	std::vector<Json::Value> MixedRcppVector_to_VectorJson(Rcpp::List obj)
 	{
 		std::vector<Json::Value> vec;
-		Rcpp::Rcout << "MixedRcppVector_to_VectorJson" << std::endl;
-		Rcpp::print(obj);
 
 		if (obj.inherits("row"))
 		{
 			// obj == list(value = ..., type = ..., format = ...)
 			Json::Value value = MixedRObject_to_JsonValue(obj);
-			Rcpp::Rcout << value.toStyledString() << std::endl;
-
 			vec.push_back(value);
 		}
 		else
@@ -175,8 +171,6 @@ public:
 			{
 
 				Json::Value value = MixedRObject_to_JsonValue(Rcpp::as<Rcpp::List>(obj[i]));
-				Rcpp::Rcout << value.toStyledString() << std::endl;
-
 				vec.push_back(value);
 			}
 		}

@@ -340,8 +340,6 @@ Json::Value jaspTable::getCell(size_t col, size_t row, size_t maxCol, size_t max
 
 	if(col < _data.size() && row < _data[col].size())
 	{
-		Rcpp::Rcout << "colFormats[" << col << "]: " << _colFormats[col] << std::endl;
-//		return _colFormats[col] == "mixed" ? _data[col][row]["value"] : _data[col][row];
 		return _data[col][row];
 	}
 
@@ -353,8 +351,6 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 {
 	Json::Value val(getCell(col, row, maxCol, maxRow));
 
-	Rcpp::Rcout << "val: " << val.toStyledString() << std::endl;
-
 	std::string format = "";
 	if(_colFormats.containsField(getColName(col)))	format = _colFormats[getColName(col)];
 	else if(_colFormats.rowCount() > col)			format = _colFormats[col];
@@ -364,9 +360,6 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 		format  = val["format"].isNull() ? "" : val["format"].asString();
 		val		= val["value"];
 	}
-
-	Rcpp::Rcout << "format: " << format << std::endl;
-
 
 	if(val.isNull())	return "";
 	if(val.isString())	return val.asString();
@@ -1406,7 +1399,6 @@ Json::Value	jaspTable::rowsJson(Json::Value footnotes) const
 
 jaspTableColumnType jaspTable::deriveColumnType(int col) const
 {
-	Rcpp::Rcout << "Inside deriveColumnType" << std::endl;
 	if(static_cast<size_t>(col) >= _data.size())
 		return jaspTableColumnType::null;
 
@@ -1481,8 +1473,6 @@ void jaspTable::addColumnInfo(Rcpp::RObject name, Rcpp::RObject title, Rcpp::ROb
 	_colNames.add(colName);
 
 	std::string lastAddedColName = getColName(_colNames.rowCount() - 1);
-
-	Rcpp::Rcout << "Inside addColumnInfo" << std::endl;
 
 	if(!title.isNULL())		_colTitles[		lastAddedColName ] = Rcpp::String(title);
 	if(!type.isNULL())		_colTypes[		lastAddedColName ] = Rcpp::String(type);
