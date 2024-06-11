@@ -31,8 +31,10 @@ createMixedColumn <- function(values, types, formats = NULL) {
   formats <- validateCellFormats(formats, types, length(values))
 
   # NOTE: names are not actually used
-  result <- Map(\(v, t, f) list(value = v, type = t, format = f), values, types, formats)
-  class(result) <- c("mixed", "column")
+  data <- Map(\(v, t, f) list(value = v, type = t, format = f), values, types, formats)
+
+  result <- vctrs::new_vctr(data, column = TRUE, class = "mixed")
+
   return(result)
 
 }
@@ -42,9 +44,52 @@ createMixedRow <- function(value, type, format = NULL) {
   # TODO: support multiple values and types?
   validateCellTypes(type)
   format <- validateCellFormats(format, type, length(value))
-  result <- list(value = value, type = type, format = format[[1L]])
-  class(result) <- c("mixed", "row")
+  data <- list(value = value, type = type, format = format[[1L]])
+  result <- vctrs::new_vctr(list(data), column = FALSE, class = "mixed")
   return(result)
+}
+
+isMixedColumn <- function(x) {
+  isTRUE(attr(x, "column"))
+}
+
+
+formatMixedHelper <- function(x, showFormat = FALSE, shortTypes = TRUE, usePillar = FALSE) {
+
+  # TODO: formatting with Pillar is way nicer, but maybe not always compatible with all terminals...
+  # it also would require overwriting the print function, which I'm not very keen about
+
+  mixedAbbreviations <- c(
+    "pvalue"  = "pval",
+    "number"  = "num",
+    "string"  = "str",
+    "integer" = "int"
+  )
+
+  value  <- x[["value"]]
+  type   <- x[["type"]]
+  format <- x[["format"]]
+
+  if (usePillar) {
+    style_num    <- pillar::style_num
+    style_subtle <- pillar::style_subtle
+  } else {
+    style_num <- style_subtle <- function(x, ...) x
+  }
+
+  paste0(
+    if (type == "string") value else style_num(value, negative = value < 0),
+    style_subtle(paste0(if (showFormat || !usePillar) "<" else "", if (shortTypes) mixedAbbreviations[type] else type)),
+    if (showFormat) style_subtle(paste0("|", format, ">")) else if (!usePillar) ">"
+  )
+}
+
+#' @exportS3Method
+format.mixed <- function(x, showFormat = FALSE, shortTypes = TRUE, usePillar = FALSE, ...) {
+
+  data <- vctrs::vec_data(x)
+  return(vapply(X = data, FUN = formatMixedHelper, FUN.VALUE = character(1L), showFormat = showFormat, shortTypes = shortTypes, usePillar = usePillar))
+
 }
 
 #' @export

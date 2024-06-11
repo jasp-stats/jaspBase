@@ -133,16 +133,9 @@ int jaspTable::getDesiredColumnIndexFromNameForRowAdding(std::string colName, in
 			if(_colNames[possibleColIndex] == colName)
 				return possibleColIndex;
 
-	int foundUnnamed = 0;
 	for(int col=0; col<_colNames.rowCount() || _data.size(); col++)
 		if(_colNames[col] == "")
-		{
-
-			if(previouslyAddedUnnamed == foundUnnamed)
-				return col;
-
-			foundUnnamed++;
-		}
+			return col;
 
 	return std::max(_colNames.rowCount(), _data.size());
 }
@@ -170,8 +163,6 @@ void jaspTable::addColumns(Rcpp::RObject newData)
 
 	//Maybe this is overkill?
 	if(Rcpp::is<Rcpp::DataFrame>(newData))				addColumnsFromList(convertFactorsToCharacters((Rcpp::DataFrame)	newData));
-	// TODO: not sure what to do here!
-//	else if(isMixedRObject(newData))					addColumnsFromList((Rcpp::List)									newData);
 	else if(Rcpp::is<Rcpp::List>(newData))				addColumnsFromList((Rcpp::List)									newData);
 
 	else if(Rcpp::is<Rcpp::NumericMatrix>(newData))		addColumnsFromMatrix<REALSXP>((Rcpp::NumericMatrix)	newData);
@@ -257,14 +248,10 @@ void jaspTable::addRowsFromList(Rcpp::List newData, Rcpp::CharacterVector newRow
 	for(size_t row=0; row<newData.size(); row++)
 	{
 		Rcpp::RObject rij = (Rcpp::RObject)newData[row];
-
 		std::vector<std::string> localColNames;
 
-		Rcpp::Rcout << "addRowsFromList is this object" << std::endl;
-		Rcpp::print(rij);
-
 		if(Rcpp::is<Rcpp::List>(rij))
-			 localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
+			localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
 
 		auto jsonRij = RcppVector_to_VectorJson(rij);
 
@@ -520,11 +507,26 @@ Rcpp::List jaspTable::toRObject()
 		}
 		case jaspTableColumnType::mixed:
 		{
-			// TODO: implement this!
-			Rcpp::StringVector values(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = _data[col][row].asString();
 
+			Rcpp::List valuesData(_data[col].size());
+			Rcpp::StringVector valuesTypes(_data[col].size());
+			Rcpp::List valuesFormats(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+			{
+				valuesTypes[row] = _data[col][row]["type"].asString();
+
+				if		(valuesTypes[row] == "number")	valuesData[row] = _data[col][row]["value"].asDouble();
+				else if (valuesTypes[row] == "pvalue")	valuesData[row] = _data[col][row]["value"].asDouble();
+				else if (valuesTypes[row] == "integer")	valuesData[row] = _data[col][row]["value"].asInt();
+				else if (valuesTypes[row] == "string")	valuesData[row] = _data[col][row]["value"].asString();
+
+				if (!_data[col][row]["format"].isNull())
+					valuesFormats[row] = _data[col][row]["format"].asString();
+			}
+
+			Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
+			Rcpp::Function createMixedColumn = jaspBase["createMixedColumn"];
+			Rcpp::List values = createMixedColumn(valuesData, valuesTypes, valuesFormats);
 			df[getColName(col)] = values;
 			break;
 		}

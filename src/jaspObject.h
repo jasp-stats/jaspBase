@@ -157,23 +157,8 @@ public:
 	std::vector<Json::Value> MixedRcppVector_to_VectorJson(Rcpp::List obj)
 	{
 		std::vector<Json::Value> vec;
-
-		if (obj.inherits("row"))
-		{
-			// obj == list(value = ..., type = ..., format = ...)
-			Json::Value value = MixedRObject_to_JsonValue(obj);
-			vec.push_back(value);
-		}
-		else
-		{
-			// obj == list(list(value = ..., type = ..., format = ...), list(value = ..., type = ..., format = ...))
-			for(int i=0; i<obj.length(); i++)
-			{
-
-				Json::Value value = MixedRObject_to_JsonValue(Rcpp::as<Rcpp::List>(obj[i]));
-				vec.push_back(value);
-			}
-		}
+		for(int i=0; i<obj.length(); i++)
+			vec.push_back(MixedRObject_to_JsonValue(obj[i]));
 
 		return vec;
 	}
@@ -213,7 +198,7 @@ public:
 	Json::Value RObject_to_JsonValue(		Rcpp::List 		obj);
 	Json::Value MixedRObject_to_JsonValue(	Rcpp::List		obj);
 
-	bool	isMixedRObject(Rcpp::RObject obj) const { return Rcpp::is<Rcpp::List>(obj) && obj.inherits("mixed"); }
+	bool	isMixedRObject(Rcpp::RObject obj) const { return obj.inherits("mixed"); }
 
 	template<int RTYPE>	 Json::Value RObject_to_JsonValue(Rcpp::Matrix<RTYPE>	obj)
 	{

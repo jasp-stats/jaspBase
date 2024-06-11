@@ -674,16 +674,20 @@ Json::Value jaspObject::MixedRObject_to_JsonValue(Rcpp::List obj)
 
 	Json::Value value(Json::objectValue);
 
+	// sometimes we receive list(mixed) and sometimes mixed, ideally we always just get mixed but I'm not sure that's possible with addRows.
 	if (obj.length() != 3)
 	{
-		Rcpp::Rcout << ("MixedRObject_to_JsonValue received invalid mixed data, expected three elements but got something else with length: " + std::to_string(obj.length()));
-		Rcpp::print(obj);
-		Rcpp::stop("Unrecoverable error occured");
+		Rcpp::List data = obj[0];
+		value["value"]  = RObject_to_JsonValue((Rcpp::RObject)data["value"]);
+		value["type"]   = RObject_to_JsonValue((Rcpp::RObject)data["type"]);
+		value["format"] = RObject_to_JsonValue((Rcpp::RObject)data["format"]);
 	}
-
-	value["value"]  = RObject_to_JsonValue((Rcpp::RObject)obj[0]);
-	value["type"]   = RObject_to_JsonValue((Rcpp::RObject)obj[1]);
-	value["format"] = RObject_to_JsonValue((Rcpp::RObject)obj[2]);
+	else
+	{
+		value["value"]  = RObject_to_JsonValue((Rcpp::RObject)obj["value"]);
+		value["type"]   = RObject_to_JsonValue((Rcpp::RObject)obj["type"]);
+		value["format"] = RObject_to_JsonValue((Rcpp::RObject)obj["format"]);
+	}
 
 	return value;
 

@@ -1,6 +1,6 @@
 library(jaspBase)
 
-# Example 1.a: assign columns directy using convenience constructor (recommended approach) ----
+# Example 1: assign columns directy using createMixedColumn (using createMixedColumn is the recommended approach) ----
 tb <- createJaspTable()
 
 data <- createMixedColumn(
@@ -12,22 +12,11 @@ tb[["col"]] <- data
 tb[["col2"]] <- seq(length(data))
 tb
 
-# Example 1.b: assign columns directy (not recommended) ---
-tb <- createJaspTable()
+tbR <- tb$toRObject()
+all.equal(tbR$col0, data) # TRUE
+all.equal(tbR$col1, seq(length(data))) # TRUE
 
-data <- list(
-  # | value | type      | format
-  list(1.23,   "number",  "sf:4;dp:3"),
-  list(0.04, "number",  "dp:3;p:.001"),
-  list("hoi",  "string",  ""),
-  list(123,    "integer", ""))
-class(data) <- "mixed"
-
-tb[["col"]] <- data
-tb[["col2"]] <- seq(length(data))
-tb
-
-# Example 2a, setData with helper ----
+# Example 2: use setData with createMixedColumn ----
 tb <- createJaspTable()
 
 df <- data.frame(
@@ -39,7 +28,7 @@ df <- data.frame(
 )
 
 
-df$col
+df
 tb$setData(df)
 tb
 
@@ -57,6 +46,12 @@ df <- data.frame(
 
 tb$addColumns(cols = df)
 tb
+
+tbR <- tb$toRObject()
+all.equal(tbR$col, df$col) # TRUE
+all.equal(tbR$col2, df$col2) # TRUE
+all.equal(tbR, df, check.attributes = FALSE) # TRUE
+
 
 # Example 3b, addColumns pass list ----
 tb <- createJaspTable()
@@ -77,55 +72,39 @@ tb
 tb <- createJaspTable()
 
 df <- data.frame(
-  col  = createMixedColumn(
+  name1  = createMixedColumn(
     values = list(1.23, 0.04, "hoi", 123),
     types =  c("number", "pvalue", "string", "integer")
   ),
-  col2 = 1:4
+  name2 = 1:4
 )
-
 
 rowList <- lapply(seq_len(nrow(df)), function(i) {
   list(
-    col = createMixedRow(
-      value = df$col[[i]]$value,
-      type  = df$col[[i]]$type
+    name1 = createMixedRow(
+      value = df$name1[[i]]$value,
+      type  = df$name1[[i]]$type
     ),
-    col2 = i
+    name2 = i
   )
 })
 
+# one by one
 tb
-tb$addRows(rows = rowList[1])
+tb$addRows(rows = rowList[[1]])
 tb
-tb$addRows(rows = rowList[2])
+tb$addRows(rows = rowList[[2]])
 tb
-tb$addRows(rows = rowList[3])
+tb$addRows(rows = rowList[[3]])
 tb
-tb$addRows(rows = rowList[4])
+tb$addRows(rows = rowList[[4]])
 tb
 
+# all at once
 tb <- createJaspTable()
 tb$addRows(rows = rowList)
 tb
 
-
-# This should work, but something else goes wrong. We're looping over the elements of col, instead of over
-# col and col2
-tb <- createJaspTable()
-tb$addRows(rows = rowList[[1]])
-tb$addRows(rows = rowList[[2]])
-tb$addRows(rows = rowList[[3]])
-tb$addRows(rows = rowList[[4]])
-tb
-
-
-tb <- createJaspTable()
-tb$addRows(rows = list(
-  col = structure(list(value = 1.23, type = "number", format = "sf:4;dp:3"), class = c("mixed", "row")),
-  col2 = 1L
-))
-tb
 
 # Example 5a, addColumnInfo pass data.frame ----
 tb <- createJaspTable()
@@ -136,77 +115,51 @@ data <- createMixedColumn(
   values = list(1.23, 0.04, "hoi", 123),
   types  = c("number", "pvalue", "string", "integer")
 )
-
 tb[["m"]] <- data
-tb[["i"]] <- seq(length(data))
-tb
+
+# temporary for comparison with master
+library(jaspBase)
+tb1 <- createJaspTable()
+tb1$addRows(rows = list(a = 1, b = 2, c = 3))
+tb1
+tb1$addRows(rows = list(a = 2, b = 4, c = 6))
+tb1
+tb1$addRows(rows = list(d = 3, f = 5))
+tb1
 
 
-jaspResultsCPP        <- jaspBase:::loadJaspResults("a name")
-jaspResultsCPP$title  <- "a title"
-jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
-
-jaspResults[["table"]] <- tb
-
-
-
-returnThis <- jaspResultsCPP$getResults()
-structure <- jsonlite::fromJSON(returnThis)
-structure$results$table$data
-
-
-
-tb <- createJaspTable()
-
-data <- createMixedColumn(
-  values = list(1.23, 0.04, "hoi", 123),
-  types  = c("number", "pvalue", "string", "integer")
+rowList2 <- list(
+  list(a = 1, b = 2),
+  list(a = 2, b = 4),
+  list(a = 3, b = 6),
+  list(c = 3, d = 4),
+  list(c = 6, d = 8)
 )
 
-tb[["m"]] <- data
-tb[["i"]] <- seq(length(data))
-tb
+tb2 <- createJaspTable()
+tb2$addRows(rows = rowList2)
+tb2
+
+# this crashes!
+tb1 <- createJaspTable()
+for (l in letters[1:6])
+  tb1$addColumnInfo(name = l, title = l, type = "integer")
+tb1$addRows(rows = list(a = 1, b = 2, c = 3))
+tb1
+tb1$addRows(rows = list(a = 2, b = 4, c = 6))
+tb1
+tb1$addRows(rows = list(d = 3, e = 5))
+tb1
 
 
-jaspResultsCPP        <- jaspBase:::loadJaspResults("a name")
-jaspResultsCPP$title  <- "a title"
-jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
-
-jaspResults[["table"]] <- tb
-
-jaspResultsCPP$send()
-
-returnThis <- jaspResultsCPP$getResults()
-structure <- jsonlite::fromJSON(returnThis)
-structure$results$table$data
-structure$results$table$schema
-
-
-
-
-tb <- createJaspTable(title = "Mixed Table Test")
-
-df <- data.frame(
-  col  = createMixedColumn(
-    values = list(1.23, 0.04, "hoi", 123),
-    types  = c("number", "pvalue", "string", "integer")
-  ),
-  col2 = 1:4
+rowList2 <- list(
+  list(a = 1, b = 2),
+  list(a = 2, b = 4),
+  list(a = 3, b = 6),
+  list(c = 3, d = 4),
+  list(c = 6, d = 8)
 )
 
-tb$setData(df)
-print(tb)
-
-jaspResultsCPP        <- jaspBase:::loadJaspResults("a name")
-jaspResultsCPP$title  <- "a title"
-jaspResults           <- jaspBase:::jaspResultsR$new(jaspResultsCPP)
-
-
-jaspResults[["mixedTestTableTest"]] <- tb
-
-
-returnThis <- jaspResultsCPP$getResults()
-structure <- jsonlite::fromJSON(returnThis)
-structure$results$table$data
-structure$results$table$schema
-
+tb2 <- createJaspTable()
+tb2$addRows(rows = rowList2)
+tb2
