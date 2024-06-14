@@ -347,25 +347,24 @@ addRenvBeforeAfterDispatch <- function() {
 
   renBeforeAfterInstallStruct <- structure(list(
     before.install = function(x) {
-      cat("BEFORE INSTALLING\n")
-      cat(sprintf("pkg = %s\n", x))
-      cat("running runJaspInstallOverrides\n")
-      print(Sys.getenv("MAKEFLAGS"))
+#      cat("BEFORE INSTALLING\n")
+#      cat(sprintf("pkg = %s\n", x))
+#      cat("running runJaspInstallOverrides\n")
+#      print(Sys.getenv("MAKEFLAGS"))
       runJaspInstallOverrides(x, "before")
-      print(Sys.getenv("MAKEFLAGS"))
-      cat("END BEFORE INSTALLING\n")
+#      print(Sys.getenv("MAKEFLAGS"))
+#      cat("END BEFORE INSTALLING\n")
     },
 
     after.install = function(x)
     {
-        cat("AFTER INSTALLING\n")
-        cat(sprintf("pkg = %s\n", x))
-        cat("running runJaspInstallOverrides\n")
-        print(Sys.getenv("MAKEFLAGS"))
+#        cat("AFTER INSTALLING\n")
+#        cat(sprintf("pkg = %s\n", x))
+#        cat("running runJaspInstallOverrides\n")
+#        print(Sys.getenv("MAKEFLAGS"))
         runJaspInstallOverrides(x, "after")
-        print(Sys.getenv("MAKEFLAGS"))
-        cat("END AFTER INSTALLING\n")
-
+#        print(Sys.getenv("MAKEFLAGS"))
+#        cat("END AFTER INSTALLING\n")
 
       installPath <- mget("installpath", envir = parent.frame(1), ifnotfound = "unknown")
 
