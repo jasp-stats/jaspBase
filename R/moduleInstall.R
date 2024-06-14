@@ -329,19 +329,43 @@ libraryMatchesLockfile <- function(project = NULL) {
   return(!hasDiff)
 }
 
+runJaspInstallOverrides <- function(pkg, what = c("before", "after")) {
+  what <- match.arg(what)
+  jaspOverrides <- getOption("JASP_RENV_INSTALL_OPTIONS")
+  if (is.null(jaspOverrides))
+    return(NULL)
+  if (pkg %in% names(jaspOverrides) && !is.null(jaspOverrides[[pkg]][[what]]))
+    if (is.function(jaspOverrides[[pkg]][[what]]))
+        jaspOverrides[[pkg]][[what]]()
+    else
+        stop("options(\"JASP_RENV_INSTALL_OPTIONS\") should be list(pkgName1 = list(before = function() <>, after = function <>), pkgName2 = ...)!", domain = NA)
+}
+
+
 #' @export
 addRenvBeforeAfterDispatch <- function() {
 
   renBeforeAfterInstallStruct <- structure(list(
     before.install = function(x) {
-      #print("BEFORE INSTALLING")
-      #print(sprintf("Path = %s", mget("path", envir = parent.frame(1),
-      #                                ifnotfound = "unknown path")))
-      0 #do nothing
+#      cat("BEFORE INSTALLING\n")
+#      cat(sprintf("pkg = %s\n", x))
+#      cat("running runJaspInstallOverrides\n")
+#      print(Sys.getenv("MAKEFLAGS"))
+      runJaspInstallOverrides(x, "before")
+#      print(Sys.getenv("MAKEFLAGS"))
+#      cat("END BEFORE INSTALLING\n")
     },
 
     after.install = function(x)
     {
+#        cat("AFTER INSTALLING\n")
+#        cat(sprintf("pkg = %s\n", x))
+#        cat("running runJaspInstallOverrides\n")
+#        print(Sys.getenv("MAKEFLAGS"))
+        runJaspInstallOverrides(x, "after")
+#        print(Sys.getenv("MAKEFLAGS"))
+#        cat("END AFTER INSTALLING\n")
+
       installPath <- mget("installpath", envir = parent.frame(1), ifnotfound = "unknown")
 
       if(installPath != "unknown")
