@@ -268,6 +268,9 @@ isTryError <- function(obj){
 #' @param keys character, option name(s) that contain variables in the dataset.
 #' @param exclude.na.listwise character, column names for which any missing values will cause that row to be excluded.
 #'
+#' @details
+#' `readDataSetByVariableTypes` automatically removes keys that are empty lists or empty strings, unlike `.readDataSetToEnd` which would throw an error.
+#'
 #' @export
 readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL) {
 
@@ -308,6 +311,10 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
   #   covariate2.types = c("ordinal")
   # )
   # keys <- c("variables", "covariate", "covariate2")
+
+  # automatically remove keys that are empty lists or empty strings
+  validKeys <- vapply(keys, \(key) !identical(options[[key]], "") && !identical(options[[key]], list()), FUN.VALUE = logical(1L))
+  keys <- keys[validKeys]
 
   variableNames <- options[keys]
   variableTypes <- options[paste0(keys, ".types")]
