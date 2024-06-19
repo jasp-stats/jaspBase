@@ -262,6 +262,118 @@ isTryError <- function(obj){
   return(cols);
 }
 
+#' @title readDataSetByVariableTypes
+#'
+#' @param options options from QML.
+#' @param keys character, option name(s) that contain variables in the dataset.
+#' @param exclude.na.listwise character, column names for which any missing values will cause that row to be excluded.
+#'
+#' @details
+#' `readDataSetByVariableTypes` automatically removes keys that are empty lists or empty strings, unlike `.readDataSetToEnd` which would throw an error.
+#'
+#' @export
+readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL) {
+
+  if (!is.list(options))
+    stop(".readDataSetByVariableTypes received `options` that are not a list.")
+
+  if (!is.character(keys))
+    stop(".readDataSetByVariableTypes received `keys` that are not a character vector")
+
+  # TODO: use the values below for unit tests!
+  # test error 1: missing <key>.types
+  # options <- list(
+  #   variables       = c("contNormal", "contGamma"),
+  #   variables.types = c("scale", "scale"),
+  #   covariate       = "contBinom",
+  #   factor          = "contBinom"
+  # )
+  # keys <- c("variables", "covariate", "factor")
+
+  # test error 2: repeated variable names
+  # options <- list(
+  #   variables       = c("contNormal", "contGamma", "debString"),
+  #   variables.types = c("scale", "scale", "nominal"),
+  #   covariate       = "contNormal",
+  #   covariate.types = c("ordinal"),
+  #   covariate2       = "contGamma",
+  #   covariate2.types = c("ordinal")
+  # )
+  # keys <- c("variables", "covariate", "covariate2")
+
+  # test 3: this one should not error
+  # options <- list(
+  #   variables       = c("contNormal", "contGamma", "debString"),
+  #   variables.types = c("scale", "scale", "nominal"),
+  #   covariate       = "contExpon",
+  #   covariate.types = c("ordinal"),
+  #   covariate2       = "contBinom",
+  #   covariate2.types = c("ordinal")
+  # )
+  # keys <- c("variables", "covariate", "covariate2")
+
+  # automatically remove keys that are empty lists or empty strings
+  validKeys <- vapply(keys, \(key) !identical(options[[key]], "") && !identical(options[[key]], list()), FUN.VALUE = logical(1L))
+  if (!any(validKeys))
+    return(data.frame())
+
+  keys <- keys[validKeys]
+
+  variableNames <- options[keys]
+  variableTypes <- options[paste0(keys, ".types")]
+
+  lengthsVars  <- lengths(variableNames)
+  lengthsTypes <- lengths(variableTypes)
+
+  # are any keys missing the element key.types in options?
+  mismatch <- which(lengthsVars != lengthsTypes)
+  if (length(mismatch) > 0L)
+    stop(".readDataSetByVariableTypes received the following key(s) which are missing the types:\n\n", paste0("\"", names(mismatch), "\"", collapse = ", "))
+
+  variableNamesVec <- unlist(variableNames, use.names = FALSE)
+
+  if (!all(is.character(variableNamesVec)))     stop(".readDataSetByVariableTypes received key(s) for which the type in options[[\"{key}\"]] was not a character vector")
+  if (anyNA(variableNamesVec))                  stop(".readDataSetByVariableTypes received key(s) for which the type in options[[\"{key}\"]] was NA")
+
+  # are any keys containing the same variable twice?
+  if (anyDuplicated(variableNamesVec)) {
+
+    names(variableNamesVec) <- rep(keys, lengthsVars)
+
+    duplicatedVariables <- unique(variableNamesVec[duplicated(variableNamesVec)])
+
+    # the width here will probably be overkill because it looks at encoded columns, but it'll look pretty nopntheless
+    desiredWidth <- max(nchar(duplicatedVariables), 8L) # 8 == nchar("variable") from the header below
+    rows <- vapply(duplicatedVariables, \(var) {
+      paste0(formatC(var, width = desiredWidth), " | ", paste(sort(names(variableNamesVec[variableNamesVec == var])), collapse = ", "))
+    }, FUN.VALUE = character(1L))
+    header <- paste0(formatC("variable", width = desiredWidth), " | ", "key(s)\n")
+    separator <- paste0(strrep("-", desiredWidth), "-|-")
+    separator <- paste0(separator, strrep("-", max(nchar(rows)) - nchar(separator)), "\n")
+
+    stop(".readDataSetByVariableTypes received the same variable(s) more than once.\nEnsure this cannot happen or call .readDataSetByVariableTypes multiple times. \n\n",
+         header, separator, paste(rows, collapse = "\n"))
+
+  }
+
+  variableTypesVec <- unlist(variableTypes, use.names = FALSE)
+
+  allowedTypes <- c("scale", "ordinal", "nominal")
+  if (!all(is.character(variableTypesVec)))     stop(".readDataSetByVariableTypes received key(s) for which the type in options[[\"{key}.types\"]] was not a character vector")
+  if (anyNA(variableTypesVec))                  stop(".readDataSetByVariableTypes received key(s) for which the type in options[[\"{key}.types\"]] was NA")
+  if (!all(variableTypesVec %in% allowedTypes)) stop(".readDataSetByVariableTypes received key(s) for which the type in options[[\"{key}.types\"]] was not one of \"scale\", \"ordinal\", or \"nominal\"")
+
+  variablesSplitByType <- split(variableNamesVec, variableTypesVec)
+
+  return(.readDataSetToEnd(
+    columns.as.numeric  = variablesSplitByType[["scale"]],
+    columns.as.ordinal  = variablesSplitByType[["ordinal"]],
+    columns.as.factor   = variablesSplitByType[["nominal"]],
+    exclude.na.listwise = exclude.na.listwise
+  ))
+
+}
+
 #' @export
 .readDataSetToEnd <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
 
@@ -539,7 +651,7 @@ jaspResultsStrings <- function() {
     base::tryCatch(
       base::load(location$relativePath),
       error=function(e) e
-      #,warning=function(w) w #Commented out because if there *is* a warning, which there of course shouldnt be, the state wont be loaded *at all*. 
+      #,warning=function(w) w #Commented out because if there *is* a warning, which there of course shouldnt be, the state wont be loaded *at all*.
     )
   }
 
