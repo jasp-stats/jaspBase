@@ -314,6 +314,9 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 
   # automatically remove keys that are empty lists or empty strings
   validKeys <- vapply(keys, \(key) !identical(options[[key]], "") && !identical(options[[key]], list()), FUN.VALUE = logical(1L))
+  if (!any(validKeys))
+    return(data.frame())
+
   keys <- keys[validKeys]
 
   variableNames <- options[keys]
