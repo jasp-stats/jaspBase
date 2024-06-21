@@ -471,7 +471,13 @@ void jaspObject::dependOnOptions(Rcpp::CharacterVector listOptions)
 	if(currentOptions.isNull()) Rf_error("No options known!");
 
 	for(auto & nameOption : listOptions)
-		_optionMustBe[Rcpp::as<std::string>(nameOption)] = currentOptions.get(nameOption, Json::nullValue);
+	{
+		std::string name = Rcpp::as<std::string>(nameOption);
+		std::string nameTypes = name + ".types";
+		_optionMustBe[name] = currentOptions.get(name, Json::nullValue);
+		if (currentOptions.isMember(nameTypes))
+			_optionMustBe[nameTypes] = currentOptions.get(nameTypes, Json::nullValue);
+	}
 }
 
 void jaspObject::setOptionMustBeDependency(std::string optionName, Rcpp::RObject mustBeThis)
