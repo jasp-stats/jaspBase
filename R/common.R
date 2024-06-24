@@ -114,6 +114,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
 
+  # hack to add types automatically as dependencies, used in jaspObjectR$dependOn
+  options("__JASP__OPTIONS" = options)
+
   analysisResult <-
     tryCatch(
       expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),

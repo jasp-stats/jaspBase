@@ -190,6 +190,11 @@ jaspObjR <- R6::R6Class(
       if (!is.null(optionContainsValue)) {
         if (!is.list(optionContainsValue) || is.null(names(optionContainsValue)))
           stop("please provide a named list in `optionContainsValue`", domain = NA)
+
+        # would be nicer to extract this from jaspResults somehow
+        completeOptions <- getOption("__JASP__OPTIONS", NULL)
+        meta <- completeOptions[[".meta"]]
+
         for (i in seq_along(optionContainsValue)) {
           name  <- names(optionContainsValue)[i]
           value <- optionContainsValue[[i]]
@@ -197,6 +202,25 @@ jaspObjR <- R6::R6Class(
           if (is.null(value))
             stop("Expected not-null but got null")
           private$jaspObject$setOptionMustContainDependency(name, value)
+
+          # if we have something of the form list(variables       = variable)
+          # check if we need to add also     list(variables.types = type)
+          if (!is.null(meta)) {
+            nameType  <- paste0(name, ".types")
+            if (isTRUE(meta[[name]][["hasTypes"]]) &&
+                !is.null(completeOptions[[nameType]])) {
+              completeOptionsValue <- completeOptions[[name]]
+              completeOptionsTypes <- completeOptions[[nameType]]
+              idx <- which(completeOptionsValue == value)
+              if (length(idx) > 0L) {
+                valueType <- completeOptionsTypes[[idx[[1L]]]] # take first element in case there are multiple matches (which should be impossible)
+                # for debugging
+                # cat(sprintf("Automatically added setOptionMustContainDependency(%s, %s)\n", nameType, valueType))
+                private$jaspObject$setOptionMustContainDependency(nameType, valueType)
+              }
+            }
+          }
+
         }
       }
 
@@ -824,7 +848,7 @@ jaspColumnR <- R6::R6Class(
   inherit   = jaspOutputObjR,
   cloneable = FALSE,
   public    = list(
-    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL) 
+    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL)
     {
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
@@ -848,7 +872,7 @@ jaspColumnR <- R6::R6Class(
 
       return()
     },
-    
+
     setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
     setOrdinal      = function(ordinalData) private$jaspObject$setOrdinal(ordinalData),
     setNominal      = function(nominalData) private$jaspObject$setNominal(nominalData),
