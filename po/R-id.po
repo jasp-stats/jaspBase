@@ -30,7 +30,7 @@ msgid ""
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
-"Analisis ini dihentikan secara tidak terduga. Untuk mendapatkan bantuan atas "
+"Analisis ini dihentikan secara tidak terduga. %s Untuk mendapatkan bantuan atas "
 "masalah ini, silakan laporkan pesan di atas di: https://jasp-stats.org/bug-"
 "reports"
 
