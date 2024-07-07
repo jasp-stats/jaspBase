@@ -105,11 +105,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
 
-  dataset <- NULL
-  if (! is.null(dataKey)) {
-    cols    <- .getDataSetCols(dataKey, options)
-    dataset <- do.call(.readDataSetToEnd, cols)
-  }
+  dataset <- .readDataSetRequestedNative()
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
