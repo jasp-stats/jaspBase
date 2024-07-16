@@ -133,16 +133,9 @@ int jaspTable::getDesiredColumnIndexFromNameForRowAdding(std::string colName, in
 			if(_colNames[possibleColIndex] == colName)
 				return possibleColIndex;
 
-	int foundUnnamed = 0;
 	for(int col=0; col<_colNames.rowCount() || _data.size(); col++)
 		if(_colNames[col] == "")
-		{
-
-			if(previouslyAddedUnnamed == foundUnnamed)
-				return col;
-
-			foundUnnamed++;
-		}
+			return col;
 
 	return std::max(_colNames.rowCount(), _data.size());
 }
@@ -156,6 +149,7 @@ void jaspTable::setColumn(std::string columnName, Rcpp::RObject column)
 	else if(Rcpp::is<Rcpp::IntegerVector>(column))		setColumnFromVector<INTSXP>((Rcpp::IntegerVector)	column, colIndex);
 	else if(Rcpp::is<Rcpp::StringVector>(column))		setColumnFromVector<STRSXP>((Rcpp::StringVector)	column, colIndex);
 	else if(Rcpp::is<Rcpp::CharacterVector>(column))	setColumnFromVector<STRSXP>((Rcpp::CharacterVector)	column, colIndex);
+	else if(isMixedRObject(column))						setColumnFromMixedVector((Rcpp::List)				column, colIndex);
 	else if(Rcpp::is<Rcpp::List>(column))				setColumnFromList((Rcpp::List)						column,	colIndex);
 	else Rf_error("Did not get a vector or list as column..");
 
@@ -254,11 +248,10 @@ void jaspTable::addRowsFromList(Rcpp::List newData, Rcpp::CharacterVector newRow
 	for(size_t row=0; row<newData.size(); row++)
 	{
 		Rcpp::RObject rij = (Rcpp::RObject)newData[row];
-
 		std::vector<std::string> localColNames;
 
 		if(Rcpp::is<Rcpp::List>(rij))
-			 localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
+			localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
 
 		auto jsonRij = RcppVector_to_VectorJson(rij);
 
@@ -333,7 +326,9 @@ Json::Value jaspTable::getCell(size_t col, size_t row, size_t maxCol, size_t max
 			amIExpected		= col < _expectedColumnCount	&& row < _expectedRowCount;
 
 	if(col < _data.size() && row < _data[col].size())
+	{
 		return _data[col][row];
+	}
 
 	return !amIWithinBounds || !amIExpected ? Json::nullValue : Json::Value(".");
 }
@@ -346,6 +341,12 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 	std::string format = "";
 	if(_colFormats.containsField(getColName(col)))	format = _colFormats[getColName(col)];
 	else if(_colFormats.rowCount() > col)			format = _colFormats[col];
+
+	if(isMixedJson(val))
+	{
+		format  = val["format"].isNull() ? "" : val["format"].asString();
+		val		= val["value"];
+	}
 
 	if(val.isNull())	return "";
 	if(val.isString())	return val.asString();
@@ -501,6 +502,31 @@ Rcpp::List jaspTable::toRObject()
 			for (size_t row = 0; row < _data[col].size(); row++)
 				values[row] = _data[col][row].asString();
 
+			df[getColName(col)] = values;
+			break;
+		}
+		case jaspTableColumnType::mixed:
+		{
+
+			Rcpp::List valuesData(_data[col].size());
+			Rcpp::StringVector valuesTypes(_data[col].size());
+			Rcpp::List valuesFormats(_data[col].size());
+			for (size_t row = 0; row < _data[col].size(); row++)
+			{
+				valuesTypes[row] = _data[col][row]["type"].asString();
+
+				if		(valuesTypes[row] == "number")	valuesData[row] = _data[col][row]["value"].asDouble();
+				else if (valuesTypes[row] == "pvalue")	valuesData[row] = _data[col][row]["value"].asDouble();
+				else if (valuesTypes[row] == "integer")	valuesData[row] = _data[col][row]["value"].asInt();
+				else if (valuesTypes[row] == "string")	valuesData[row] = _data[col][row]["value"].asString();
+
+				if (!_data[col][row]["format"].isNull())
+					valuesFormats[row] = _data[col][row]["format"].asString();
+			}
+
+			Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
+			Rcpp::Function createMixedColumn = jaspBase["createMixedColumn"];
+			Rcpp::List values = createMixedColumn(valuesData, valuesTypes, valuesFormats);
 			df[getColName(col)] = values;
 			break;
 		}
@@ -1406,6 +1432,13 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 				return jaspTableColumnType::various;
 			break;
 
+		case Json::objectValue:
+		{
+			if (cell.isMember("value") && cell.isMember("type") && cell.isMember("format"))
+				return jaspTableColumnType::mixed;
+			break;
+		}
+
 		default:
 			return jaspTableColumnType::composite; //arrays and objects are not really supported as cells at the moment but maybe we could add that in the future?
 		}
@@ -1418,6 +1451,7 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 	case Json::intValue:
 	case Json::uintValue:		return jaspTableColumnType::integer;
 	case Json::realValue:		return jaspTableColumnType::number;
+	case Json::arrayValue:		return jaspTableColumnType::mixed;
 	default:					return jaspTableColumnType::unknown;
 	}
 }
