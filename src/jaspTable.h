@@ -238,6 +238,18 @@ protected:
 		_data[col] = RcppVector_to_VectorJson<RTYPE>(newData);
 	}
 
+	void setColumnFromMixedVector(Rcpp::List newData, size_t col)
+	{
+		setRowNamesWhereApplicable(extractElementOrColumnNames(newData));
+
+		if(_data.size() <= col)
+			_data.resize(col+1);
+		_data[col] = MixedRcppVector_to_VectorJson(newData);
+
+	}
+
+	bool isMixedJson(const Json::Value &v) const { return v.isObject() && !v.get("value", Json::nullValue).isNull() && !v.get("type", Json::nullValue).isNull() && v.isMember("format"); }
+
 	void setColumnFromList(Rcpp::List column, int colIndex);
 
 	template<int RTYPE>	void addColumnsFromMatrix(Rcpp::Matrix<RTYPE> newData)

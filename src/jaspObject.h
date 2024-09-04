@@ -17,7 +17,7 @@ void		jaspPrint(			std::string msg);
 
 DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource, report);
 DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
-DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite); //can be merged with columnType from CentralDatasetModel branch later on?
+DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite, mixed); //can be merged with columnType from CentralDatasetModel branch later on?
 
 jaspObjectType jaspObjectTypeStringToObjectType(std::string type);
 
@@ -147,12 +147,21 @@ public:
 		else if(Rcpp::is<Rcpp::IntegerVector>(obj))		return RcppVector_to_VectorJson<INTSXP>((Rcpp::IntegerVector)		obj);
 		else if(Rcpp::is<Rcpp::StringVector>(obj))		return RcppVector_to_VectorJson<STRSXP>((Rcpp::StringVector)		obj);
 		else if(Rcpp::is<Rcpp::CharacterVector>(obj))	return RcppVector_to_VectorJson<STRSXP>((Rcpp::CharacterVector)		obj);
+		else if(isMixedRObject(obj))					return MixedRcppVector_to_VectorJson(	(Rcpp::List)				obj);
 		else if(Rcpp::is<Rcpp::List>(obj))				return RList_to_VectorJson((Rcpp::List)								obj);
 		else if(throwError) Rf_error("JASPjson::RcppVector_to_VectorJson received an SEXP that is not a Vector of some kind.");
 
 		return std::vector<Json::Value>({""});
 	}
 
+	std::vector<Json::Value> MixedRcppVector_to_VectorJson(Rcpp::List obj)
+	{
+		std::vector<Json::Value> vec;
+		for(int i=0; i<obj.length(); i++)
+			vec.push_back(MixedRObject_to_JsonValue(obj[i]));
+
+		return vec;
+	}
 
 	template<int RTYPE>	 std::vector<Json::Value> RcppVector_to_VectorJson(Rcpp::Vector<RTYPE> obj)
 	{
@@ -185,9 +194,11 @@ public:
 		return vecvec;
 	}
 
-	Json::Value RObject_to_JsonValue(Rcpp::RObject		obj);
-	Json::Value RObject_to_JsonValue(Rcpp::List 		obj);
+	Json::Value RObject_to_JsonValue(		Rcpp::RObject	obj);
+	Json::Value RObject_to_JsonValue(		Rcpp::List 		obj);
+	Json::Value MixedRObject_to_JsonValue(	Rcpp::List		obj);
 
+	bool	isMixedRObject(Rcpp::RObject obj) const { return obj.inherits("mixed"); }
 
 	template<int RTYPE>	 Json::Value RObject_to_JsonValue(Rcpp::Matrix<RTYPE>	obj)
 	{

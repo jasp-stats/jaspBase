@@ -662,6 +662,7 @@ std::vector<Json::Value> jaspObject::RList_to_VectorJson(Rcpp::List obj)
 Json::Value jaspObject::RObject_to_JsonValue(Rcpp::RObject obj)
 {
 	if(obj.isNULL())								return Json::nullValue;
+	else if(isMixedRObject(obj))					return MixedRObject_to_JsonValue((Rcpp::List)				obj);
 	else if(Rcpp::is<Rcpp::List>(obj))				return RObject_to_JsonValue((Rcpp::List)					obj);
 	else if(Rcpp::is<Rcpp::DataFrame>(obj))			return RObject_to_JsonValue((Rcpp::List)					obj);
 	else if(Rcpp::is<Rcpp::NumericMatrix>(obj))		return RObject_to_JsonValue<REALSXP>((Rcpp::NumericMatrix)	obj);
@@ -673,6 +674,24 @@ Json::Value jaspObject::RObject_to_JsonValue(Rcpp::RObject obj)
 	else if(obj.isS4())								return "an S4, which is too complicated for jaspResults now.";
 	else											return "something that is not understood by jaspResults right now..";
 }
+
+Json::Value jaspObject::MixedRObject_to_JsonValue(Rcpp::List obj)
+{
+
+	Json::Value value(Json::objectValue);
+
+	// sometimes we receive list(mixed) and sometimes mixed, ideally we always just get mixed but I'm not sure that's possible with addRows.
+	Rcpp::List data = obj.length() != 3 ? obj[0] : obj;
+
+	value["value"]  = RObject_to_JsonValue((Rcpp::RObject)data["value"]);
+	value["type"]   = RObject_to_JsonValue((Rcpp::RObject)data["type"]);
+	value["format"] = RObject_to_JsonValue((Rcpp::RObject)data["format"]);
+	
+
+	return value;
+
+}
+
 
 Json::Value jaspObject::RObject_to_JsonValue(Rcpp::List obj)
 {
