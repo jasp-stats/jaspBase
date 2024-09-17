@@ -1,0 +1,4 @@
+jaspColumnEncoderInfo <- function() {
+  return(r"{@extrainfo@}")
+}
+

@@ -21,6 +21,7 @@ if [ "$UNAME" = "SunOS" ]; then
 fi
 
 DOWNLOAD_SUCCESS=1
+EXTRA_INFO="Version info is only available when git is available!"
 
 if [ "${INCLUDE_DIR}" ]; then
 
@@ -28,6 +29,16 @@ if [ "${INCLUDE_DIR}" ]; then
 	DOWNLOAD_SUCCESS=0
 	PKG_CXXFLAGS="-I\"${INCLUDE_DIR}\""
 	JASPCOLUMNENCODER_DIR="${INCLUDE_DIR}"
+
+	if git --version 2>&1 >/dev/null; then
+
+		if [ -d "${JASPCOLUMNENCODER_DIR}/.git" ]; then
+			EXTRA_INFO="include_dir, git_repo at:  + $(git --git-dir="${JASPCOLUMNENCODER_DIR}/.git" --work-tree="${JASPCOLUMNENCODER_DIR}" log -1 --oneline)"
+		else
+			EXTRA_INFO='include_dir that is not a git repo.'
+		fi
+
+	fi
 
 else
 
@@ -55,6 +66,8 @@ else
 
 		fi
 
+		EXTRA_INFO="$(git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" log -1 --oneline)"
+
 	fi
 
 	if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
@@ -69,6 +82,7 @@ else
 
 			curl --silent --location https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
 			DOWNLOAD_SUCCESS=$?
+			EXTRA_INFO="curl was used to download jaspColumnEncoder, no version info is available."
 
 		fi
 	fi
@@ -85,6 +99,7 @@ else
 
 			wget --quiet --output-document=- https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
 			DOWNLOAD_SUCCESS=$?
+			EXTRA_INFO="wget was used to download jaspColumnEncoder, no version info is available."
 
 		fi
 	fi
@@ -112,5 +127,7 @@ else
 fi
 
 sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
+sed -e "s|@extrainfo@|${EXTRA_INFO}|" inst/jaspColumnEncoderVersion.R.in > R/jaspColumnEncoderVersion.R
+
 
 exit 0

@@ -61,3 +61,5 @@ src/Makevars.win
 !.github
 !.Rbuildignore
 _processedLockFile.lock
+
+R/jaspColumnEncoderVersion.R
