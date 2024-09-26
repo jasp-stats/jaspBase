@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -104,9 +104,10 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   analysis    <- eval(parse(text=functionCall))
-
-  dataset <- .fromRCPP(".readDataSetRequestedNative")
-
+  dataset     <- NULL
+  
+  if(preloadData)
+    dataset <- .fromRCPP(".readDataSetRequestedNative")
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
