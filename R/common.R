@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -104,12 +104,10 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   analysis    <- eval(parse(text=functionCall))
-
-  dataset <- NULL
-  if (! is.null(dataKey)) {
-    cols    <- .getDataSetCols(dataKey, options)
-    dataset <- do.call(.readDataSetToEnd, cols)
-  }
+  dataset     <- NULL
+  
+  if(preloadData)
+    dataset <- .fromRCPP(".readDataSetRequestedNative")
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
@@ -484,6 +482,33 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
   new.df
 }
 
+#' Exclude rows with missing values (listwise deletion)
+#'
+#' @param dataset dataframe containing the dataset.
+#' @param columns a character vector with column names, or NULL to remove all rows with missing values.
+#'
+#' @return a dataframe with rows that contain missing values removed
+#' @export
+excludeNaListwise <- function(dataset, columns = NULL) {
+
+  if (length(dataset) == 0 || nrow(dataset) == 0)
+    return(dataset)
+
+  if (!is.data.frame(dataset))
+    stop("excludeNaListwise: the `dataset` argument must be a dataframe.")
+
+  if (is.null(columns))
+    return(dataset[stats::complete.cases(dataset), , drop = FALSE])
+
+  if (!character(columns))
+    stop("excludeNaListwise: the `columns` argument must be a character vector.")
+
+  if (!all(columns %in% colnames(dataset)))
+    stop("excludeNaListwise: the following columns did not appear in the dataset:", setdiff(columns, colnames(dataset)))
+
+  return(dataset[stats::complete.cases(dataset[columns]), , drop = FALSE])
+}
+
 .excludeNaListwise <- function(dataset, exclude.na.listwise) {
 
   if ( ! is.null(exclude.na.listwise)) {
@@ -594,6 +619,7 @@ jaspResultsStrings <- function() {
     ".requestTempRootNameNative",
     ".readDatasetToEndNative",
     ".readDataSetHeaderNative",
+    ".readDataSetRequestedNative",
     ".callbackNative",
     ".requestStateFileNameNative",
     ".baseCitation",
