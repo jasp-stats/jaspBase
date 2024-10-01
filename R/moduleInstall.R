@@ -419,5 +419,8 @@ setupRenv <- function(moduleLibrary, modulePkg) {
   if(getOS() == "windows" || getOS() == "osx")
     options(install.packages.compile.from.source = "never")
 
+  if (getOS() == "osx")
+    options(renv.config.install.staged = FALSE, renv.config.install.transactional = FALSE)
+
   addRenvBeforeAfterDispatch()
 }
