@@ -500,7 +500,7 @@ excludeNaListwise <- function(dataset, columns = NULL) {
   if (is.null(columns))
     return(dataset[stats::complete.cases(dataset), , drop = FALSE])
 
-  if (!character(columns))
+  if (!is.character(columns))
     stop("excludeNaListwise: the `columns` argument must be a character vector.")
 
   if (!all(columns %in% colnames(dataset)))
