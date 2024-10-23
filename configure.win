@@ -47,6 +47,7 @@ else
 			echo 'Cloning c++ dependency jaspColumnEncoder'
 			rm -rf 'inst/include/jaspColumnEncoder'
 			git clone --depth 1 https://github.com/jasp-stats/jaspColumnEncoder.git inst/include/jaspColumnEncoder
+			WORK_TREE="$(pwd)/inst/include/jaspColumnEncoder"
 			DOWNLOAD_SUCCESS=0
 
 		fi
