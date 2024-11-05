@@ -44,10 +44,11 @@
 #' @keywords internal
 #' @export
 jaspFormula <- function(formula, data) {
-  formula <- formulaEncode(formula)
+  formulaEncoded <- formulaEncode(formula)
   data    <- formulaCheckOrReadData(data)
-  formulaCheckRequirements(formula, data)
+  formulaCheckRequirements(formulaEncoded, data)
 
+  # TODO: We should use the encoded formula hier, but if a column has a type ('col.scale'), then it is decoded by 'col'
   result <- list(
     formula = paste(deparse(formula), collapse = ""),
     lhs = formulaGetLhs(formula),
@@ -132,7 +133,7 @@ formulaEncode <- function(formula) {
 
 formulaCheckOrReadData <- function(data) {
   # If we are in JASP and no data are supplied explicitly, we simply read the dataset from JASP.
-  if(jaspBase::jaspResultsCalledFromJasp() && (missing(data) || is.null(data)))
+  if(jaspBase::jaspResultsCalledFromJasp()) # && (missing(data) || is.null(data)))
     data <- jaspBase::readDataSetToEnd(all.columns = TRUE)
 
   if(missing(data) || is.null(data) || !is.data.frame(data))
@@ -152,11 +153,12 @@ formulaCheckRequirements <- function(formula, data) {
     stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.", domain = NA)
   }
 
-  lhs <- all.names(formulaExtractLhs(formula))
-  anyLhsTransformed <- !all(lhs %in% c(colnames(data), "cbind", "(", ")"))
+  columnNames <- decodeColNames(colnames(data))
+  lhs <- decodeColNames(all.names(formulaExtractLhs(formula)))
+  anyLhsTransformed <- !all(lhs %in% c(columnNames, "cbind", "(", ")"))
 
-  rhs <- all.names(formulaExtractRhs(formula))
-  anyRhsTransformed <- !all(rhs %in% c(colnames(data), "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
+  rhs <- decodeColNames(all.names(formulaExtractRhs(formula)))
+  anyRhsTransformed <- !all(rhs %in% c(columnNames, "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
     stop(paste0("Cannot parse the formula `", deparse(formula), "`: maybe a wrong variable name is used. Note that variable transformation is not allowed: in this case, please transform your variables before running the analysis."), domain = NA)
@@ -167,6 +169,7 @@ formulaGetLhs <- function(formula) {
   lhs <- list(
     vars = all.vars(formulaExtractLhs(formula))
   )
+
   return(lhs)
 }
 
