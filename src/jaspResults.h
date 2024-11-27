@@ -95,7 +95,7 @@ public:
 
 	std::string encodeColumnName(const std::string & in)	{ GUARD_ENCODE_FUNCS(return _extraEncodings->shouldEncode(in) ? _extraEncodings->encode(in) : ColumnEncoder::columnEncoder()->encode(in); ) }
 	std::string decodeColumnName(const std::string & in)	{ GUARD_ENCODE_FUNCS(return _extraEncodings->shouldDecode(in) ? _extraEncodings->decode(in) : ColumnEncoder::columnEncoder()->decode(in); ) }
-	std::string decodeColumnType(const std::string & in)	{ GUARD_ENCODE_FUNCS(return columnTypeToString(_extraEncodings->shouldDecode(in) ? _extraEncodings->getColumnType(in) : ColumnEncoder::columnEncoder()->getColumnType(in)); ) }
+	std::string decodeColumnType(const std::string & in)	{ GUARD_ENCODE_FUNCS(return columnTypeToString(_extraEncodings->shouldDecode(in) ? _extraEncodings->columnTypeFromEncoded(in) : ColumnEncoder::columnEncoder()->columnTypeFromEncoded(in)); ) }
 	std::string encodeAllColumnNames(const std::string & in){ GUARD_ENCODE_FUNCS(return ColumnEncoder::columnEncoder()->encodeAll(in); ) }
 	std::string decodeAllColumnNames(const std::string & in){ GUARD_ENCODE_FUNCS(return ColumnEncoder::columnEncoder()->decodeAll(in); ) }
 

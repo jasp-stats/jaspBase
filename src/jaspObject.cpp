@@ -129,8 +129,12 @@ void jaspObject::removeChild(jaspObject * child)
 Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> nestedKey, Json::Value ifNotFound) const
 {
 	Json::Value obj = currentOptions;
+	
 	for (const auto& key: nestedKey)
 	{
+
+		std::cout << "jaspObject::getObjectFromNestedOption sees obj: " << obj.toStyledString() << std::endl;
+
 		// NOTE: this fails if we have options which are an array where some elements are named, but not all.
 		// I think that would violate the Json spec for arrays, but I'm not 100% sure.
 		if (obj.isArray() && std::all_of(key.begin(), key.end(), ::isdigit))
@@ -138,7 +142,7 @@ Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> neste
 			int index = stoi(key) - 1; // So R users can use 1-based indexing
 			obj = obj.get(index, Json::nullValue);
 		}
-		else
+		else if(obj.isObject())
 			obj = obj.get(key, Json::nullValue);
 
 		if (obj.isNull())

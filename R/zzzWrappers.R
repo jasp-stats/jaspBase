@@ -201,12 +201,13 @@ jaspObjR <- R6::R6Class(
           # however, in the situation that it is actually an encoded columnname + columntype it is different
           # because the actual options from qml contains { value: [], types: [] }
           # So lets see
-          decodedType = decodeColumnType(value)
+
+          decodedType = .decodeColType(value)
           if(decodedType != "unknown")
           {
-            decodedName = decodeColumnName(value)
-            private$jaspObject$setOptionMustContainNestedDependency(c(name, "value"), decodedName)
-            private$jaspObject$setOptionMustContainNestedDependency(c(name, "types"), decodedType)
+            decodedName = .decodeColNamesStrict(value)
+            private$jaspObject$setNestedOptionMustContainDependency(c(name, "value"), decodedName)
+            private$jaspObject$setNestedOptionMustContainDependency(c(name, "types"), decodedType)
           } else {
             private$jaspObject$setOptionMustContainDependency(name, value)
           }
