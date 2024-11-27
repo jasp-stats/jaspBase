@@ -202,14 +202,21 @@ jaspObjR <- R6::R6Class(
           # because the actual options from qml contains { value: [], types: [] }
           # So lets see
 
+          defaultSetMustContain <- function(ignoreMe)
+          {
+            private$jaspObject$setOptionMustContainDependency(name, value)
+          }
+
           decodedType = .decodeColType(value)
           if(decodedType != "unknown")
           {
             decodedName = .decodeColNamesStrict(value)
-            private$jaspObject$setNestedOptionMustContainDependency(c(name, "value"), decodedName)
-            private$jaspObject$setNestedOptionMustContainDependency(c(name, "types"), decodedType)
+            tryCatch(exprt={
+              private$jaspObject$setNestedOptionMustContainDependency(c(name, "value"), decodedName)
+              private$jaspObject$setNestedOptionMustContainDependency(c(name, "types"), decodedType)
+            }, error = defaultSetMustContain)
           } else {
-            private$jaspObject$setOptionMustContainDependency(name, value)
+            defaultSetMustContain()
           }
         }
       }
