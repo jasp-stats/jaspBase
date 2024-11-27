@@ -516,7 +516,6 @@ void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nest
 	_nestedOptionMustContain[nestedKey] = RObject_to_JsonValue(mustContainThis);
 }
 
-
 void jaspObject::copyDependenciesFromJaspObject(jaspObject * other)
 {
 	for(auto fieldVal : other->_optionMustBe)

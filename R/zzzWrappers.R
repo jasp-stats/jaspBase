@@ -196,7 +196,20 @@ jaspObjR <- R6::R6Class(
 
           if (is.null(value))
             stop("Expected not-null but got null")
-          private$jaspObject$setOptionMustContainDependency(name, value)
+
+          # so we want to depend on this option containing value, this usually works.
+          # however, in the situation that it is actually an encoded columnname + columntype it is different
+          # because the actual options from qml contains { value: [], types: [] }
+          # So lets see
+          decodedType = decodeColumnType(value)
+          if(decodedType != "unknown")
+          {
+            decodedName = decodeColumnName(value)
+            private$jaspObject$setOptionMustContainNestedDependency(c(name, "value"), decodedName)
+            private$jaspObject$setOptionMustContainNestedDependency(c(name, "types"), decodedType)
+          } else {
+            private$jaspObject$setOptionMustContainDependency(name, value)
+          }
         }
       }
 
@@ -542,6 +555,7 @@ jaspResultsR <- R6::R6Class(
     setCurrentColumnNames = function(names) private$jaspObject$setCurrentColumnNames(names),
     encodeColumnName      = function(input) private$jaspObject$encodeColumnName(input),
     decodeColumnName      = function(input) private$jaspObject$decodeColumnName(input),
+    decodeColumnType      = function(input) private$jaspObject$decodeColumnType(input),
     encodeAllColumnNames  = function(input) private$jaspObject$encodeAllColumnNames(input),
     decodeAllColumnNames  = function(input) private$jaspObject$decodeAllColumnNames(input)
   ),

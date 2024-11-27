@@ -238,6 +238,7 @@ RCPP_MODULE(jaspResults)
 		.method("setCurrentColumnNames",	&jaspResults_Interface::setCurrentColumnNames,					"setCurrentColumnNames")
 		.method("encodeColumnName",			&jaspResults_Interface::encodeColumnName,						"encodeColumnName")
 		.method("decodeColumnName",			&jaspResults_Interface::decodeColumnName,						"decodeColumnName")
+		.method("decodeColumnType",			&jaspResults_Interface::decodeColumnType,						"decodeColumnType")
 		.method("encodeAllColumnNames",		&jaspResults_Interface::encodeAllColumnNames,					"encodeAllColumnNames")
 		.method("decodeAllColumnNames",		&jaspResults_Interface::decodeAllColumnNames,					"decodeAllColumnNames")
 	;
