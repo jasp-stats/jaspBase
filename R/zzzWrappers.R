@@ -207,7 +207,7 @@ jaspObjR <- R6::R6Class(
             private$jaspObject$setOptionMustContainDependency(name, value)
           }
 
-          decodedType = .decodeColType(value)
+          decodedType = .decodeColTypes(value)
           if(decodedType != "unknown")
           {
             decodedName = .decodeColNamesStrict(value)
