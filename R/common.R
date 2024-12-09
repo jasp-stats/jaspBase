@@ -919,6 +919,8 @@ saveImage <- function(plotName, format, height, width)
         .redrawPlot(plt)
       } else if (inherits(plt, c("gtable", "ggMatrixplot", "jaspGraphs"))) {
         gridExtra::grid.arrange(plt)
+      } else if (inherits(plt, "gTree")) {
+        grid::grid.draw(plt)
       } else {
         plot(plt)
       }
