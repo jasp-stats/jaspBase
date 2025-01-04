@@ -1,0 +1,106 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: jaspBase 0.19.2\n"
+"POT-Creation-Date: 2024-10-19 03:41\n"
+"PO-Revision-Date: 2025-01-04 03:39+0000\n"
+"Last-Translator: தமிழ்நேரம் <anishprabu.t@gmail.com>\n"
+"Language-Team: Tamil <https://hosted.weblate.org/projects/jasp/jaspbase/ta/>"
+"\n"
+"Language: ta\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10-dev\n"
+
+msgid "<em>Note.</em>"
+msgstr "<em> குறிப்பு.</em>"
+
+msgid "no plot object was found"
+msgstr "சூழ்ச்சி பொருள் எதுவும் கிடைக்கவில்லை"
+
+msgid "The following problem(s) occurred while running the analysis:"
+msgstr "பகுப்பாய்வை இயக்கும் போது பின்வரும் சிக்கல் (கள்) நிகழ்ந்தது:"
+
+msgid "after grouping on %s"
+msgstr "%s இல் தொகுத்த பிறகு"
+
+msgid "This analysis terminated unexpectedly. %s To receive assistance with this problem, please report the message above at: https://jasp-stats.org/bug-reports"
+msgstr ""
+"இந்த பகுப்பாய்வு எதிர்பாராத விதமாக நிறுத்தப்பட்டது. இந்த சிக்கலுடன் உதவியைப் பெற, "
+"தயவுசெய்து மேலே உள்ள செய்தியைப் புகாரளிக்கவும்: https://jasp-stats.org/bug-ports"
+
+msgid "Infinity found in %s"
+msgstr "%s இல் முடிவிலி காணப்படுகிறது"
+
+msgid "Number of factor levels is %1$s in %2$s"
+msgstr "காரணி அளவுகளின் எண்ணிக்கை %2$s இல் %1$s ஆகும்"
+
+msgid "The variance in %1$s is equal to %2$s"
+msgstr "%1$s இல் உள்ள மாறுபாடு %2$s க்கு சமம்"
+
+msgid "Number of observations is %1$s in %2$s"
+msgstr "அவதானிப்புகளின் எண்ணிக்கை %2$s இல் %1$s ஆகும்"
+
+msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr ""
+"புள்ளிவிவரத்தை நம்பத்தகுந்த முறையில் கணக்கிட முடியாது: அவதானிப்புகளின் எண்ணிக்கை %2$s இல்"
+" %1$s ஆகும்"
+
+msgid "Values in %1$s outside interval [%2$s, %3$s]"
+msgstr "%1$s க்கு வெளியே இடைவெளியில் மதிப்புகள் [ %2$s, %3$s]"
+
+msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."
+msgstr ""
+"தரவுத்தொகுப்பு சரியான மாறுபாடு-கோவாரன்ச் மேட்ரிக்ச் அல்ல. உங்கள் தரவுத்தொகுப்பாக நேர்மறையா"
+"ன திட்டவட்டமான சமச்சீர் மேட்ரிக்சை மட்டுமே ஏற்றவும்."
+
+msgid "The variance-covariance matrix of the supplied data is not positive-definite. Please check if variables have many missings observations or are collinear"
+msgstr ""
+"வழங்கப்பட்ட தரவின் மாறுபாடு-கோவாரன்ச் மேட்ரிக்ச் நேர்மறை-வரையறை அல்ல. மாறிகள் பல மிச்சிங் "
+"அவதானிப்புகள் உள்ளதா அல்லது கோலைனியர் என்பதை சரிபார்க்கவும்"
+
+msgid "Main effects and lower-order interactions must be included whenever the corresponding higher-order interaction is included"
+msgstr ""
+"தொடர்புடைய உயர்-வரிசை தொடர்பு சேர்க்கும்போதெல்லாம் முக்கிய விளைவுகள் மற்றும் கீழ்-வரிசை "
+"தொடர்புகள் சேர்க்கப்பட வேண்டும்"
+
+msgid "Negative numbers found in %s"
+msgstr "%s இல் காணப்படும் எதிர்மறை எண்கள்"
+
+msgid "Missing values encountered in %s"
+msgstr "காணாமல் போன மதிப்புகள் %s இல் எதிர்கொள்ளும்"
+
+msgid "Duplicate variables encountered in %s"
+msgstr "%s இல் எதிர்கொள்ளும் நகல் மாறிகள்"
+
+msgid "Over %s%% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue."
+msgstr ""
+"வரிசைகளில்%s %% க்கு மேல் முற்றிலும் காணாமல் போன மதிப்புகள் உள்ளன. நீங்கள் தொடர "
+"விரும்பினால் தரவு தொகுப்பிலிருந்து இந்த வரிசைகளை அகற்றவும்."
+
+msgid "Levene's test is significant (p < .05), suggesting a violation of the equal variance assumption"
+msgstr ""
+"லெவனின் சோதனை குறிப்பிடத்தக்கது (ப <.05), இது சம மாறுபாடு அனுமானத்தை மீறுவதைக் "
+"குறிக்கிறது"
+
+msgid "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgstr ""
+"Vovk -sellke அதிகபட்சம் <em> ப </em> -ரேடியோ: <em> ப </em> -மதிப்பின் அடிப்படையில்"
+", h%2$s க்கு மேல் h%1$s க்கு ஆதரவாக அதிகபட்ச முரண்பாடுகள் 1/ ."
+
+msgid "Proportions tested against value: %s"
+msgstr "மதிப்புக்கு எதிராக சோதிக்கப்பட்ட விகிதாச்சாரம்: %s"
+
+msgid "For all tests, the alternative hypothesis specifies that the proportion is less than %s"
+msgstr ""
+"எல்லா சோதனைகளுக்கும், மாற்று கருதுகோள் விகிதாச்சாரத்திற்கு %s க்கும் குறைவாக இருப்பதைக் "
+"குறிப்பிடுகிறது"
+
+msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
+msgstr ""
+"அனைத்து சோதனைகளுக்கும், மாற்று கருதுகோள் விகிதாச்சாரத்தை %s ஐ விட அதிகமாக உள்ளது "
+"என்பதைக் குறிப்பிடுகிறது"
+
+msgid "Could not find message for class %1$s and type %2$s"
+msgstr "வகுப்பு %1$s மற்றும் வகை %2$s க்கான செய்தியைக் கண்டுபிடிக்க முடியவில்லை"
