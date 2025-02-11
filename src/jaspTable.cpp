@@ -377,14 +377,27 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 	double	pVal	= 0;
 	bool	round	= false,
 			log10	= false,
-			prcnt	= false;
-
-	std::string pValOri = "";
+			prcnt	= false,
+			money	= false;
+	
+	std::string pValOri = "",
+				moneySymbol;
+	
+	const std::string moneyS = "monetary";
 
 	for(auto & f : formats)
-		if		(f == "~")		round = true;
-		else if	(f == "log10")	log10 = true;
-		else if(f == "pc")		prcnt = true;
+		if(	f.size() >= moneyS.size() && 
+			f.substr(0, moneyS.size()) == moneyS)
+		{
+			money = true;
+			if(f.size() == moneyS.size())
+				moneySymbol = "€";
+			else
+				moneySymbol = f.substr(moneyS.size());
+		}
+		else if(f == "~")							round = true;
+		else if(f == "log10")						log10 = true;
+		else if(f == "pc")							prcnt = true;
 		else if(f.find(':') != std::string::npos)
 		{
 			auto fmtval = stringSplit(f, ':');
@@ -408,7 +421,7 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 		std::cout << "unknown formatting option '" << f << "'" << std::endl;
 
 	if(log10)
-		std::cout << "jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact Joris Goosen or your local jaspResults-programmer..." << std::endl;
+		std::cout << "jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact your local jaspResults-programmer..." << std::endl;
 
 	if(prcnt)
 	{
@@ -427,7 +440,12 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 	if(sigFig > 0)			out << std::scientific		<< std::setprecision(sigFig) << value;
 	else if(decPts > 0)		out << std::fixed			<< std::setprecision(decPts) << value;
 	else if(round)			out << std::round(value);
-	else					out << value;
+	else if(!money)			out << value;
+	
+	if(money)
+	{
+		out << moneySymbol << " " << std::round(value);
+	}
 
 	if(prcnt)
 		out << "%";
