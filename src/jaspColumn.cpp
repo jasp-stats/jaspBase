@@ -6,6 +6,7 @@ deleteColumnFuncDef		jaspColumn::_deleteColumnFunc					= nullptr;
 getColumnTypeFuncDef	jaspColumn::_getColumnTypeFunc					= nullptr;
 getColumnExistsFDef		jaspColumn::_getColumnExistsFunc				= nullptr;
 getColumnAnIdFuncDef	jaspColumn::_getColumnAnalysisIdFunc	 		= nullptr;
+getColumnAnIdFuncDef	jaspColumn::_getColumnOriginalIndexFunc	 		= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsScaleFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsOrdinalFunc			= nullptr;
 setColumnDataFuncDef	jaspColumn::_setColumnDataAsNominalFunc			= nullptr;
@@ -46,13 +47,14 @@ jaspColumn::jaspColumn()
 }
 
 void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, 
-	colGetTF colType, colGetAIF colAnId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists,
+	colGetTF colType, colGetAIF colAnId, colGetAIF colIndex, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists,
 	encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode)
 {
 	_createColumnFunc				= * colCreate;
 	_deleteColumnFunc				= * colDelete;
 	_getColumnTypeFunc 				= * colType;
 	_getColumnAnalysisIdFunc		= * colAnId;
+	_getColumnOriginalIndexFunc		= * colIndex;
 	_setColumnDataAsScaleFunc 		= * scalar;
 	_setColumnDataAsOrdinalFunc 	= * ordinal;
 	_setColumnDataAsNominalFunc 	= * nominal;
@@ -96,6 +98,14 @@ int jaspColumn::getColumnAnalysisId(const std::string & columnName)
 		return -1;
 	else
 		return (*_getColumnAnalysisIdFunc)(columnName); 
+}
+
+int jaspColumn::getColumnOriginalIndex(const std::string &columnName)
+{
+	if(!_getColumnOriginalIndexFunc) 
+		return -1;
+	else
+		return (*_getColumnOriginalIndexFunc)(columnName); 
 }
 
 bool jaspColumn::columnIsMine(	const std::string & columnName)

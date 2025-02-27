@@ -41,20 +41,19 @@ public:
 	Json::Value	metaEntry()										const	override { return constructMetaEntry("column"); }
 	Json::Value	dataEntry(std::string & errorMessage)			const	override;
 
-	bool 				setScale(		Rcpp::RObject 		scalarData);
-	bool 				setOrdinal(		Rcpp::RObject 		ordinalData);
-	bool 				setNominal(		Rcpp::RObject		nominalData);
-	bool 				setNominalText(	Rcpp::RObject 		nominalData);
+	bool 				setScale(			Rcpp::RObject 		scalarData);
+	bool 				setOrdinal(			Rcpp::RObject 		ordinalData);
+	bool 				setNominal(			Rcpp::RObject		nominalData);
+	bool 				setNominalText(		Rcpp::RObject 		nominalData);
 	//void				removeFromData();
-	static bool			columnIsMine(	const std::string & columnName); ///< "Mine" means of analysis that is running
-	static bool			columnExists(	const std::string & columnName) { return getColumnExists(columnName); }
-	
+	static bool			columnIsMine(		const std::string & columnName); ///< "Mine" means of analysis that is running
+	static bool			columnExists(		const std::string & columnName) { return getColumnExists(columnName); }
+	static int			getColumnOriginalIndex(		const std::string & encodedColumnName						);
 
-	static 
-	Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
+	static Rcpp::StringVector 	createColumnsCPP(Rcpp::StringVector columnNames); 		///<Checks whether the columns exist first, if not creates them otherwise does nothing. Returns a list of encoded columnNames if creation worked.
 
 
-	static void			setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colGetTF colType, colGetAIF colAnaId, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
+	static void			setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nominal, colGetTF colType, colGetAIF colAnaId, colGetAIF colIndex, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists, encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode);
 	static bool			deleteColumn(const std::string & columnName);
 
 private:
@@ -74,6 +73,7 @@ private:
 	static bool			getColumnExists(			const std::string & columnName								);
 	static columnType	getColumnType(				const std::string & encodedColumnName						);
 	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
+	
 	void				determineTypeTitle();
 	bool				setColumnDataAsScale(		const std::string & encodedColumnName, Rcpp::RObject data	);
 	bool				setColumnDataAsOrdinal(		const std::string & encodedColumnName, Rcpp::RObject data	);
@@ -84,7 +84,8 @@ private:
 	static deleteColumnFuncDef		_deleteColumnFunc;
 	static getColumnExistsFDef		_getColumnExistsFunc;
 	static getColumnTypeFuncDef		_getColumnTypeFunc;
-	static getColumnAnIdFuncDef		_getColumnAnalysisIdFunc;
+	static getColumnAnIdFuncDef		_getColumnAnalysisIdFunc,
+									_getColumnOriginalIndexFunc;
 	static setColumnDataFuncDef		_setColumnDataAsScaleFunc,
 									_setColumnDataAsOrdinalFunc,
 									_setColumnDataAsNominalFunc;
