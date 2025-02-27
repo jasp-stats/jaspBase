@@ -45,6 +45,7 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("columnDelete",						jaspColumn::deleteColumn);
 	Rcpp::function("columnIsMine",						jaspColumn::columnIsMine);
 	Rcpp::function("columnExists",						jaspColumn::columnExists);
+	Rcpp::function("columnIndexInData",					jaspColumn::getColumnOriginalIndex);
 	Rcpp::function("setJaspLogFunction",				setJaspLogFunction);
 
 
