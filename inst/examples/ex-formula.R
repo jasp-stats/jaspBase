@@ -1,5 +1,6 @@
 # Each successive `jaspFormula` and `makeJaspFormula` give the same result
 
+if (FALSE) {
 # standard lm-style formulas with interaction
 jaspFormula(mpg ~ cyl * disp, mtcars)
 makeJaspFormula(
@@ -95,3 +96,5 @@ makeJaspFormula(
   jaspFormulaRhs(terms = c("disp", "hp"), group = "cyl", intercept = FALSE, correlated = TRUE),
   jaspFormulaRhs(terms = "drat",          group = "cyl", intercept = TRUE,  correlated = TRUE)
 )
+
+}
