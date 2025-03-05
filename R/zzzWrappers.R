@@ -613,7 +613,17 @@ jaspPlotR <- R6::R6Class(
     }
   ),
   active = list(
-    plotObject  = function(x) if (missing(x)) private$jaspObject$plotObject   else private$jaspObject$plotObject   <- x,
+    plotObject  = function(x) {
+      if (missing(x)) {
+        private$jaspObject$plotObject
+      } else {
+        if (isTryError(x)) {
+          jaspPlotObj$setError(.extractErrorMessage(x))
+        } else {
+          private$jaspObject$plotObject   <- x
+        }
+      }
+    },
     aspectRatio = function(x) if (missing(x)) private$jaspObject$aspectRatio  else private$jaspObject$aspectRatio  <- x,
     width       = function(x) if (missing(x)) private$jaspObject$width        else private$jaspObject$width        <- x,
     height      = function(x) if (missing(x)) private$jaspObject$height       else private$jaspObject$height       <- x,
@@ -824,7 +834,7 @@ jaspColumnR <- R6::R6Class(
   inherit   = jaspOutputObjR,
   cloneable = FALSE,
   public    = list(
-    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL) 
+    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL)
     {
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
@@ -848,7 +858,7 @@ jaspColumnR <- R6::R6Class(
 
       return()
     },
-    
+
     setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
     setOrdinal      = function(ordinalData) private$jaspObject$setOrdinal(ordinalData),
     setNominal      = function(nominalData) private$jaspObject$setNominal(nominalData),
