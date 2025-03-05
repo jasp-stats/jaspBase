@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        r: [4.4.0, release, devel]
+        r: [oldrel, release, devel]
         os: [ubuntu-latest, macOS-latest, windows-latest]
 
     env:
