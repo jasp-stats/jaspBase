@@ -133,6 +133,7 @@ public:
 
 	static int getCurrentTimeMs();
 	static void setDeveloperMode(bool developerMode);
+	static bool getDeveloperMode();
 
 	bool			connectedToJaspResults();
 
