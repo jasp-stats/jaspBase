@@ -78,7 +78,6 @@ makeJaspFormula(
 
 # convert to json
 jsonlite::toJSON(jaspFormula(mpg ~ (cyl * disp | am), mtcars), force = TRUE, pretty = TRUE)
-rjson::toJSON(jaspFormula(mpg ~ (cyl * disp | am), mtcars))
 
 # exclude intercept
 jaspFormula(mpg ~  0 + cyl * disp, mtcars)
