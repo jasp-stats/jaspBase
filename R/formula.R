@@ -45,6 +45,9 @@
 #' @export
 jaspFormula <- function(formula, data) {
   formulaEncoded <- formulaEncode(formula)
+  if (is.null(data))
+	data <- .RSyntaxEnv[["dataset"]]
+
   data    <- formulaCheckOrReadData(data)
   formulaCheckRequirements(formulaEncoded, data)
 
@@ -146,18 +149,17 @@ formulaCheckRequirements <- function(formula, data) {
   if (!inherits(formula, "formula")) {
     stop("`formula` argument must be object of class `formula`.", domain = NA)
   }
-
   attr <- attributes(stats::terms(formula))
 
   if (!is.null(attr[["offset"]])) {
     stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.", domain = NA)
   }
 
-  columnNames <- decodeColNames(colnames(data))
-  lhs <- decodeColNames(all.names(formulaExtractLhs(formula)))
+  columnNames <- colnames(data)
+  lhs <- all.names(formulaExtractLhs(formula))
   anyLhsTransformed <- !all(lhs %in% c(columnNames, "cbind", "(", ")"))
 
-  rhs <- decodeColNames(all.names(formulaExtractRhs(formula)))
+  rhs <- all.names(formulaExtractRhs(formula))
   anyRhsTransformed <- !all(rhs %in% c(columnNames, "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {

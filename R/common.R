@@ -97,7 +97,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   if (! jaspResultsCalledFromJasp()) {
-    .numDecimals        <- 3
+	.numDecimals        <- 3
     .fixedDecimals      <- FALSE
     .normalizedNotation <- TRUE
     .exactPValues       <- FALSE
@@ -140,7 +140,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     }
 
     finishJaspResults(jaspResultsCPP)
-    return(jaspResults)
+	return(jaspResults)
   }
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
@@ -1145,29 +1145,40 @@ editImage <- function(name, optionsJson) {
   return(toJSON(response))
 }
 
-registerData <- function(data) {
-   #TODO
+#' @export
+storeDataSet <- function(dataset) {
+	.RSyntaxEnv[["dataset"]] = dataset
+	jaspQmlR::loadDataSet(dataset)
 }
 
-checkAnalysisOptions <- function(analysisName, options, version) {
-  # TODO when QMLComponents can be linked to jaspBase
-  return(options)
+checkAnalysisOptions <- function(moduleName, analysisName, qmlFile, options, version) {
+   # Load the qml form, and set some options, and get back the real options needed for the analysis (formula should be parsed,
+   # and all logics set in QML should be checked).
+  return(jaspQmlR::loadQmlFileAndCheckOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version))
 }
 
 #' @export
-runWrappedAnalysis <- function(analysisName, data, options, version) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version) {
   if (jaspResultsCalledFromJasp()) {
-
-    result <- list("options" = options, "analysis" = analysisName, "version" = version)
-    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
-    return(as.character(result))
+	# In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
+	# in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
+	# So here, just give back the parsed options.
+	return(toJSON(list("options" = options, "module" = moduleName, "analysis" = analysisName, "version" = version)))
 
   } else {
+	# The wrapper is called inside an R environment (R Studio probably).
+	# The options must be parsed and checked by the QML form, and then the real analysis can be called.
+	qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
+	options <- checkAnalysisOptions(moduleName, analysisName, qmlFile, options, version)
+	optionsJson <- fromJSON(options)
+	if (optionsJson$error != "")
+	   return(optionsJson$error)
 
-    options <- checkAnalysisOptions(analysisName, options, version)
-    # fool renv so it does not try to install jaspTools
-    jaspToolsRunAnalysis <- utils::getFromNamespace("runAnalysis", asNamespace("jaspTools"))
-    return(jaspToolsRunAnalysis(analysisName, data, options))
-
+	internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+	options <- as.character(toJSON(optionsJson$options))
+	return(runJaspResults(internalAnalysisName, analysisName, "{}", options, "{}", internalAnalysisName, optionsJson$preloadData))
   }
 }
+
+
+
