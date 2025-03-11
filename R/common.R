@@ -97,7 +97,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   if (! jaspResultsCalledFromJasp()) {
-	.numDecimals        <- 3
+    .numDecimals        <- 3
     .fixedDecimals      <- FALSE
     .normalizedNotation <- TRUE
     .exactPValues       <- FALSE
