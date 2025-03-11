@@ -43,6 +43,6 @@ LinkingTo: Rcpp
 RcppModules: jaspResults
 NeedsCompilation: yes
 Suggests: 
-	testthat (>= 3.0.0),
-	jaspQmlR
+    testthat (>= 3.0.0),
+    jaspQmlR
 Config/testthat/edition: 3
