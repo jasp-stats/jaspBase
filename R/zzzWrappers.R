@@ -856,4 +856,4 @@ jaspColumnR <- R6::R6Class(
   )
 )
 
-.RSyntaxEnv <- list2env(list("dataset" = NULL))
+.RSyntaxEnv <- list2env(list(dataset = NULL))
