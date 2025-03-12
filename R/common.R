@@ -85,9 +85,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   jaspResultsCPP$setOptions(options)
 
-  dataKey     <- rjson::fromJSON(dataKey)
-  options     <- rjson::fromJSON(options)
-  stateKey    <- rjson::fromJSON(stateKey)
+  dataKey     <- fromJSON(dataKey)
+  options     <- fromJSON(options)
+  stateKey    <- fromJSON(stateKey)
 
   if (base::exists(".requestStateFileNameNative")) {
     location              <- .fromRCPP(".requestStateFileNameNative")
@@ -105,7 +105,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
   dataset     <- NULL
-  
+
   if(preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
 

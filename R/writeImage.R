@@ -104,7 +104,8 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
       .redrawPlot(plot2draw) #(see below)
     } else if (inherits(plot2draw, "qgraph")) {
 
-      qgraph:::plot.qgraph(plot2draw)
+      plot(plot2draw)
+      # qgraph:::plot.qgraph(plot2draw)
 
     } else {
       plot(plot2draw)
