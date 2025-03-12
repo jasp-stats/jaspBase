@@ -598,13 +598,12 @@ jaspPlotR <- R6::R6Class(
       if (!is.null(error))
         jaspPlotObj$setError(error)
 
-      if (!is.null(plot))
-        jaspPlotObj$plotObject <- plot
+      private$setPlotObject(plot, setNull = FALSE)
 
       if (!is.null(info))
         jaspPlotObj$info <- info
 
-      if(is.numeric(position))
+      if (is.numeric(position))
         jaspPlotObj$position = position
 
       super$dependOn(dependencies)
@@ -613,11 +612,26 @@ jaspPlotR <- R6::R6Class(
     }
   ),
   active = list(
-    plotObject  = function(x) if (missing(x)) private$jaspObject$plotObject   else private$jaspObject$plotObject   <- x,
+    plotObject  = function(x) if (missing(x)) private$jaspObject$plotObject   else private$setPlotObject(x, setNull = TRUE),
     aspectRatio = function(x) if (missing(x)) private$jaspObject$aspectRatio  else private$jaspObject$aspectRatio  <- x,
     width       = function(x) if (missing(x)) private$jaspObject$width        else private$jaspObject$width        <- x,
     height      = function(x) if (missing(x)) private$jaspObject$height       else private$jaspObject$height       <- x,
     status      = function(x) if (missing(x)) private$jaspObject$status       else private$jaspObject$status       <- x
+  ),
+  private = list(
+    setPlotObject = function(plot, setNull = FALSE) {
+      # avoids code duplication in constructor and active plotObject
+
+      # if the plot is an unevaluated function call, evaluate it in a try block
+      # and show errors automagically. Note that this only works when called from the constructor,
+      # not when passing plot$plotObject <- fun() because `$<-` always evaluates the argument eagerly
+      plot <- try(plot)
+      if (isTryError(plot)) {
+        super$setError(.extractErrorMessage(plot))
+      } else if (setNull || !is.null(plot)) {
+        private$jaspObject$plotObject <- plot
+      }
+    }
   )
 )
 
@@ -824,7 +838,7 @@ jaspColumnR <- R6::R6Class(
   inherit   = jaspOutputObjR,
   cloneable = FALSE,
   public    = list(
-    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL) 
+    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL)
     {
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
@@ -848,7 +862,7 @@ jaspColumnR <- R6::R6Class(
 
       return()
     },
-    
+
     setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
     setOrdinal      = function(ordinalData) private$jaspObject$setOrdinal(ordinalData),
     setNominal      = function(nominalData) private$jaspObject$setNominal(nominalData),
