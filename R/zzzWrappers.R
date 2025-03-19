@@ -869,3 +869,5 @@ jaspColumnR <- R6::R6Class(
     setNominalText  = function(nominalData) private$jaspObject$setNominalText(nominalData)
   )
 )
+
+.RSyntaxEnv <- list2env(list(dataset = NULL))

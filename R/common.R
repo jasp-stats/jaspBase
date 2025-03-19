@@ -70,6 +70,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 #' @export
 runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE) {
+
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -97,7 +98,8 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   }
 
   if (! jaspResultsCalledFromJasp()) {
-    .numDecimals        <- 3
+
+	.numDecimals        <- 3
     .fixedDecimals      <- FALSE
     .normalizedNotation <- TRUE
     .exactPValues       <- FALSE
@@ -108,16 +110,15 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   if(preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
-
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
-
   analysisResult <-
     tryCatch(
       expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
+
 
   if (!jaspResultsCalledFromJasp()) {
 
@@ -133,6 +134,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
         stackTrace   <- paste(stackTrace, collapse="<br><br>")
         errorMessage <- .generateErrorMessage(type=errorStatus, error=error, stackTrace=stackTrace)
       }
+	  print(paste0("There is an error: ", errorMessage))
 
       jaspResultsCPP$setErrorMessage(errorMessage, errorStatus)
       jaspResultsCPP$send()
@@ -140,8 +142,9 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     }
 
     finishJaspResults(jaspResultsCPP)
-    return(jaspResults)
+	return(jaspResults)
   }
+
 
   if (inherits(analysisResult, "jaspAnalysisAbort")) {
     jaspResultsCPP$send()
@@ -383,7 +386,6 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 
   if (all.columns == FALSE && is.null(columns) && is.null(columns.as.numeric) && is.null(columns.as.ordinal) && is.null(columns.as.factor))
     return (data.frame())
-
   dataset <- .fromRCPP(".readDatasetToEndNative", unlist(columns), unlist(columns.as.numeric), unlist(columns.as.ordinal), unlist(columns.as.factor), all.columns != FALSE)
   dataset <- .excludeNaListwise(dataset, exclude.na.listwise)
 
@@ -1145,29 +1147,35 @@ editImage <- function(name, optionsJson) {
   return(toJSON(response))
 }
 
-registerData <- function(data) {
-   #TODO
-}
-
-checkAnalysisOptions <- function(analysisName, options, version) {
-  # TODO when QMLComponents can be linked to jaspBase
-  return(options)
+#' @export
+storeDataSet <- function(dataset) {
+	.RSyntaxEnv[["dataset"]] = dataset
+	jaspQmlR::loadDataSet(dataset)
 }
 
 #' @export
-runWrappedAnalysis <- function(analysisName, data, options, version) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData) {
   if (jaspResultsCalledFromJasp()) {
-
-    result <- list("options" = options, "analysis" = analysisName, "version" = version)
-    result <- jsonlite::toJSON(result, auto_unbox = TRUE, digits = NA, null="null", force = TRUE)
-    return(as.character(result))
+	# In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
+	# in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
+	# So here, just give back the parsed options.
+	return(toJSON(list("options" = options, "module" = moduleName, "analysis" = analysisName, "version" = version)))
 
   } else {
+	# The wrapper is called inside an R environment (R Studio probably).
+	# The options must be parsed and checked by the QML form, and then the real analysis can be called.
+	qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
+	# Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
+	options <- jaspQmlR::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
-    options <- checkAnalysisOptions(analysisName, options, version)
-    # fool renv so it does not try to install jaspTools
-    jaspToolsRunAnalysis <- utils::getFromNamespace("runAnalysis", asNamespace("jaspTools"))
-    return(jaspToolsRunAnalysis(analysisName, data, options))
+	if (options == "")
+		return("Error when parsing the options")
 
+	internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+
+	return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
   }
 }
+
+
+
