@@ -1166,15 +1166,14 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
 	# The options must be parsed and checked by the QML form, and then the real analysis can be called.
 	qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
 	# Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
-	options <- jaspQmlR::loadQmlAndRunAnalysis(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+	options <- jaspQmlR::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+
+	if (options == "")
+		return("Error when parsing the options")
 
 	internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
-	jaspResultsCPP        <- loadJaspResults(internalAnalysisName)
-	return(jaspResultsCPP$printHtml())
 
-	#optionsJson <- fromJSON(options)
-	#options <- as.character(toJSON(optionsJson$options))
-	#return(runJaspResults(internalAnalysisName, analysisName, "{}", options, "{}", internalAnalysisName, preloadData))
+	return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
   }
 }
 
