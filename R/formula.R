@@ -45,8 +45,9 @@
 #' @export
 jaspFormula <- function(formula, data) {
   formulaEncoded <- formulaEncode(formula)
-  data    <- formulaCheckOrReadData(data)
-  formulaCheckRequirements(formulaEncoded, data)
+
+  colNames    <- formulaCheckOrReadData(data)
+  formulaCheckRequirements(formulaEncoded, colNames)
 
   # TODO: We should use the encoded formula hier, but if a column has a type ('col.scale'), then it is decoded by 'col'
   result <- list(
@@ -63,7 +64,6 @@ jaspFormula <- function(formula, data) {
 #' @rdname jaspFormula
 #' @export
 makeJaspFormula <- function(..., response=NULL, data) {
-  data <- formulaCheckOrReadData(data)
 
   if(!is.null(response) && !is.character(response)) {
     stop("`response` must be a character.", domain = NA)
@@ -78,7 +78,7 @@ makeJaspFormula <- function(..., response=NULL, data) {
   }
 
 
-  rhs <- vapply(dots, makeJaspFormulaRhs, character(1), data = data)
+  rhs <- vapply(dots, makeJaspFormulaRhs, character(1))
 
   formula <- stats::reformulate(rhs, response)
   return(jaspFormula(formula, data))
@@ -94,8 +94,7 @@ jaspFormulaRhs <- function(terms = NULL, group = NULL, intercept = TRUE, correla
   return(result)
 }
 
-makeJaspFormulaRhs <- function(rhs, data) {
-  allVarNames <- colnames(data)
+makeJaspFormulaRhs <- function(rhs) {
 
   result <- paste(rhs[["terms"]], collapse = "+")
   if (is.null(rhs[["terms"]])) {
@@ -133,27 +132,26 @@ formulaEncode <- function(formula) {
 
 formulaCheckOrReadData <- function(data) {
   # If we are in JASP and no data are supplied explicitly, we simply read the dataset from JASP.
-  if(jaspBase::jaspResultsCalledFromJasp()) # && (missing(data) || is.null(data)))
+  if(jaspBase::jaspResultsCalledFromJasp()) {
     data <- jaspBase::readDataSetToEnd(all.columns = TRUE)
+	colNames = decodeColNames(colnames(data))
+  } else {
+	colNames = jaspSyntax::getVariableNames()
+  }
 
-  if(missing(data) || is.null(data) || !is.data.frame(data))
-    stop("`data` must be a data frame.", domain = NA)
-
-  return(data)
+  return(colNames)
 }
 
-formulaCheckRequirements <- function(formula, data) {
+formulaCheckRequirements <- function(formula, columnNames) {
   if (!inherits(formula, "formula")) {
     stop("`formula` argument must be object of class `formula`.", domain = NA)
   }
-
   attr <- attributes(stats::terms(formula))
 
   if (!is.null(attr[["offset"]])) {
     stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.", domain = NA)
   }
 
-  columnNames <- decodeColNames(colnames(data))
   lhs <- decodeColNames(all.names(formulaExtractLhs(formula)))
   anyLhsTransformed <- !all(lhs %in% c(columnNames, "cbind", "(", ")"))
 
