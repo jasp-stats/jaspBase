@@ -1166,7 +1166,7 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
     if (options == "")
-      return("Error when parsing the options")
+      stop("Error when parsing the options")
 
      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
 
