@@ -885,6 +885,7 @@ saveImage <- function(plotName, format, height, width)
           relativePath,
           width = insize[1],
           height = insize[2],
+          onefile = FALSE,
           bg = "transparent"
         )
 
