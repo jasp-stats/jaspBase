@@ -4,7 +4,7 @@
 #include <set>
 #include <sstream>
 #include <queue>
-#include "enumutilities.h"
+#include "jaspEnums.h"
 #include <json/json.h>
 
 typedef void (*logFuncDef)(const std::string &);
@@ -14,12 +14,6 @@ void		jaspPrint(			std::string msg);
 
 #define JASPOBJECT_DEFAULT_POSITION 9999
 //#define JASP_RESULTS_DEBUG_TRACES
-
-DECLARE_ENUM(jaspObjectType, unknown, container, table, plot, list, results, html, state, column, qmlSource, report);
-DECLARE_ENUM(jaspColumnType, unknown, scale, ordinal, nominal, nominalText); //can be merged with columnType from CentralDatasetModel branch later on?
-DECLARE_ENUM(jaspTableColumnType, unknown, null, string, logical, integer, number, various, composite, mixed); //can be merged with columnType from CentralDatasetModel branch later on?
-
-jaspObjectType jaspObjectTypeStringToObjectType(std::string type);
 
 class jaspContainer;
 

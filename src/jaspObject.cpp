@@ -1,4 +1,3 @@
-#define ENUM_DECLARATION_CPP
 #include "jaspObject.h"
 #include <chrono>
 
@@ -10,11 +9,7 @@
 #include "json/json_writer.cpp"
 #endif
 
-jaspObjectType jaspObjectTypeStringToObjectType(std::string type)
-{
-	try			{ return jaspObjectTypeFromString(type); }
-	catch(...)	{ return jaspObjectType::unknown; }
-}
+
 
 std::string stringExtend(std::string & str, size_t len, char kar)
 {
