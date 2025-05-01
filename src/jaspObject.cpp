@@ -600,6 +600,11 @@ void jaspObject::setDeveloperMode(bool developerMode)
 	_developerMode = developerMode;
 }
 
+bool jaspObject::getDeveloperMode()
+{
+	return _developerMode;
+}
+
 bool jaspObject::connectedToJaspResults()
 {
 
