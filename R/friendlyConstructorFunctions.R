@@ -150,72 +150,83 @@ hasSubstring <- function(string, substring) {
   return(v)
 }
 
+
+# The rowWise functions operate on data.frames rather than matrices.
+# While vectorized operations on matrices are likely more efficient,
+# data.frames have two advantages.
+# 1. they don't do copying or type coercions
+# 2. they automatically recycles length 1 objects.
+# this saves a few headaches over manual loops or matrix operations
+.todf <- function(...) {
+  data.frame(..., check.names = FALSE, fix.empty.names = FALSE)
+}
+
 #' @export
 rowMean <- function(...) {
-  rowMeans(matrix(c(...), ncol = ...length()), na.rm = FALSE)
+  rowMeans(.todf(...), na.rm = FALSE)
 }
 
 #' @export
 rowMeanNaRm <- function(...) {
-  rowMeans(matrix(c(...), ncol = ...length()), na.rm = TRUE)
+  rowMeans(.todf(...), na.rm = TRUE)
 }
 
 #' @export
 rowSum <- function(...) {
-  rowSums(matrix(c(...), ncol = ...length()), na.rm = FALSE)
+  rowSums(.todf(...), na.rm = FALSE)
 }
 
 #' @export
 rowSumNaRm <- function(...) {
-  rowSums(matrix(c(...), ncol = ...length()), na.rm = TRUE)
+  rowSums(.todf(...), na.rm = TRUE)
 }
 
 #' @export
 rowSD <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = FALSE)
+  apply(.todf(...), 1, stats::sd, na.rm = FALSE)
 }
 
 #' @export
 rowSDNaRm <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::sd, na.rm = TRUE)
+  apply(.todf(...), 1, stats::sd, na.rm = TRUE)
 }
 
 #' @export
 rowVariance <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = FALSE)
+  apply(.todf(...), 1, stats::var, na.rm = FALSE)
 }
 
 #' @export
 rowVarianceNaRm <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::var, na.rm = TRUE)
+  apply(.todf(...), 1, stats::var, na.rm = TRUE)
 }
 
 #' @export
 rowMedian <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = FALSE)
+  apply(.todf(...), 1, stats::median, na.rm = FALSE)
 }
 
 #' @export
 rowMedianNaRm <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, stats::median, na.rm = TRUE)
+  apply(.todf(...), 1, stats::median, na.rm = TRUE)
 }
 
 #' @export
 rowMin <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = FALSE)
+  apply(.todf(...), 1, min, na.rm = FALSE)
 }
 
 #' @export
 rowMinNaRm <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, min, na.rm = TRUE)
+  apply(.todf(...), 1, min, na.rm = TRUE)
 }
 
 #' @export
 rowMax <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = FALSE)
+  apply(.todf(...), 1, max, na.rm = FALSE)
 }
 
 #' @export
 rowMaxNaRm <- function(...) {
-  apply(matrix(c(...), ncol = ...length()), 1, max, na.rm = TRUE)
+  apply(.todf(...), 1, max, na.rm = TRUE)
 }
