@@ -391,6 +391,17 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 }
 
 #' @export
+.readFullDataset <- function(exclude.na.listwise=NULL, ...) {
+
+  exclude.na.listwise  <- .readDataSetCleanNAs(exclude.na.listwise)
+
+  dataset <- .fromRCPP(".readFullDatasetToEnd")
+  dataset <- .excludeNaListwise(dataset, exclude.na.listwise)
+
+  dataset
+}
+
+#' @export
 .readDataSetHeader <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
 
   columns              <- .readDataSetCleanNAs(columns)
