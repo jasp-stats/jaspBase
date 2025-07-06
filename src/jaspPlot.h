@@ -13,11 +13,14 @@ public:
 				_height,
 				_revision = 0;
 	bool		_editing = false,
-				_resizedByUser = false;
+				_resizedByUser = false,
+				_interactive = false;
 	std::string	_filePathPng,
 				_status = "waiting",
-				_envName;
-	Json::Value _editOptions = Json::nullValue;
+				_envName,
+				_interactiveConvertError = "";
+	Json::Value _editOptions = Json::nullValue,
+				_interactiveJsonData = Json::nullValue;
 
 	///For safekeeping (aka state replacement?)
 	void setPlotObject(Rcpp::RObject plotSerialized);

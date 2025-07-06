@@ -122,6 +122,51 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
   image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
 
+  image[["interactive"]] <- ggplot2::is.ggplot(plot)
+  print("Interactive plot:")
+  print(image[["interactive"]])
+  if (image[["interactive"]] ) {
+
+    print("Converting ggplot to plotly:")
+
+    # see https://github.com/Rdatatable/data.table/issues/5375
+    # we must set getOption("datatable.alloccol"), verbose = getOption("datatable.verbose")
+    # options(datatable.alloccol = 1024L, datatable.verbose = FALSE) # default values
+    # https://github.com/Rdatatable/data.table/blob/35544d34ce779599cb2ed8900da2ffbac0ffbf29/R/onLoad.R#L76C11-L94C9
+    options(
+       "datatable.verbose"=FALSE,        # datatable.<argument name>
+       "datatable.optimize"=Inf,             # datatable.<argument name>
+       "datatable.print.nrows"=100L,         # datatable.<argument name>
+       "datatable.print.topn"=5L,            # datatable.<argument name>
+       "datatable.print.class"=TRUE,         # for print.data.table
+       "datatable.print.rownames"=TRUE,      # for print.data.table
+       "datatable.print.colnames"="'auto'",    # for print.data.table
+       "datatable.print.keys"=TRUE,          # for print.data.table
+       "datatable.print.trunc.cols"=FALSE,   # for print.data.table
+       "datatable.show.indices"=FALSE,       # for print.data.table
+       "datatable.allow.cartesian"=FALSE,    # datatable.<argument name>
+       "datatable.join.many"=TRUE,           # mergelist, [.data.table #4383 #914
+       "datatable.dfdispatchwarn"=TRUE,                   # not a function argument
+       "datatable.warnredundantby"=TRUE,                  # not a function argument
+       "datatable.alloccol"=1024L,           # argument 'n' of alloc.col. Over-allocate 1024 spare column slots
+       "datatable.auto.index"=TRUE,          # DT[col=="val"] to auto add index so 2nd time faster
+       "datatable.use.index"=TRUE,           # global switch to address #1422
+       "datatable.prettyprint.char" = NULL     # FR #1091
+    )
+
+    e <- try({
+      plotlyplotje <- plotly::ggplotly(plot)
+      plotlybuild <- plotly::plotly_build(plotlyplotje)
+      # TODO: we should decode any column names in the data in plotlybuild$x
+      image[["interactiveJsonData"]] <- toJSON(plotlybuild$x$data)
+    })
+
+    print(e)
+    if (inherits(e, "try-error"))
+      image[["interactiveConvertError"]] <- gettextf("The following error occured while converting a ggplot to plotly: %s", e$message)
+
+  }
+
   return(image)
 }
 

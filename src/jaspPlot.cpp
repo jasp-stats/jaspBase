@@ -44,6 +44,11 @@ Json::Value jaspPlot::dataEntry(std::string & errorMessage) const
 	data["errorType"]			= _editOptions.get("errorType", "fatalError");
 	data["editable"]			= !_editOptions.isNull() && data["errorType"] == "success";
 
+	data["interactive"]				= _interactive;
+	data["interactiveConvertError"]	= _interactiveConvertError;
+	data["interactiveJsonData"]		= _interactiveJsonData;
+
+
 	return data;
 }
 
@@ -130,6 +135,25 @@ void jaspPlot::renderPlot()
 			}
 		}
 
+		if(writeResult.containsElementNamed("interactive"))
+		{
+			_interactive = Rcpp::as<bool>(writeResult["interactive"]);
+			if (_interactive)
+			{
+				if(writeResult.containsElementNamed("interactiveConvertError"))
+					_interactiveConvertError = Rcpp::as<std::string>(writeResult["interactiveConvertError"]);
+				else if (writeResult.containsElementNamed("interactiveJsonData"))
+				{
+					std::string interactiveJsonDataStr = Rcpp::as<Rcpp::String>(writeResult["interactiveJsonData"]);
+					_interactiveJsonData = Json::objectValue;
+					Json::Reader().parse(interactiveJsonDataStr, _interactiveJsonData);
+				}
+				else
+					_interactiveConvertError = "Unknown error converting interactive plot to JSON";
+			}
+		}
+
+
 		if(writeResult.containsElementNamed("error"))
 		{
 			_error			= true;
@@ -152,11 +176,11 @@ Rcpp::RObject jaspPlot::getPlotObject() const
 	Rcpp::RObject plotInfo = jaspResults::getObjectFromEnv(_envName);
 	if (!plotInfo.isNULL() && Rcpp::is<Rcpp::List>(plotInfo))
 	{
-		
+
 		Rcpp::List plotInfoList = Rcpp::as<Rcpp::List>(plotInfo);
 		if (plotInfoList.containsElementNamed("obj"))
 			return Rcpp::as<Rcpp::RObject>(plotInfoList["obj"]);
-			
+
 	}
 	return R_NilValue;
 }
@@ -166,15 +190,15 @@ void jaspPlot::setUserPlotChangesFromRStateObject()
 	Rcpp::RObject plotInfo = jaspResults::getObjectFromEnv(_envName);
 	if (plotInfo.isNULL() || !Rcpp::is<Rcpp::List>(plotInfo))
 		return;
-	
+
 	Rcpp::List plotInfoList = Rcpp::as<Rcpp::List>(plotInfo);
-	
+
 	if (plotInfoList.containsElementNamed("width"))
 		_width = Rcpp::as<int>(plotInfoList["width"]);
-	
+
 	if (plotInfoList.containsElementNamed("height"))
 		_height = Rcpp::as<int>(plotInfoList["height"]);
-	
+
 	if (plotInfoList.containsElementNamed("revision"))
 		_revision = Rcpp::as<int>(plotInfoList["revision"]);
 }
@@ -224,6 +248,10 @@ Json::Value jaspPlot::convertToJSON() const
 	obj["editOptions"]			= _editOptions;
 	obj["resizedByUser"]		= _resizedByUser;
 
+	obj["interactive"]				= _interactive;
+	obj["interactiveConvertError"]	= _interactiveConvertError;
+	obj["interactiveJsonData"]		= _interactiveJsonData;
+
 	return obj;
 }
 
@@ -240,9 +268,13 @@ void jaspPlot::convertFromJSON_SetFields(Json::Value in)
 	_envName		= in.get("environmentName",	_envName).asString();
 	_editOptions	= in.get("editOptions",		Json::nullValue);
 	_resizedByUser	= in.get("resizedByUser",	false).asBool();
-	
+
+	_interactive				= in.get("interactive", 				false).asBool();
+	_interactiveConvertError	= in.get("interactiveConvertError", 	"").asString();
+	_interactiveJsonData		= in.get("interactiveJsonData", 		Json::nullValue);
+
 	setUserPlotChangesFromRStateObject();
-	
+
 	/*JASP_OBJECT_TIMERBEGIN
 	std::string jsonPlotObjStr = in.get("plotObjSerialized", "").asString();
 	_plotObjSerialized = Rcpp::Vector<RAWSXP>(jsonPlotObjStr.begin(), jsonPlotObjStr.end());
