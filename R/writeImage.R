@@ -158,7 +158,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
       plotlyplotje <- plotly::ggplotly(plot)
       plotlybuild <- plotly::plotly_build(plotlyplotje)
       # TODO: we should decode any column names in the data in plotlybuild$x
-      image[["interactiveJsonData"]] <- toJSON(plotlybuild$x$data)
+      image[["interactiveJsonData"]] <- toJSON(list(data = plotlybuild$x$data, layout = plotlybuild$x$layout))
     })
 
     print(e)
