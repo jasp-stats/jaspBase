@@ -1,7 +1,7 @@
 #' Yeo-Johnson transformation
 #'
 #' Transform a variable using the Yeo-Johnson transformation that extends the Box-Cox transform to unbounded variables.
-#' It is possible to select the value of \code{lambda} automatically by maximizing the profile likelihood.
+#' It is possible to select the value of \code{lambda} automatically by maximizing the normal profile log likelihood.
 #'
 #' @param x a numeric vector to be transformed.
 #' @param lambda The lambda parameter of the transform.
@@ -51,6 +51,7 @@ YeoJohnson <- function(x, lambda) {
 YeoJohnsonAuto <- function(x, lower=-5, upper=5) {
   lambda <- YeoJohnsonLambda(x, lower, upper)
   y <- YeoJohnson(x, lambda)
+  attr(y, "lambda") <- lambda
   return(y)
 }
 
@@ -59,14 +60,14 @@ YeoJohnsonAuto <- function(x, lower=-5, upper=5) {
 YeoJohnsonLambda <- function(x, lower=-5, upper=5) {
   stopifnot(lower < upper)
   lambda <- optimize(
-    .yeoJohnsonLambdaLogLik,
+    .yeoJohnsonLogLik,
     interval = c(lower, upper), x = x, maximum = TRUE
   )[["maximum"]]
 
   return(lambda)
 }
 
-.yeoJohnsonLambdaLogLik <- function(lambda, x) {
+.yeoJohnsonLogLik <- function(lambda, x) {
   y <- YeoJohnson(x, lambda)
   m <- mean(y)
   s2 <- mean((y - m)^2) # MLE variance: divisor n (as in paper)
