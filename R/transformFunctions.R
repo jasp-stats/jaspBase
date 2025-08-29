@@ -6,34 +6,6 @@ fishZ        <- function(x)              { return(atanh(x))                   }
 invFishZ     <- function(x)              { return(tanh(x))                    }
 
 #' @export
-BoxCox <- function(x, lambda, shift = 0) {
-  x <- x + shift
-  x[x<=0] <- NA
-
-  if (lambda == 0) {
-    result <- log(x)
-  } else {
-    result <- (x^lambda - 1)/lambda
-  }
-
-  return(result)
-}
-
-#' @export
-invBoxCox <- function(x, lambda, shift = 0) {
-  if(lambda == 0) {
-    result <- exp(x)
-  } else {
-    x <- x * lambda + 1
-    result <- x^(1/lambda)
-  }
-
-  result <- result - shift
-
-  return(result)
-}
-
-#' @export
 powerTransform <- function(x, lambda, shift = 0) {
   x <- x + shift
   x[x<=0] <- NA
