@@ -84,7 +84,7 @@ invBoxCox <- function(x, lambda, shift = 0) {
 #' @export
 BoxCoxAuto <- function(x, method=c("guerrero", "loglik", "minitab"), lower, upper, shift = 0) {
   x <- x + shift
-  if (any(x <= 0)) stop("All values must be larger than `shift`.")
+  if (any(x <= 0)) stop("All values must be strictly positive after applying 'shift'.")
   lambda <- BoxCoxLambda(x, method, lower, upper)
   output <- BoxCox(x, lambda, shift=0)
   return(output)
