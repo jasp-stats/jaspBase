@@ -27,7 +27,7 @@ YeoJohnsonLambda(x, lower = -5, upper = 5)
 }
 \description{
 Transform a variable using the Yeo-Johnson transformation that extends the Box-Cox transform to unbounded variables.
-It is possible to select the value of \code{lambda} automatically by maximizing the normal profile log likelihood
+It is possible to select the value of \code{lambda} automatically by maximizing the normal profile log likelihood.
 }
 \references{
 Yeo, I. K., & Johnson, R. A. (2000). A new family of power transformations to improve normality or symmetry. \emph{Biometrika, 87}(4), 954-959.

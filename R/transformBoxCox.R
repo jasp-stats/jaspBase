@@ -6,9 +6,10 @@
 #' @param x a numeric vector.
 #' @param lambda The lambda parameter of the transform.
 #' @param shift The shift parameter of the transform. \code{shift=0} by default. All values of \code{x} must be larger than \code{shift}.
-#' @param method Choose method to be used in calculating lambda. See details for explanation.
 #' @param lower Lower limit for possible lambda values.
 #' @param upper Upper limit for possible lambda values.
+#' @param group Group vector indicating groups (for minitab emulation).
+#' @param size If \code{group=NULL}, the number of observations per group.
 #' @return
 #' \code{BoxCox} and \code{BoxCoxAuto} return the transformed variable. \code{invBoxCox} returns the untransformed variable.
 #' \code{BoxCoxLambda} returns the optimal value of \code{lambda} for the given data.
@@ -16,13 +17,28 @@
 #'
 #' @details
 #'
-#' If \code{method=="loglik"}, the value of lambda is chosen to maximize the
+#' In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is chosen to maximize the
 #' normal profile log likelihood of the transformed variable.
 #'
+#' The two-parameter Box-Cox transformation is defined as
+#' \deqn{y =
+#' \begin{cases}
+#' \frac{(x+\text{shift})^\lambda - 1}{\lambda} & \mathrm{if } \lambda \neq 0 \\
+#' \log(x+\text{shift}) & \mathrm{if } \lambda = 0
+#' \end{cases}
+#' }
 #'
-#' If \code{method=="minitab"}, the value of lambda is chosen to minimize
-#' the sample standard deviation of the standardized, Box-Cox transformed variable.
-#' This behavior mimics the auto Box-Cox transform available in the Minitab software.
+#'
+#' \code{BoxCoxLambdaMinitab} and \code{BoxCoxMinitab} mimic the auto Box-Cox transform available in the Minitab software.
+#' The value of lambda is chosen to minimize the pooled sample standard deviation
+#' of the "standardized transformed variable" (see [powerTransform]). The resulting transformation is then based on
+#' a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
+#' \deqn{y =
+#' \begin{cases}
+#' x^\lambda & \mathrm{if } \lambda \neq 0 \\
+#' \log(x) & \mathrm{if } \lambda = 0
+#' \end{cases}
+#' }
 #'
 #'
 #' @references Box, G. E. P. and Cox, D. R. (1964) An analysis of
@@ -66,8 +82,8 @@ invBoxCox <- function(x, lambda, shift=0) {
 
 #' @rdname BoxCox
 #' @export
-BoxCoxAuto <- function(x, method=c("loglik", "minitab"), lower=-5, upper=5, shift=0) {
-  lambda <- BoxCoxLambda(x, method, lower, upper, shift)
+BoxCoxAuto <- function(x, lower=-5, upper=5, shift=0) {
+  lambda <- BoxCoxLambda(x, lower, upper, shift)
   y <- BoxCox(x, lambda, shift)
   attr(y, "lambda") <- lambda
   return(y)
@@ -75,18 +91,7 @@ BoxCoxAuto <- function(x, method=c("loglik", "minitab"), lower=-5, upper=5, shif
 
 #' @rdname BoxCox
 #' @export
-BoxCoxLambda <- function(x, method=c("loglik", "minitab"), lower=-5, upper=5, shift=0) {
-  method <- match.arg(method)
-
-  fn <- switch (method,
-    loglik = .boxCoxLambdaLogLik,
-    minitab = .boxCoxLambdaMinitab
-  )
-
-  return(fn(x, lower, upper, shift))
-}
-
-.boxCoxLambdaLogLik <- function(x, lower, upper, shift) {
+BoxCoxLambda <- function(x, lower=-5, upper=5, shift=0) {
   lambda <- optimise(
     .boxCoxLogLik,
     interval = c(lower, upper), x = x, shift = shift, maximum = TRUE
@@ -109,18 +114,84 @@ BoxCoxLambda <- function(x, method=c("loglik", "minitab"), lower=-5, upper=5, sh
   return(logLikNorm + logDetJac)
 }
 
-.boxCoxLambdaMinitab <- function(x, lower, upper, shift) {
+# Emulate minitab ----
+
+#' @rdname BoxCox
+#' @export
+BoxCoxMinitab <- function(x, group=NULL, size=NULL, lower=-5, upper=5) {
+  stopifnot(all(x >= 0))
+
+  group <- .getGroupMinitab(x, group, size)
+
+  ns <- .lengthGrouped(x, group)
+  if (all(ns < 2)) stop("There must be at least two observations per group")
+
+  lambda <- BoxCoxLambdaMinitab(x, group, lower, upper)
+
+  y <- if (lambda != 0) x^lambda else log(x)
+  attr(y, "lambda") <- lambda
+
+  return(y)
+}
+
+#' @rdname BoxCox
+#' @export
+BoxCoxLambdaMinitab <- function(x, group, lower=-5, upper=5) {
   lambda <- optimise(
-    .boxCoxSd,
-    interval = c(lower, upper), x = x, shift = shift, maximum = FALSE
-    )[["minimum"]]
+    .boxCoxSdMinitab,
+    interval = c(lower, upper), x = x, group, maximum = FALSE
+  )[["minimum"]]
 
   return(lambda)
 }
 
-.boxCoxSd <- function(lambda, x, shift) {
-  # for the sd to be comparable across lambdas,
-  # calculated for the scale-invariant version
-  z <- powerTransform(x, lambda, shift)
-  return(sd(z, na.rm = TRUE))
+.boxCoxSdMinitab <- function(lambda, x, group) {
+  z <- powerTransform(x, lambda, shift=0)
+
+  # calculate variance per group
+  var <- .varGrouped(z, group)
+  n  <- .lengthGrouped(z, group)
+
+  remove <- is.na(var)
+  var <- var[!remove]
+  n <- n[!remove]
+
+  # calculate pooled sd
+  sd <- sqrt(
+    sum((n-1)*var) / sum(n-1)
+  )
+
+  return(sd)
+}
+
+## helper functions for minitab version -----
+
+# get groups based on the group vector, or the group 'size'
+.getGroupMinitab <- function(x, group=NULL, size=NULL) {
+  if (!is.null(group)) {
+    stopifnot(length(x) == length(group))
+    return(group)
+  }
+
+  if (is.null(size)) {
+    size <- length(x)
+  }
+
+  numGroups <- length(x) %/% size
+  group <- rep(seq_len(numGroups), each=size)
+
+  lastGroupSize <- length(x) - length(group)
+  group <- c(group, rep(numGroups+1, lastGroupSize))
+
+  return(group)
+}
+
+# get variance of observations per group
+.varGrouped <- function(x, group) {
+  tapply(x, group, var, na.rm = TRUE, simplify = TRUE)
+}
+
+# get number of observations per group
+.lengthGrouped <- function(x, group) {
+  tapply(x, group, \(x) sum(!is.na(x)), simplify = TRUE)
 }
