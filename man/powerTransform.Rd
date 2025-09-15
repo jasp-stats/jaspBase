@@ -31,6 +31,16 @@ powerTransformLambda(x, lower = -5, upper = 5, shift = 0)
 Transform a variable using the power transformation (scale-invariant Box-Cox).
 It is possible to select the value of \code{lambda} automatically by maximizing the normal profile log likelihood.
 }
+\details{
+The power transform is defined as
+\deqn{y_i =
+\begin{cases}
+\frac{(x_i+\text{shift})^\lambda - 1}{\lambda \mathrm{GM}(\mathbb{x+\text{shift}})^{\lambda-1}} & \mathrm{if } \lambda \neq 0 \\
+\mathrm{GM}(\mathbb{x+\text{shift}})\log(x_i+\text{shift}) & \mathrm{if } \lambda = 0,
+\end{cases}
+}
+where \eqn{\mathrm{GM}(\mathbb{x})} is the geometric mean of observations \eqn{x = x_1, \dots, x_n}.
+}
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of transformations. \emph{JRSS B} \bold{26} 211--246.
 }

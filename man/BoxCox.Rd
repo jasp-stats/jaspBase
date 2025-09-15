@@ -5,27 +5,21 @@
 \alias{invBoxCox}
 \alias{BoxCoxAuto}
 \alias{BoxCoxLambda}
+\alias{BoxCoxMinitab}
+\alias{BoxCoxLambdaMinitab}
 \title{Box-Cox transformation}
 \usage{
 BoxCox(x, lambda, shift = 0)
 
 invBoxCox(x, lambda, shift = 0)
 
-BoxCoxAuto(
-  x,
-  method = c("loglik", "minitab"),
-  lower = -5,
-  upper = 5,
-  shift = 0
-)
+BoxCoxAuto(x, lower = -5, upper = 5, shift = 0)
 
-BoxCoxLambda(
-  x,
-  method = c("loglik", "minitab"),
-  lower = -5,
-  upper = 5,
-  shift = 0
-)
+BoxCoxLambda(x, lower = -5, upper = 5, shift = 0)
+
+BoxCoxMinitab(x, group = NULL, size = NULL, lower = -5, upper = 5)
+
+BoxCoxLambdaMinitab(x, group, lower = -5, upper = 5)
 }
 \arguments{
 \item{x}{a numeric vector.}
@@ -34,11 +28,13 @@ BoxCoxLambda(
 
 \item{shift}{The shift parameter of the transform. \code{shift=0} by default. All values of \code{x} must be larger than \code{shift}.}
 
-\item{method}{Choose method to be used in calculating lambda. See details for explanation.}
-
 \item{lower}{Lower limit for possible lambda values.}
 
 \item{upper}{Upper limit for possible lambda values.}
+
+\item{group}{Group vector indicating groups (for minitab emulation).}
+
+\item{size}{If \code{group=NULL}, the number of observations per group.}
 }
 \value{
 \code{BoxCox} and \code{BoxCoxAuto} return the transformed variable. \code{invBoxCox} returns the untransformed variable.
@@ -46,16 +42,30 @@ BoxCoxLambda(
 }
 \description{
 Transform a variable using the two-parameter Box-Cox transformation.
-It is possible to select the value of \code{lambda} automatically
-using one of two available methods.
+It is possible to select the value of \code{lambda} automatically using one of two available methods.
 }
 \details{
-If \code{method=="loglik"}, the value of lambda is chosen to maximize the
+In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is chosen to maximize the
 normal profile log likelihood of the transformed variable.
 
-If \code{method=="minitab"}, the value of lambda is chosen to minimize
-the sample standard deviation of the standardized, Box-Cox transformed variable.
-This behavior mimics the auto Box-Cox transform available in the Minitab software.
+The two-parameter Box-Cox transformation is defined as
+\deqn{y =
+\begin{cases}
+\frac{(x+\text{shift})^\lambda - 1}{\lambda} & \mathrm{if } \lambda \neq 0 \\
+\log(x+\text{shift}) & \mathrm{if } \lambda = 0
+\end{cases}
+}
+
+\code{BoxCoxLambdaMinitab} and \code{BoxCoxMinitab} mimic the auto Box-Cox transform available in the Minitab software.
+The value of lambda is chosen to minimize the pooled sample standard deviation
+of the "standardized transformed variable" (see \link{powerTransform}). The resulting transformation is then based on
+a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
+\deqn{y =
+\begin{cases}
+x^\lambda & \mathrm{if } \lambda \neq 0 \\
+\log(x) & \mathrm{if } \lambda = 0
+\end{cases}
+}
 }
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of
