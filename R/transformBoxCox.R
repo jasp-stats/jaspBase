@@ -24,15 +24,19 @@
 #' \deqn{y =
 #' \begin{cases}
 #' \frac{(x+\text{shift})^\lambda - 1}{\lambda} & \mathrm{if } \lambda \neq 0 \\
-#' \log(x+\text{shift}) & \mathrm{if } \lambda = 0
+#' \log(x+\text{shift}) & \mathrm{if } \lambda = 0.
 #' \end{cases}
 #' }
 #'
 #'
+#'
+#' ## Minitab emulation
 #' \code{BoxCoxLambdaMinitab} and \code{BoxCoxMinitab} mimic the auto Box-Cox transform available in the Minitab software.
 #' The value of lambda is chosen to minimize the pooled sample standard deviation
-#' of the "standardized transformed variable" (see [powerTransform]). The resulting transformation is then based on
-#' a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
+#' of the "standardized transformed variable" (see [powerTransform]), unless the data is based on individuals (ungrouped),
+#' that is, when \code{size=1} or all values in \code{group} are unique: then lambda minimizes the
+#' unbiased estimate of the average moving range.
+#' The data is then transformed using a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
 #' \deqn{y =
 #' \begin{cases}
 #' x^\lambda & \mathrm{if } \lambda \neq 0 \\
@@ -44,7 +48,9 @@
 #' @references Box, G. E. P. and Cox, D. R. (1964) An analysis of
 #' transformations. \emph{JRSS B} \bold{26} 211--246.
 #'
-#' https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/box-cox-transformation/methods-and-formulas/methods-and-formulas/
+#' \href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/box-cox-transformation/methods-and-formulas/methods-and-formulas/}{Box-Cox transformation in Minitab}
+#'
+#' \href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/i-mr-r-s-chart/methods-and-formulas/estimating-sigma-for-the-i-chart-and-the-mr-chart/#average-moving-range-method}{Unbiased average moving range in Minitab}
 #'
 #' @name BoxCox
 NULL
@@ -121,12 +127,7 @@ BoxCoxLambda <- function(x, lower=-5, upper=5, shift=0) {
 BoxCoxMinitab <- function(x, group=NULL, size=NULL, lower=-5, upper=5) {
   stopifnot(all(x >= 0))
 
-  group <- .getGroupMinitab(x, group, size)
-
-  ns <- .lengthGrouped(x, group)
-  if (all(ns < 2)) stop("There must be at least two observations per group")
-
-  lambda <- BoxCoxLambdaMinitab(x, group, lower, upper)
+  lambda <- BoxCoxLambdaMinitab(x, group, size, lower, upper)
 
   y <- if (lambda != 0) x^lambda else log(x)
   attr(y, "lambda") <- lambda
@@ -136,11 +137,15 @@ BoxCoxMinitab <- function(x, group=NULL, size=NULL, lower=-5, upper=5) {
 
 #' @rdname BoxCox
 #' @export
-BoxCoxLambdaMinitab <- function(x, group, lower=-5, upper=5) {
-  lambda <- optimise(
-    .boxCoxSdMinitab,
-    interval = c(lower, upper), x = x, group, maximum = FALSE
-  )[["minimum"]]
+BoxCoxLambdaMinitab <- function(x, group=NULL, size=NULL,lower=-5, upper=5) {
+  group <- .getGroupMinitab(x, group, size)
+
+  ns <- .lengthGrouped(x, group)
+  # if individual data, then average moving range is the loss function
+  # otherwise, the pooled standard deviation
+  fn <- if (all(ns ==1)) .boxCoxAverageMovingRangeMinitab else .boxCoxSdMinitab
+
+  lambda <- optimise(fn, interval = c(lower, upper), x = x, group, maximum = FALSE)[["minimum"]]
 
   return(lambda)
 }
@@ -164,8 +169,15 @@ BoxCoxLambdaMinitab <- function(x, group, lower=-5, upper=5) {
   return(sd)
 }
 
-## helper functions for minitab version -----
+.boxCoxAverageMovingRangeMinitab <- function(lambda, x, group) {
+  z <- powerTransform(x, lambda, shift=0)
 
+  sd <- .avgMovingRange(z)
+
+  return(sd)
+}
+
+## helper functions for minitab version -----
 # get groups based on the group vector, or the group 'size'
 .getGroupMinitab <- function(x, group=NULL, size=NULL) {
   if (!is.null(group)) {
@@ -194,4 +206,22 @@ BoxCoxLambdaMinitab <- function(x, group, lower=-5, upper=5) {
 # get number of observations per group
 .lengthGrouped <- function(x, group) {
   tapply(x, group, \(x) sum(!is.na(x)), simplify = TRUE)
+}
+
+.avgMovingRange <- function(x) {
+  # https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/i-mr-r-s-chart/methods-and-formulas/estimating-sigma-for-the-i-chart-and-the-mr-chart/#average-moving-range-method
+  w <- 2 # hard-coded lag=2 of the moving range
+
+  # unbiasing constant from https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/r-chart/methods-and-formulas/estimating-sigma/#unbiasing-constants-d2-d3-and-d4
+  d2 <- 1.128
+
+  n <- length(x)
+  stopifnot(n > w)
+
+  mr <- 0
+  for (i in w:n) mr <- mr+abs(diff(range(x[i:(i-w+1)], na.rm=TRUE)))
+
+  mr <- mr/(n-w+1)
+
+  return(mr / d2)
 }
