@@ -127,6 +127,8 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   print(image[["interactive"]])
   if (image[["interactive"]] ) {
 
+    # TODO: move all of this to jaspGraphs
+
     print("Converting ggplot to plotly:")
 
     # see https://github.com/Rdatatable/data.table/issues/5375
