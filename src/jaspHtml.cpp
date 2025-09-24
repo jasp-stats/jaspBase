@@ -26,20 +26,20 @@ std::string jaspHtml::sanitizeTextForHtml(std::string text)
 
 std::string jaspHtml::convertTextToHtml(std::string text) const
 {
-    // first we replace \n by <br>
-    text = sanitizeTextForHtml(text);
+	// first we replace \n by <br>
+	text = sanitizeTextForHtml(text);
 
-    // Then add element tags
-    std::stringstream out;
+	// Then add element tags
+	std::stringstream out;
 	if(_elementType != "" && _elementType != "errorMsg")
-		out << "<" << _elementType  << (_class != "" ? "class=\""+_class+'"' : "") << ">";
+		out << "<" << _elementType << (_class != "" ? "class=\""+_class+'"' : "") << ">";
 
-    out << text;
+	out << text;
 
 	if(_elementType != "" && _elementType != "errorMsg")
 		out << " </" << _elementType << ">";
 
-    return out.str();
+	return out.str();
 }
 
 std::string jaspHtml::toHtml() const
