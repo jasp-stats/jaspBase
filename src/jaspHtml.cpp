@@ -26,21 +26,20 @@ std::string jaspHtml::sanitizeTextForHtml(std::string text)
 
 std::string jaspHtml::convertTextToHtml(std::string text) const
 {
-    // first we replace \n by <br>, but not for plotly elements
-	if (_elementType != "__plotly__")
-    	text = sanitizeTextForHtml(text);
+	// first we replace \n by <br>
+	text = sanitizeTextForHtml(text);
 
-    // Then add element tags
-    std::stringstream out;
-	if(_elementType != "" && _elementType != "errorMsg" && _elementType != "__plotly__")
-		out << "<" << _elementType  << (_class != "" ? "class=\""+_class+'"' : "") << ">";
+	// Then add element tags
+	std::stringstream out;
+	if(_elementType != "" && _elementType != "errorMsg")
+		out << "<" << _elementType << (_class != "" ? "class=\""+_class+'"' : "") << ">";
 
-    out << text;
+	out << text;
 
-	if(_elementType != "" && _elementType != "errorMsg" && _elementType != "__plotly__")
+	if(_elementType != "" && _elementType != "errorMsg")
 		out << " </" << _elementType << ">";
 
-    return out.str();
+	return out.str();
 }
 
 std::string jaspHtml::toHtml() const
