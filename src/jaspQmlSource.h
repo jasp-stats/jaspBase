@@ -9,11 +9,11 @@ public:
 					jaspQmlSource(const std::string & sourceID = "");
 
 	void			setSourceID(const std::string & sourceID)							{ _sourceID = sourceID; }
-	std::string		sourceID()										const				{ return _sourceID; }
+	std::string		sourceID()										const;
 	void			setValue(Rcpp::RObject Robj)										{ _json = RObject_to_JsonValue(Robj); _changed = true;	}
 	std::string		getValue()										const				{ return _json.toStyledString();		}
 
-	Json::Value		metaEntry()										const	override	{ return constructMetaEntry("qmlSource"); }
+	Json::Value		metaEntry()										const	override;
 	Json::Value		dataEntry(std::string & errorMessage)			const	override;
 
 	void			convertFromJSON_SetFields(Json::Value in)				override;
@@ -29,7 +29,6 @@ public:
 
 	void			complete()	{ _complete = true; }
 	bool			changed()										const				{ return _changed; }
-
 	std::string		_sourceID;
 
 protected:
