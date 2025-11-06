@@ -8,11 +8,40 @@ testthat::test_that("fisher Z works", {
 testthat::test_that("Power transforms work", {
   x <- seq(-1, 10, by = 1)
   testthat::expect_equal(
-    object = BoxCox(x, lambda = 2, shift = 2) |> invBoxCox(lambda = 2, shift = 2),
+    object = BoxCox(x, lambda=2, shift=2) |> invBoxCox(lambda=2, shift=2),
     expected = x)
 
   testthat::expect_equal(
-    object = powerTransform(x, lambda = 0.5, shift = 1),
+    object = BoxCox(x, lambda=2.5, shift=2, continuityAdjustment = FALSE) |>
+      invBoxCox(lambda=2.5, shift=2, continuityAdjustment = FALSE),
+    expected = x)
+
+  # test some special cases
+  testthat::expect_equal(
+    object = BoxCox(x, lambda=0, shift = 2),
+    expected = log(x+2)
+  )
+
+  testthat::expect_equal(
+    object = BoxCox(x, lambda=0.5, shift=3, continuityAdjustment = FALSE),
+    expected = sqrt(x+3)
+  )
+
+  testthat::expect_equal(
+    object = BoxCox(x, lambda=-1, shift=2, continuityAdjustment = FALSE),
+    expected = 1/(x+2)
+  )
+
+  testthat::expect_equal(
+    object = BoxCox(x, lambda=2, shift=1.5, continuityAdjustment = FALSE),
+    expected = (x+1.5)^2
+  )
+
+
+  # first element will be set to NA with a warning because it is on the boundary of admissible values
+  testthat::expect_warning(y <- powerTransform(x, lambda=0.5, shift=1))
+  testthat::expect_equal(
+    object = y,
     expected = c(NA, 0, 1.83552958322202, 3.24398096966205, 4.43136041395163,
                  5.47746270444583, 6.42321146659831, 7.29291721106063, 8.10241958039567,
                  8.86272082790327, 9.58183162724212, 10.2657993899599))
@@ -40,9 +69,9 @@ testthat::test_that("Auto transforms work", {
   y <- BoxCoxAuto(x)
   testthat::expect_equal(
     object = y,
-    expected = c(-0.319395836440043, 11.2605876201426, -0.250599437523637,
-                 3.91717936655459, -0.231049967619291, 0.189454075774882, 0.157510562708716,
-                 5.27886307986331, -0.0375454162860614, 0.869872446555355),
+    expected = c(-1.30245492213035, 1.55736867304615, -0.433487839215894,
+                 1.02638011585724, -0.370139173611634, 0.154543673772499, 0.132320670855039,
+                 1.16498788784776, -0.0395369680851299, 0.468237164461956),
     ignore_attr = TRUE
   )
 
@@ -53,9 +82,9 @@ testthat::test_that("Auto transforms work", {
   y <- powerTransformAuto(x)
   testthat::expect_equal(
     object = y,
-    expected = c(-1.33611036495374, 1.59761108868762, -0.444689167522521,
-                 1.05290178406806, -0.37970357202767, 0.158537083208781, 0.135739837765653,
-                 1.1950911816994, -0.0405586035722318, 0.480336415536656),
+    expected = c(-1.33612171066568, 1.59760265131298, -0.444690332051012,
+                 1.05289802739253, -0.379704438725285, 0.158537049024274, 0.13573982165449,
+                 1.19508635952894, -0.0405586301453423, 0.480335687426334),
     ignore_attr = TRUE
   )
 

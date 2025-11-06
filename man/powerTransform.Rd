@@ -8,16 +8,18 @@
 \usage{
 powerTransform(x, lambda, shift = 0)
 
-powerTransformAuto(x, lower = -5, upper = 5, shift = 0)
+powerTransformAuto(x, predictor = NULL, lower = -5, upper = 5, shift = 0)
 
-powerTransformLambda(x, lower = -5, upper = 5, shift = 0)
+powerTransformLambda(x, predictor = NULL, lower = -5, upper = 5, shift = 0)
 }
 \arguments{
-\item{x}{a numeric vector to be transformed.}
+\item{x}{a numeric vector.}
 
 \item{lambda}{The lambda parameter of the transform.}
 
-\item{shift}{The shift parameter of the transform. \code{shift=0} by default. All values of \code{x} must be larger than \code{shift}.}
+\item{shift}{The shift parameter of the transform. \code{shift=0} by default. Values of \code{x} smaller than \code{shift} will turn \code{NA}.}
+
+\item{predictor}{Vector indicating regression variable (factor or numeric).}
 
 \item{lower}{Lower limit for possible lambda values.}
 
@@ -29,7 +31,7 @@ powerTransformLambda(x, lower = -5, upper = 5, shift = 0)
 }
 \description{
 Transform a variable using the power transformation (scale-invariant Box-Cox).
-It is possible to select the value of \code{lambda} automatically by maximizing the normal profile log likelihood.
+It is possible to select the value of \code{lambda} automatically.
 }
 \details{
 The power transform is defined as
@@ -40,6 +42,9 @@ The power transform is defined as
 \end{cases}
 }
 where \eqn{\mathrm{GM}(\mathbb{x})} is the geometric mean of observations \eqn{x = x_1, \dots, x_n}.
+
+Automatic transform finds lambda that minimizes the residual sums of squares of the power-transformed variable
+regressed on the predictor (Box & Cox, 1964, p. 216).
 }
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of transformations. \emph{JRSS B} \bold{26} 211--246.

@@ -1,24 +1,21 @@
 #' Box-Cox transformation
 #'
 #' Transform a variable using the two-parameter Box-Cox transformation.
-#' It is possible to select the value of \code{lambda} automatically using one of two available methods.
+#' It is possible to select the value of \code{lambda} automatically.
 #'
 #' @param x a numeric vector.
 #' @param lambda The lambda parameter of the transform.
-#' @param shift The shift parameter of the transform. \code{shift=0} by default. All values of \code{x} must be larger than \code{shift}.
+#' @param shift The shift parameter of the transform. \code{shift=0} by default. Values of \code{x} smaller than \code{shift} will turn \code{NA}.
+#' @param continuityAdjustment Boolean (default \code{TRUE}) whether to apply the continuity adjustment term (see Details).
 #' @param lower Lower limit for possible lambda values.
 #' @param upper Upper limit for possible lambda values.
-#' @param group Group vector indicating groups (for minitab emulation).
-#' @param size If \code{group=NULL}, the number of observations per group.
+#' @param predictor Vector indicating regression variable (factor or numeric).
 #' @return
 #' \code{BoxCox} and \code{BoxCoxAuto} return the transformed variable. \code{invBoxCox} returns the untransformed variable.
 #' \code{BoxCoxLambda} returns the optimal value of \code{lambda} for the given data.
 #'
 #'
 #' @details
-#'
-#' In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is chosen to maximize the
-#' normal profile log likelihood of the transformed variable.
 #'
 #' The two-parameter Box-Cox transformation is defined as
 #' \deqn{y =
@@ -28,44 +25,47 @@
 #' \end{cases}
 #' }
 #'
-#'
-#'
-#' ## Minitab emulation
-#' \code{BoxCoxLambdaMinitab} and \code{BoxCoxMinitab} mimic the auto Box-Cox transform available in the Minitab software.
-#' The value of lambda is chosen to minimize the pooled sample standard deviation
-#' of the "standardized transformed variable" (see [powerTransform]), unless the data is based on individuals (ungrouped),
-#' that is, when \code{size=1} or all values in \code{group} are unique: then lambda minimizes the
-#' unbiased estimate of the average moving range.
-#' The data is then transformed using a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
+#' If \code{continuityAdjustment=FALSE},
 #' \deqn{y =
 #' \begin{cases}
-#' x^\lambda & \mathrm{if } \lambda \neq 0 \\
-#' \log(x) & \mathrm{if } \lambda = 0
+#' (x+\text{shift})^\lambda & \mathrm{if } \lambda \neq 0 \\
+#' \log(x+\text{shift}) & \mathrm{if } \lambda = 0
 #' \end{cases}
 #' }
+#'
+#' The continuity adjustment term ensures smooth convergence to the log transform as \eqn{\lambda \rightarrow 0}.
+#'
+#'
+#' In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is automatically selected using one of three possible methods:
+#'
+#' - When \code{method="loglik"}, lambda maximizes the normal log-likelihood of the transformed variable regressed on the predictor (Box & Cox, 1964, p. 215).
+#' - When \code{method="sd"}, lambda minimizes the residual sums of squares of the power-transformed variable regressed on the predictor (see [powerTransform]; Box & Cox, 1964, p. 216).
+#' - When \code{method="movingRange"}, lambda minimizes the estimate of variability based on the average moving range of the power-transformed variable (see Montgomerry, 2012).
+#' Predictor is ignored in this case.
+#'
 #'
 #'
 #' @references Box, G. E. P. and Cox, D. R. (1964) An analysis of
 #' transformations. \emph{JRSS B} \bold{26} 211--246.
 #'
-#' \href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/box-cox-transformation/methods-and-formulas/methods-and-formulas/}{Box-Cox transformation in Minitab}
-#'
-#' \href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/i-mr-r-s-chart/methods-and-formulas/estimating-sigma-for-the-i-chart-and-the-mr-chart/#average-moving-range-method}{Unbiased average moving range in Minitab}
+#' Montgomery, D. C. (2012). Statistical quality control (Vol. 4). New York: John Wiley & Sons.
 #'
 #' @name BoxCox
 NULL
 
 #' @rdname BoxCox
 #' @export
-BoxCox <- function(x, lambda, shift=0) {
+BoxCox <- function(x, lambda, shift=0, continuityAdjustment=TRUE) {
+  stopifnot(length(lambda) == 1L)
   x <- x + shift
+  if (any(x <= 0, na.rm = TRUE)) warning("Values smaller than -shift set to NA.")
   x[x<=0] <- NA
-  if (any(x <= 0, na.rm = TRUE)) warning("Nonpositive values after shift set to NA.")
 
   if (lambda == 0) {
     result <- log(x)
   } else {
-    result <- (x^lambda - 1)/lambda
+    result <- x^lambda
+    if (continuityAdjustment) result <- (result - 1) / lambda
   }
 
   return(result)
@@ -73,11 +73,11 @@ BoxCox <- function(x, lambda, shift=0) {
 
 #' @rdname BoxCox
 #' @export
-invBoxCox <- function(x, lambda, shift=0) {
+invBoxCox <- function(x, lambda, shift=0, continuityAdjustment=TRUE) {
   if(lambda == 0) {
     result <- exp(x)
   } else {
-    x <- x * lambda + 1
+    if (continuityAdjustment) x <- x * lambda + 1
     result <- x^(1/lambda)
   }
 
@@ -88,131 +88,65 @@ invBoxCox <- function(x, lambda, shift=0) {
 
 #' @rdname BoxCox
 #' @export
-BoxCoxAuto <- function(x, lower=-5, upper=5, shift=0) {
-  lambda <- BoxCoxLambda(x, lower, upper, shift)
-  y <- BoxCox(x, lambda, shift)
+BoxCoxAuto <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
+  lambda <- BoxCoxLambda(x, predictor, method, lower, upper, shift, continuityAdjustment)
+  y <- BoxCox(x, lambda, shift, continuityAdjustment)
   attr(y, "lambda") <- lambda
   return(y)
 }
 
 #' @rdname BoxCox
 #' @export
-BoxCoxLambda <- function(x, lower=-5, upper=5, shift=0) {
-  lambda <- optimise(
-    .boxCoxLogLik,
-    interval = c(lower, upper), x = x, shift = shift, maximum = TRUE
-  )[["maximum"]]
+BoxCoxLambda <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
+  stopifnot(lower < upper)
+  if(is.null(predictor)) predictor <- rep(1, length(x))
 
-  return(lambda)
-}
+  method <- match.arg(method, c("loglik", "sd"))
 
-.boxCoxLogLik <- function(lambda, x, shift = 0) {
-  y  <- BoxCox(x, lambda, shift)
-  m  <- mean(y, na.rm=TRUE)
-  s2 <- mean((y - m)^2, na.rm=TRUE) # MLE variance (divisor n)
-
-  logLikNorm <- sum(stats::dnorm(y, mean = m, sd = sqrt(s2), log = TRUE), na.rm=TRUE)
-
-  z  <- x + 1
-  z  <- z[is.finite(z) & z > 0]
-  logDetJac <- (lambda - 1) * sum(log(z), na.rm=TRUE)
-
-  return(logLikNorm + logDetJac)
-}
-
-# Emulate minitab ----
-
-#' @rdname BoxCox
-#' @export
-BoxCoxMinitab <- function(x, group=NULL, size=NULL, lower=-5, upper=5) {
-  stopifnot(all(x >= 0))
-
-  lambda <- BoxCoxLambdaMinitab(x, group, size, lower, upper)
-
-  y <- if (lambda != 0) x^lambda else log(x)
-  attr(y, "lambda") <- lambda
-
-  return(y)
-}
-
-#' @rdname BoxCox
-#' @export
-BoxCoxLambdaMinitab <- function(x, group=NULL, size=NULL,lower=-5, upper=5) {
-  group <- .getGroupMinitab(x, group, size)
-
-  ns <- .lengthGrouped(x, group)
-  # if individual data, then average moving range is the loss function
-  # otherwise, the pooled standard deviation
-  fn <- if (all(ns ==1)) .boxCoxAverageMovingRangeMinitab else .boxCoxSdMinitab
-
-  lambda <- optimise(fn, interval = c(lower, upper), x = x, group, maximum = FALSE)[["minimum"]]
-
-  return(lambda)
-}
-
-.boxCoxSdMinitab <- function(lambda, x, group) {
-  z <- powerTransform(x, lambda, shift=0)
-
-  # calculate variance per group
-  var <- .varGrouped(z, group)
-  n  <- .lengthGrouped(z, group)
-
-  remove <- is.na(var)
-  var <- var[!remove]
-  n <- n[!remove]
-
-  # calculate pooled sd
-  sd <- sqrt(
-    sum((n-1)*var) / sum(n-1)
+  fn <- switch(
+    method,
+    loglik = .boxCoxLogLik,
+    sd = .boxCoxSd,
+    movingRange = .boxCoxAverageMovingRange
   )
 
-  return(sd)
+  lambda <- optimise(
+    fn,
+    interval = c(lower, upper), x = x, predictor = predictor, shift = shift, continuityAdjustment = continuityAdjustment, maximum = FALSE
+  )[["minimum"]]
+
+  return(lambda)
 }
 
-.boxCoxAverageMovingRangeMinitab <- function(lambda, x, group) {
-  z <- powerTransform(x, lambda, shift=0)
+.boxCoxLogLik <- function(lambda, x, predictor, shift = 0, continuityAdjustment = TRUE) {
+  # continuityAdjustment = TRUE is intentional (continuity ensures smooth optimization)
+  y  <- BoxCox(x, lambda, shift, continuityAdjustment = TRUE)
 
-  sd <- .avgMovingRange(z)
+  # Box & Cox (1964), p. 215
+  fit <- lm(y~predictor)
+  n <- nobs(fit)
+  sigma2 <- deviance(fit) / n
+  logLikSigma <- -n/2 * log(sigma2)
+  logDetJac <- (lambda - 1) * sum(log(x+shift), na.rm=TRUE)
 
-  return(sd)
+  # return negative log lik for minimization
+  return(- logLikSigma - logDetJac)
 }
 
-## helper functions for minitab version -----
-# get groups based on the group vector, or the group 'size'
-.getGroupMinitab <- function(x, group=NULL, size=NULL) {
-  if (!is.null(group)) {
-    stopifnot(length(x) == length(group))
-    return(group)
-  }
+.boxCoxSd <- function(lambda, x, predictor, shift = 0, ...) {
+  # Box & Cox (1964), p. 216
+  y <- powerTransform(x, lambda, shift=shift)
 
-  if (is.null(size)) {
-    size <- length(x)
-  }
+  fit <- lm(y~predictor)
 
-  numGroups <- length(x) %/% size
-  group <- rep(seq_len(numGroups), each=size)
-
-  lastGroupSize <- length(x) - length(group)
-  group <- c(group, rep(numGroups+1, lastGroupSize))
-
-  return(group)
+  return(deviance(fit))
 }
 
-# get variance of observations per group
-.varGrouped <- function(x, group) {
-  tapply(x, group, var, na.rm = TRUE, simplify = TRUE)
-}
+.boxCoxAverageMovingRange <- function(lambda, x, shift = 0, ...) {
+  x <- powerTransform(x, lambda, shift = shift)
 
-# get number of observations per group
-.lengthGrouped <- function(x, group) {
-  tapply(x, group, \(x) sum(!is.na(x)), simplify = TRUE)
-}
-
-.avgMovingRange <- function(x) {
-  # https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/i-mr-r-s-chart/methods-and-formulas/estimating-sigma-for-the-i-chart-and-the-mr-chart/#average-moving-range-method
   w <- 2 # hard-coded lag=2 of the moving range
 
-  # unbiasing constant from https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/r-chart/methods-and-formulas/estimating-sigma/#unbiasing-constants-d2-d3-and-d4
   d2 <- 1.128
 
   n <- length(x)
@@ -223,5 +157,7 @@ BoxCoxLambdaMinitab <- function(x, group=NULL, size=NULL,lower=-5, upper=5) {
 
   mr <- mr/(n-w+1)
 
+  # return estimate of sd
   return(mr / d2)
 }
+

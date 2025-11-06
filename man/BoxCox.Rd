@@ -5,36 +5,46 @@
 \alias{invBoxCox}
 \alias{BoxCoxAuto}
 \alias{BoxCoxLambda}
-\alias{BoxCoxMinitab}
-\alias{BoxCoxLambdaMinitab}
 \title{Box-Cox transformation}
 \usage{
-BoxCox(x, lambda, shift = 0)
+BoxCox(x, lambda, shift = 0, continuityAdjustment = TRUE)
 
-invBoxCox(x, lambda, shift = 0)
+invBoxCox(x, lambda, shift = 0, continuityAdjustment = TRUE)
 
-BoxCoxAuto(x, lower = -5, upper = 5, shift = 0)
+BoxCoxAuto(
+  x,
+  predictor = NULL,
+  method = "loglik",
+  lower = -5,
+  upper = 5,
+  shift = 0,
+  continuityAdjustment = TRUE
+)
 
-BoxCoxLambda(x, lower = -5, upper = 5, shift = 0)
-
-BoxCoxMinitab(x, group = NULL, size = NULL, lower = -5, upper = 5)
-
-BoxCoxLambdaMinitab(x, group = NULL, size = NULL, lower = -5, upper = 5)
+BoxCoxLambda(
+  x,
+  predictor = NULL,
+  method = "loglik",
+  lower = -5,
+  upper = 5,
+  shift = 0,
+  continuityAdjustment = TRUE
+)
 }
 \arguments{
 \item{x}{a numeric vector.}
 
 \item{lambda}{The lambda parameter of the transform.}
 
-\item{shift}{The shift parameter of the transform. \code{shift=0} by default. All values of \code{x} must be larger than \code{shift}.}
+\item{shift}{The shift parameter of the transform. \code{shift=0} by default. Values of \code{x} smaller than \code{shift} will turn \code{NA}.}
+
+\item{continuityAdjustment}{Boolean (default \code{TRUE}) whether to apply the continuity adjustment term (see Details).}
+
+\item{predictor}{Vector indicating regression variable (factor or numeric).}
 
 \item{lower}{Lower limit for possible lambda values.}
 
 \item{upper}{Upper limit for possible lambda values.}
-
-\item{group}{Group vector indicating groups (for minitab emulation).}
-
-\item{size}{If \code{group=NULL}, the number of observations per group.}
 }
 \value{
 \code{BoxCox} and \code{BoxCoxAuto} return the transformed variable. \code{invBoxCox} returns the untransformed variable.
@@ -42,12 +52,9 @@ BoxCoxLambdaMinitab(x, group = NULL, size = NULL, lower = -5, upper = 5)
 }
 \description{
 Transform a variable using the two-parameter Box-Cox transformation.
-It is possible to select the value of \code{lambda} automatically using one of two available methods.
+It is possible to select the value of \code{lambda} automatically.
 }
 \details{
-In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is chosen to maximize the
-normal profile log likelihood of the transformed variable.
-
 The two-parameter Box-Cox transformation is defined as
 \deqn{y =
 \begin{cases}
@@ -55,27 +62,28 @@ The two-parameter Box-Cox transformation is defined as
 \log(x+\text{shift}) & \mathrm{if } \lambda = 0.
 \end{cases}
 }
-\subsection{Minitab emulation}{
 
-\code{BoxCoxLambdaMinitab} and \code{BoxCoxMinitab} mimic the auto Box-Cox transform available in the Minitab software.
-The value of lambda is chosen to minimize the pooled sample standard deviation
-of the "standardized transformed variable" (see \link{powerTransform}), unless the data is based on individuals (ungrouped),
-that is, when \code{size=1} or all values in \code{group} are unique: then lambda minimizes the
-unbiased estimate of the average moving range.
-The data is then transformed using a simple exponential equation (neglecting the normalizing factor of the standard Box-Cox transform)
+If \code{continuityAdjustment=FALSE},
 \deqn{y =
 \begin{cases}
-x^\lambda & \mathrm{if } \lambda \neq 0 \\
-\log(x) & \mathrm{if } \lambda = 0
+(x+\text{shift})^\lambda & \mathrm{if } \lambda \neq 0 \\
+\log(x+\text{shift}) & \mathrm{if } \lambda = 0
 \end{cases}
 }
+
+The continuity adjustment term ensures smooth convergence to the log transform as \eqn{\lambda \rightarrow 0}.
+
+In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is automatically selected using one of three possible methods:
+\itemize{
+\item When \code{method="loglik"}, lambda maximizes the normal log-likelihood of the transformed variable regressed on the predictor (Box & Cox, 1964, p. 215).
+\item When \code{method="sd"}, lambda minimizes the residual sums of squares of the power-transformed variable regressed on the predictor (see \link{powerTransform}; Box & Cox, 1964, p. 216).
+\item When \code{method="movingRange"}, lambda minimizes the estimate of variability based on the average moving range of the power-transformed variable (see Montgomerry, 2012).
+Predictor is ignored in this case.
 }
 }
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of
 transformations. \emph{JRSS B} \bold{26} 211--246.
 
-\href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/box-cox-transformation/methods-and-formulas/methods-and-formulas/}{Box-Cox transformation in Minitab}
-
-\href{https://support.minitab.com/en-us/minitab/help-and-how-to/quality-and-process-improvement/control-charts/how-to/variables-charts-for-subgroups/i-mr-r-s-chart/methods-and-formulas/estimating-sigma-for-the-i-chart-and-the-mr-chart/#average-moving-range-method}{Unbiased average moving range in Minitab}
+Montgomery, D. C. (2012). Statistical quality control (Vol. 4). New York: John Wiley & Sons.
 }
