@@ -838,7 +838,7 @@ jaspColumnR <- R6::R6Class(
   inherit   = jaspOutputObjR,
   cloneable = FALSE,
   public    = list(
-    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, jaspObject = NULL)
+    initialize = function(columnName="", dependencies=NULL, scalarData=NULL, ordinalData=NULL, nominalData=NULL, nominalTextData=NULL, info=NULL, computed=FALSE, jaspObject = NULL)
     {
       if (!is.null(jaspObject)) {
         private$jaspObject <- jaspObject
@@ -852,10 +852,10 @@ jaspColumnR <- R6::R6Class(
       columnObj <- create_cpp_jaspColumn(columnName)
       private$jaspObject <- columnObj
 
-      if (!is.null(scalarData))      columnObj$setScale(scalarData)
-      if (!is.null(ordinalData))     columnObj$setOrdinal(ordinalData)
-      if (!is.null(nominalData))     columnObj$setNominal(nominalData)
-      if (!is.null(nominalTextData)) columnObj$setNominalText(nominalTextData)
+      if (!is.null(scalarData))      columnObj$setScale(scalarData,            computed)
+      if (!is.null(ordinalData))     columnObj$setOrdinal(ordinalData,         computed)
+      if (!is.null(nominalData))     columnObj$setNominal(nominalData,         computed)
+      if (!is.null(nominalTextData)) columnObj$setNominalText(nominalTextData, computed)
       if (!is.null(info))            columnObj$info <- info
 
       super$dependOn(dependencies)
@@ -863,9 +863,9 @@ jaspColumnR <- R6::R6Class(
       return()
     },
 
-    setScale        = function(scalarData)  private$jaspObject$setScale(scalarData),
-    setOrdinal      = function(ordinalData) private$jaspObject$setOrdinal(ordinalData),
-    setNominal      = function(nominalData) private$jaspObject$setNominal(nominalData),
-    setNominalText  = function(nominalData) private$jaspObject$setNominalText(nominalData)
+    setScale        = function(scalarData,   computed=FALSE) private$jaspObject$setScale(scalarData,        computed),
+    setOrdinal      = function(ordinalData,  computed=FALSE) private$jaspObject$setOrdinal(ordinalData,     computed),
+    setNominal      = function(nominalData,  computed=FALSE) private$jaspObject$setNominal(nominalData,     computed),
+    setNominalText  = function(nominalData,  computed=FALSE) private$jaspObject$setNominalText(nominalData, computed)
   )
 )
