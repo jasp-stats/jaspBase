@@ -14,6 +14,7 @@ invBoxCox(x, lambda, shift = 0, continuityAdjustment = TRUE)
 BoxCoxAuto(
   x,
   predictor = NULL,
+  groupSize = NULL,
   method = "loglik",
   lower = -5,
   upper = 5,
@@ -24,6 +25,7 @@ BoxCoxAuto(
 BoxCoxLambda(
   x,
   predictor = NULL,
+  groupSize = NULL,
   method = "loglik",
   lower = -5,
   upper = 5,
@@ -41,6 +43,10 @@ BoxCoxLambda(
 \item{continuityAdjustment}{Boolean (default \code{TRUE}) whether to apply the continuity adjustment term (see Details).}
 
 \item{predictor}{Vector indicating regression variable (factor or numeric).}
+
+\item{groupSize}{Integer indicating the group size (exclusive argument with \code{predictor}). Must be larger than 1. For individual data, use \code{method="movingRange"}.}
+
+\item{method}{Method for automatic determination of \code{lambda}. See details.}
 
 \item{lower}{Lower limit for possible lambda values.}
 
@@ -80,6 +86,8 @@ In \code{BoxCoxLambda} and \code{BoxCoxAuto}, the value of lambda is automatical
 \item When \code{method="movingRange"}, lambda minimizes the estimate of variability based on the average moving range of the power-transformed variable (see Montgomerry, 2012).
 Predictor is ignored in this case.
 }
+
+The predictor is either taken from the predictor argument, or inferred from the \code{groupSize} argument.
 }
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of

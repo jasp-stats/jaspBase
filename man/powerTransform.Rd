@@ -8,9 +8,23 @@
 \usage{
 powerTransform(x, lambda, shift = 0)
 
-powerTransformAuto(x, predictor = NULL, lower = -5, upper = 5, shift = 0)
+powerTransformAuto(
+  x,
+  predictor = NULL,
+  groupSize = NULL,
+  lower = -5,
+  upper = 5,
+  shift = 0
+)
 
-powerTransformLambda(x, predictor = NULL, lower = -5, upper = 5, shift = 0)
+powerTransformLambda(
+  x,
+  predictor = NULL,
+  groupSize = NULL,
+  lower = -5,
+  upper = 5,
+  shift = 0
+)
 }
 \arguments{
 \item{x}{a numeric vector.}
@@ -20,6 +34,8 @@ powerTransformLambda(x, predictor = NULL, lower = -5, upper = 5, shift = 0)
 \item{shift}{The shift parameter of the transform. \code{shift=0} by default. Values of \code{x} smaller than \code{shift} will turn \code{NA}.}
 
 \item{predictor}{Vector indicating regression variable (factor or numeric).}
+
+\item{groupSize}{Integer indicating the group size (exclusive argument with \code{predictor}). Must be larger than 1.}
 
 \item{lower}{Lower limit for possible lambda values.}
 
@@ -45,6 +61,8 @@ where \eqn{\mathrm{GM}(\mathbb{x})} is the geometric mean of observations \eqn{x
 
 Automatic transform finds lambda that minimizes the residual sums of squares of the power-transformed variable
 regressed on the predictor (Box & Cox, 1964, p. 216).
+
+See \link{BoxCox} for \code{predictor} and \code{groupSize} arguments.
 }
 \references{
 Box, G. E. P. and Cox, D. R. (1964) An analysis of transformations. \emph{JRSS B} \bold{26} 211--246.

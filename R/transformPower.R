@@ -9,6 +9,7 @@
 #' @param lower Lower limit for possible lambda values.
 #' @param upper Upper limit for possible lambda values.
 #' @param predictor Vector indicating regression variable (factor or numeric).
+#' @param groupSize Integer indicating the group size (exclusive argument with \code{predictor}). Must be larger than 1.
 #' @return
 #' \code{powerTransform} and \code{powerTransformAuto} return the transformed variable.
 #' \code{powerTransformLambda} returns the optimal value of \code{lambda} for the given data.
@@ -26,6 +27,8 @@
 #'
 #' Automatic transform finds lambda that minimizes the residual sums of squares of the power-transformed variable
 #' regressed on the predictor (Box & Cox, 1964, p. 216).
+#'
+#' See [BoxCox] for `predictor` and `groupSize` arguments.
 #'
 #'
 #' @references
@@ -54,8 +57,8 @@ powerTransform <- function(x, lambda, shift = 0) {
 
 #' @rdname powerTransform
 #' @export
-powerTransformAuto <- function(x, predictor=NULL, lower=-5, upper=5, shift=0) {
-  lambda <- powerTransformLambda(x, predictor, lower, upper, shift)
+powerTransformAuto <- function(x, predictor=NULL, groupSize=NULL, lower=-5, upper=5, shift=0) {
+  lambda <- powerTransformLambda(x, predictor, groupSize, lower, upper, shift)
   y <- powerTransform(x, lambda, shift)
   attr(y, "lambda") <- lambda
   return(y)
@@ -63,9 +66,9 @@ powerTransformAuto <- function(x, predictor=NULL, lower=-5, upper=5, shift=0) {
 
 #' @rdname powerTransform
 #' @export
-powerTransformLambda <- function(x, predictor=NULL, lower=-5, upper=5, shift=0) {
+powerTransformLambda <- function(x, predictor=NULL, groupSize=NULL, lower=-5, upper=5, shift=0) {
   stopifnot(lower < upper)
-  if(is.null(predictor)) predictor <- rep(1, length(x))
+  predictor <- .getPredictorBoxCox(x, predictor, groupSize)
 
   lambda <- optimise(
     .powerTransformLogLik,
@@ -79,7 +82,7 @@ powerTransformLambda <- function(x, predictor=NULL, lower=-5, upper=5, shift=0) 
   # Box & Cox (1964), p. 216
   y <- powerTransform(x, lambda, shift=shift)
 
-  fit <- lm(y~predictor)
+  fit <- if(!is.null(predictor)) lm(y~predictor) else lm(y~1)
 
   return(deviance(fit))
 }

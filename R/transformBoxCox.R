@@ -9,7 +9,9 @@
 #' @param continuityAdjustment Boolean (default \code{TRUE}) whether to apply the continuity adjustment term (see Details).
 #' @param lower Lower limit for possible lambda values.
 #' @param upper Upper limit for possible lambda values.
+#' @param method Method for automatic determination of \code{lambda}. See details.
 #' @param predictor Vector indicating regression variable (factor or numeric).
+#' @param groupSize Integer indicating the group size (exclusive argument with \code{predictor}). Must be larger than 1. For individual data, use `method="movingRange"`.
 #' @return
 #' \code{BoxCox} and \code{BoxCoxAuto} return the transformed variable. \code{invBoxCox} returns the untransformed variable.
 #' \code{BoxCoxLambda} returns the optimal value of \code{lambda} for the given data.
@@ -42,6 +44,8 @@
 #' - When \code{method="sd"}, lambda minimizes the residual sums of squares of the power-transformed variable regressed on the predictor (see [powerTransform]; Box & Cox, 1964, p. 216).
 #' - When \code{method="movingRange"}, lambda minimizes the estimate of variability based on the average moving range of the power-transformed variable (see Montgomerry, 2012).
 #' Predictor is ignored in this case.
+#'
+#' The predictor is either taken from the predictor argument, or inferred from the `groupSize` argument.
 #'
 #'
 #'
@@ -88,8 +92,8 @@ invBoxCox <- function(x, lambda, shift=0, continuityAdjustment=TRUE) {
 
 #' @rdname BoxCox
 #' @export
-BoxCoxAuto <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
-  lambda <- BoxCoxLambda(x, predictor, method, lower, upper, shift, continuityAdjustment)
+BoxCoxAuto <- function(x, predictor=NULL, groupSize=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
+  lambda <- BoxCoxLambda(x, predictor, groupSize, method, lower, upper, shift, continuityAdjustment)
   y <- BoxCox(x, lambda, shift, continuityAdjustment)
   attr(y, "lambda") <- lambda
   return(y)
@@ -97,11 +101,11 @@ BoxCoxAuto <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, sh
 
 #' @rdname BoxCox
 #' @export
-BoxCoxLambda <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
+BoxCoxLambda <- function(x, predictor=NULL, groupSize=NULL, method="loglik", lower=-5, upper=5, shift=0, continuityAdjustment=TRUE) {
   stopifnot(lower < upper)
-  if(is.null(predictor)) predictor <- rep(1, length(x))
+  predictor <- .getPredictorBoxCox(x, predictor, groupSize)
 
-  method <- match.arg(method, c("loglik", "sd"))
+  method <- match.arg(method, c("loglik", "sd", "movingRange"))
 
   fn <- switch(
     method,
@@ -123,7 +127,7 @@ BoxCoxLambda <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, 
   y  <- BoxCox(x, lambda, shift, continuityAdjustment = TRUE)
 
   # Box & Cox (1964), p. 215
-  fit <- lm(y~predictor)
+  fit <- if(!is.null(predictor)) lm(y~predictor) else lm(y~1)
   n <- nobs(fit)
   sigma2 <- deviance(fit) / n
   logLikSigma <- -n/2 * log(sigma2)
@@ -137,7 +141,7 @@ BoxCoxLambda <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, 
   # Box & Cox (1964), p. 216
   y <- powerTransform(x, lambda, shift=shift)
 
-  fit <- lm(y~predictor)
+  fit <- if(!is.null(predictor)) lm(y~predictor) else lm(y~1)
 
   return(deviance(fit))
 }
@@ -161,3 +165,24 @@ BoxCoxLambda <- function(x, predictor=NULL, method="loglik", lower=-5, upper=5, 
   return(mr / d2)
 }
 
+
+.getPredictorBoxCox <- function(x, predictor=NULL, groupSize=NULL) {
+  if (!is.null(predictor) && !is.null(groupSize)) stop("Only one of `predictor`, `groupSize` may be specified")
+
+  if (!is.null(predictor)) {
+    stopifnot(length(x) == length(predictor))
+    return(predictor)
+  }
+
+  if (is.null(groupSize)) return(NULL)
+  stopifnot(length(groupSize) == 1L)
+  stopifnot(groupSize > 1)
+
+  numGroups <- length(x) %/% groupSize
+  group <- rep(seq_len(numGroups), each=groupSize)
+
+  lastGroupSize <- length(x) - length(group)
+  group <- c(group, rep(numGroups+1, lastGroupSize))
+
+  return(as.factor(group))
+}
