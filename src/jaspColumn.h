@@ -6,7 +6,7 @@
 #include <Rcpp.h>
 
 typedef bool			(*shouldEnDecodeFuncDef)	(std::string);
-typedef bool			(*setColumnDataFuncDef)		(std::string, Rcpp::RObject);
+typedef bool			(*setColumnDataFuncDef)		(std::string, Rcpp::RObject, bool);
 typedef columnType		(*getColumnTypeFuncDef)		(std::string);
 typedef int				(*getColumnAnIdFuncDef)		(std::string);
 typedef bool			(*getColumnExistsFDef)		(std::string);
@@ -41,10 +41,10 @@ public:
 	Json::Value	metaEntry()										const	override { return constructMetaEntry("column"); }
 	Json::Value	dataEntry(std::string & errorMessage)			const	override;
 
-	bool 				setScale(			Rcpp::RObject 		scalarData);
-	bool 				setOrdinal(			Rcpp::RObject 		ordinalData);
-	bool 				setNominal(			Rcpp::RObject		nominalData);
-	bool 				setNominalText(		Rcpp::RObject 		nominalData);
+	bool 				setScale(			Rcpp::RObject 		scalarData,		bool computed = false);
+	bool 				setOrdinal(			Rcpp::RObject 		ordinalData,	bool computed = false);
+	bool 				setNominal(			Rcpp::RObject		nominalData,	bool computed = false);
+	bool 				setNominalText(		Rcpp::RObject 		nominalData,	bool computed = false);
 	//void				removeFromData();
 	static bool			columnIsMine(		const std::string & columnName); ///< "Mine" means of analysis that is running
 	static bool			columnExists(		const std::string & columnName) { return getColumnExists(columnName); }
@@ -75,10 +75,10 @@ private:
 	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
 	
 	void				determineTypeTitle();
-	bool				setColumnDataAsScale(		const std::string & encodedColumnName, Rcpp::RObject data	);
-	bool				setColumnDataAsOrdinal(		const std::string & encodedColumnName, Rcpp::RObject data	);
-	bool				setColumnDataAsNominal(		const std::string & encodedColumnName, Rcpp::RObject data	);
-	bool				setColumnDataAsNominalText(	const std::string & encodedColumnName, Rcpp::RObject data	);
+	bool				setColumnDataAsScale(		const std::string & encodedColumnName, Rcpp::RObject data,	bool computed=false);
+	bool				setColumnDataAsOrdinal(		const std::string & encodedColumnName, Rcpp::RObject data,	bool computed=false);
+	bool				setColumnDataAsNominal(		const std::string & encodedColumnName, Rcpp::RObject data,	bool computed=false);
+	bool				setColumnDataAsNominalText(	const std::string & encodedColumnName, Rcpp::RObject data,	bool computed=false);
 	
 	static createColumnFuncDef		_createColumnFunc;
 	static deleteColumnFuncDef		_deleteColumnFunc;
