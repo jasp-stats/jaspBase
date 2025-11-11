@@ -46,6 +46,7 @@
 #' Predictor is ignored in this case.
 #'
 #' The predictor is either taken from the predictor argument, or inferred from the `groupSize` argument.
+#' If both arguments are \code{NULL}, the data is assumed to be in one group (and regressed only on an intercept term).
 #'
 #'
 #'
