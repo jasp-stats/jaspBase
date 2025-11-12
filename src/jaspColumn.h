@@ -104,10 +104,10 @@ class jaspColumn_Interface : public jaspObject_Interface
 public:
 	jaspColumn_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
 
-	bool setScale(		Rcpp::RObject scalarData)	{ return static_cast<jaspColumn*>(myJaspObject)->setScale(scalarData);			}
-	bool setOrdinal(	Rcpp::RObject ordinalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData);		}
-	bool setNominal(	Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
-	bool setNominalText(Rcpp::RObject nominalData)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData);		}
+	bool setScale(		Rcpp::RObject scalarData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setScale(scalarData,		computed);		}
+	bool setOrdinal(	Rcpp::RObject ordinalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(ordinalData,	computed);		}
+	bool setNominal(	Rcpp::RObject nominalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData,	computed);		}
+	bool setNominalText(Rcpp::RObject nominalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(nominalData,	computed);		}
 	//void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
 };
 
