@@ -75,7 +75,7 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 		return false;																	\
 	}																					\
 	else																				\
-		return (*FUNC)(columnName, data);												\
+		return (*FUNC)(columnName, data, computed);												\
 }																						\
 
 bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
