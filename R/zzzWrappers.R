@@ -134,8 +134,8 @@ createJaspState <- function(object = NULL,   dependencies = NULL)
   return(jaspStateR$new(    object = object, dependencies = dependencies))
 
 #' @export
-createJaspColumn <- function(columnName = "",         dependencies = NULL)
-  return(jaspColumnR$new(    columnName = columnName, dependencies = dependencies))
+createJaspColumn <- function(columnName = "",         dependencies = NULL, computed=FALSE)
+  return(jaspColumnR$new(    columnName = columnName, dependencies = dependencies, computed=computed))
 
 #' @export
 createJaspQmlSource <- function(sourceID="", value=NULL, dependencies=NULL)
