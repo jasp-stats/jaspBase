@@ -15,7 +15,7 @@ enDecodeFuncDef			jaspColumn::_decodeFunc							= nullptr;
 shouldEnDecodeFuncDef 	jaspColumn::_shouldEncodeFunc					= nullptr;
 shouldEnDecodeFuncDef	jaspColumn::_shouldDecodeFunc					= nullptr;
 
-jaspColumn::jaspColumn(std::string columnName)
+jaspColumn::jaspColumn(std::string columnName, bool computed)
 	: jaspObject(jaspObjectType::column, "jaspColumn for " + columnName),
 	  _columnName(columnName)
 {
@@ -27,7 +27,7 @@ jaspColumn::jaspColumn(std::string columnName)
 	}
 	else //It isnt an encoded name of an existing column, so it should be a normal human columnname
 	{
-		_encoded = !getColumnExists(_columnName) ? createColumn(columnName) : encode(_columnName);
+		_encoded = !getColumnExists(_columnName) ? createColumn(columnName, computed) : encode(_columnName);
 	}
 	
 	switch(getColumnType(_columnName))
@@ -175,7 +175,7 @@ bool jaspColumn::shouldDecode(const std::string & columnName)
 }
 
 
-std::string jaspColumn::createColumn(const std::string & columnName)
+std::string jaspColumn::createColumn(const std::string & columnName, bool computed)
 {
 	if(!_createColumnFunc) 
 	{
@@ -190,7 +190,7 @@ std::string jaspColumn::createColumn(const std::string & columnName)
 		return encode(columnName);
 	}
 	else
-		return (*_createColumnFunc)(columnName); 
+		return (*_createColumnFunc)(columnName, computed); 
 }
 
 /*void jaspColumn::removeFromData()
@@ -244,7 +244,7 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 	
 	for(const std::string & columnName : colNames)
 		if(!getColumnExists(columnName))
-			result.push_back((*_createColumnFunc)(columnName));
+			result.push_back((*_createColumnFunc)(columnName, false));
 		else
 			result.push_back(encode(columnName));
 

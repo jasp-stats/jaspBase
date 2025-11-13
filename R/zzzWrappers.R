@@ -849,7 +849,7 @@ jaspColumnR <- R6::R6Class(
         stop("You MUST specify a name for the column you want to change the data of", domain = NA)
 
       checkForJaspResultsInit()
-      columnObj <- create_cpp_jaspColumn(columnName)
+      columnObj <- create_cpp_jaspColumn(columnName, computed)
       private$jaspObject <- columnObj
 
       if (!is.null(scalarData))      columnObj$setScale(scalarData,            computed)
