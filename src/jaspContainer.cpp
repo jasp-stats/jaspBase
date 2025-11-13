@@ -115,7 +115,7 @@ std::string jaspContainer::toHtml() const
 
 	out << "</ul>" "\n" "</div>" "\n";
 
-	return out.str();
+	return decodeColumnNames(out.str());
 }
 
 std::vector<std::pair<double, std::string>> jaspContainer::getSortedDataFieldsSortVector() const
