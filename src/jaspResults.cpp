@@ -9,7 +9,6 @@ typedef std::ifstream bifstream;
 #define BREMOVE std::remove //Also not a type
 
 
-
 sendFuncDef			jaspResults::_ipccSendFunc		= nullptr;
 pollMessagesFuncDef jaspResults::_ipccPollFunc		= nullptr;
 std::string			jaspResults::_saveResultsHere	= "";
@@ -84,10 +83,6 @@ jaspResults::jaspResults(Rcpp::String title, Rcpp::RObject oldState)
 {
 	_jaspResults = this;
 
-#ifdef INCLUDE_COLUMN_ENCODING_ETC
-	_extraEncodings	= new ColumnEncoder("JaspExtraOptions_");
-#endif
-
 	if(_RStorageEnv != nullptr)
 		delete _RStorageEnv;
 
@@ -118,11 +113,6 @@ jaspResults::jaspResults(Rcpp::String title, Rcpp::RObject oldState)
 
 jaspResults::~jaspResults()
 {
-#ifdef INCLUDE_COLUMN_ENCODING_ETC
-	delete _extraEncodings;
-	_extraEncodings = nullptr;
-#endif
-
 	if(_RStorageEnv != nullptr)
 		delete _RStorageEnv;
 	
@@ -267,10 +257,6 @@ void jaspResults::setOptions(std::string opts)
 
 	if(_previousOptions != Json::nullValue)
 		pruneInvalidatedData();
-
-#ifdef INCLUDE_COLUMN_ENCODING_ETC
-	setCurrentNamesFromOptionsMeta(_currentOptions);
-#endif
 }
 
 void jaspResults::storeOldResults()

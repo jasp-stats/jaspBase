@@ -5,19 +5,6 @@
 typedef void (*sendFuncDef)(const char *);
 typedef bool (*pollMessagesFuncDef)();
 
-#ifdef JASP_R_INTERFACE_LIBRARY
-#define GUARD_ENCODE_FUNCS(...) throw std::runtime_error("Do not use column encoding from jaspResults when running in JASP!");
-#else
-
-//If you edit any function(signatures) or objects for JASP* Rcpp modules and you want to run it as an R-Package you should run Rcpp::compileAttributes from an R instance started in $PWD/R-Interface/jaspResults
-
-#include "columnencoder.h"
-#define INCLUDE_COLUMN_ENCODING_ETC
-#define GUARD_ENCODE_FUNCS(CODE) CODE
-#endif
-
-
-																									\
 
 class jaspResults : public jaspContainer
 {
@@ -89,15 +76,6 @@ public:
 
 	jaspObject *			getOldObjectFromUniqueNestedNameVector(const std::vector<std::string>& uniqueNames)	override { return _oldResults == nullptr ? nullptr : _oldResults->findObjectWithNestedNameVector(uniqueNames); } ;
 
-
-	void	setCurrentNamesFromOptionsMeta(Json::Value & optionsMeta)		{ GUARD_ENCODE_FUNCS(_extraEncodings->setCurrentNamesFromOptionsMeta(optionsMeta);	) }
-	void	setCurrentColumnNames(const std::vector<std::string> & names) 	{ GUARD_ENCODE_FUNCS(ColumnEncoder::setCurrentColumnNames(names); 					) }
-
-	std::string encodeColumnName(const std::string & in)	{ GUARD_ENCODE_FUNCS(return _extraEncodings->shouldEncode(in) ? _extraEncodings->encode(in) : ColumnEncoder::columnEncoder()->encode(in); ) }
-	std::string decodeColumnName(const std::string & in)	{ GUARD_ENCODE_FUNCS(return _extraEncodings->shouldEncode(in) ? _extraEncodings->decode(in) : ColumnEncoder::columnEncoder()->decode(in); ) }
-	std::string encodeAllColumnNames(const std::string & in){ GUARD_ENCODE_FUNCS(return ColumnEncoder::columnEncoder()->encodeAll(in); ) }
-	std::string decodeAllColumnNames(const std::string & in){ GUARD_ENCODE_FUNCS(return ColumnEncoder::columnEncoder()->decodeAll(in); ) }
-
 private:
 
 	// silences e.g., "./jaspResults.h:36:15: warning: 'jaspResults::dataEntry' hides overloaded virtual function [-Woverloaded-virtual]"
@@ -139,10 +117,6 @@ private:
             _sendingFeedbackInterval		= 1000;
 
     static int _analysisId;
-
-#ifdef INCLUDE_COLUMN_ENCODING_ETC
-	ColumnEncoder	* _extraEncodings		= nullptr;
-#endif
 };
 
 void JASPresultFinalizer(jaspResults * obj);
@@ -173,21 +147,6 @@ public:
 	std::string getStatus()							{ return ((jaspResults*)myJaspObject)->getStatus(); }
 
 	void		prepareForWriting()					{ ((jaspResults*)myJaspObject)->prepareForWriting(); }
-
-	void	setCurrentColumnNames(Rcpp::CharacterVector names)
-	{ 
-		std::vector<std::string> vec;
-
-		for(int row=0; row<names.size(); row++)
-			vec.push_back((std::string)(names[row]));
-
-		((jaspResults*)myJaspObject)->setCurrentColumnNames(vec); 
-	}
-
-	std::string encodeColumnName(	 const std::string & in) {return ((jaspResults*)myJaspObject)->encodeColumnName(in);	 }
-	std::string decodeColumnName(	 const std::string & in) {return ((jaspResults*)myJaspObject)->decodeColumnName(in);	 }
-	std::string encodeAllColumnNames(const std::string & in) {return ((jaspResults*)myJaspObject)->encodeAllColumnNames(in); }
-	std::string decodeAllColumnNames(const std::string & in) {return ((jaspResults*)myJaspObject)->decodeAllColumnNames(in); }
 
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspResults, std::string,	_relativePathKeep, RelativePathKeep)
 };

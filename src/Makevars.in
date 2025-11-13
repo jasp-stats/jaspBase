@@ -2,8 +2,8 @@ CXX_STD = CXX20
 PKG_CXXFLAGS = @cppflags@
 MAKEFLAGS=-j
 
-# Include all C++ files in src/ and jaspColumnEncoder
-SOURCES=@src_sources@ @jaspColumnEncoder_sources@
+# Include all C++ files in src/ and JASP Common sources
+SOURCES=@src_sources@ @jaspCommon_sources@
 
 # Obtain the object files
 OBJECTS=$(SOURCES:.cpp=.o)
