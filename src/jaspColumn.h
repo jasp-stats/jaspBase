@@ -10,7 +10,7 @@ typedef bool			(*setColumnDataFuncDef)		(std::string, Rcpp::RObject, bool);
 typedef columnType		(*getColumnTypeFuncDef)		(std::string);
 typedef int				(*getColumnAnIdFuncDef)		(std::string);
 typedef bool			(*getColumnExistsFDef)		(std::string);
-typedef std::string		(*createColumnFuncDef)		(std::string);
+typedef std::string		(*createColumnFuncDef)		(std::string, bool);
 typedef bool			(*deleteColumnFuncDef)		(std::string);
 typedef std::string		(*enDecodeFuncDef)			(std::string);
 
@@ -28,7 +28,7 @@ class jaspColumn : public jaspObject
 {
 public:
 	jaspColumn();
-	jaspColumn(std::string columnName);
+	jaspColumn(std::string columnName, bool computed=false);
 	
 	const std::string & nameDecoded() const { return _columnName;	}
 	const std::string & nameEncoded() const { return _encoded;		}
@@ -69,7 +69,7 @@ private:
 	static std::string	decode(						const std::string & columnName								);
 	static bool			shouldEncode(				const std::string & columnName								);
 	static bool			shouldDecode(				const std::string & columnName								);
-	static std::string	createColumn(				const std::string & columnName								); ///< Returns encoded columnname
+	static std::string	createColumn(				const std::string & columnName,		bool computed=false		); ///< Returns encoded columnname
 	static bool			getColumnExists(			const std::string & columnName								);
 	static columnType	getColumnType(				const std::string & encodedColumnName						);
 	static int			getColumnAnalysisId(		const std::string & encodedColumnName						);
