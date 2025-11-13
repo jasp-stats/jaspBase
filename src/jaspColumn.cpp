@@ -78,10 +78,10 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 		return (*FUNC)(columnName, data, computed);												\
 }																						\
 
-bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data, bool computed=false) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
-bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data, bool computed=false) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
-bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data, bool computed=false) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
-bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data, bool computed=false) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
+bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
+bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
 
 
 columnType jaspColumn::getColumnType(const std::string & columnName)
