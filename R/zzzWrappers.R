@@ -46,8 +46,13 @@ progressbarTick <- function() {
 # we need to decode all the names for jaspObjects before going to CPP to avoid some problems. This because otherwise some jaspPlots (and others) might contain encoded columnnames. Which breaks plot-resizing-persistence
 #' @export
 decodeName <- function(name) {
-  if(jaspResultsCalledFromJasp())    return(.decodeColNamesLax(name))
-  else                               return(name)
+  if(jaspBase::jaspResultsCalledFromJasp())    {
+  tryCatch(
+    suppressWarnings(return(.getDefaultEnDeCoderFun("decode", FALSE)(name))),
+    error	= function(e) { return(name) }
+  )
+    
+  } else                             return(name)
 }
 
 #' @export
