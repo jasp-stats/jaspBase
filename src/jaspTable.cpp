@@ -411,17 +411,17 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 					pValOri = fmtval[1];
 				}
 				else
-					std::cout << "unknown formatting option '" << fmtval[0] << "'" << std::endl;
+					jaspPrint("unknown formatting option '" + fmtval[0] + "'");
 
 			}
 			catch(std::invalid_argument & e)	{}
 			catch(std::out_of_range & e)		{}
 		}
 	else
-		std::cout << "unknown formatting option '" << f << "'" << std::endl;
+		jaspPrint("unknown formatting option '"+ f + "'");
 
 	if(log10)
-		std::cout << "jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact your local jaspResults-programmer..." << std::endl;
+		jaspPrint("jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact your local jaspResults-programmer...");
 
 	if(prcnt)
 	{
