@@ -255,7 +255,7 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
   fun <- .findFun(defaults[[type]][[method]])
 
   if (!is.function(fun))
-    stop("Could not locate ", type, " function; an analysis won't work correctly unless run inside JASP or jasptools", domain = NA)
+    return(function(inIsOut){return(inIsOut)}) # Instead of complaining we just give it a dummy function
 
   return(fun)
 }
