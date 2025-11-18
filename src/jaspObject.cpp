@@ -60,7 +60,7 @@ void jaspPrint(std::string msg)
 #endif
 }
 
-std::string decodeColumnNames(std::string str)
+std::string decodeColumnNames(const std::string & str)
 {
 	static Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
 	static Rcpp::Function decodeAll = jaspBase["decodeColNames"];
