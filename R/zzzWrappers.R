@@ -46,8 +46,13 @@ progressbarTick <- function() {
 # we need to decode all the names for jaspObjects before going to CPP to avoid some problems. This because otherwise some jaspPlots (and others) might contain encoded columnnames. Which breaks plot-resizing-persistence
 #' @export
 decodeName <- function(name) {
-  if(jaspResultsCalledFromJasp())    return(.decodeColNamesLax(name))
-  else                               return(name)
+  if(jaspBase::jaspResultsCalledFromJasp())    {
+  tryCatch(
+    suppressWarnings(return(.getDefaultEnDeCoderFun("decode", FALSE)(name))),
+    error	= function(e) { return(name) }
+  )
+    
+  } else                             return(name)
 }
 
 #' @export
@@ -347,7 +352,8 @@ jaspOutputObjR <- R6::R6Class(
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
     },
-    toRObject   = function() private$jaspObject$toRObject()
+    toRObject   = function() private$jaspObject$toRObject(),
+    toHtml      = function() private$jaspObject$toHtml()
   ),
   active = list(
     position = function(x) { if (missing(x)) private$jaspObject$position else private$jaspObject$position <- as.numeric(x) },
@@ -537,13 +543,7 @@ jaspResultsR <- R6::R6Class(
         private$jaspObject = private$getJaspObject(x)
       else
         stop("You should not create a new jaspResultsR object!", domain = NA)
-    },
-    #The following functions for column encoding will fail hard when you run them inside JASP, only for R in other words
-    setCurrentColumnNames = function(names) private$jaspObject$setCurrentColumnNames(names),
-    encodeColumnName      = function(input) private$jaspObject$encodeColumnName(input),
-    decodeColumnName      = function(input) private$jaspObject$decodeColumnName(input),
-    encodeAllColumnNames  = function(input) private$jaspObject$encodeAllColumnNames(input),
-    decodeAllColumnNames  = function(input) private$jaspObject$decodeAllColumnNames(input)
+    }
   ),
   private = list(
     children    = list(),

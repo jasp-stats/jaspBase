@@ -234,13 +234,7 @@ RCPP_MODULE(jaspResults)
 
 		.method("prepareForWriting",		&jaspResults_Interface::prepareForWriting,						"Remove seal for writing")
 		.method("finishWriting",			&jaspResults_Interface::finishWriting,							"Set seal for writing")
-		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")
-		
-		.method("setCurrentColumnNames",	&jaspResults_Interface::setCurrentColumnNames,					"setCurrentColumnNames")
-		.method("encodeColumnName",			&jaspResults_Interface::encodeColumnName,						"encodeColumnName")
-		.method("decodeColumnName",			&jaspResults_Interface::decodeColumnName,						"decodeColumnName")
-		.method("encodeAllColumnNames",		&jaspResults_Interface::encodeAllColumnNames,					"encodeAllColumnNames")
-		.method("decodeAllColumnNames",		&jaspResults_Interface::decodeAllColumnNames,					"decodeAllColumnNames")
+		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")		
 	;
 
 	Rcpp::class_<jaspQmlSource_Interface>("jaspQmlSource")

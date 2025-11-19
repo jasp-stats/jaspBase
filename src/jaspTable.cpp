@@ -411,17 +411,17 @@ std::string	jaspTable::getCellFormatted(size_t col, size_t row, size_t maxCol, s
 					pValOri = fmtval[1];
 				}
 				else
-					std::cout << "unknown formatting option '" << fmtval[0] << "'" << std::endl;
+					jaspPrint("unknown formatting option '" + fmtval[0] + "'");
 
 			}
 			catch(std::invalid_argument & e)	{}
 			catch(std::out_of_range & e)		{}
 		}
 	else
-		std::cout << "unknown formatting option '" << f << "'" << std::endl;
+		jaspPrint("unknown formatting option '"+ f + "'");
 
 	if(log10)
-		std::cout << "jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact your local jaspResults-programmer..." << std::endl;
+		jaspPrint("jaspTable doesnt know what to do with the formatting option 'log10', if you DO know, contact your local jaspResults-programmer...");
 
 	if(prcnt)
 	{
@@ -518,9 +518,9 @@ Rcpp::List jaspTable::toRObject()
 		{
 			Rcpp::StringVector values(_data[col].size());
 			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = _data[col][row].asString();
+				values[row] = decodeColumnNames(_data[col][row].asString());
 
-			df[getColName(col)] = values;
+			df[decodeColumnNames(getColName(col))] = values;
 			break;
 		}
 		case jaspTableColumnType::mixed:
@@ -536,7 +536,7 @@ Rcpp::List jaspTable::toRObject()
 				if		(valuesTypes[row] == "number")	valuesData[row] = _data[col][row]["value"].asDouble();
 				else if (valuesTypes[row] == "pvalue")	valuesData[row] = _data[col][row]["value"].asDouble();
 				else if (valuesTypes[row] == "integer")	valuesData[row] = _data[col][row]["value"].asInt();
-				else if (valuesTypes[row] == "string")	valuesData[row] = _data[col][row]["value"].asString();
+				else if (valuesTypes[row] == "string")	valuesData[row] = decodeColumnNames(_data[col][row]["value"].asString());
 
 				if (!_data[col][row]["format"].isNull())
 					valuesFormats[row] = _data[col][row]["format"].asString();
@@ -545,7 +545,7 @@ Rcpp::List jaspTable::toRObject()
 			Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
 			Rcpp::Function createMixedColumn = jaspBase["createMixedColumn"];
 			Rcpp::List values = createMixedColumn(valuesData, valuesTypes, valuesFormats);
-			df[getColName(col)] = values;
+			df[decodeColumnNames(getColName(col))] = values;
 			break;
 		}
 		// this case is probably unnecessary
@@ -559,13 +559,13 @@ Rcpp::List jaspTable::toRObject()
 	}
 
 	df.attr("footnotes")  = _footnotes.toRObject();
-	df.attr("title") = _title;
+	df.attr("title") = decodeColumnNames(_title);
 	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
 
 	std::vector<std::string> rowNames;
 	rowNames.reserve(_data[0].size());
 	for (size_t i = 0; i < _data[0].size(); i++)
-		rowNames.push_back(_rowNames[i] != "" ? _rowNames[i] : std::to_string(i + 1)); // R numbers from 1 to n by default
+		rowNames.push_back(_rowNames[i] != "" ? decodeColumnNames(_rowNames[i]) : std::to_string(i + 1)); // R numbers from 1 to n by default
 
 	df.attr("row.names") = rowNames;
 

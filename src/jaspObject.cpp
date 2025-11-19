@@ -51,12 +51,30 @@ void		setJaspLogFunction(Rcpp::XPtr<logFuncDef> func)
 
 void jaspPrint(std::string msg)
 {
+	msg = decodeColumnNames(msg);
+
 #ifdef JASP_R_INTERFACE_LIBRARY
 	_jaspRCPP_logString(msg + "\n");
 #else
 	Rcpp::Rcout << msg << "\n";
 #endif
 }
+
+std::string decodeColumnNames(const std::string & str)
+{
+	static Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
+	static Rcpp::Function decodeAll = jaspBase["decodeColNames"];
+
+	if (!decodeAll.isNULL())
+	{
+		Rcpp::String decodeStr = decodeAll(str);
+		return decodeStr;
+	}
+
+	return str;
+}
+
+
 
 std::set<jaspObject*> * jaspObject::allocatedObjects = new std::set<jaspObject*>();
 

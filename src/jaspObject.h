@@ -11,6 +11,8 @@ typedef void (*logFuncDef)(const std::string &);
 
 void		setJaspLogFunction( Rcpp::XPtr<logFuncDef> func );
 void		jaspPrint(			std::string msg);
+std::string	decodeColumnNames(const	std::string & str);
+
 
 #define JASPOBJECT_DEFAULT_POSITION 9999
 //#define JASP_RESULTS_DEBUG_TRACES

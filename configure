@@ -1,7 +1,7 @@
-# configure script that automatically downloads jaspColumnEncoder if it is missing.
-# to manual specify a location for jaspColumnEncoder and not download it, do
+# configure script that automatically downloads jasp-desktop/Common if it is missing.
+# to manual specify a location for jasp-desktop/Common and not download it, do
 #
-# options(configure.vars = c(jaspBase = "INCLUDE_DIR='<path>/github/jaspColumnEncoder'"))
+# options(configure.vars = c(jaspBase = "INCLUDE_DIR='<path>/github/jasp-desktop/Common'"))
 # install.packages("jaspBase", ...)
 
 if test -f "/etc/redhat-release" && ! grep -Fq Fedora "/etc/redhat-release"; then
@@ -21,70 +21,69 @@ if [ "$UNAME" = "SunOS" ]; then
 fi
 
 DOWNLOAD_SUCCESS=1
-EXTRA_INFO="Version info is only available when git is available!"
+COMMON_DIR="inst/include/Common"
 
 if [ "${INCLUDE_DIR}" ]; then
 
 	echo "Found INCLUDE_DIR: ${INCLUDE_DIR}"
 	DOWNLOAD_SUCCESS=0
 	PKG_CXXFLAGS="-I\"${INCLUDE_DIR}\""
-	JASPCOLUMNENCODER_DIR="${INCLUDE_DIR}"
-
-	if git --version 2>&1 >/dev/null; then
-
-		if [ -d "${JASPCOLUMNENCODER_DIR}/.git" ]; then
-			EXTRA_INFO="include_dir, git_repo at:  + $(git --git-dir="${JASPCOLUMNENCODER_DIR}/.git" --work-tree="${JASPCOLUMNENCODER_DIR}" log -1 --oneline)"
-		else
-			EXTRA_INFO='include_dir that is not a git repo.'
-		fi
-
-	fi
 
 else
 
-	PKG_CXXFLAGS='-I"../inst/include/jaspColumnEncoder"'
-	JASPCOLUMNENCODER_DIR='../inst/include/jaspColumnEncoder'
+	PKG_CXXFLAGS='-I"../inst/include/Common"'
 	mkdir -p 'inst/include'
 
-	echo "seeing if git is available"
-	if git --version 2>&1 >/dev/null; then
+	COMMON_FILES=(
+		enumutilities.h
+		columntype.h
+		columntype.cpp
+		stringutils.h
+		utils.h
+		utils.cpp
+	)
 
-		if [ -d 'inst/include/jaspColumnEncoder' ] && [ -d 'inst/include/jaspColumnEncoder/.git' ]; then
+	JSON_FILES=(
+		allocator.h
+		assertions.h
+		config.h
+		forwards.h
+		json.h
+		json_features.h
+		json_reader.cpp
+		json_tool.h
+		json_value.cpp
+		json_valueiterator.inl
+		json_writer.cpp
+		reader.h
+		value.h
+		version.h
+		writer.h
+	)
 
-			echo 'Fetching and pulling existing repo'
-			WORK_TREE="$(pwd)/inst/include/jaspColumnEncoder"
-			git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" fetch origin
-			git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" pull
-			DOWNLOAD_SUCCESS=0
-
-		else
-
-			echo 'Cloning c++ dependency jaspColumnEncoder'
-			rm -rf 'inst/include/jaspColumnEncoder'
-			git clone --depth 1 https://github.com/jasp-stats/jaspColumnEncoder.git inst/include/jaspColumnEncoder
-			DOWNLOAD_SUCCESS=0
-
-		fi
-
-		EXTRA_INFO="$(git --git-dir="${WORK_TREE}/.git" --work-tree="${WORK_TREE}" log -1 --oneline)"
-
+	if [ "${GITHUB_JASP_DESKTOP_FILES}" == "" ]; then
+		GITHUB_JASP_DESKTOP_FILES="https://raw.githubusercontent.com/jasp-stats/jasp-desktop/refs/heads/development"
 	fi
 
-	if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
+	rm -rf "${COMMON_DIR}"
+	mkdir -p "${COMMON_DIR}"
+	mkdir -p "${COMMON_DIR}/json"
 
-		echo "seeing if curl is available"
-		if curl --version 2>&1 >/dev/null; then
+	echo "seeing if curl is available"
+	if curl --version 2>&1 >/dev/null; then
 
-			echo 'Downloading jaspColumnEncoder with curl'
+		echo 'Downloading jasp-desktop/Common with curl'
 
-			rm -rf 'inst/include/jaspColumnEncoder'
-			mkdir -p 'inst/include/jaspColumnEncoder'
+		for i in "${COMMON_FILES[@]}"; do
+			curl --silent --output "${COMMON_DIR}/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/${i}"
+		done
 
-			curl --silent --location https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
-			DOWNLOAD_SUCCESS=$?
-			EXTRA_INFO="curl was used to download jaspColumnEncoder, no version info is available."
+		for i in "${JSON_FILES[@]}"; do
+			curl --silent --output "${COMMON_DIR}/json/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/json/${i}"
+		done
 
-		fi
+		DOWNLOAD_SUCCESS=$?
+
 	fi
 
 	if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
@@ -92,42 +91,42 @@ else
 		echo "seeing if wget is available"
 		if wget --version 2>&1 >/dev/null; then
 
-			echo 'Downloading jaspColumnEncoder with wget'
+			echo 'Downloading jasp-desktop/Common with wget'
 
-			rm -rf 'inst/include/jaspColumnEncoder'
-			mkdir -p 'inst/include/jaspColumnEncoder'
+			for i in "${COMMON_FILES[@]}"; do
+				wget --quiet -O "${COMMON_DIR}/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/${i}"
+			done
 
-			wget --quiet --output-document=- https://api.github.com/repos/jasp-stats/jaspColumnEncoder/tarball | tar xz --strip=1 --directory inst/include/jaspColumnEncoder
+			for i in "${JSON_FILES[@]}"; do
+				wget --quiet -O "${COMMON_DIR}/json/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/json/${i}"
+			done
+
 			DOWNLOAD_SUCCESS=$?
-			EXTRA_INFO="wget was used to download jaspColumnEncoder, no version info is available."
 
 		fi
 	fi
 fi
 
 if [ "${DOWNLOAD_SUCCESS}" -ne "0" ]; then
-	printf "Installing jaspBase failed because the required C++ dependency jaspColumnEncoder is missing.\n\
+	printf "Installing jaspBase failed because the required C++ dependency jasp-desktop/Common is missing.\n\
 Normally this is downloaded automatically if either git, curl, or wget is available, but apparently this failed.\n\
-Either download \"https://github.com/jasp-stats/jaspColumnEncoder\" manually and specify the path through configure.args,\
+Either download \"https://github.com/jasp-stats/jasp-desktop/Common\" manually and specify the path through configure.args,\
 download git, or download curl.\n\
-If you're specifying configure.args manually, note that you must provide the location of jaspColumnEncoder and the\
-location of the parent directory (e.g., the default is '-I\"../inst/include/jaspColumnEncoder\" -I\"../inst/include\"'))
+If you're specifying configure.args manually, note that you must provide the location of jasp-desktop/Common and the\
+location of the parent directory (e.g., the default is '-I\"../inst/include/jasp-desktop/Common\" -I\"../inst/include\"'))
 "
 	exit 1
 fi
 
 SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
-JASPCOLUMNENCODER_SOURCES="${JASPCOLUMNENCODER_DIR}/columnencoder.cpp ${JASPCOLUMNENCODER_DIR}/columntype.cpp"
+JASPCOMMON_SOURCES="../${COMMON_DIR}/columntype.cpp"
 
-#add the define if JASP_R_INTERFACE_LIBRARY env var says anything at all
 if [ "${JASP_R_INTERFACE_LIBRARY}" != "" ]; then
-	PKG_CXXFLAGS=-DJASP_R_INTERFACE_LIBRARY\ -DRCPP_NO_SUGAR\ ${PKG_CXXFLAGS}
-else
-	PKG_CXXFLAGS=-DRCPP_NO_SUGAR\ ${PKG_CXXFLAGS}
+	PKG_CXXFLAGS=-DJASP_R_INTERFACE_LIBRARY\ ${PKG_CXXFLAGS}
 fi
 
-sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspColumnEncoder_sources@|${JASPCOLUMNENCODER_SOURCES}|" src/Makevars.in > src/Makevars
-sed -e "s|@extrainfo@|${EXTRA_INFO}|" inst/jaspColumnEncoderVersion.R.in > R/jaspColumnEncoderVersion.R
+PKG_CXXFLAGS=-DRCPP_NO_SUGAR\ ${PKG_CXXFLAGS}
 
+sed -e "s|@cppflags@|${PKG_CXXFLAGS}|" -e "s|@src_sources@|${SRC_SOURCES}|" -e "s|@jaspCommon_sources@|${JASPCOMMON_SOURCES}|" src/Makevars.in > src/Makevars
 
 exit 0
