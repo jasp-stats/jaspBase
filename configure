@@ -34,34 +34,11 @@ else
 	PKG_CXXFLAGS='-I"../inst/include/Common"'
 	mkdir -p 'inst/include'
 
-	COMMON_FILES=(
-		enumutilities.h
-		columntype.h
-		columntype.cpp
-		stringutils.h
-		utils.h
-		utils.cpp
-	)
+	COMMON_FILES="enumutilities.h columntype.h columntype.cpp stringutils.h utils.h utils.cpp"
 
-	JSON_FILES=(
-		allocator.h
-		assertions.h
-		config.h
-		forwards.h
-		json.h
-		json_features.h
-		json_reader.cpp
-		json_tool.h
-		json_value.cpp
-		json_valueiterator.inl
-		json_writer.cpp
-		reader.h
-		value.h
-		version.h
-		writer.h
-	)
+	JSON_FILES="allocator.h assertions.h config.h forwards.h json.h json_features.h json_reader.cpp json_tool.h json_value.cpp json_valueiterator.inl json_writer.cpp reader.h value.h version.h writer.h"
 
-	if [ "${GITHUB_JASP_DESKTOP_FILES}" == "" ]; then
+	if [ "${GITHUB_JASP_DESKTOP_FILES}" = "" ]; then
 		GITHUB_JASP_DESKTOP_FILES="https://raw.githubusercontent.com/jasp-stats/jasp-desktop/refs/heads/development"
 	fi
 
@@ -74,11 +51,11 @@ else
 
 		echo 'Downloading jasp-desktop/Common with curl'
 
-		for i in "${COMMON_FILES[@]}"; do
+		for i in ${COMMON_FILES}; do
 			curl --silent --output "${COMMON_DIR}/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/${i}"
 		done
 
-		for i in "${JSON_FILES[@]}"; do
+		for i in ${JSON_FILES}; do
 			curl --silent --output "${COMMON_DIR}/json/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/json/${i}"
 		done
 
@@ -93,11 +70,11 @@ else
 
 			echo 'Downloading jasp-desktop/Common with wget'
 
-			for i in "${COMMON_FILES[@]}"; do
+			for i in ${COMMON_FILES}; do
 				wget --quiet -O "${COMMON_DIR}/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/${i}"
 			done
 
-			for i in "${JSON_FILES[@]}"; do
+			for i in ${JSON_FILES}; do
 				wget --quiet -O "${COMMON_DIR}/json/${i}" "${GITHUB_JASP_DESKTOP_FILES}/Common/json/${i}"
 			done
 
