@@ -141,12 +141,16 @@ void jaspPlot::renderPlot()
 			if (_interactive)
 			{
 				if(writeResult.containsElementNamed("interactiveConvertError"))
+				{
 					_interactiveConvertError = Rcpp::as<std::string>(writeResult["interactiveConvertError"]);
+					_interactiveJsonData = "";
+				}
 				else if (writeResult.containsElementNamed("interactiveJsonData"))
 				{
-					std::string interactiveJsonDataStr = Rcpp::as<Rcpp::String>(writeResult["interactiveJsonData"]);
-					_interactiveJsonData = Json::objectValue;
-					Json::Reader().parse(interactiveJsonDataStr, _interactiveJsonData);
+					std::string interactiveJsonDataStr = Rcpp::as<std::string>(writeResult["interactiveJsonData"]);
+					_interactiveJsonData = interactiveJsonDataStr;
+					//Json::Reader().parse(interactiveJsonDataStr, _interactiveJsonData);
+					_interactiveConvertError = "";
 				}
 				else
 					_interactiveConvertError = "Unknown error converting interactive plot to JSON";
@@ -271,7 +275,7 @@ void jaspPlot::convertFromJSON_SetFields(Json::Value in)
 
 	_interactive				= in.get("interactive", 				false).asBool();
 	_interactiveConvertError	= in.get("interactiveConvertError", 	"").asString();
-	_interactiveJsonData		= in.get("interactiveJsonData", 		Json::nullValue);
+	_interactiveJsonData		= in.get("interactiveJsonData", 		"").asString();
 
 	setUserPlotChangesFromRStateObject();
 
