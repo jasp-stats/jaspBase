@@ -499,8 +499,12 @@ void jaspResults::addPlotPathsForKeepFromJaspObject(jaspObject * obj, Rcpp::List
 	if(obj->getType() == jaspObjectType::plot)
 	{
 		jaspPlot * plot = (jaspPlot*)obj;
+		
 		if(plot->_filePathPng != "")
 			pngPlotPaths.push_back(plot->_filePathPng);
+
+		if(plot->_interactiveJsonData != "")
+			pngPlotPaths.push_back(plot->_interactiveJsonData);
 	}
 
 	for(auto c : obj->getChildren())

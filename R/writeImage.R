@@ -122,6 +122,31 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
   image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
 
+print("Trying to do the interactive thing now")
+  image[["interactive"]] <- ggplot2::is.ggplot(plot)
+  if (image[["interactive"]] ) {
+
+    jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
+
+    if (exists(".fromRCPP")) {
+        
+        if(inherits(jsonOrTryError, "try-error")) {
+          image[["interactiveConvertError"]] = gettextf("The following error occured while converting a ggplot to plotly: %s", jsonOrTryError$message)
+        }
+        else {
+          locationPlotly  <- .fromRCPP(".requestTempFileNameNative", "json")
+          fullPathPlotly  <- paste(locationPlotly$root, locationPlotly$relativePath, sep="/")
+          plotlyJsonFile  <- file(fullPathPlotly)
+          writeLines(jsonOrTryError, plotlyJsonFile)
+          close(plotlyJsonFile)
+
+          image[["interactiveJsonData"]] <- locationPlotly$relativePath
+        }
+    }
+
+    
+  }
+
   return(image)
 }
 

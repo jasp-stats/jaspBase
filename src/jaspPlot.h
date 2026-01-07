@@ -13,10 +13,13 @@ public:
 				_height,
 				_revision = 0;
 	bool		_editing = false,
-				_resizedByUser = false;
+				_resizedByUser = false,
+				_interactive = false;
 	std::string	_filePathPng,
 				_status = "waiting",
-				_envName;
+				_envName,
+				_interactiveConvertError = "",
+				_interactiveJsonData = "";
 	Json::Value _editOptions = Json::nullValue;
 
 	///For safekeeping (aka state replacement?)
