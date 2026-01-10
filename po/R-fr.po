@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-12-17 03:40\n"
+"POT-Creation-Date: 2026-01-10 03:55\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/jasp/jaspbase/fr/"
@@ -135,6 +135,12 @@ msgstr ""
 
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "Impossible de trouver le message pour la classe %1$s et le type %2$s"
+
+#, fuzzy
+msgid "The following error occured while converting a ggplot to plotly: %s"
+msgstr ""
+"Le(s) problème(s) suivant(s) se sont produits lors de l'exécution de "
+"l'analyse :"
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "registerFonts a été appelé mais resultFont n'existe pas !"

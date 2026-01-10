@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.20.4\n"
-"POT-Creation-Date: 2025-11-22 03:45\n"
+"POT-Creation-Date: 2026-01-10 03:55\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,4 +80,7 @@ msgid "For all tests, the alternative hypothesis specifies that the proportion i
 msgstr ""
 
 msgid "Could not find message for class %1$s and type %2$s"
+msgstr ""
+
+msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr ""

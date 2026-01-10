@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2022-12-17 03:40\n"
+"POT-Creation-Date: 2026-01-10 03:55\n"
 "PO-Revision-Date: 2023-11-20 23:04+0000\n"
 "Last-Translator: rania rahida <raniarahida3@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -30,9 +30,9 @@ msgid ""
 "problem, please report the message above at: https://jasp-stats.org/bug-"
 "reports"
 msgstr ""
-"Analisis ini dihentikan secara tidak terduga. %s Untuk mendapatkan bantuan atas "
-"masalah ini, silakan laporkan pesan di atas di: https://jasp-stats.org/bug-"
-"reports"
+"Analisis ini dihentikan secara tidak terduga. %s Untuk mendapatkan bantuan "
+"atas masalah ini, silakan laporkan pesan di atas di: https://jasp-stats.org/"
+"bug-reports"
 
 #, fuzzy
 msgid "Infinity found in %s"
@@ -115,6 +115,10 @@ msgstr ""
 
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr ""
+
+#, fuzzy
+msgid "The following error occured while converting a ggplot to plotly: %s"
+msgstr "Masalah berikut ini terjadi saat menjalankan analisis:"
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "registerFonts dipanggil tetapi resultFont tidak ada!"

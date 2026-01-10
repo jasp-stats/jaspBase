@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.20.4\n"
-"POT-Creation-Date: 2025-11-22 03:45\n"
+"POT-Creation-Date: 2026-01-10 03:55\n"
 "PO-Revision-Date: 2026-01-02 22:01+0000\n"
 "Last-Translator: Zev Oster <zevelijah@gmail.com>\n"
-"Language-Team: Tibetan <https://hosted.weblate.org/projects/jasp/jaspbase/"
-"bo/>\n"
+"Language-Team: Tibetan <https://hosted.weblate.org/projects/jasp/jaspbase/bo/"
+">\n"
 "Language: bo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -30,10 +30,13 @@ msgid "after grouping on %s"
 msgstr "%s ལ་ཚོགས་སྒྲིག་བྱས་རྗེས།"
 
 #, fuzzy
-msgid "This analysis terminated unexpectedly. %s To receive assistance with this problem, please report the message above at: https://jasp-stats.org/bug-reports"
+msgid ""
+"This analysis terminated unexpectedly. %s To receive assistance with this "
+"problem, please report the message above at: https://jasp-stats.org/bug-"
+"reports"
 msgstr ""
-"དབྱེ་ཞིབ་འདི་རེ་བ་མ་བྱས་པར་མཇུག་བསྒྲིལ། %s གནད་དོན་འདི་ལ་རོགས་རམ་ཐོབ་པར་གོང་གི་གནས་ཚུལ་འདི་ལ་སྙན"
-"་ཞུ་བྱེད་རོགས། https://jasp-stats.org/bug-reports"
+"དབྱེ་ཞིབ་འདི་རེ་བ་མ་བྱས་པར་མཇུག་བསྒྲིལ། %s གནད་དོན་འདི་ལ་རོགས་རམ་ཐོབ་པར་གོང་གི་གནས་ཚུལ་འདི་ལ་"
+"སྙན་ཞུ་བྱེད་རོགས། https://jasp-stats.org/bug-reports"
 
 #, fuzzy
 msgid "Infinity found in %s"
@@ -52,29 +55,36 @@ msgid "Number of observations is %1$s in %2$s"
 msgstr "%2$s ནང་ལྟ་ཞིབ་གྲངས་གནས་ཀྱི་གྲངས་ནི་ %1$s ཡིན།"
 
 #, fuzzy
-msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
-msgstr ""
-"སྡོམ་རྩིས་ཡིད་རྟོན་རུང་བར་བརྩི་མི་ཐུབ།: %2$s ནང་ལྟ་ཞིབ་གྲངས་གནས་ཀྱི་གྲངས་ནི་ %1$s ཡིན།"
+msgid ""
+"Cannot compute statistic reliably: number of observations is %1$s in %2$s"
+msgstr "སྡོམ་རྩིས་ཡིད་རྟོན་རུང་བར་བརྩི་མི་ཐུབ།: %2$s ནང་ལྟ་ཞིབ་གྲངས་གནས་ཀྱི་གྲངས་ནི་ %1$s ཡིན།"
 
 #, fuzzy
 msgid "Values in %1$s outside interval [%2$s, %3$s]"
 msgstr "%1$s ནང་གི་རིན་ཐང་དེ་ [%2$s, %3$s] བར་མཚམས་ཕྱི་རོལ་དུ་ཡོད།"
 
 #, fuzzy
-msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."
+msgid ""
+"Dataset is not a proper variance-covariance matrix. Please load only a "
+"positive definite symmetrical matrix as your dataset."
 msgstr ""
 "གྲངས་གནས་ཚོགས་པ་ནི་འགྱུར་ཚད་-མཉམ་འགྱུར་ཚད་ཀྱི་ matrix ཡང་དག་པ་ཞིག་མིན། ཁྱེད་ཀྱི་གྲངས་གནས་ཚོགས་"
 "པ་ནི་ positive definite symmetrical matrix ཁོ་ན་འཇུག་རོགས།"
 
 #, fuzzy
-msgid "The variance-covariance matrix of the supplied data is not positive-definite. Please check if variables have many missings observations or are collinear"
+msgid ""
+"The variance-covariance matrix of the supplied data is not positive-"
+"definite. Please check if variables have many missings observations or are "
+"collinear"
 msgstr ""
 "མཁོ་སྤྲོད་བྱས་པའི་གྲངས་གནས་ཀྱི་འགྱུར་ཚད་-མཉམ་འགྱུར་ཚད་ཀྱི་ matrix ནི་ positive-definite མིན། "
 "འགྱུར་གྲངས་དག་ལ་ལྟ་ཞིབ་གྲངས་གནས་མང་པོ་ཆད་པ་ཡོད་མེད་དམ་ཡང་ན་ collinear ཡིན་མིན་ཞིབ་བཤེར་བྱེད་"
 "རོགས།"
 
 #, fuzzy
-msgid "Main effects and lower-order interactions must be included whenever the corresponding higher-order interaction is included"
+msgid ""
+"Main effects and lower-order interactions must be included whenever the "
+"corresponding higher-order interaction is included"
 msgstr ""
 "གལ་ཏེ་ higher-order interaction འདུས་ཡོད་ན། main effects དང་ lower-order "
 "interactions ངེས་པར་དུ་འདུས་དགོས།"
@@ -92,18 +102,25 @@ msgid "Duplicate variables encountered in %s"
 msgstr "%s ནང་འགྱུར་གྲངས་ཟློས་པ་འཕྲད།"
 
 #, fuzzy
-msgid "Over %s%% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue."
+msgid ""
+"Over %s%% of the rows consist entirely of missing values. Please remove "
+"these rows from the data set if you wish to continue."
 msgstr ""
 "ཐིག་ཕྲེང་གི་ %s%% ལས་བརྒལ་བ་ཆད་པའི་རིན་ཐང་ཁོ་ན་ལས་གྲུབ་ཡོད། གལ་ཏེ་ཁྱེད་ཀྱིས་མུ་མཐུད་འདོད་ན། གྲངས་"
 "གནས་ཚོགས་པ་ནས་ཐིག་ཕྲེང་འདི་དག་སུབ་རོགས།"
 
 #, fuzzy
-msgid "Levene's test is significant (p < .05), suggesting a violation of the equal variance assumption"
+msgid ""
+"Levene's test is significant (p < .05), suggesting a violation of the equal "
+"variance assumption"
 msgstr ""
 "Levene's test གལ་ཆེན་ཡིན། (p < .05) འདིས་འགྱུར་ཚད་མཚུངས་པའི་ཆ་འཇོག་ལ་འགལ་བ་ཡོད་པར་བསྟན།"
 
 #, fuzzy
-msgid "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
+msgid ""
+"Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the "
+"maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> "
+"log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
 "Vovk-Sellke Maximum <em>p</em>-Ratio: <em>p</em>-value ལ་གཞིགས་ན། H%1$s ལ་རྒྱབ་"
 "སྐྱོར་བྱེད་པའི་མང་ཤོས་ཀྱི་སྲིད་ཕྱོད་དེ་ H%2$s ལས་ <em>p</em> %3$s .37 ཆེད་དུ་ 1/(-e <em>p</"
@@ -114,15 +131,23 @@ msgid "Proportions tested against value: %s"
 msgstr "རིན་ཐང་དང་བསྡུར་ནས་ཚོད་ལྟ་བྱས་པའི་བསྡུར་ཚད།: %s"
 
 #, fuzzy
-msgid "For all tests, the alternative hypothesis specifies that the proportion is less than %s"
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"less than %s"
 msgstr ""
 "ཚོད་ལྟ་ཚང་མའི་ཆེད་དུ། གཞན་པའི་ཚོད་དཔག་གིས་བསྡུར་ཚད་དེ་ %s ལས་ཆུང་བ་ཡིན་པར་གསལ་བཀོད་བྱེད།"
 
 #, fuzzy
-msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
+msgid ""
+"For all tests, the alternative hypothesis specifies that the proportion is "
+"greater than %s"
 msgstr ""
 "ཚོད་ལྟ་ཚང་མའི་ཆེད་དུ། གཞན་པའི་ཚོད་དཔག་གིས་བསྡུར་ཚད་དེ་ %s ལས་ཆེ་བ་ཡིན་པར་གསལ་བཀོད་བྱེད།"
 
 #, fuzzy
 msgid "Could not find message for class %1$s and type %2$s"
 msgstr "class %1$s དང་ type %2$s གི་ཆེད་དུ་གནས་ཚུལ་མ་རྙེད།"
+
+#, fuzzy
+msgid "The following error occured while converting a ggplot to plotly: %s"
+msgstr "དབྱེ་ཞིབ་བྱེད་སྐབས་གནད་དོན་འདི་དག་བྱུང་།:"
