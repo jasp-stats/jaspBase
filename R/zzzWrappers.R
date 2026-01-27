@@ -730,7 +730,7 @@ jaspTableR <- R6::R6Class(
           stop("type must be ", paste0("`", permittedTypes, "`", collapse = ", "), " (provided type: `", type, "`)", domain = NA)
 
         if (is.null(format) && type == "number")
-          format <- "dp:3"
+          format <- "sf:4;dp:3"
         else if (type == "pvalue")
           format <- "dp:3;p:.001"
       }
