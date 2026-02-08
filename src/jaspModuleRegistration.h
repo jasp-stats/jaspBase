@@ -96,9 +96,10 @@ RCPP_MODULE(jaspResults)
 
 		.property("plotObject",		&jaspPlot_Interface::getPlotObject,		&jaspPlot_Interface::setPlotObject,		"Stores the plotObj used to generate the graphic, will (should) be stored in a way that is later accesible to saveImage an editImage.")
 
-		.property("editing",		&jaspPlot_Interface::getEditing,		&jaspPlot_Interface::setEditing,		"If set to true will overwrite current png file when rendering a plot.")
-		.property("resizedByUser",	&jaspPlot_Interface::getResizedByUser,	&jaspPlot_Interface::setResizedByUser,	"If set to true, a user resized the plot and its width and height may be recycled in future runs of this analysis.")
-		.property("revision",		&jaspPlot_Interface::getRevision,												"return the current revision of the plot.")
+		.property("editing",			&jaspPlot_Interface::getEditing,				&jaspPlot_Interface::setEditing,				"If set to true will overwrite current png file when rendering a plot.")
+		.property("resizedByUser",		&jaspPlot_Interface::getResizedByUser,	&jaspPlot_Interface::setResizedByUser,	"If set to true, a user resized the plot and its width and height may be recycled in future runs of this analysis.")
+		.property("revision",			&jaspPlot_Interface::getRevision,																								"return the current revision of the plot.")
+		.property("interactiveJsonData",	&jaspPlot_Interface::getInteractiveJsonData,													"Returns the relative path to the interactive plotly JSON data file.")
 	;
 
 	JASPLIST_MODULE_EXPORT(jaspStringlist_Interface,	"jaspStringlist")
@@ -189,7 +190,7 @@ RCPP_MODULE(jaspResults)
 		.property("class",			&jaspHtml_Interface::getClass,			&jaspHtml_Interface::setClass,			"The Css-class of this element, for monospace one could use jasp-code or simply leave it empty.")
 		.property("maxWidth",		&jaspHtml_Interface::getMaxWidth,		&jaspHtml_Interface::setMaxWidth,		"The Css-max-width property. It will be set on a span around your html.")
 	;
-	
+
 	Rcpp::class_<jaspReport_Interface>("jaspReport")
 		.derives<jaspObject_Interface>("jaspObject")
 		.property("text",			&jaspReport_Interface::getText,			&jaspReport_Interface::setText,			"The text of this element")
@@ -234,7 +235,7 @@ RCPP_MODULE(jaspResults)
 
 		.method("prepareForWriting",		&jaspResults_Interface::prepareForWriting,						"Remove seal for writing")
 		.method("finishWriting",			&jaspResults_Interface::finishWriting,							"Set seal for writing")
-		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")		
+		.method("saveResults",				&jaspResults_Interface::saveResults,							"save results")
 	;
 
 	Rcpp::class_<jaspQmlSource_Interface>("jaspQmlSource")
