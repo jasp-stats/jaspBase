@@ -26,7 +26,7 @@ openGrDevice <- function(...) {
   ragg::agg_png(...)
 }
 
-writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, relativePathpng = NULL, ppi = 300, backgroundColor = "white",
+writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, relativePathpng = NULL, relativePathJson = NULL, ppi = 300, backgroundColor = "white",
                                   location = getImageLocation(), oldPlotInfo = list()) {
   # Set values from JASP'S Rcpp when available
   if (exists(".fromRCPP")) {
@@ -132,7 +132,12 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
         if (isTryError(jsonOrTryError)) {
           image[["interactiveConvertError"]] = gettextf("The following error occured while converting a ggplot to plotly: %s", .extractErrorMessage(jsonOrTryError))
         } else {
-          locationPlotly  <- .fromRCPP(".requestTempFileNameNative", "json")
+
+          if (!is.null(relativePathJson) && nzchar(relativePathJson)) {
+            locationPlotly <- list(root = location$root, relativePath = relativePathJson)
+          } else {
+            locationPlotly <- .fromRCPP(".requestTempFileNameNative", "json")
+          }
           fullPathPlotly  <- paste(locationPlotly$root, locationPlotly$relativePath, sep="/")
           plotlyJsonFile  <- file(fullPathPlotly)
           on.exit(close(plotlyJsonFile), add = TRUE)

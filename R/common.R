@@ -1122,6 +1122,7 @@ editImage <- function(name, optionsJson) {
         jaspPlotCPP$plotObject <- newPlot
 
     }
+    interactiveJsonData <- jaspPlotCPP$interactiveJsonData
     revision <- jaspPlotCPP$revision
 
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
@@ -1140,7 +1141,8 @@ editImage <- function(name, optionsJson) {
       height   = height,
       revision = revision,
       error    = FALSE,
-      editOptions = jaspGraphs::plotEditingOptions(plot)
+      editOptions         = jaspGraphs::plotEditingOptions(plot),
+      interactiveJsonData = interactiveJsonData
     )
   )
 

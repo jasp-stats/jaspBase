@@ -98,7 +98,7 @@ void jaspPlot::renderPlot()
 		{
 			oldPlotInfo = Rcpp::List();
 			_revision++;
-			writeResult = tryToWriteImage(Rcpp::_["width"] = _width, Rcpp::_["height"] = _height, Rcpp::_["plot"] = obj, Rcpp::_["oldPlotInfo"] = oldPlotInfo, Rcpp::_["relativePathpng"] = _filePathPng);
+			writeResult = tryToWriteImage(Rcpp::_["width"] = _width, Rcpp::_["height"] = _height, Rcpp::_["plot"] = obj, Rcpp::_["oldPlotInfo"] = oldPlotInfo, Rcpp::_["relativePathpng"] = _filePathPng, Rcpp::_["relativePathJson"] = Rcpp::String(_interactiveJsonData));
 		}
 		else
 		{
