@@ -173,12 +173,35 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
   # alternatively, those edge cases will need to be handled by the developer.
-  labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
-  for (i in seq_along(labels))
-    if (!is.null(labels[[i]]))
-      labels[[i]] <- decodeColNames(labels[[i]])
+  if (packageVersion("ggplot2") < "4.0.0") {
+    labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
+    for (i in seq_along(labels))
+      if (!is.null(labels[[i]]))
+        labels[[i]] <- decodeColNames(labels[[i]])
+    x$labels <- labels
+  } else {
+    currentGuides <- x@guides
 
-  x$labels <- labels
+    .makeDecodedAxisGuide <- function(axisName) {
+      existing <- currentGuides$guides[[axisName]]
+      title    <- existing$params$title
+      newTitle <- if (is.null(title) || ggplot2::is.waive(title)) {
+        decodeColNames
+      } else if (is.character(title)) {
+        decodeColNames(title)
+      } else if (is.function(title)) {
+        function(t) decodeColNames(title(t))
+      } else {
+        decodeColNames
+      }
+      ggplot2::guide_axis(title = newTitle)
+    }
+
+    x <- x + ggplot2::guides(
+      x = .makeDecodedAxisGuide("x"),
+      y = .makeDecodedAxisGuide("y"),
+    )
+  }
   if (returnGrob) {
     grDevices::png(f <- tempfile())
     on.exit({
