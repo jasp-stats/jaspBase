@@ -184,22 +184,29 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
 
     .makeDecodedAxisGuide <- function(axisName) {
       existing <- currentGuides$guides[[axisName]]
-      title    <- existing$params$title
-      newTitle <- if (is.null(title) || ggplot2::is.waive(title)) {
-        decodeColNames
-      } else if (is.character(title)) {
-        decodeColNames(title)
-      } else if (is.function(title)) {
-        function(t) decodeColNames(title(t))
+      if (is.character(existing)) {
+        newTitle <- decodeColNames
       } else {
-        decodeColNames
+        title    <- existing$params$title
+        newTitle <- if (is.null(title) || ggplot2::is_waiver(title)) {
+          decodeColNames
+        } else if (is.character(title)) {
+          decodeColNames(title)
+        } else if (is.function(title)) {
+          function(t) decodeColNames(title(t))
+        } else {
+          decodeColNames
+        }
       }
       ggplot2::guide_axis(title = newTitle)
     }
 
     x <- x + ggplot2::guides(
-      x = .makeDecodedAxisGuide("x"),
-      y = .makeDecodedAxisGuide("y"),
+      x     = .makeDecodedAxisGuide("x"),
+      y     = .makeDecodedAxisGuide("y"),
+      color = .makeDecodedAxisGuide("color"),
+      fill  = .makeDecodedAxisGuide("fill"),
+      shape = .makeDecodedAxisGuide("shape"),
     )
   }
   if (returnGrob) {
