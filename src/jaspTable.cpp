@@ -821,7 +821,7 @@ void jaspTable::rectangularDataWithNamesToString(std::stringstream & out, std::s
 		else if(topNames[row].size() < vierkant[0][row].size())
 			stringExtend(topNames[row], vierkant[0][row].size());
 
-	size_t extraSpaceSide = sideNames[0].size() + sideOvertitleSpace;
+	size_t extraSpaceSide = (sideNames.size() > 0 ? sideNames[0].size() : 0) + sideOvertitleSpace;
 
 	//lets print the topOvertitles
 	{
@@ -874,7 +874,7 @@ void jaspTable::rectangularDataWithNamesToString(std::stringstream & out, std::s
 	{
 		//put the side overtitle here
 		out << colSep.str();
-		out << prefix << sideOvertitleRow[col] << sideNames[col] << "  | ";
+		out << prefix << (col < sideOvertitleRow.size() ? sideOvertitleRow[col] : "") << (col < sideNames.size() ? sideNames[col] : "") << "  | ";
 
 		for(size_t row=0; row<vierkant[col].size(); row++)
 			out << (row>0? " | " : "") << vierkant[col][row];
