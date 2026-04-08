@@ -190,7 +190,7 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   } else {
     currentGuides <- x@guides
 
-    .makeDecodedAxisGuide <- function(axisName) {
+    .makeDecodedGuide <- function(axisName, positional = TRUE) {
       existing <- currentGuides$guides[[axisName]]
       if (is.character(existing)) {
         newTitle <- decodeColNames
@@ -206,15 +206,20 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
           decodeColNames
         }
       }
-      ggplot2::guide_axis(title = newTitle)
+
+      if (positional) {
+        ggplot2::guide_axis(title = newTitle)
+      } else {
+        ggplot2::guide_legend(title = newTitle)
+      }
     }
 
     x <- x + ggplot2::guides(
-      x     = .makeDecodedAxisGuide("x"),
-      y     = .makeDecodedAxisGuide("y"),
-      color = .makeDecodedAxisGuide("color"),
-      fill  = .makeDecodedAxisGuide("fill"),
-      shape = .makeDecodedAxisGuide("shape"),
+      x     = .makeDecodedGuide("x",      positional = TRUE),
+      y     = .makeDecodedGuide("y",      positional = TRUE),
+      colour = .makeDecodedGuide("colour", positional = FALSE),
+      fill  = .makeDecodedGuide("fill",   positional = FALSE),
+      shape = .makeDecodedGuide("shape",  positional = FALSE)
     )
   }
   if (returnGrob) {
