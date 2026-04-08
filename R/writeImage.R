@@ -123,12 +123,12 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
 
   image[["interactive"]] <- ggplot2::is.ggplot(plot)
-  if (image[["interactive"]] ) {
+  if (image[["interactive"]] )
+    tryCatch(
+    {
+      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
 
-    jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
-
-    if (exists(".fromRCPP")) {
-
+      if (exists(".fromRCPP")) {
         if (isTryError(jsonOrTryError)) {
           image[["interactiveConvertError"]] = gettextf("The following error occured while converting a ggplot to plotly: %s", .extractErrorMessage(jsonOrTryError))
         } else {
@@ -143,13 +143,21 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
           on.exit(close(plotlyJsonFile), add = TRUE)
           writeLines(jsonOrTryError, plotlyJsonFile)
 
-          image[["interactiveJsonData"]] <- locationPlotly$relativePath
+          if(file.exists(fullPathPlotly)) {
+            image[["interactiveJsonData"]] <- locationPlotly$relativePath
+          }
+          else
+          {
+            image[["interactiveJsonData"]]      <- ""
+            image[["interactiveConvertError"]]  <- gettext("No interactive plot generated...")
+          }
         }
-    }
-
-
-  }
-
+      }
+    },
+    error	= function(e) {
+      image[["interactiveConvertError"]]  <- e
+    })
+  
   return(image)
 }
 
