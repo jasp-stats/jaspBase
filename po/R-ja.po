@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -125,6 +125,9 @@ msgstr "クラス %1$s およびタイプ %2$s のメッセージが見つかり
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "分析の実行中に次の問題が発生しました:"
+
+msgid "No interactive plot generated..."
+msgstr ""
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "registerFontsが呼び出されましたが、resultFontが存在しません!"

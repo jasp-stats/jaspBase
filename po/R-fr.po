@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2022-10-07 06:06+0000\n"
 "Last-Translator: JASP Stats <b.boutin@uva.nl>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/jasp/jaspbase/fr/"
@@ -141,6 +141,9 @@ msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr ""
 "Le(s) problème(s) suivant(s) se sont produits lors de l'exécution de "
 "l'analyse :"
+
+msgid "No interactive plot generated..."
+msgstr ""
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "registerFonts a été appelé mais resultFont n'existe pas !"

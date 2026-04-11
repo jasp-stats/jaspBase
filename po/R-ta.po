@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.19.2\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2026-01-16 15:01+0000\n"
 "Last-Translator: தமிழ்நேரம் <tamilneram247@gmail.com>\n"
-"Language-Team: Tamil <https://hosted.weblate.org/projects/jasp/jaspbase/ta/>"
-"\n"
+"Language-Team: Tamil <https://hosted.weblate.org/projects/jasp/jaspbase/ta/"
+">\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -130,3 +130,6 @@ msgstr "வகுப்பு %1$s மற்றும் வகை %2$s க்�
 
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "பகுப்பாய்வை இயக்கும்போது பின்வரும் சிக்கல் நிகழ்ந்தது: %s"
+
+msgid "No interactive plot generated..."
+msgstr ""

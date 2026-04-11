@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2026-03-28 02:09+0000\n"
 "Last-Translator: Zahid Rizky Fakhri <zahidrizkyfakhri@gmail.com>\n"
 "Language-Team: Indonesian <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -133,6 +133,9 @@ msgstr "Pesan untuk kelas %1$s dan jenis %2$s tidak ditemukan"
 
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "Terjadi galat berikut saat mengonversikan ggplot ke plotly: %s"
+
+msgid "No interactive plot generated..."
+msgstr ""
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "registerFonts dipanggil tetapi resultFont tidak ada!"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.19.2\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2025-10-07 22:02+0000\n"
 "Last-Translator: Hamza Yalçin <h.yalcin08@gmail.com>\n"
 "Language-Team: Turkish <https://hosted.weblate.org/projects/jasp/jaspbase/tr/"
@@ -131,3 +131,6 @@ msgstr "Sınıf %1$s ve tip %2$s için mesaj bulunamadı"
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "Analizi çalıştırırken aşağıdaki sorun(lar) oluştu:"
+
+msgid "No interactive plot generated..."
+msgstr ""

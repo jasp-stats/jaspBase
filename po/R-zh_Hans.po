@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2022-10-29 04:12+0000\n"
 "Last-Translator: Shun Wang <shuonwang@gmail.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
@@ -116,6 +116,9 @@ msgstr "找不到类 %1$s 和类型 %2$s 的消息"
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "运行分析时出现以下问题："
+
+msgid "No interactive plot generated..."
+msgstr ""
 
 #~ msgid "registerFonts was called but resultFont does not exist!"
 #~ msgstr "已调用 registerFonts 但 resultFont 不存在！"

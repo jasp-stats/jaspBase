@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.19.2\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2025-04-13 00:02+0000\n"
 "Last-Translator: Marko Bojović <bojovicmarko@outlook.com>\n"
 "Language-Team: Serbian <https://hosted.weblate.org/projects/jasp/jaspbase/sr/"
@@ -128,3 +128,6 @@ msgstr "Није пронађена порука за класу %1$s и тип 
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "Дошло је до следећег проблема током извршавања анализе:"
+
+msgid "No interactive plot generated..."
+msgstr ""

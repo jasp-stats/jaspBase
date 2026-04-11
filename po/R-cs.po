@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.17.2\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2025-11-02 17:51+0000\n"
 "Last-Translator: Standa Ježek <standa.jezek@gmail.com>\n"
 "Language-Team: Czech <https://hosted.weblate.org/projects/jasp/jaspbase/cs/"
@@ -131,3 +131,6 @@ msgstr "Nemohu najít zprávu pro třídu %1$s a typ %2$s"
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "Během analýzy se vyskytly následující problémy:"
+
+msgid "No interactive plot generated..."
+msgstr ""

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.16.4\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2024-06-30 10:01+0000\n"
 "Last-Translator: Marco Capozzi <giammarcous@yahoo.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/jasp/jaspbase/it/"
@@ -133,6 +133,9 @@ msgstr ""
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr ""
 "Si sono verificati i seguenti problemi durante l'esecuzione dell'analisi:"
+
+msgid "No interactive plot generated..."
+msgstr ""
 
 #~ msgid "Unknown RCPP object"
 #~ msgstr "Oggetto RCPP sconosciuto"

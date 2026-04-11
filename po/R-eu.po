@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.18.0\n"
-"POT-Creation-Date: 2026-01-10 03:55\n"
+"POT-Creation-Date: 2026-04-11 04:23\n"
 "PO-Revision-Date: 2025-12-16 18:00+0000\n"
 "Last-Translator: Jose Ramon Rueda <joseramon.rueda@ehu.eus>\n"
 "Language-Team: Basque <https://hosted.weblate.org/projects/jasp/jaspbase/eu/"
@@ -133,3 +133,6 @@ msgstr "Ezin izan da mezurik aurkitu %1$s klaserako eta %2$s motarako"
 #, fuzzy
 msgid "The following error occured while converting a ggplot to plotly: %s"
 msgstr "Arazo hauek gertatu dira analisia exekutatzean:"
+
+msgid "No interactive plot generated..."
+msgstr ""
