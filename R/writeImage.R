@@ -122,7 +122,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
   image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
 
-  image[["interactive"]] <- ggplot2::is.ggplot(plot)
+  image[["interactive"]] <- ggplot2::is.ggplot(plot) || inherits(plot, c("jaspMatrixPlot", "jaspMatrixplot"))
   if (image[["interactive"]] )
     tryCatch(
     {
