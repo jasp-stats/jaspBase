@@ -85,6 +85,17 @@ testthat::test_that("standalone state saving uses the callback file contract", {
   testthat::expect_equal(state, savedState)
 })
 
+testthat::test_that("state file locations reject unsupported callback shapes", {
+  testthat::expect_error(
+    jaspBase:::.stateFilePath(list(root = tempdir())),
+    "non-empty `relativePath`"
+  )
+  testthat::expect_error(
+    jaspBase:::.stateFilePath(tempfile()),
+    "non-empty `relativePath`"
+  )
+})
+
 testthat::test_that("standalone state retrieval uses the callback root", {
   oldCallback <- if (exists(".requestStateFileNameNative", envir = .GlobalEnv, inherits = FALSE)) {
     get(".requestStateFileNameNative", envir = .GlobalEnv, inherits = FALSE)

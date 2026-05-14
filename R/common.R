@@ -660,9 +660,18 @@ jaspResultsStrings <- function() {
 
 }
 
+.isNonEmptyString <- function(x) {
+  rlang::is_string(x) && nzchar(x)
+}
+
 .stateFilePath <- function(location) {
-  if (is.list(location) && !is.null(location$root) && !is.null(location$relativePath))
-    return(file.path(location$root, location$relativePath))
+  if (!rlang::is_list(location) || !.isNonEmptyString(location$relativePath))
+    stop("State file callback must return a list with a non-empty `relativePath`.", call. = FALSE)
+
+  # Desktop/native callbacks return `root` plus `relativePath`; standalone callbacks
+  # may only have a relative path, which is then interpreted from the current wd.
+  if (.isNonEmptyString(location$root))
+    return(as.character(fs::path(location$root, location$relativePath)))
 
   location$relativePath
 }
@@ -671,7 +680,7 @@ jaspResultsStrings <- function() {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
   statePath <- .stateFilePath(location)
-  dir.create(dirname(statePath), recursive = TRUE, showWarnings = FALSE)
+  fs::dir_create(fs::path_dir(statePath))
 
   try(suppressWarnings(base::save(state, file=statePath, compress=FALSE)), silent = FALSE)
 
@@ -1167,21 +1176,19 @@ storeDataSet <- function(dataset) {
 }
 
 .wrappedAnalysisQmlFile <- function(moduleName, qmlFileName, modulePath = NULL, qmlFile = NULL) {
-  isNonEmptyString <- function(x) is.character(x) && length(x) == 1 && !is.na(x) && nzchar(x)
+  if (.isNonEmptyString(qmlFile))
+    return(as.character(fs::path_norm(qmlFile)))
 
-  if (isNonEmptyString(qmlFile))
-    return(normalizePath(qmlFile, winslash = "/", mustWork = FALSE))
-
-  if (isNonEmptyString(modulePath)) {
-    qmlCandidates <- file.path(modulePath, c("inst/qml", "qml"), qmlFileName)
-    existingQml <- qmlCandidates[file.exists(qmlCandidates)]
+  if (.isNonEmptyString(modulePath)) {
+    qmlCandidates <- fs::path(modulePath, c("inst/qml", "qml"), qmlFileName)
+    existingQml <- qmlCandidates[fs::file_exists(qmlCandidates)]
     if (length(existingQml) > 0)
-      return(normalizePath(existingQml[[1]], winslash = "/", mustWork = FALSE))
+      return(as.character(fs::path_norm(existingQml[[1]])))
 
-    return(normalizePath(qmlCandidates[[1]], winslash = "/", mustWork = FALSE))
+    return(as.character(fs::path_norm(qmlCandidates[[1]])))
   }
 
-  normalizePath(file.path(find.package(moduleName), "qml", qmlFileName), winslash = "/", mustWork = FALSE)
+  as.character(fs::path_norm(fs::path(find.package(moduleName), "qml", qmlFileName)))
 }
 
 #' @export
@@ -1196,6 +1203,7 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
       "analysis"        = analysisName,
       "version"         = version,
       "qmlFileName"     = qmlFileName,
+      # `version` is the generated module wrapper version; this is the runtime contract version.
       "jaspBaseVersion" = as.character(utils::packageVersion("jaspBase")),
       "source"          = "jaspBase::runWrappedAnalysis"
     )
