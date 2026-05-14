@@ -131,12 +131,18 @@ std::string jaspResults::getStatus()
 
 void jaspResults::prepareForWriting()
 {
+	if(_writeSealRoot + _writeSealRelative == "")
+		return;
+
 	//Remove the seal if it is there or not doesnt matter
 	BREMOVE((_writeSealRoot + _writeSealRelative).c_str());
 }
 
 void jaspResults::finishWriting()
 {
+	if(_writeSealRoot + _writeSealRelative == "")
+		return;
+
 	//Let us write a small file that tells us writing stuff went well ( https://github.com/jasp-stats/INTERNAL-jasp/issues/884 )
 	bofstream sealMe((_writeSealRoot + _writeSealRelative).c_str(), std::ios_base::trunc);
 
@@ -278,6 +284,9 @@ void jaspResults::send(std::string otherMsg)
 #ifdef JASP_RESULTS_DEBUG_TRACES
 	jaspPrint("send was called!");
 #endif
+
+	if(!_insideJASP)
+		return;
 
 	if(_ipccSendFunc != nullptr)
 		(*_ipccSendFunc)(otherMsg == "" ? constructResultJson() : otherMsg.c_str());

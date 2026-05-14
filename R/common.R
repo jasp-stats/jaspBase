@@ -629,6 +629,7 @@ jaspResultsStrings <- function() {
     ".requestTempFileNameNative",
     ".requestTempRootNameNative",
     ".readDatasetToEndNative",
+    ".readFullDatasetToEnd",
     ".readDataSetHeaderNative",
     ".readDataSetRequestedNative",
     ".requestStateFileNameNative",
@@ -659,19 +660,20 @@ jaspResultsStrings <- function() {
 
 }
 
+.stateFilePath <- function(location) {
+  if (is.list(location) && !is.null(location$root) && !is.null(location$relativePath))
+    return(file.path(location$root, location$relativePath))
+
+  location$relativePath
+}
+
 .saveState <- function(state) {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
+  statePath <- .stateFilePath(location)
+  dir.create(dirname(statePath), recursive = TRUE, showWarnings = FALSE)
 
-  # when run through jaspTools do not save the state, but store it internally
-  if ("jaspTools" %in% loadedNamespaces()) {
-    # fool renv so it does not try to install jaspTools
-    .setInternal <- utils::getFromNamespace(".setInternal", asNamespace("jaspTools"))
-    .setInternal("state", state)
-    return(list(relativePath = relativePath))
-  }
-
-  try(suppressWarnings(base::save(state, file=relativePath, compress=FALSE)), silent = FALSE)
+  try(suppressWarnings(base::save(state, file=statePath, compress=FALSE)), silent = FALSE)
 
   return(list(relativePath = relativePath))
 }
@@ -683,9 +685,10 @@ jaspResultsStrings <- function() {
   if (base::exists(".requestStateFileNameNative")) {
 
     location <- .fromRCPP(".requestStateFileNameNative")
+    statePath <- .stateFilePath(location)
 
     base::tryCatch(
-      base::load(location$relativePath),
+      base::load(statePath),
       error=function(e) e
       #,warning=function(w) w #Commented out because if there *is* a warning, which there of course shouldnt be, the state wont be loaded *at all*.
     )
@@ -1163,18 +1166,49 @@ storeDataSet <- function(dataset) {
   jaspSyntax::loadDataSet(dataset)
 }
 
+.wrappedAnalysisQmlFile <- function(moduleName, qmlFileName, modulePath = NULL, qmlFile = NULL) {
+  isNonEmptyString <- function(x) is.character(x) && length(x) == 1 && !is.na(x) && nzchar(x)
+
+  if (isNonEmptyString(qmlFile))
+    return(normalizePath(qmlFile, winslash = "/", mustWork = FALSE))
+
+  if (isNonEmptyString(modulePath)) {
+    qmlCandidates <- file.path(modulePath, c("inst/qml", "qml"), qmlFileName)
+    existingQml <- qmlCandidates[file.exists(qmlCandidates)]
+    if (length(existingQml) > 0)
+      return(normalizePath(existingQml[[1]], winslash = "/", mustWork = FALSE))
+
+    return(normalizePath(qmlCandidates[[1]], winslash = "/", mustWork = FALSE))
+  }
+
+  normalizePath(file.path(find.package(moduleName), "qml", qmlFileName), winslash = "/", mustWork = FALSE)
+}
+
 #' @export
-runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
     # So here, just give back the parsed options.
-    return(toJSON(list("options" = options, "module" = moduleName, "analysis" = analysisName, "version" = version)))
+    response <- list(
+      "options"         = options,
+      "module"          = moduleName,
+      "analysis"        = analysisName,
+      "version"         = version,
+      "qmlFileName"     = qmlFileName,
+      "jaspBaseVersion" = as.character(utils::packageVersion("jaspBase")),
+      "source"          = "jaspBase::runWrappedAnalysis"
+    )
+    if (!is.null(modulePath))
+      response[["modulePath"]] <- modulePath
+    if (!is.null(qmlFile))
+      response[["qmlFile"]] <- qmlFile
+    return(toJSON(response))
 
   } else {
     # The wrapper is called inside an R environment (R Studio probably).
     # The options must be parsed and checked by the QML form, and then the real analysis can be called.
-    qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
+    qmlFile <- .wrappedAnalysisQmlFile(moduleName, qmlFileName, modulePath, qmlFile)
     # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
     options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 

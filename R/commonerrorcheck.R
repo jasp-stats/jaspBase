@@ -432,6 +432,9 @@
     validValues <- x[is.finite(x)]
     variance <- -1 # Prevents the function from returning NA's
     if (length(validValues) > 1) {
+      if (is.factor(validValues)) {
+        validValues <- as.numeric(validValues)
+      }
       variance <- stats::var(validValues)
     }
     return(variance)
