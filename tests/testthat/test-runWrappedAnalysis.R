@@ -8,7 +8,7 @@ testthat::test_that("wrapped analysis QML paths prefer explicit files", {
     qmlFile = explicitFile
   )
 
-  testthat::expect_equal(qmlFile, normalizePath(explicitFile, winslash = "/", mustWork = FALSE))
+  testthat::expect_equal(qmlFile, as.character(fs::path_norm(explicitFile)))
 })
 
 testthat::test_that("wrapped analysis QML paths resolve checkout module paths", {
@@ -24,7 +24,7 @@ testthat::test_that("wrapped analysis QML paths resolve checkout module paths", 
     modulePath = modulePath
   )
 
-  testthat::expect_equal(qmlFile, normalizePath(qmlPath, winslash = "/", mustWork = FALSE))
+  testthat::expect_equal(qmlFile, as.character(fs::path_norm(qmlPath)))
 })
 
 testthat::test_that("standalone bridge can read the full dataset callback", {
