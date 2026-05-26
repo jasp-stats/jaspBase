@@ -352,7 +352,7 @@ jaspOutputObjR <- R6::R6Class(
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
     },
-    toRObject   = function() private$jaspObject$toRObject(),
+    toRObject   = function() .decodeJaspRObject(private$jaspObject$toRObject()),
     toHtml      = function() private$jaspObject$toHtml()
   ),
   active = list(
@@ -361,6 +361,57 @@ jaspOutputObjR <- R6::R6Class(
     info     = function(x) { if (missing(x)) private$jaspObject$info     else private$jaspObject$info     <- x }
   )
 )
+
+.decodeJaspRObject <- function(x) {
+  if (is.null(x))
+    return(x)
+
+  if (inherits(x, "jaspPlotWrapper")) {
+    if (!is.null(x[["plotObject"]])) {
+      x[["plotObject"]] <- tryCatch(
+        decodeplot(x[["plotObject"]], returnGrob = FALSE),
+        error = function(e) x[["plotObject"]]
+      )
+    }
+    return(.decodeJaspRObjectAttributes(x))
+  }
+
+  if (is.character(x))
+    return(decodeColNames(x))
+
+  if (is.factor(x)) {
+    levels(x) <- decodeColNames(levels(x))
+    return(x)
+  }
+
+  if (is.data.frame(x)) {
+    for (name in names(x))
+      x[[name]] <- .decodeJaspRObject(x[[name]])
+    names(x) <- decodeColNames(names(x))
+    return(.decodeJaspRObjectAttributes(x))
+  }
+
+  if (is.list(x)) {
+    for (i in seq_along(x))
+      x[[i]] <- .decodeJaspRObject(x[[i]])
+    names(x) <- decodeColNames(names(x))
+    return(.decodeJaspRObjectAttributes(x))
+  }
+
+  .decodeJaspRObjectAttributes(x)
+}
+
+.decodeJaspRObjectAttributes <- function(x) {
+  attributesToDecode <- setdiff(
+    names(attributes(x)),
+    c("class", "dim", "dimnames", "names", "row.names", "jaspObjectEnvironment")
+  )
+
+  for (attribute in attributesToDecode)
+    attr(x, attribute) <- .decodeJaspRObject(attr(x, attribute))
+
+  x
+}
 
 .jaspHtmlPixelizer <- function(maxWidth) {
   if(is.numeric(maxWidth)) return(paste0(as.character(maxWidth), "px"))

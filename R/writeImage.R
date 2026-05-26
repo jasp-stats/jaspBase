@@ -181,13 +181,13 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
   # alternatively, those edge cases will need to be handled by the developer.
-  if (packageVersion("ggplot2") < "4.0.0") {
-    labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
-    for (i in seq_along(labels))
-      if (!is.null(labels[[i]]))
-        labels[[i]] <- decodeColNames(labels[[i]])
-    x$labels <- labels
-  } else {
+  labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
+  for (i in seq_along(labels))
+    if (!is.null(labels[[i]]))
+      labels[[i]] <- decodeColNames(labels[[i]])
+  x$labels <- labels
+
+  if (packageVersion("ggplot2") >= "4.0.0") {
     currentGuides <- x@guides
 
     .makeDecodedGuide <- function(axisName, positional = TRUE) {
@@ -219,7 +219,8 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
       y     = .makeDecodedGuide("y",      positional = TRUE),
       colour = .makeDecodedGuide("colour", positional = FALSE),
       fill  = .makeDecodedGuide("fill",   positional = FALSE),
-      shape = .makeDecodedGuide("shape",  positional = FALSE)
+      shape = .makeDecodedGuide("shape",  positional = FALSE),
+      linetype = .makeDecodedGuide("linetype", positional = FALSE)
     )
   }
   if (returnGrob) {
