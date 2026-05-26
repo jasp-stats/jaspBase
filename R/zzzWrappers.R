@@ -367,12 +367,8 @@ jaspOutputObjR <- R6::R6Class(
     return(x)
 
   if (inherits(x, "jaspPlotWrapper")) {
-    if (!is.null(x[["plotObject"]])) {
-      x[["plotObject"]] <- tryCatch(
-        decodeplot(x[["plotObject"]], returnGrob = FALSE),
-        error = function(e) x[["plotObject"]]
-      )
-    }
+    if (!is.null(x[["plotObject"]]))
+      x[["plotObject"]] <- .decodeJaspPlotObject(x[["plotObject"]])
     return(.decodeJaspRObjectAttributes(x))
   }
 
