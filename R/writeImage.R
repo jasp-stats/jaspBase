@@ -297,6 +297,39 @@ decodeplot.function <- function(x, ...) {
   return(decodeplot.recordedplot(out))
 }
 
+#' Decode JASP Result State
+#'
+#' Decodes display-only plot objects stored in a JASP result state. This is
+#' intended for R-facing result payloads that need the same decoded figure
+#' objects as rendered JASP output, without changing backend/runtime state.
+#'
+#' @param state A JASP result state list, typically containing a `figures`
+#'   element.
+#'
+#' @return `state`, with decodable figure objects decoded.
+#' @export
+decodeJaspResultState <- function(state) {
+  if (!is.list(state) || is.null(state[["figures"]]))
+    return(state)
+
+  for (figureIndex in seq_along(state[["figures"]])) {
+    figure <- state[["figures"]][[figureIndex]]
+    if (is.list(figure) && !is.null(figure[["obj"]])) {
+      figure[["obj"]] <- .decodeJaspPlotObject(figure[["obj"]])
+      state[["figures"]][[figureIndex]] <- figure
+    }
+  }
+
+  state
+}
+
+.decodeJaspPlotObject <- function(plot) {
+  tryCatch(
+    decodeplot(plot, returnGrob = FALSE),
+    error = function(e) plot
+  )
+}
+
 # Some functions that act as a bridge between R and JASP. If JASP isn't running then all columnNames are expected to not be encoded
 
 # Two convenience functions to encode/decode jasp column names. A custom encoder/decoder function may be supplied, otherwise a default is used.

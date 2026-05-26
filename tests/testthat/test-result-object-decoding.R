@@ -102,3 +102,35 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   testthat::expect_equal(unname(decoded$Plot$plotObject$labels$y), "score")
   testthat::expect_equal(attr(decoded, "title"), "group results")
 })
+
+testthat::test_that("decodeJaspResultState decodes stored figure objects", {
+  restoreDecoder <- localDecoder(c(
+    JaspColumn_1_Encoded = "group",
+    JaspColumn_2_Encoded = "score"
+  ))
+  on.exit(restoreDecoder(), add = TRUE)
+
+  plot <- ggplot2::ggplot(
+    data.frame(x = 1, y = 2),
+    ggplot2::aes(x = x, y = y)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::labs(
+      x = "JaspColumn_1_Encoded",
+      y = "JaspColumn_2_Encoded"
+    )
+  state <- list(
+    figures = list(
+      "1.png" = list(obj = plot),
+      "2.png" = list(other = "JaspColumn_1_Encoded")
+    ),
+    other = list(label = "JaspColumn_2_Encoded")
+  )
+
+  decoded <- jaspBase::decodeJaspResultState(state)
+
+  testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$x), "group")
+  testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$y), "score")
+  testthat::expect_identical(decoded$figures[["2.png"]]$other, "JaspColumn_1_Encoded")
+  testthat::expect_identical(decoded$other$label, "JaspColumn_2_Encoded")
+})
