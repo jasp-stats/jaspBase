@@ -27,17 +27,17 @@ testthat::test_that("wrapped analysis QML paths resolve checkout module paths", 
   testthat::expect_equal(qmlFile, as.character(fs::path_norm(qmlPath)))
 })
 
-testthat::test_that("wrapped analysis quiet mode suppresses raw R chatter", {
+testthat::test_that("wrapped analysis verbosity separates analysis and JASP chatter", {
   noisyValue <- function() {
-    cat("raw module output\n")
-    message("raw module message")
-    warning("raw module warning", call. = FALSE)
+    cat("jasp bridge output\n")
+    message("analysis message")
+    warning("analysis warning", call. = FALSE)
     42
   }
 
   testthat::expect_silent(
     testthat::expect_equal(
-      jaspBase:::.runWrappedAnalysisQuietly(noisyValue(), quiet = TRUE),
+      jaspBase:::.runWrappedAnalysisWithVerbosity(noisyValue(), verbose = "none"),
       42
     )
   )
@@ -45,12 +45,51 @@ testthat::test_that("wrapped analysis quiet mode suppresses raw R chatter", {
   testthat::expect_output(
     testthat::expect_message(
       testthat::expect_warning(
-        jaspBase:::.runWrappedAnalysisQuietly(noisyValue(), quiet = FALSE),
-        "raw module warning"
+        jaspBase:::.runWrappedAnalysisWithVerbosity(noisyValue(), verbose = "analysis"),
+        "analysis warning"
       ),
-      "raw module message"
+      "analysis message"
     ),
-    "raw module output"
+    NA
+  )
+
+  testthat::expect_output(
+    testthat::expect_warning(
+      testthat::expect_message(
+        testthat::expect_equal(
+          jaspBase:::.runWrappedAnalysisWithVerbosity(noisyValue(), verbose = "jasp"),
+          42
+        ),
+        NA
+      ),
+      NA
+    ),
+    "jasp bridge output"
+  )
+
+  testthat::expect_output(
+    testthat::expect_message(
+      testthat::expect_warning(
+        jaspBase:::.runWrappedAnalysisWithVerbosity(noisyValue(), verbose = "all"),
+        "analysis warning"
+      ),
+      "analysis message"
+    ),
+    "jasp bridge output"
+  )
+})
+
+testthat::test_that("wrapped analysis verbosity normalizes legacy quiet options", {
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose(NULL), "analysis")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose(NULL, quiet = TRUE), "analysis")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose(NULL, quiet = FALSE), "all")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose(TRUE), "all")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose(FALSE), "none")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose("jasp"), "jasp")
+  testthat::expect_equal(jaspBase:::.normalizeRunWrappedAnalysisVerbose("off"), "none")
+  testthat::expect_error(
+    jaspBase:::.normalizeRunWrappedAnalysisVerbose("loud"),
+    "`verbose` must be one of"
   )
 })
 
