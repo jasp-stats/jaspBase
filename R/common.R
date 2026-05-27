@@ -1191,8 +1191,28 @@ storeDataSet <- function(dataset) {
   as.character(fs::path_norm(fs::path(find.package(moduleName), "qml", qmlFileName)))
 }
 
+.runWrappedAnalysisQuietly <- function(expr, quiet) {
+  if (isTRUE(quiet)) {
+    outputFile <- tempfile("jaspBase-runWrappedAnalysis-")
+    outputConnection <- file(outputFile, open = "wt")
+    outputSink <- sink.number(type = "output")
+    on.exit({
+      while (sink.number(type = "output") > outputSink)
+        sink(type = "output")
+      close(outputConnection)
+      unlink(outputFile)
+    }, add = TRUE)
+
+    sink(outputConnection, type = "output")
+    return(suppressWarnings(suppressMessages(expr)))
+  }
+
+  expr
+}
+
 #' @export
-runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL,
+                               quiet = getOption("jaspBase.runWrappedAnalysis.quiet", TRUE)) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
@@ -1214,18 +1234,22 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     return(toJSON(response))
 
   } else {
-    # The wrapper is called inside an R environment (R Studio probably).
-    # The options must be parsed and checked by the QML form, and then the real analysis can be called.
-    qmlFile <- .wrappedAnalysisQmlFile(moduleName, qmlFileName, modulePath, qmlFile)
-    # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
-    options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+    runWrapped <- function() {
+      # The wrapper is called inside an R environment (R Studio probably).
+      # The options must be parsed and checked by the QML form, and then the real analysis can be called.
+      qmlFile <- .wrappedAnalysisQmlFile(moduleName, qmlFileName, modulePath, qmlFile)
+      # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
+      options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
-    if (options == "")
-      stop("Error when parsing the options")
+      if (options == "")
+        stop("Error when parsing the options")
 
-     internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+      return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+    }
+
+    return(.runWrappedAnalysisQuietly(runWrapped(), quiet = quiet))
   }
 }
 

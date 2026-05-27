@@ -27,6 +27,33 @@ testthat::test_that("wrapped analysis QML paths resolve checkout module paths", 
   testthat::expect_equal(qmlFile, as.character(fs::path_norm(qmlPath)))
 })
 
+testthat::test_that("wrapped analysis quiet mode suppresses raw R chatter", {
+  noisyValue <- function() {
+    cat("raw module output\n")
+    message("raw module message")
+    warning("raw module warning", call. = FALSE)
+    42
+  }
+
+  testthat::expect_silent(
+    testthat::expect_equal(
+      jaspBase:::.runWrappedAnalysisQuietly(noisyValue(), quiet = TRUE),
+      42
+    )
+  )
+
+  testthat::expect_output(
+    testthat::expect_message(
+      testthat::expect_warning(
+        jaspBase:::.runWrappedAnalysisQuietly(noisyValue(), quiet = FALSE),
+        "raw module warning"
+      ),
+      "raw module message"
+    ),
+    "raw module output"
+  )
+})
+
 testthat::test_that("standalone bridge can read the full dataset callback", {
   oldCallback <- if (exists(".readFullDatasetToEnd", envir = .GlobalEnv, inherits = FALSE)) {
     get(".readFullDatasetToEnd", envir = .GlobalEnv, inherits = FALSE)
