@@ -1227,6 +1227,73 @@ storeDataSet <- function(dataset) {
   verbose %in% c("all", "jasp")
 }
 
+.decodeRunWrappedAnalysisConditionMessage <- function(condition) {
+  message <- conditionMessage(condition)
+  if (!is.character(message) || length(message) != 1L || is.na(message) || !nzchar(message))
+    return(message)
+
+  decoded <- tryCatch(
+    decodeColNames(message, strict = FALSE),
+    error = function(e) message
+  )
+  if (!is.character(decoded) || length(decoded) != 1L || is.na(decoded))
+    return(message)
+
+  decoded
+}
+
+.decodeRunWrappedAnalysisCondition <- function(condition) {
+  decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(condition)
+  if (identical(decodedMessage, conditionMessage(condition)))
+    return(condition)
+
+  if (is.list(condition) && "message" %in% names(condition)) {
+    condition[["message"]] <- decodedMessage
+    return(condition)
+  }
+
+  simpleError(decodedMessage, call = conditionCall(condition))
+}
+
+.runWrappedAnalysisWithDecodedConditions <- function(expr) {
+  replayingCondition <- FALSE
+
+  tryCatch(
+    withCallingHandlers(
+      expr,
+      message = function(messageCondition) {
+        if (isTRUE(replayingCondition))
+          return()
+
+        decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(messageCondition)
+        if (identical(decodedMessage, conditionMessage(messageCondition)))
+          return()
+
+        replayingCondition <<- TRUE
+        on.exit(replayingCondition <<- FALSE, add = TRUE)
+        message(decodedMessage, appendLF = !grepl("\n$", decodedMessage))
+        tryInvokeRestart("muffleMessage")
+      },
+      warning = function(warningCondition) {
+        if (isTRUE(replayingCondition))
+          return()
+
+        decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(warningCondition)
+        if (identical(decodedMessage, conditionMessage(warningCondition)))
+          return()
+
+        replayingCondition <<- TRUE
+        on.exit(replayingCondition <<- FALSE, add = TRUE)
+        warning(decodedMessage, call. = FALSE)
+        tryInvokeRestart("muffleWarning")
+      }
+    ),
+    error = function(errorCondition) {
+      stop(.decodeRunWrappedAnalysisCondition(errorCondition))
+    }
+  )
+}
+
 .runWrappedAnalysisWithVerbosity <- function(expr, verbose = "analysis") {
   verbose <- .normalizeRunWrappedAnalysisVerbose(verbose)
   showAnalysis <- .runWrappedAnalysisShowsAnalysis(verbose)
@@ -1247,7 +1314,7 @@ storeDataSet <- function(dataset) {
   }
 
   if (showAnalysis)
-    return(expr)
+    return(.runWrappedAnalysisWithDecodedConditions(expr))
 
   suppressWarnings(suppressMessages(expr))
 }

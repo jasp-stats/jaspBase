@@ -93,6 +93,53 @@ testthat::test_that("wrapped analysis verbosity normalizes legacy quiet options"
   )
 })
 
+testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
+  oldDecoder <- if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
+    get(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
+  } else {
+    NULL
+  }
+  hadDecoder <- exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
+  on.exit({
+    if (hadDecoder) {
+      assign(".decodeColNamesLax", oldDecoder, envir = .GlobalEnv)
+    } else if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
+      rm(".decodeColNamesLax", envir = .GlobalEnv)
+    }
+  }, add = TRUE)
+
+  assign(
+    ".decodeColNamesLax",
+    function(x) gsub("JaspColumn_3_Encoded", "angle", x, fixed = TRUE),
+    envir = .GlobalEnv
+  )
+
+  noisyValue <- function() {
+    message("analysis message: JaspColumn_3_Encoded")
+    warning("analysis warning: JaspColumn_3_Encoded", call. = FALSE)
+    42
+  }
+
+  testthat::expect_output(
+    testthat::expect_message(
+      testthat::expect_warning(
+        jaspBase:::.runWrappedAnalysisWithVerbosity(noisyValue(), verbose = "analysis"),
+        "analysis warning: angle"
+      ),
+      "analysis message: angle"
+    ),
+    NA
+  )
+
+  testthat::expect_error(
+    jaspBase:::.runWrappedAnalysisWithVerbosity(
+      stop("analysis error: JaspColumn_3_Encoded", call. = FALSE),
+      verbose = "analysis"
+    ),
+    "analysis error: angle"
+  )
+})
+
 testthat::test_that("standalone bridge can read the full dataset callback", {
   oldCallback <- if (exists(".readFullDatasetToEnd", envir = .GlobalEnv, inherits = FALSE)) {
     get(".readFullDatasetToEnd", envir = .GlobalEnv, inherits = FALSE)
