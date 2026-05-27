@@ -1191,8 +1191,48 @@ storeDataSet <- function(dataset) {
   as.character(fs::path_norm(fs::path(find.package(moduleName), "qml", qmlFileName)))
 }
 
-.runWrappedAnalysisQuietly <- function(expr, quiet) {
-  if (isTRUE(quiet)) {
+.normalizeRunWrappedAnalysisVerbose <- function(verbose = NULL, quiet = NULL) {
+  if (is.null(verbose) || length(verbose) == 0L) {
+    if (isFALSE(quiet))
+      return("all")
+
+    return("analysis")
+  }
+
+  verbose <- verbose[[1L]]
+  if (is.na(verbose))
+    stop("`verbose` must be one of 'all', 'analysis', 'jasp', 'none', TRUE, or FALSE.", call. = FALSE)
+
+  if (is.logical(verbose))
+    return(if (isTRUE(verbose)) "all" else "none")
+
+  if (is.character(verbose)) {
+    verbose <- tolower(trimws(verbose))
+    if (verbose %in% c("true", "yes", "on", "1"))
+      return("all")
+    if (verbose %in% c("false", "no", "off", "0"))
+      return("none")
+    if (verbose %in% c("all", "analysis", "jasp", "none"))
+      return(verbose)
+  }
+
+  stop("`verbose` must be one of 'all', 'analysis', 'jasp', 'none', TRUE, or FALSE.", call. = FALSE)
+}
+
+.runWrappedAnalysisShowsAnalysis <- function(verbose) {
+  verbose %in% c("all", "analysis")
+}
+
+.runWrappedAnalysisShowsJasp <- function(verbose) {
+  verbose %in% c("all", "jasp")
+}
+
+.runWrappedAnalysisWithVerbosity <- function(expr, verbose = "analysis") {
+  verbose <- .normalizeRunWrappedAnalysisVerbose(verbose)
+  showAnalysis <- .runWrappedAnalysisShowsAnalysis(verbose)
+  showJasp <- .runWrappedAnalysisShowsJasp(verbose)
+
+  if (!showJasp) {
     outputFile <- tempfile("jaspBase-runWrappedAnalysis-")
     outputConnection <- file(outputFile, open = "wt")
     outputSink <- sink.number(type = "output")
@@ -1204,15 +1244,18 @@ storeDataSet <- function(dataset) {
     }, add = TRUE)
 
     sink(outputConnection, type = "output")
-    return(suppressWarnings(suppressMessages(expr)))
   }
 
-  expr
+  if (showAnalysis)
+    return(expr)
+
+  suppressWarnings(suppressMessages(expr))
 }
 
 #' @export
 runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL,
-                               quiet = getOption("jaspBase.runWrappedAnalysis.quiet", TRUE)) {
+                               quiet = getOption("jaspBase.runWrappedAnalysis.quiet", NULL),
+                               verbose = getOption("jaspBase.runWrappedAnalysis.verbose", NULL)) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
@@ -1234,6 +1277,9 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     return(toJSON(response))
 
   } else {
+    verbose <- .normalizeRunWrappedAnalysisVerbose(verbose, quiet = quiet)
+    jaspSyntax::setParameter("verbose", .runWrappedAnalysisShowsJasp(verbose))
+
     runWrapped <- function() {
       # The wrapper is called inside an R environment (R Studio probably).
       # The options must be parsed and checked by the QML form, and then the real analysis can be called.
@@ -1249,7 +1295,7 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
       return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
     }
 
-    return(.runWrappedAnalysisQuietly(runWrapped(), quiet = quiet))
+    return(.runWrappedAnalysisWithVerbosity(runWrapped(), verbose = verbose))
   }
 }
 
