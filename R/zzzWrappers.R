@@ -307,6 +307,12 @@ jaspObjR <- R6::R6Class(
 print.jaspObjR <- function(x, ...) 	# TODO: print actual information depending on object type
   x$print()
 
+#' @export
+print.jaspOutputObjR <- function(x, ...) {
+  print(x$toRObject(), ...)
+  invisible(x)
+}
+
 jaspStateR <- R6::R6Class(
   classname = "jaspStateR",
   inherit   = jaspObjR,
