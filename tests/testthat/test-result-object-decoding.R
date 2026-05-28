@@ -123,6 +123,133 @@ testthat::test_that("printing output wrappers shows the R-facing object", {
   testthat::expect_true(any(grepl("angle", printed, fixed = TRUE)))
 })
 
+testthat::test_that("R-facing wrapper print methods are registered", {
+  testthat::expect_false(is.null(getS3method("print", "jaspContainerWrapper", optional = TRUE)))
+  testthat::expect_false(is.null(getS3method("print", "jaspTableWrapper", optional = TRUE)))
+  testthat::expect_false(is.null(getS3method("print", "jaspPlotWrapper", optional = TRUE)))
+})
+
+testthat::test_that("printing result wrappers keeps tables readable and plots compact", {
+  table <- data.frame(
+    effect = "angle",
+    stat = 21.89,
+    check.names = FALSE
+  )
+  class(table) <- c("jaspTableWrapper", "jaspWrapper", class(table))
+  attr(table, "title") <- "ANOVA Summary"
+  attr(table, "footnotes") <- list(
+    list(
+      text = "Model terms tested with Satterthwaite method.",
+      symbol = "<em>Note.</em>"
+    )
+  )
+  attr(table, "jaspObjectEnvironment") <- new.env(parent = emptyenv())
+
+  plotWrapper <- list(plotObject = NULL)
+  class(plotWrapper) <- c("jaspPlotWrapper", "jaspWrapper")
+  attr(plotWrapper, "title") <- "Plot"
+  attr(plotWrapper, "jaspObjectEnvironment") <- new.env(parent = emptyenv())
+
+  result <- list(
+    "ANOVA Summary" = table,
+    Plot = plotWrapper
+  )
+  class(result) <- c("jaspContainerWrapper", "jaspWrapper")
+  attr(result, "title") <- "MixedModelsLMM"
+  before <- result
+
+  printed <- capture.output(returned <- print(result))
+
+  testthat::expect_identical(returned, result)
+  testthat::expect_identical(result, before)
+  testthat::expect_true(any(grepl("MixedModelsLMM", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl("ANOVA Summary", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl(
+    "<jasp table: use x$`ANOVA Summary` as a data.frame; footnotes are in attr(x$`ANOVA Summary`, \"footnotes\")>",
+    printed,
+    fixed = TRUE
+  )))
+  testthat::expect_true(any(grepl("angle", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl("Footnotes:", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl("Note. Model terms tested", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl(
+    "<jasp plot: use x$Plot$plotObject to display or modify>",
+    printed,
+    fixed = TRUE
+  )))
+  testthat::expect_false(any(printed == "$plotObject"))
+  testthat::expect_false(any(grepl("jaspObjectEnvironment", printed, fixed = TRUE)))
+})
+
+testthat::test_that("table wrapper printing forwards data-frame options", {
+  table <- data.frame(
+    effect = "angle",
+    stat = 21.89,
+    check.names = FALSE
+  )
+  class(table) <- c("jaspTableWrapper", "jaspWrapper", class(table))
+  attr(table, "title") <- "ANOVA Summary"
+  attr(table, "footnotes") <- list()
+
+  printed <- capture.output(returned <- print(table, row.names = FALSE))
+
+  testthat::expect_identical(returned, table)
+  testthat::expect_true(any(grepl(
+    "<jasp table: use x as a data.frame; footnotes are in attr(x, \"footnotes\")>",
+    printed,
+    fixed = TRUE
+  )))
+  testthat::expect_true(any(grepl("angle", printed, fixed = TRUE)))
+  testthat::expect_false(any(grepl("Footnotes:", printed, fixed = TRUE)))
+  testthat::expect_false(any(grepl("^1\\s+angle", printed)))
+})
+
+testthat::test_that("plot wrapper printing separates placeholders from rendering", {
+  plotWrapper <- list(plotObject = "dummy plot printed")
+  class(plotWrapper) <- c("jaspPlotWrapper", "jaspWrapper")
+  attr(plotWrapper, "title") <- "Plot"
+
+  suppressed <- capture.output(returned <- print(plotWrapper, display = FALSE))
+
+  testthat::expect_identical(returned, plotWrapper)
+  testthat::expect_true(any(grepl(
+    "<jasp plot: use x$plotObject to display or modify>",
+    suppressed,
+    fixed = TRUE
+  )))
+  testthat::expect_false(any(grepl("dummy plot printed", suppressed, fixed = TRUE)))
+
+  rendered <- capture.output(print(plotWrapper))
+  testthat::expect_true(any(grepl("dummy plot printed", rendered, fixed = TRUE)))
+})
+
+testthat::test_that("container wrapper printing formats nested paths and protects non-JASP children", {
+  plotWrapper <- list(plotObject = NULL)
+  class(plotWrapper) <- c("jaspPlotWrapper", "jaspWrapper")
+  attr(plotWrapper, "title") <- "Plot"
+
+  section <- list(Plot = plotWrapper)
+  class(section) <- c("jaspContainerWrapper", "jaspWrapper")
+  attr(section, "title") <- "Section"
+
+  result <- list(
+    Section = section,
+    Other = "plain child"
+  )
+  class(result) <- c("jaspContainerWrapper", "jaspWrapper")
+  attr(result, "title") <- "MixedModelsLMM"
+
+  printed <- capture.output(returned <- print(result))
+
+  testthat::expect_identical(returned, result)
+  testthat::expect_true(any(grepl(
+    "<jasp plot: use x$Section$Plot$plotObject to display or modify>",
+    printed,
+    fixed = TRUE
+  )))
+  testthat::expect_true(any(grepl("plain child", printed, fixed = TRUE)))
+})
+
 testthat::test_that("decodeJaspResultState decodes stored figure objects", {
   restoreDecoder <- localDecoder(c(
     JaspColumn_1_Encoded = "group",

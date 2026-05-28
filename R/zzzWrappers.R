@@ -313,6 +313,126 @@ print.jaspOutputObjR <- function(x, ...) {
   invisible(x)
 }
 
+.jaspWrapperTitle <- function(x) {
+  title <- attr(x, "title", exact = TRUE)
+  if (is.null(title) || !is.character(title) || length(title) == 0L)
+    return(NULL)
+  title[[1L]]
+}
+
+.jaspWrapperHasTitle <- function(x) {
+  title <- .jaspWrapperTitle(x)
+  !is.null(title) && nzchar(title)
+}
+
+.jaspWrapperPrintTitle <- function(x) {
+  title <- .jaspWrapperTitle(x)
+  if (!is.null(title) && nzchar(title))
+    cat(title, "\n", sep = "")
+}
+
+.jaspWrapperFormatName <- function(name) {
+  if (is.null(name) || !is.character(name) || length(name) == 0L || is.na(name[[1L]]) || !nzchar(name[[1L]]))
+    return("[[1]]")
+
+  name <- name[[1L]]
+  if (make.names(name) == name)
+    return(name)
+
+  paste0("`", gsub("`", "\\\\`", name, fixed = TRUE), "`")
+}
+
+.jaspWrapperChildPath <- function(path, name, index = 1L) {
+  formattedName <- .jaspWrapperFormatName(name)
+  if (identical(formattedName, "[[1]]"))
+    return(paste0(path, "[[", index, "]]"))
+
+  paste0(path, "$", formattedName)
+}
+
+.jaspWrapperPlainDataFrame <- function(x) {
+  class(x) <- setdiff(class(x), c("jaspTableWrapper", "jaspWrapper"))
+  x
+}
+
+.jaspWrapperHasPrintPath <- function(x) {
+  inherits(x, c("jaspContainerWrapper", "jaspTableWrapper", "jaspPlotWrapper"))
+}
+
+.jaspWrapperStripHtml <- function(x) {
+  if (is.null(x) || !is.character(x) || length(x) == 0L)
+    return("")
+
+  gsub("<[^>]+>", "", x[[1L]])
+}
+
+.jaspWrapperPrintFootnotes <- function(x) {
+  footnotes <- attr(x, "footnotes", exact = TRUE)
+  if (is.null(footnotes) || length(footnotes) == 0L)
+    return(invisible(NULL))
+
+  cat("\nFootnotes:\n")
+  for (footnote in footnotes) {
+    if (!is.list(footnote) || is.null(footnote[["text"]]))
+      next
+
+    symbol <- .jaspWrapperStripHtml(footnote[["symbol"]])
+    prefix <- if (nzchar(symbol)) paste0(symbol, " ") else ""
+    cat("- ", prefix, footnote[["text"]][[1L]], "\n", sep = "")
+  }
+
+  invisible(NULL)
+}
+
+#' @export
+print.jaspContainerWrapper <- function(x, ..., path = "x") {
+  .jaspWrapperPrintTitle(x)
+
+  childNames <- names(x)
+  for (i in seq_along(x)) {
+    if (i > 1L || .jaspWrapperHasTitle(x))
+      cat("\n")
+
+    childName <- if (!is.null(childNames) && length(childNames) >= i) childNames[[i]] else ""
+    childPath <- .jaspWrapperChildPath(path, childName, i)
+    if (.jaspWrapperHasPrintPath(x[[i]])) {
+      print(x[[i]], ..., path = childPath)
+    } else {
+      if (nzchar(childName))
+        cat(childName, "\n", sep = "")
+      print(x[[i]], ...)
+    }
+  }
+
+  invisible(x)
+}
+
+#' @export
+print.jaspTableWrapper <- function(x, ..., path = "x") {
+  .jaspWrapperPrintTitle(x)
+  cat("<jasp table: use ", path, " as a data.frame; footnotes are in attr(", path, ", \"footnotes\")>\n\n", sep = "")
+  print(.jaspWrapperPlainDataFrame(x), ...)
+  .jaspWrapperPrintFootnotes(x)
+  invisible(x)
+}
+
+#' @export
+print.jaspPlotWrapper <- function(x, ..., path = NULL, display = NULL) {
+  directPrint <- is.null(path)
+  if (is.null(display))
+    display <- directPrint
+  if (directPrint)
+    path <- "x"
+
+  .jaspWrapperPrintTitle(x)
+  cat("<jasp plot: use ", path, "$plotObject to display or modify>\n", sep = "")
+
+  if (isTRUE(display) && !is.null(x[["plotObject"]]))
+    print(x[["plotObject"]], ...)
+
+  invisible(x)
+}
+
 jaspStateR <- R6::R6Class(
   classname = "jaspStateR",
   inherit   = jaspObjR,
