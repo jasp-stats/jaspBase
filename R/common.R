@@ -1322,7 +1322,7 @@ storeDataSet <- function(dataset) {
 #' @export
 runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL,
                                quiet = getOption("jaspBase.runWrappedAnalysis.quiet", NULL),
-                               verbose = getOption("jaspBase.runWrappedAnalysis.verbose", NULL)) {
+                               verbose = getOption("jaspBase.runWrappedAnalysis.verbose", getOption("jaspSyntax.verbose", NULL))) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.

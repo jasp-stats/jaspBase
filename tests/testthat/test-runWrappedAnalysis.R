@@ -93,6 +93,25 @@ testthat::test_that("wrapped analysis verbosity normalizes legacy quiet options"
   )
 })
 
+testthat::test_that("wrapped analysis verbosity honors jaspSyntax default option", {
+  oldOptions <- options(
+    jaspBase.runWrappedAnalysis.verbose = NULL,
+    jaspSyntax.verbose = "none"
+  )
+  on.exit(do.call(options, oldOptions), add = TRUE)
+
+  testthat::expect_identical(
+    eval(formals(jaspBase::runWrappedAnalysis)$verbose),
+    "none"
+  )
+
+  options(jaspBase.runWrappedAnalysis.verbose = "jasp")
+  testthat::expect_identical(
+    eval(formals(jaspBase::runWrappedAnalysis)$verbose),
+    "jasp"
+  )
+})
+
 testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
   oldDecoder <- if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
     get(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
