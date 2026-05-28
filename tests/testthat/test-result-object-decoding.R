@@ -103,6 +103,26 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   testthat::expect_equal(attr(decoded, "title"), "group results")
 })
 
+testthat::test_that("printing output wrappers shows the R-facing object", {
+  richResult <- list(
+    toRObject = function() list(
+      "ANOVA Summary" = data.frame(
+        effect = "angle",
+        stat = 21.89,
+        check.names = FALSE
+      )
+    ),
+    print = function() stop("native wrapper print should not be used", domain = NA)
+  )
+  class(richResult) <- c("jaspOutputObjR", "jaspObjR")
+
+  printed <- capture.output(returned <- print(richResult))
+
+  testthat::expect_identical(returned, richResult)
+  testthat::expect_true(any(grepl("ANOVA Summary", printed, fixed = TRUE)))
+  testthat::expect_true(any(grepl("angle", printed, fixed = TRUE)))
+})
+
 testthat::test_that("decodeJaspResultState decodes stored figure objects", {
   restoreDecoder <- localDecoder(c(
     JaspColumn_1_Encoded = "group",
