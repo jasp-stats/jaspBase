@@ -86,8 +86,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
   jaspResults           <- jaspResultsR$new(jaspResultsCPP)
-  decodeContext         <- .currentJaspDecodeContext()
-  jaspResults$setDecodeContext(decodeContext)
 
   jaspResultsCPP$setOptions(options)
 
@@ -114,6 +112,12 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   if(preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
+
+  # Capture the analysis decode context after dataset preload: that is when the
+  # bridge exposes the encoded requested-dataset names needed to materialize
+  # R-facing results with original column and factor labels.
+  decodeContext <- .currentJaspDecodeContext()
+  jaspResults$setDecodeContext(decodeContext)
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()

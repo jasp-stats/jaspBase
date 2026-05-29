@@ -153,6 +153,52 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   testthat::expect_equal(attr(decoded, "title"), "group results")
 })
 
+testthat::test_that("decoder handles JASP-owned mixed table cells without broad object mutation", {
+  table <- data.frame(
+    JaspColumn_1_Encoded = jaspBase::createMixedColumn(
+      values = list("JaspColumn_2_Encoded", 12L),
+      types = c("string", "integer")
+    ),
+    check.names = FALSE
+  )
+
+  decoded <- jaspBase:::.decodeJaspRObject(table, decodeContext = localDecodeContext())
+  decodedCells <- vctrs::vec_data(decoded$group)
+
+  testthat::expect_s3_class(decoded$group, "mixed")
+  testthat::expect_identical(decodedCells[[1L]][["value"]], "score")
+  testthat::expect_identical(decodedCells[[2L]][["value"]], 12L)
+})
+
+testthat::test_that("decoder handles legacy scalar mixed table cells", {
+  cell <- structure(
+    list(value = "JaspColumn_2_Encoded", type = "string", format = NULL),
+    class = "mixed"
+  )
+
+  decoded <- jaspBase:::.decodeJaspRObject(cell, fieldName = "JaspColumn_1_Encoded", decodeContext = localDecodeContext())
+
+  testthat::expect_s3_class(decoded, "mixed")
+  testthat::expect_identical(decoded$value, "score")
+  testthat::expect_identical(decoded$type, "string")
+})
+
+testthat::test_that("decoder leaves foreign mixed model objects intact", {
+  object <- structure(
+    list(
+      anova_table = data.frame(JaspColumn_1_Encoded = "JaspColumn_2_Encoded", check.names = FALSE),
+      full_model = structure(list(JaspColumn_3_Encoded = "JaspColumn_1_Encoded"), class = "opaqueModel")
+    ),
+    class = "mixed",
+    type = "3",
+    method = "S"
+  )
+
+  decoded <- jaspBase:::.decodeJaspRObject(object, decodeContext = localDecodeContext())
+
+  testthat::expect_identical(decoded, object)
+})
+
 testthat::test_that("R6 result wrappers keep their analysis decode context", {
   jaspResults <- jaspBase:::jaspResultsR$new(jaspBase:::create_cpp_jaspResults("Context test", NULL))
   jaspResults$setDecodeContext(localDecodeContext())
@@ -180,6 +226,28 @@ testthat::test_that("R6 result wrappers keep their analysis decode context", {
   testthat::expect_equal(attr(decodedTable, "title"), "group table")
   testthat::expect_false(any(grepl("wrong dataset name", capture.output(str(decoded)), fixed = TRUE)))
   testthat::expect_equal(child$getDecodeContext()[["columns"]], localDecodeContext()[["columns"]])
+})
+
+testthat::test_that("decoder leaves opaque S4 internals intact", {
+  className <- paste0("OpaqueDecodeState", sample.int(.Machine$integer.max, 1L))
+  methods::setClass(className, slots = c(label = "character"), where = environment())
+  object <- methods::new(className, label = "JaspColumn_1_Encoded")
+
+  decoded <- jaspBase:::.decodeJaspRObject(object, decodeContext = localDecodeContext())
+
+  testthat::expect_s4_class(decoded, className)
+  testthat::expect_identical(methods::slot(decoded, "label"), "JaspColumn_1_Encoded")
+})
+
+testthat::test_that("decoder leaves opaque classed objects intact", {
+  object <- structure(
+    list(JaspColumn_1_Encoded = "JaspColumn_2_Encoded"),
+    class = "opaqueModelState"
+  )
+
+  decoded <- jaspBase:::.decodeJaspRObject(object, decodeContext = localDecodeContext())
+
+  testthat::expect_identical(decoded, object)
 })
 
 testthat::test_that("printing output wrappers shows the R-facing object", {
@@ -329,7 +397,7 @@ testthat::test_that("container wrapper printing formats nested paths and protect
   testthat::expect_true(any(grepl("plain child", printed, fixed = TRUE)))
 })
 
-testthat::test_that("result state decoding eagerly decodes figures and other state", {
+testthat::test_that("result state decoding eagerly decodes figures and preserves analysis state", {
   plot <- ggplot2::ggplot(
     data.frame(x = 1, y = 2),
     ggplot2::aes(x = x, y = y)
@@ -344,7 +412,7 @@ testthat::test_that("result state decoding eagerly decodes figures and other sta
       "1.png" = list(obj = plot),
       "2.png" = list(other = "JaspColumn_1_Encoded")
     ),
-    other = list(label = "JaspColumn_2_Encoded")
+    other = list(model = list(label = "JaspColumn_2_Encoded"))
   )
 
   decoded <- jaspBase:::.decodeJaspResultState(state, decodeContext = localDecodeContext())
@@ -352,7 +420,7 @@ testthat::test_that("result state decoding eagerly decodes figures and other sta
   testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$x), "group")
   testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$y), "score")
   testthat::expect_identical(decoded$figures[["2.png"]]$other, "group")
-  testthat::expect_identical(decoded$other$label, "score")
+  testthat::expect_identical(decoded$other, state$other)
 })
 
 testthat::test_that("result state decoding is internal", {

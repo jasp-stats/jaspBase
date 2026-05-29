@@ -83,13 +83,25 @@
   requestedDataset <- NULL
 
   if (requireNamespace("jaspSyntax", quietly = TRUE)) {
-    columnMapping <- tryCatch(
-      getExportedValue("jaspSyntax", "columnMapping")(strict = FALSE),
-      error = function(e) character()
-    )
     requestedDataset <- tryCatch(
       getExportedValue("jaspSyntax", "readRequestedDataset")(decode = FALSE, normalize = FALSE),
       error = function(e) NULL
+    )
+    defaultMapping <- tryCatch(
+      getExportedValue("jaspSyntax", "columnMapping")(strict = FALSE),
+      error = function(e) character()
+    )
+    requestedMapping <- character()
+    requestedNames <- if (is.data.frame(requestedDataset)) names(requestedDataset) else character()
+    if (length(requestedNames) > 0L && .containsJaspEncodedTokens(requestedNames)) {
+      requestedMapping <- tryCatch(
+        getExportedValue("jaspSyntax", "columnMapping")(requestedNames, strict = FALSE),
+        error = function(e) character()
+      )
+    }
+    columnMapping <- c(
+      requestedMapping,
+      defaultMapping[setdiff(names(defaultMapping), names(requestedMapping))]
     )
   }
 
@@ -292,8 +304,9 @@
     }
   }
 
-  if (!is.null(state[["other"]]))
-    state[["other"]] <- .decodeJaspRObject(state[["other"]], decodeContext = decodeContext)
+  # `other` contains jaspState payloads: arbitrary analysis-owned R objects
+  # restored into the next run. Keep those objects opaque. Display/replay state
+  # that JASP owns lives under `figures` and is decoded above.
 
   otherFields <- setdiff(names(state), c("figures", "other"))
   for (field in otherFields)
