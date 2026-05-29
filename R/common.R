@@ -30,10 +30,12 @@ loadJaspResults <- function(name) {
   create_cpp_jaspResults(name, .retrieveState())
 }
 
-finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
+finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE, decodeContext = NULL) {
 
   jaspResultsCPP$prepareForWriting()
-  decodeContext <- .currentJaspDecodeContext()
+  if (is.null(decodeContext) && !isTRUE(calledFromAnalysis))
+    decodeContext <- .jaspDecodeContext(source = "stored-result-state")
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
 
   newState <- list(
     figures = jaspResultsCPP$getPlotObjectsForState(),
@@ -84,6 +86,8 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
   jaspResults           <- jaspResultsR$new(jaspResultsCPP)
+  decodeContext         <- .currentJaspDecodeContext()
+  jaspResults$setDecodeContext(decodeContext)
 
   jaspResultsCPP$setOptions(options)
 
@@ -141,7 +145,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
     }
 
-    finishJaspResults(jaspResultsCPP)
+    finishJaspResults(jaspResultsCPP, decodeContext = decodeContext)
     return(jaspResults)
   }
 
@@ -167,7 +171,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     return(paste0("{ \"status\" : \"", errorStatus, "\", \"results\" : { \"title\" : \"error\", \"error\" : 1, \"errorMessage\" : \"", errorMessage, "\" } }", sep=""))
   } else {
 
-    returnThis <- finishJaspResults(jaspResultsCPP)
+    returnThis <- finishJaspResults(jaspResultsCPP, decodeContext = decodeContext)
 
     json <- try({ toJSON(returnThis) })
     if (isTryError(json))
@@ -836,7 +840,11 @@ saveImage <- function(plotName, format, height, width)
   state           <- .retrieveState()     # Retrieve plot object from state
   plt             <- state[["figures"]][[plotName]][["obj"]]
 
-  plt             <- .decodeJaspPlotObject(plt, returnGrob = FALSE);
+  plt             <- .decodeJaspPlotObject(
+    plt,
+    returnGrob = FALSE,
+    decodeContext = .jaspDecodeContext(source = "stored-result-state")
+  )
 
   location        <- .fromRCPP(".requestTempFileNameNative", "png") # create file location string to extract the root location
   backgroundColor <- .fromRCPP(".imageBackground")
@@ -1042,7 +1050,11 @@ rewriteImages <- function(name, ppi, imageBackground) {
 
       jaspPlotCPP$editing <- TRUE
 
-      plot <- jaspPlotCPP$plotObject
+      plot <- .decodeJaspPlotObject(
+        jaspPlotCPP$plotObject,
+        returnGrob = FALSE,
+        decodeContext = .jaspDecodeContext(source = "stored-result-state")
+      )
 
       # here we can modify general things for all plots (theme, font, etc.).
       # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
@@ -1093,7 +1105,11 @@ editImage <- function(name, optionsJson) {
     jaspPlotCPP$editing <- TRUE
     on.exit({jaspPlotCPP$editing <- FALSE}) # this should not persist!
 
-    plot <- jaspPlotCPP$plotObject
+    plot <- .decodeJaspPlotObject(
+      jaspPlotCPP$plotObject,
+      returnGrob = FALSE,
+      decodeContext = .jaspDecodeContext(source = "stored-result-state")
+    )
     if (is.null(plot))
       stop("no plot object found")
 
@@ -1134,8 +1150,10 @@ editImage <- function(name, optionsJson) {
       newPlot       <- jaspGraphs::plotEditing(newPlot, newOpts)
 
       # plot editing did nothing or was canceled
-      if (!identical(plot, newPlot))
+      if (!identical(plot, newPlot)) {
         jaspPlotCPP$plotObject <- newPlot
+        plot <- newPlot
+      }
 
     }
     interactiveJsonData <- jaspPlotCPP$interactiveJsonData

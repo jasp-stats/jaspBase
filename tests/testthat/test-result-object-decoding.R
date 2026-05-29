@@ -153,6 +153,35 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   testthat::expect_equal(attr(decoded, "title"), "group results")
 })
 
+testthat::test_that("R6 result wrappers keep their analysis decode context", {
+  jaspResults <- jaspBase:::jaspResultsR$new(jaspBase:::create_cpp_jaspResults("Context test", NULL))
+  jaspResults$setDecodeContext(localDecodeContext())
+  on.exit({
+    jaspBase:::destroyAllAllocatedObjects()
+    jaspBase:::destroyAllAllocatedRObjects()
+  }, add = TRUE)
+
+  table <- jaspBase::createJaspTable(
+    title = "JaspColumn_1_Encoded table",
+    data = data.frame(JaspColumn_1_Encoded = c("1", "2"), check.names = FALSE)
+  )
+  jaspResults[["JaspColumn_1_Encoded"]] <- table
+
+  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
+  on.exit(restoreDecoder(), add = TRUE)
+
+  decoded <- jaspResults$toRObject()
+  child <- jaspResults[["JaspColumn_1_Encoded"]]
+  decodedTable <- decoded[[1L]]
+
+  testthat::expect_equal(names(decoded), "group table")
+  testthat::expect_equal(names(decodedTable), "group")
+  testthat::expect_equal(decodedTable$group, c("control", "treatment"))
+  testthat::expect_equal(attr(decodedTable, "title"), "group table")
+  testthat::expect_false(any(grepl("wrong dataset name", capture.output(str(decoded)), fixed = TRUE)))
+  testthat::expect_equal(child$getDecodeContext()[["columns"]], localDecodeContext()[["columns"]])
+})
+
 testthat::test_that("printing output wrappers shows the R-facing object", {
   richResult <- list(
     toRObject = function() list(
@@ -357,7 +386,7 @@ testthat::test_that("decoded result objects persist without a live decoder", {
 })
 
 testthat::test_that("missing decode context warns for encoded legacy state", {
-  restoreDecoder <- localDecoder(stats::setNames(character(), character()))
+  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
   on.exit(restoreDecoder(), add = TRUE)
 
   state <- list(other = list(label = "JaspColumn_1_Encoded"))
