@@ -163,6 +163,13 @@ jaspObjR <- R6::R6Class(
   public    = list(
     initialize = function()	stop("You should not create a new jaspObject!", domain = NA),
     print      = function()	private$jaspObject$print(),
+    setDecodeContext = function(decodeContext = NULL) {
+      private$decodeContext <- if (is.null(decodeContext)) NULL else .serializableJaspDecodeContext(decodeContext)
+      invisible(self)
+    },
+    getDecodeContext = function() {
+      private$decodeContext
+    },
     dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL, nestedOptions = NULL, nestedOptionsContainsValue = NULL) {
 
       if (is.jaspDeps(options)) {
@@ -299,6 +306,7 @@ jaspObjR <- R6::R6Class(
   ),
   private = list(
     jaspObject    = NULL,
+    decodeContext = NULL,
     getJaspObject = function(R6obj) R6obj$.__enclos_env__$private$jaspObject
   )
 )
@@ -478,7 +486,7 @@ jaspOutputObjR <- R6::R6Class(
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
     },
-    toRObject   = function() .decodeJaspRObject(private$jaspObject$toRObject(), decodeContext = .currentJaspDecodeContext()),
+    toRObject   = function() .decodeJaspRObjectFromCpp(private$jaspObject, decodeContext = self$getDecodeContext()),
     toHtml      = function() private$jaspObject$toHtml()
   ),
   active = list(
@@ -685,7 +693,7 @@ jaspContainerR <- R6::R6Class(
     children    = list(),
     jaspObject  = NULL,
     jaspCppToR6 = function(cppObj) {
-      return(switch(
+      r6Obj <- switch(
         class(cppObj),
         "Rcpp_jaspPlot"      = jaspPlotR$new(      jaspObject = cppObj ),
         "Rcpp_jaspTable"     = jaspTableR$new(     jaspObject = cppObj ),
@@ -696,11 +704,16 @@ jaspContainerR <- R6::R6Class(
         "Rcpp_jaspQmlSource" = jaspQmlSourceR$new(jaspObject = cppObj  ),
 		    "Rcpp_jaspReport"    = jaspReportR$new(    jaspObject = cppObj ),
         stop(sprintf("Invalid call to jaspCppToR6. Expected jaspResults object but got %s", class(cppObj)), domain = NA)
-      ))
+      )
+      if (is.JaspResultsObj(r6Obj))
+        r6Obj$setDecodeContext(private$decodeContext)
+      r6Obj
     },
     #These two functions should be the exact same as those for jaspResults
     setField   = function(field, value) {
       field <- decodeName(field)
+      if (is.JaspResultsObj(value))
+        value$setDecodeContext(private$decodeContext)
       private$jaspObject[[field]] <- private$getJaspObject(value);
       private$children[[field]]   <- value;
     },

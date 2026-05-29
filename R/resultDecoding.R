@@ -1,4 +1,4 @@
-.jaspDecodeContext <- function(columns = character(), factors = list(), source = "manual") {
+.jaspDecodeContext <- function(columns = character(), factors = list(), source = "manual", allowLiveFallback = FALSE) {
   columns <- .normalizeJaspColumnMapping(columns)
   factors <- .normalizeJaspFactorMappings(factors, columns)
 
@@ -7,6 +7,7 @@
     columns = columns,
     factors = factors,
     source = source,
+    allowLiveFallback = isTRUE(allowLiveFallback),
     warningState = new.env(parent = emptyenv())
   )
 }
@@ -17,11 +18,67 @@
     version = decodeContext[["version"]],
     columns = decodeContext[["columns"]],
     factors = decodeContext[["factors"]],
-    source = decodeContext[["source"]]
+    source = decodeContext[["source"]],
+    allowLiveFallback = isTRUE(decodeContext[["allowLiveFallback"]])
   )
 }
 
-.currentJaspDecodeContext <- function() {
+.withJaspDecodeContextDecoder <- function(decodeContext, expr) {
+  if (is.null(decodeContext))
+    return(eval.parent(substitute(expr)))
+
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  columns <- decodeContext[["columns"]]
+
+  oldStrict <- .globalBinding(".decodeColNamesStrict")
+  oldLax    <- .globalBinding(".decodeColNamesLax")
+  on.exit({
+    .restoreGlobalBinding(".decodeColNamesStrict", oldStrict)
+    .restoreGlobalBinding(".decodeColNamesLax", oldLax)
+  }, add = TRUE)
+
+  assign(".decodeColNamesStrict", .decodeJaspColumnsStrict(columns), envir = .GlobalEnv)
+  assign(".decodeColNamesLax",    .decodeJaspColumnsLax(columns),    envir = .GlobalEnv)
+
+  eval.parent(substitute(expr))
+}
+
+.globalBinding <- function(name) {
+  exists <- exists(name, envir = .GlobalEnv, inherits = FALSE)
+  list(
+    exists = exists,
+    value = if (exists) get(name, envir = .GlobalEnv, inherits = FALSE) else NULL
+  )
+}
+
+.restoreGlobalBinding <- function(name, binding) {
+  if (isTRUE(binding[["exists"]])) {
+    assign(name, binding[["value"]], envir = .GlobalEnv)
+  } else if (exists(name, envir = .GlobalEnv, inherits = FALSE)) {
+    rm(list = name, envir = .GlobalEnv)
+  }
+  invisible(NULL)
+}
+
+.decodeJaspColumnsStrict <- function(columnMapping) {
+  force(columnMapping)
+  function(x) {
+    if (!is.character(x) || length(x) == 0L || length(columnMapping) == 0L)
+      return(x)
+
+    out <- x
+    matched <- !is.na(out) & out %in% names(columnMapping)
+    out[matched] <- unname(columnMapping[out[matched]])
+    out
+  }
+}
+
+.decodeJaspColumnsLax <- function(columnMapping) {
+  force(columnMapping)
+  function(x) .decodeJaspColumnText(x, columnMapping)
+}
+
+.currentJaspDecodeContext <- function(allowLiveFallback = FALSE) {
   columnMapping <- character()
   requestedDataset <- NULL
 
@@ -39,13 +96,14 @@
   .jaspDecodeContext(
     columns = columnMapping,
     factors = .jaspFactorMappingsFromDataset(requestedDataset, columnMapping),
-    source = "jaspSyntax"
+    source = "jaspSyntax",
+    allowLiveFallback = allowLiveFallback
   )
 }
 
-.normalizeJaspDecodeContext <- function(decodeContext = NULL) {
+.normalizeJaspDecodeContext <- function(decodeContext = NULL, allowLiveFallback = is.null(decodeContext)) {
   if (is.null(decodeContext))
-    return(.currentJaspDecodeContext())
+    return(.currentJaspDecodeContext(allowLiveFallback = allowLiveFallback))
 
   decodeContext[["columns"]] <- .normalizeJaspColumnMapping(decodeContext[["columns"]])
   decodeContext[["factors"]] <- .normalizeJaspFactorMappings(decodeContext[["factors"]], decodeContext[["columns"]])
@@ -53,6 +111,7 @@
     decodeContext[["version"]] <- 1L
   if (is.null(decodeContext[["source"]]))
     decodeContext[["source"]] <- "unknown"
+  decodeContext[["allowLiveFallback"]] <- isTRUE(decodeContext[["allowLiveFallback"]])
   if (!is.environment(decodeContext[["warningState"]]))
     decodeContext[["warningState"]] <- new.env(parent = emptyenv())
 
@@ -193,7 +252,7 @@
   x <- .decodeJaspFactorValues(x, fieldName = fieldName, decodeContext = decodeContext)
   x <- .decodeJaspColumnText(x, decodeContext[["columns"]])
 
-  if (length(decodeContext[["columns"]]) == 0L) {
+  if (isTRUE(decodeContext[["allowLiveFallback"]]) && length(decodeContext[["columns"]]) == 0L) {
     fallback <- tryCatch(
       decodeColNames(x, strict = FALSE),
       error = function(e) x
@@ -262,4 +321,10 @@
     decoded <- .markJaspDecodedPlotObject(decoded)
 
   decoded
+}
+
+.decodeJaspRObjectFromCpp <- function(jaspObject, decodeContext = NULL) {
+  .withJaspDecodeContextDecoder(decodeContext, {
+    .decodeJaspRObject(jaspObject$toRObject(), decodeContext = decodeContext)
+  })
 }
