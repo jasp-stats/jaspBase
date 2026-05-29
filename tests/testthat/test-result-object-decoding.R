@@ -25,13 +25,20 @@ localDecoder <- function(mapping) {
   }
 }
 
-testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
-  restoreDecoder <- localDecoder(c(
-    JaspColumn_1_Encoded = "group",
-    JaspColumn_2_Encoded = "score"
-  ))
-  on.exit(restoreDecoder(), add = TRUE)
+localDecodeContext <- function() {
+  jaspBase:::.jaspDecodeContext(
+    columns = c(
+      JaspColumn_1_Encoded = "group",
+      JaspColumn_2_Encoded = "score",
+      JaspColumn_3_Encoded = "cluster"
+    ),
+    factors = list(
+      JaspColumn_1_Encoded = c("1" = "control", "2" = "treatment")
+    )
+  )
+}
 
+testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
   plot <- ggplot2::ggplot(
     data.frame(x = 1, y = 2),
     ggplot2::aes(x = x, y = y)
@@ -42,22 +49,64 @@ testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
       y = "JaspColumn_2_Encoded"
     )
 
-  decoded <- jaspBase:::decodeplot(plot, returnGrob = FALSE)
+  decoded <- jaspBase:::decodeplot(plot, returnGrob = FALSE, decodeContext = localDecodeContext())
 
   testthat::expect_equal(unname(decoded$labels$x), "group")
   testthat::expect_equal(unname(decoded$labels$y), "score")
 })
 
-testthat::test_that("toRObject result copies decode tables, footnotes, and plots", {
-  restoreDecoder <- localDecoder(c(
-    JaspColumn_1_Encoded = "group",
-    JaspColumn_2_Encoded = "score",
-    JaspColumn_3_Encoded = "cluster"
-  ))
-  on.exit(restoreDecoder(), add = TRUE)
+testthat::test_that("writeImage uses decoded editable objects for state and interactive conversion", {
+  ns <- asNamespace("jaspGraphs")
+  original <- get("convertGgplotToPlotly", envir = ns)
+  captured <- new.env(parent = emptyenv())
+  unlockBinding("convertGgplotToPlotly", ns)
+  assign("convertGgplotToPlotly", function(plot, ...) {
+    captured$x <- unname(plot$labels$x)
+    "{}"
+  }, envir = ns)
+  lockBinding("convertGgplotToPlotly", ns)
+  on.exit({
+    unlockBinding("convertGgplotToPlotly", ns)
+    assign("convertGgplotToPlotly", original, envir = ns)
+    lockBinding("convertGgplotToPlotly", ns)
+  }, add = TRUE)
 
+  oldTempFile <- if (exists(".requestTempFileNameNative", envir = .GlobalEnv, inherits = FALSE)) get(".requestTempFileNameNative", envir = .GlobalEnv) else NULL
+  oldBackground <- if (exists(".imageBackground", envir = .GlobalEnv, inherits = FALSE)) get(".imageBackground", envir = .GlobalEnv) else NULL
+  oldPpi <- if (exists(".ppi", envir = .GlobalEnv, inherits = FALSE)) get(".ppi", envir = .GlobalEnv) else NULL
+  hadTempFile <- exists(".requestTempFileNameNative", envir = .GlobalEnv, inherits = FALSE)
+  hadBackground <- exists(".imageBackground", envir = .GlobalEnv, inherits = FALSE)
+  hadPpi <- exists(".ppi", envir = .GlobalEnv, inherits = FALSE)
+  on.exit({
+    if (hadTempFile) assign(".requestTempFileNameNative", oldTempFile, envir = .GlobalEnv) else if (exists(".requestTempFileNameNative", envir = .GlobalEnv, inherits = FALSE)) rm(".requestTempFileNameNative", envir = .GlobalEnv)
+    if (hadBackground) assign(".imageBackground", oldBackground, envir = .GlobalEnv) else if (exists(".imageBackground", envir = .GlobalEnv, inherits = FALSE)) rm(".imageBackground", envir = .GlobalEnv)
+    if (hadPpi) assign(".ppi", oldPpi, envir = .GlobalEnv) else if (exists(".ppi", envir = .GlobalEnv, inherits = FALSE)) rm(".ppi", envir = .GlobalEnv)
+  }, add = TRUE)
+  assign(".requestTempFileNameNative", function(extension) list(root = tempdir(), relativePath = paste0("decoded-write-image.", extension)), envir = .GlobalEnv)
+  assign(".imageBackground", "white", envir = .GlobalEnv)
+  assign(".ppi", 300, envir = .GlobalEnv)
+
+  plot <- ggplot2::ggplot(
+    data.frame(x = 1, y = 2),
+    ggplot2::aes(x = x, y = y)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = "JaspColumn_1_Encoded")
+
+  image <- jaspBase:::writeImageJaspResults(
+    plot,
+    location = list(root = tempdir(), relativePath = "decoded-write-image.png"),
+    decodeContext = localDecodeContext()
+  )
+
+  testthat::expect_equal(unname(image$obj$labels$x), "group")
+  testthat::expect_equal(captured$x, "group")
+})
+
+testthat::test_that("toRObject result copies decode tables, footnotes, and plots", {
   table <- data.frame(
-    JaspColumn_1_Encoded = "JaspColumn_2_Encoded",
+    JaspColumn_1_Encoded = c("1", "2"),
+    label = "JaspColumn_2_Encoded",
     check.names = FALSE
   )
   class(table) <- c("jaspTableWrapper", "jaspWrapper", class(table))
@@ -87,11 +136,12 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   class(result) <- c("jaspContainerWrapper", "jaspWrapper")
   attr(result, "title") <- "JaspColumn_1_Encoded results"
 
-  decoded <- jaspBase:::.decodeJaspRObject(result)
+  decoded <- jaspBase:::.decodeJaspRObject(result, decodeContext = localDecodeContext())
 
   testthat::expect_equal(names(decoded), c("group", "Plot"))
-  testthat::expect_equal(names(decoded$group), "group")
-  testthat::expect_equal(decoded$group$group, "score")
+  testthat::expect_equal(names(decoded$group), c("group", "label"))
+  testthat::expect_equal(decoded$group$group, c("control", "treatment"))
+  testthat::expect_equal(decoded$group$label, c("score", "score"))
   testthat::expect_equal(attr(decoded$group, "title"), "group table")
   testthat::expect_equal(
     attr(decoded$group, "footnotes")[[1L]]$text,
@@ -250,13 +300,7 @@ testthat::test_that("container wrapper printing formats nested paths and protect
   testthat::expect_true(any(grepl("plain child", printed, fixed = TRUE)))
 })
 
-testthat::test_that("decodeJaspResultState decodes stored figure objects", {
-  restoreDecoder <- localDecoder(c(
-    JaspColumn_1_Encoded = "group",
-    JaspColumn_2_Encoded = "score"
-  ))
-  on.exit(restoreDecoder(), add = TRUE)
-
+testthat::test_that("result state decoding eagerly decodes figures and other state", {
   plot <- ggplot2::ggplot(
     data.frame(x = 1, y = 2),
     ggplot2::aes(x = x, y = y)
@@ -274,10 +318,53 @@ testthat::test_that("decodeJaspResultState decodes stored figure objects", {
     other = list(label = "JaspColumn_2_Encoded")
   )
 
-  decoded <- jaspBase::decodeJaspResultState(state)
+  decoded <- jaspBase:::.decodeJaspResultState(state, decodeContext = localDecodeContext())
 
   testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$x), "group")
   testthat::expect_equal(unname(decoded$figures[["1.png"]]$obj$labels$y), "score")
-  testthat::expect_identical(decoded$figures[["2.png"]]$other, "JaspColumn_1_Encoded")
-  testthat::expect_identical(decoded$other$label, "JaspColumn_2_Encoded")
+  testthat::expect_identical(decoded$figures[["2.png"]]$other, "group")
+  testthat::expect_identical(decoded$other$label, "score")
+})
+
+testthat::test_that("result state decoding is internal", {
+  testthat::expect_false("decodeJaspResultState" %in% getNamespaceExports("jaspBase"))
+})
+
+testthat::test_that("decoded result objects persist without a live decoder", {
+  plot <- ggplot2::ggplot(
+    data.frame(x = 1, y = 2),
+    ggplot2::aes(x = x, y = y)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = "JaspColumn_1_Encoded")
+
+  result <- list(
+    table = data.frame(JaspColumn_1_Encoded = c("1", "2"), check.names = FALSE),
+    plot = list(plotObject = plot)
+  )
+  class(result$plot) <- c("jaspPlotWrapper", "jaspWrapper")
+
+  decoded <- jaspBase:::.decodeJaspRObject(result, decodeContext = localDecodeContext())
+  path <- tempfile(fileext = ".rds")
+  saveRDS(decoded, path)
+
+  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
+  on.exit(restoreDecoder(), add = TRUE)
+
+  restored <- readRDS(path)
+  testthat::expect_equal(restored$table$group, c("control", "treatment"))
+  testthat::expect_equal(unname(restored$plot$plotObject$labels$x), "group")
+})
+
+testthat::test_that("missing decode context warns for encoded legacy state", {
+  restoreDecoder <- localDecoder(stats::setNames(character(), character()))
+  on.exit(restoreDecoder(), add = TRUE)
+
+  state <- list(other = list(label = "JaspColumn_1_Encoded"))
+
+  testthat::expect_warning(
+    decoded <- jaspBase:::.decodeJaspResultState(state, decodeContext = jaspBase:::.jaspDecodeContext()),
+    "no analysis decode context"
+  )
+  testthat::expect_identical(decoded$other$label, "JaspColumn_1_Encoded")
 })

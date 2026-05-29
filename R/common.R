@@ -33,13 +33,15 @@ loadJaspResults <- function(name) {
 finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
 
   jaspResultsCPP$prepareForWriting()
+  decodeContext <- .currentJaspDecodeContext()
 
   newState <- list(
     figures = jaspResultsCPP$getPlotObjectsForState(),
     other   = jaspResultsCPP$getOtherObjectsForState()
   )
+  newState <- .decodeJaspResultState(newState, decodeContext = decodeContext)
 
-  jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
+  jaspResultsCPP$relativePathKeep <- .saveState(newState, decodeContext = decodeContext)$relativePath
 
   returnThis <- NULL
   if (calledFromAnalysis) {
@@ -676,11 +678,13 @@ jaspResultsStrings <- function() {
   location$relativePath
 }
 
-.saveState <- function(state) {
+.saveState <- function(state, decodeContext = NULL) {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
   statePath <- .stateFilePath(location)
   fs::dir_create(fs::path_dir(statePath))
+
+  state <- .decodeJaspResultState(state, decodeContext = decodeContext)
 
   try(suppressWarnings(base::save(state, file=statePath, compress=FALSE)), silent = FALSE)
 
@@ -832,7 +836,7 @@ saveImage <- function(plotName, format, height, width)
   state           <- .retrieveState()     # Retrieve plot object from state
   plt             <- state[["figures"]][[plotName]][["obj"]]
 
-  plt             <- decodeplot(plt);
+  plt             <- .decodeJaspPlotObject(plt, returnGrob = FALSE);
 
   location        <- .fromRCPP(".requestTempFileNameNative", "png") # create file location string to extract the root location
   backgroundColor <- .fromRCPP(".imageBackground")
@@ -1227,13 +1231,13 @@ storeDataSet <- function(dataset) {
   verbose %in% c("all", "jasp")
 }
 
-.decodeRunWrappedAnalysisConditionMessage <- function(condition) {
+.decodeRunWrappedAnalysisConditionMessage <- function(condition, decodeContext = NULL) {
   message <- conditionMessage(condition)
   if (!is.character(message) || length(message) != 1L || is.na(message) || !nzchar(message))
     return(message)
 
   decoded <- tryCatch(
-    decodeColNames(message, strict = FALSE),
+    .decodeJaspText(message, decodeContext = decodeContext),
     error = function(e) message
   )
   if (!is.character(decoded) || length(decoded) != 1L || is.na(decoded))

@@ -107,8 +107,10 @@ void jaspPlot::renderPlot()
 			writeResult = tryToWriteImage(Rcpp::_["width"] = _width, Rcpp::_["height"] = _height, Rcpp::_["plot"] = obj, Rcpp::_["oldPlotInfo"] = oldPlotInfo, Rcpp::_["relativePathpng"] = R_NilValue);
 		}
 
-		// we need to overwrite plot functions with their recordedplot result
-		if(Rcpp::is<Rcpp::Function>(obj) && writeResult.containsElementNamed("obj"))
+		// Keep the state object in sync with the rendered object. R returns an
+		// editable decoded object for ggplot-like plots and a materialized object
+		// for function/base plots.
+		if(writeResult.containsElementNamed("obj"))
 			plotInfo["obj"] = writeResult["obj"];
 
 		if(writeResult.containsElementNamed("png"))
