@@ -31,6 +31,7 @@ Imports:
   rvg,
   svglite,
   systemfonts,
+  vctrs,
   withr
 Remotes:
   jasp-stats/jaspGraphs

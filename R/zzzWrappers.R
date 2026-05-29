@@ -516,6 +516,9 @@ jaspOutputObjR <- R6::R6Class(
     return(x)
   }
 
+  if (.isJaspMixedObject(x))
+    return(.decodeJaspMixedObject(x, fieldName = fieldName, decodeContext = decodeContext))
+
   if (is.data.frame(x)) {
     oldNames <- names(x)
     for (name in oldNames)
@@ -526,6 +529,17 @@ jaspOutputObjR <- R6::R6Class(
       row.names(x) <- .decodeJaspText(rowNames, decodeContext = decodeContext)
     return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
   }
+
+  # Decode only JASP-owned result wrappers and plain R result payloads here.
+  # Model objects from analysis packages can be S3/S4 lists internally; rewriting
+  # their slots, attributes, or names mutates package-owned state and can break
+  # invariants such as lme4 response objects. In particular, external packages
+  # may use class names that overlap with JASP display helpers.
+  if (isS4(x) || is.call(x) || is.name(x))
+    return(x)
+
+  if (is.object(x) && !inherits(x, "jaspWrapper"))
+    return(x)
 
   if (is.list(x)) {
     oldNames <- names(x)
@@ -553,6 +567,48 @@ jaspOutputObjR <- R6::R6Class(
     names(x) <- .decodeJaspText(objectNames, decodeContext = decodeContext)
 
   .decodeJaspRObjectAttributes(x, decodeContext = decodeContext)
+}
+
+.isJaspMixedObject <- function(x) {
+  if (!inherits(x, "mixed"))
+    return(FALSE)
+
+  if (inherits(x, "vctrs_vctr"))
+    return(!is.null(attr(x, "column", exact = TRUE)))
+
+  is.list(x) && all(c("value", "type", "format") %in% names(x))
+}
+
+.decodeJaspMixedObject <- function(x, fieldName = NULL, decodeContext = NULL) {
+  if (!inherits(x, "vctrs_vctr")) {
+    oldNames <- names(x)
+    for (i in seq_along(x))
+      x[[i]] <- .decodeJaspRObject(
+        x[[i]],
+        fieldName = if (!is.null(oldNames) && length(oldNames) >= i && identical(oldNames[[i]], "value")) fieldName else NULL,
+        decodeContext = decodeContext
+      )
+    return(x)
+  }
+
+  data <- vctrs::vec_data(x)
+  for (i in seq_along(data)) {
+    cell <- data[[i]]
+    if (is.list(cell) && !is.null(cell[["value"]])) {
+      cell[["value"]] <- .decodeJaspRObject(
+        cell[["value"]],
+        fieldName = fieldName,
+        decodeContext = decodeContext
+      )
+      data[[i]] <- cell
+    }
+  }
+
+  result <- vctrs::new_vctr(data, column = attr(x, "column", exact = TRUE), class = "mixed")
+  objectNames <- names(x)
+  if (!is.null(objectNames))
+    names(result) <- .decodeJaspText(objectNames, decodeContext = decodeContext)
+  result
 }
 
 .decodeJaspRObjectAttributes <- function(x, decodeContext = NULL) {
