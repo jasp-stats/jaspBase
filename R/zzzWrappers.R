@@ -478,7 +478,7 @@ jaspOutputObjR <- R6::R6Class(
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
     },
-    toRObject   = function() .decodeJaspRObject(private$jaspObject$toRObject()),
+    toRObject   = function() .decodeJaspRObject(private$jaspObject$toRObject(), decodeContext = .currentJaspDecodeContext()),
     toHtml      = function() private$jaspObject$toHtml()
   ),
   active = list(
@@ -488,49 +488,74 @@ jaspOutputObjR <- R6::R6Class(
   )
 )
 
-.decodeJaspRObject <- function(x) {
+.decodeJaspRObject <- function(x, fieldName = NULL, decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+
   if (is.null(x))
     return(x)
 
   if (inherits(x, "jaspPlotWrapper")) {
     if (!is.null(x[["plotObject"]]))
-      x[["plotObject"]] <- .decodeJaspPlotObject(x[["plotObject"]])
-    return(.decodeJaspRObjectAttributes(x))
+      x[["plotObject"]] <- .decodeJaspPlotObject(x[["plotObject"]], returnGrob = FALSE, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
   }
 
   if (is.character(x))
-    return(decodeColNames(x))
+    return(.decodeJaspText(x, fieldName = fieldName, decodeContext = decodeContext))
 
   if (is.factor(x)) {
-    levels(x) <- decodeColNames(levels(x))
+    levels(x) <- .decodeJaspText(levels(x), fieldName = fieldName, decodeContext = decodeContext)
     return(x)
   }
 
   if (is.data.frame(x)) {
-    for (name in names(x))
-      x[[name]] <- .decodeJaspRObject(x[[name]])
-    names(x) <- decodeColNames(names(x))
-    return(.decodeJaspRObjectAttributes(x))
+    oldNames <- names(x)
+    for (name in oldNames)
+      x[[name]] <- .decodeJaspRObject(x[[name]], fieldName = name, decodeContext = decodeContext)
+    names(x) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+    rowNames <- row.names(x)
+    if (is.character(rowNames))
+      row.names(x) <- .decodeJaspText(rowNames, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
   }
 
   if (is.list(x)) {
+    oldNames <- names(x)
     for (i in seq_along(x))
-      x[[i]] <- .decodeJaspRObject(x[[i]])
-    names(x) <- decodeColNames(names(x))
-    return(.decodeJaspRObjectAttributes(x))
+      x[[i]] <- .decodeJaspRObject(
+        x[[i]],
+        fieldName = if (!is.null(oldNames) && length(oldNames) >= i) oldNames[[i]] else NULL,
+        decodeContext = decodeContext
+      )
+    names(x) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
   }
 
-  .decodeJaspRObjectAttributes(x)
+  decodedFactorValues <- .decodeJaspFactorValues(x, fieldName = fieldName, decodeContext = decodeContext)
+  if (!identical(decodedFactorValues, x))
+    return(decodedFactorValues)
+
+  dimNames <- dimnames(x)
+  if (!is.null(dimNames)) {
+    dimnames(x) <- lapply(dimNames, .decodeJaspText, decodeContext = decodeContext)
+  }
+
+  objectNames <- names(x)
+  if (!is.null(objectNames))
+    names(x) <- .decodeJaspText(objectNames, decodeContext = decodeContext)
+
+  .decodeJaspRObjectAttributes(x, decodeContext = decodeContext)
 }
 
-.decodeJaspRObjectAttributes <- function(x) {
+.decodeJaspRObjectAttributes <- function(x, decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   attributesToDecode <- setdiff(
     names(attributes(x)),
     c("class", "dim", "dimnames", "names", "row.names", "jaspObjectEnvironment")
   )
 
   for (attribute in attributesToDecode)
-    attr(x, attribute) <- .decodeJaspRObject(attr(x, attribute))
+    attr(x, attribute) <- .decodeJaspRObject(attr(x, attribute), fieldName = attribute, decodeContext = decodeContext)
 
   x
 }
