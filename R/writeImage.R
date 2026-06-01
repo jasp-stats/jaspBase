@@ -80,7 +80,11 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   height <- height * (ppi / 96)
 
   plotObject <- .decodeJaspPlotObject(plot, returnGrob = FALSE, decodeContext = decodeContext)
-  plot2draw <- plotObject
+  plot2draw  <- if (ggplot2::is.ggplot(plot)) {
+    .decodeJaspPlotObject(plot, returnGrob = TRUE, decodeContext = decodeContext)
+  } else {
+    plotObject
+  }
 
   openGrDevice(file = relativePathpng, width = width, height = height, res = 72 * (ppi / 96), background = backgroundColor)#, dpi = ppi)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -184,6 +188,18 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ..., decodeContext = NULL) {
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
   # alternatively, those edge cases will need to be handled by the developer.
+  x$data    <- .decodeGgplotData(x$data, decodeContext = decodeContext)
+  x$mapping <- .decodeGgplotMapping(x$mapping, decodeContext = decodeContext)
+
+  for (i in seq_along(x$layers)) {
+    x$layers[[i]]$data    <- .decodeGgplotData(x$layers[[i]]$data, decodeContext = decodeContext)
+    x$layers[[i]]$mapping <- .decodeGgplotMapping(x$layers[[i]]$mapping, decodeContext = decodeContext)
+  }
+
+  x$facet$params$facets <- .decodeGgplotMapping(x$facet$params$facets, decodeContext = decodeContext)
+  x$facet$params$rows   <- .decodeGgplotMapping(x$facet$params$rows,   decodeContext = decodeContext)
+  x$facet$params$cols   <- .decodeGgplotMapping(x$facet$params$cols,   decodeContext = decodeContext)
+
   labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
   for (i in seq_along(labels))
     if (!is.null(labels[[i]]))
@@ -238,6 +254,53 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ..., decodeContext = NULL) {
     return(decodeplot.gTree(ggplot2::ggplotGrob(x), decodeContext = decodeContext))
   } else {
     return(x)
+  }
+}
+
+.decodeGgplotData <- function(data, decodeContext = NULL) {
+  if (is.data.frame(data))
+    .decodeJaspRObject(data, decodeContext = decodeContext)
+  else
+    data
+}
+
+.decodeGgplotMapping <- function(mapping, decodeContext = NULL) {
+  if (is.null(mapping) || length(mapping) == 0L)
+    return(mapping)
+
+  oldNames <- names(mapping)
+  for (i in seq_along(mapping))
+    mapping[[i]] <- .decodeGgplotExpression(mapping[[i]], decodeContext = decodeContext)
+  if (!is.null(oldNames))
+    names(mapping) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+
+  mapping
+}
+
+.decodeGgplotExpression <- function(x, decodeContext = NULL) {
+  if (rlang::is_quosure(x)) {
+    return(rlang::new_quosure(
+      .decodeGgplotExpression(rlang::quo_get_expr(x), decodeContext = decodeContext),
+      rlang::quo_get_env(x)
+    ))
+  }
+
+  if (is.name(x)) {
+    decodedName <- .decodeJaspText(as.character(x), decodeContext = decodeContext)
+    if (identical(decodedName, as.character(x)))
+      x
+    else
+      rlang::sym(decodedName)
+  } else if (is.call(x)) {
+    callParts <- as.list(x)
+    if (length(callParts) > 1L)
+      for (i in seq.int(2L, length(callParts)))
+        callParts[[i]] <- .decodeGgplotExpression(callParts[[i]], decodeContext = decodeContext)
+    as.call(callParts)
+  } else if (is.character(x)) {
+    .decodeJaspText(x, decodeContext = decodeContext)
+  } else {
+    x
   }
 }
 

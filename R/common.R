@@ -846,7 +846,7 @@ saveImage <- function(plotName, format, height, width)
 
   plt             <- .decodeJaspPlotObject(
     plt,
-    returnGrob = FALSE,
+    returnGrob = TRUE,
     decodeContext = .jaspDecodeContext(source = "stored-result-state")
   )
 

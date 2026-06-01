@@ -55,6 +55,33 @@ testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
   testthat::expect_equal(unname(decoded$labels$y), "score")
 })
 
+testthat::test_that("decodeplot.gg decodes plot-owned data, mappings, and metadata", {
+  plotData <- data.frame(
+    JaspColumn_1_Encoded = factor(c("1", "2")),
+    JaspColumn_2_Encoded = c(3, 4),
+    check.names = FALSE
+  )
+  attr(plotData, "pri.vars") <- "JaspColumn_1_Encoded"
+  attr(plotData, "x")        <- "JaspColumn_1_Encoded"
+  attr(plotData, "dv")       <- "JaspColumn_2_Encoded"
+
+  plot <- ggplot2::ggplot(
+    plotData,
+    ggplot2::aes(x = JaspColumn_1_Encoded, y = JaspColumn_2_Encoded)
+  ) +
+    ggplot2::geom_point()
+
+  decoded <- jaspBase:::decodeplot(plot, returnGrob = FALSE, decodeContext = localDecodeContext())
+
+  testthat::expect_named(decoded$data, c("group", "score"))
+  testthat::expect_equal(levels(decoded$data$group), c("control", "treatment"))
+  testthat::expect_identical(attr(decoded$data, "pri.vars"), "group")
+  testthat::expect_identical(attr(decoded$data, "x"), "group")
+  testthat::expect_identical(attr(decoded$data, "dv"), "score")
+  testthat::expect_identical(as.character(rlang::quo_get_expr(decoded$mapping$x)), "group")
+  testthat::expect_identical(as.character(rlang::quo_get_expr(decoded$mapping$y)), "score")
+})
+
 testthat::test_that("writeImage uses decoded editable objects for state and interactive conversion", {
   ns <- asNamespace("jaspGraphs")
   original <- get("convertGgplotToPlotly", envir = ns)
