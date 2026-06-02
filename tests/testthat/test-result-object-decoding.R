@@ -1,31 +1,5 @@
-localDecoder <- function(mapping) {
-  oldDecoder <- if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
-    get(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
-  } else {
-    NULL
-  }
-  hadDecoder <- exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
-
-  assign(
-    ".decodeColNamesLax",
-    function(x) {
-      for (encoded in names(mapping))
-        x <- gsub(encoded, unname(mapping[[encoded]]), x, fixed = TRUE)
-      x
-    },
-    envir = .GlobalEnv
-  )
-
-  function() {
-    if (hadDecoder) {
-      assign(".decodeColNamesLax", oldDecoder, envir = .GlobalEnv)
-    } else if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
-      rm(".decodeColNamesLax", envir = .GlobalEnv)
-    }
-  }
-}
-
 localDecodeContext <- function() {
+  testthat::skip_if_not_installed("jaspSyntax")
   jaspBase:::.jaspDecodeContext(
     columns = c(
       JaspColumn_1_Encoded = "group",
@@ -37,6 +11,70 @@ localDecodeContext <- function() {
     )
   )
 }
+
+localNamespaceBinding <- function(name, value, namespace) {
+  oldValue <- get(name, envir = namespace, inherits = FALSE)
+  wasLocked <- bindingIsLocked(name, namespace)
+
+  if (wasLocked)
+    unlockBinding(name, namespace)
+  assign(name, value, envir = namespace)
+  if (wasLocked)
+    lockBinding(name, namespace)
+
+  function() {
+    if (bindingIsLocked(name, namespace))
+      unlockBinding(name, namespace)
+    assign(name, oldValue, envir = namespace)
+    if (wasLocked)
+      lockBinding(name, namespace)
+  }
+}
+
+localGlobalAbsent <- function(name) {
+  hadValue <- exists(name, envir = .GlobalEnv, inherits = FALSE)
+  oldValue <- if (hadValue) get(name, envir = .GlobalEnv, inherits = FALSE) else NULL
+
+  if (hadValue)
+    rm(list = name, envir = .GlobalEnv)
+
+  function() {
+    if (hadValue)
+      assign(name, oldValue, envir = .GlobalEnv)
+  }
+}
+
+testthat::test_that("decodeColNames fails for encoded names when no decoder is installed", {
+  restoreStrict <- localGlobalAbsent(".decodeColNamesStrict")
+  restoreLax <- localGlobalAbsent(".decodeColNamesLax")
+  on.exit(restoreStrict(), add = TRUE)
+  on.exit(restoreLax(), add = TRUE)
+
+  testthat::expect_identical(jaspBase::decodeColNames("plain name"), "plain name")
+  testthat::expect_error(
+    jaspBase::decodeColNames("JaspColumn_1_Encoded"),
+    "No JASP column decoder is available",
+    fixed = TRUE
+  )
+})
+
+testthat::test_that("result decoding does not use R mapping replacement when native decoding fails", {
+  testthat::skip_if_not_installed("jaspSyntax")
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, decoderSnapshot = NULL) {
+      stop("native decode failure", call. = FALSE)
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreDecoder(), add = TRUE)
+
+  testthat::expect_error(
+    jaspBase:::.decodeJaspText("JaspColumn_1_Encoded", decodeContext = localDecodeContext()),
+    "native decode failure",
+    fixed = TRUE
+  )
+})
 
 testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
   plot <- ggplot2::ggplot(
@@ -239,9 +277,6 @@ testthat::test_that("R6 result wrappers keep their analysis decode context", {
     data = data.frame(JaspColumn_1_Encoded = c("1", "2"), check.names = FALSE)
   )
   jaspResults[["JaspColumn_1_Encoded"]] <- table
-
-  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
-  on.exit(restoreDecoder(), add = TRUE)
 
   decoded <- jaspResults$toRObject()
   child <- jaspResults[["JaspColumn_1_Encoded"]]
@@ -472,18 +507,12 @@ testthat::test_that("decoded result objects persist without a live decoder", {
   path <- tempfile(fileext = ".rds")
   saveRDS(decoded, path)
 
-  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
-  on.exit(restoreDecoder(), add = TRUE)
-
   restored <- readRDS(path)
   testthat::expect_equal(restored$table$group, c("control", "treatment"))
   testthat::expect_equal(unname(restored$plot$plotObject$labels$x), "group")
 })
 
 testthat::test_that("missing decode context warns for encoded legacy state", {
-  restoreDecoder <- localDecoder(c(JaspColumn_1_Encoded = "wrong dataset name"))
-  on.exit(restoreDecoder(), add = TRUE)
-
   state <- list(other = list(label = "JaspColumn_1_Encoded"))
 
   testthat::expect_warning(
