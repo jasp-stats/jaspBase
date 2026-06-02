@@ -1,5 +1,5 @@
 .jaspDecodeContext <- function(columns = character(), factors = list(), columnDecoder = NULL,
-                               source = "manual", allowLiveFallback = FALSE) {
+                               source = "manual") {
   columns <- .normalizeJaspColumnMapping(columns)
   factors <- .normalizeJaspFactorMappings(factors, columns)
 
@@ -9,7 +9,6 @@
     columnDecoder = columnDecoder,
     factors = factors,
     source = source,
-    allowLiveFallback = isTRUE(allowLiveFallback),
     warningState = new.env(parent = emptyenv())
   )
 }
@@ -21,8 +20,7 @@
     columns = decodeContext[["columns"]],
     columnDecoder = decodeContext[["columnDecoder"]],
     factors = decodeContext[["factors"]],
-    source = decodeContext[["source"]],
-    allowLiveFallback = isTRUE(decodeContext[["allowLiveFallback"]])
+    source = decodeContext[["source"]]
   )
 }
 
@@ -77,7 +75,7 @@
   function(x) .decodeJaspColumnText(x, decodeContext)
 }
 
-.currentJaspDecodeContext <- function(allowLiveFallback = FALSE) {
+.currentJaspDecodeContext <- function() {
   columnMapping <- character()
   columnDecoder <- NULL
   requestedDataset <- NULL
@@ -113,14 +111,13 @@
     columns = columnMapping,
     columnDecoder = columnDecoder,
     factors = .jaspFactorMappingsFromDataset(requestedDataset, columnMapping),
-    source = "jaspSyntax",
-    allowLiveFallback = allowLiveFallback
+    source = "jaspSyntax"
   )
 }
 
-.normalizeJaspDecodeContext <- function(decodeContext = NULL, allowLiveFallback = is.null(decodeContext)) {
+.normalizeJaspDecodeContext <- function(decodeContext = NULL) {
   if (is.null(decodeContext))
-    return(.currentJaspDecodeContext(allowLiveFallback = allowLiveFallback))
+    return(.currentJaspDecodeContext())
 
   decodeContext[["columns"]] <- .normalizeJaspColumnMapping(decodeContext[["columns"]])
   decodeContext[["factors"]] <- .normalizeJaspFactorMappings(decodeContext[["factors"]], decodeContext[["columns"]])
@@ -128,7 +125,6 @@
     decodeContext[["version"]] <- 1L
   if (is.null(decodeContext[["source"]]))
     decodeContext[["source"]] <- "unknown"
-  decodeContext[["allowLiveFallback"]] <- isTRUE(decodeContext[["allowLiveFallback"]])
   if (!is.environment(decodeContext[["warningState"]]))
     decodeContext[["warningState"]] <- new.env(parent = emptyenv())
 
@@ -207,21 +203,10 @@
   any(grepl(.jaspEncodedColumnTokenPattern(), x, perl = TRUE), na.rm = TRUE)
 }
 
-.decodeJaspColumnTextWithMapping <- function(x, columnMapping = character()) {
-  columnMapping <- .normalizeJaspColumnMapping(columnMapping)
-  if (!is.character(x) || length(x) == 0L || length(columnMapping) == 0L)
-    return(x)
-
-  tokens <- names(columnMapping)
-  tokens <- tokens[order(nchar(tokens), decreasing = TRUE)]
-  for (token in tokens)
-    x <- gsub(token, unname(columnMapping[[token]]), x, fixed = TRUE)
-
-  x
-}
-
 .decodeJaspColumnText <- function(x, columnMapping = character()) {
   if (!is.character(x) || length(x) == 0L)
+    return(x)
+  if (!.containsJaspEncodedTokens(x))
     return(x)
 
   decoderSnapshot <- NULL
@@ -238,13 +223,19 @@
 
   decoded <- tryCatch(
     getExportedValue("jaspSyntax", "decodeColumnText")(x, decoderSnapshot),
-    error = function(e) .decodeJaspColumnTextWithMapping(x, columnMapping)
+    error = function(e) {
+      stop(
+        "jaspBase result decoding requires a working native jaspSyntax column decoder: ",
+        conditionMessage(e),
+        call. = FALSE
+      )
+    }
   )
   if (is.character(decoded) && length(decoded) == length(x)) {
     names(decoded) <- names(x)
     decoded
   } else {
-    x
+    stop("Native jaspSyntax column decoder returned an invalid result.", call. = FALSE)
   }
 }
 
@@ -299,15 +290,6 @@
   decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   x <- .decodeJaspFactorValues(x, fieldName = fieldName, decodeContext = decodeContext)
   x <- .decodeJaspColumnText(x, decodeContext)
-
-  if (isTRUE(decodeContext[["allowLiveFallback"]]) && length(decodeContext[["columns"]]) == 0L) {
-    fallback <- tryCatch(
-      decodeColNames(x, strict = FALSE),
-      error = function(e) x
-    )
-    if (is.character(fallback) && length(fallback) == length(x))
-      x <- fallback
-  }
 
   .warnIfMissingJaspDecodeContext(x, decodeContext)
   x

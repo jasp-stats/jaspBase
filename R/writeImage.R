@@ -409,8 +409,21 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 
   fun <- .findFun(defaults[[type]][[method]])
 
-  if (!is.function(fun))
-    return(function(inIsOut){return(inIsOut)}) # Instead of complaining we just give it a dummy function
+  if (!is.function(fun)) {
+    if (type == "decode") {
+      return(function(inIsOut) {
+        if (.containsJaspEncodedTokens(inIsOut)) {
+          stop(
+            "No JASP column decoder is available for encoded column names.",
+            call. = FALSE
+          )
+        }
+        inIsOut
+      })
+    }
+
+    return(function(inIsOut){return(inIsOut)}) # Outside JASP, raw names do not need encoding.
+  }
 
   return(fun)
 }

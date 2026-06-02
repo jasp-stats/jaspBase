@@ -1258,10 +1258,7 @@ storeDataSet <- function(dataset) {
   if (!is.character(message) || length(message) != 1L || is.na(message) || !nzchar(message))
     return(message)
 
-  decoded <- tryCatch(
-    .decodeJaspText(message, decodeContext = decodeContext),
-    error = function(e) message
-  )
+  decoded <- .decodeJaspText(message, decodeContext = decodeContext)
   if (!is.character(decoded) || length(decoded) != 1L || is.na(decoded))
     return(message)
 

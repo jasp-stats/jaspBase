@@ -1,3 +1,22 @@
+localNamespaceBinding <- function(name, value, namespace) {
+  oldValue <- get(name, envir = namespace, inherits = FALSE)
+  wasLocked <- bindingIsLocked(name, namespace)
+
+  if (wasLocked)
+    unlockBinding(name, namespace)
+  assign(name, value, envir = namespace)
+  if (wasLocked)
+    lockBinding(name, namespace)
+
+  function() {
+    if (bindingIsLocked(name, namespace))
+      unlockBinding(name, namespace)
+    assign(name, oldValue, envir = namespace)
+    if (wasLocked)
+      lockBinding(name, namespace)
+  }
+}
+
 testthat::test_that("wrapped analysis QML paths prefer explicit files", {
   explicitFile <- tempfile(fileext = ".qml")
   writeLines("import QtQuick", explicitFile)
@@ -113,25 +132,24 @@ testthat::test_that("wrapped analysis verbosity honors jaspSyntax default option
 })
 
 testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
-  oldDecoder <- if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
-    get(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
-  } else {
-    NULL
-  }
-  hadDecoder <- exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
-  on.exit({
-    if (hadDecoder) {
-      assign(".decodeColNamesLax", oldDecoder, envir = .GlobalEnv)
-    } else if (exists(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)) {
-      rm(".decodeColNamesLax", envir = .GlobalEnv)
-    }
-  }, add = TRUE)
-
-  assign(
-    ".decodeColNamesLax",
-    function(x) gsub("JaspColumn_3_Encoded", "angle", x, fixed = TRUE),
-    envir = .GlobalEnv
+  testthat::skip_if_not_installed("jaspSyntax")
+  decodeContext <- jaspBase:::.jaspDecodeContext(
+    columns = c(JaspColumn_3_Encoded = "angle")
   )
+  restoreContext <- localNamespaceBinding(
+    ".currentJaspDecodeContext",
+    function() decodeContext,
+    asNamespace("jaspBase")
+  )
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, decoderSnapshot = NULL) {
+      gsub("JaspColumn_3_Encoded", "angle", text, fixed = TRUE)
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreContext(), add = TRUE)
+  on.exit(restoreDecoder(), add = TRUE)
 
   noisyValue <- function() {
     message("analysis message: JaspColumn_3_Encoded")
@@ -156,6 +174,36 @@ testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
       verbose = "analysis"
     ),
     "analysis error: angle"
+  )
+})
+
+testthat::test_that("wrapped analysis condition decoding propagates native decoder failures", {
+  testthat::skip_if_not_installed("jaspSyntax")
+  decodeContext <- jaspBase:::.jaspDecodeContext(
+    columns = c(JaspColumn_3_Encoded = "angle")
+  )
+  restoreContext <- localNamespaceBinding(
+    ".currentJaspDecodeContext",
+    function() decodeContext,
+    asNamespace("jaspBase")
+  )
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, decoderSnapshot = NULL) {
+      stop("native decode failure", call. = FALSE)
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreContext(), add = TRUE)
+  on.exit(restoreDecoder(), add = TRUE)
+
+  testthat::expect_error(
+    jaspBase:::.runWrappedAnalysisWithVerbosity(
+      stop("analysis error: JaspColumn_3_Encoded", call. = FALSE),
+      verbose = "analysis"
+    ),
+    "native decode failure",
+    fixed = TRUE
   )
 })
 
