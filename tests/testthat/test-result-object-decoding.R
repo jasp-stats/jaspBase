@@ -1,16 +1,50 @@
 localDecodeContext <- function() {
   testthat::skip_if_not_installed("jaspSyntax")
+  localTestColumnDecoder()
+  columnEncoderContext <- testColumnEncoderContext()
   jaspBase:::.jaspDecodeContext(
-    columns = c(
-      JaspColumn_1_Encoded = "group",
-      JaspColumn_2_Encoded = "score",
-      JaspColumn_3_Encoded = "cluster"
-    ),
+    columnEncoderContext = columnEncoderContext,
     factors = list(
       JaspColumn_1_Encoded = c("1" = "control", "2" = "treatment")
     )
   )
 }
+
+testColumnEncoderContext <- function() {
+  structure(
+    list(
+      version = 1L,
+      columns = list(
+        list(name = "cluster", type = "unknown"),
+        list(name = "group", type = "unknown"),
+        list(name = "score", type = "unknown")
+      ),
+      extra = list()
+    ),
+    class = "jaspSyntaxColumnEncoderContext"
+  )
+}
+
+localTestColumnDecoder <- local({
+  function() {
+    restore <- localNamespaceBinding(
+      "decodeColumnText",
+      function(text, encoderContext = NULL) {
+        if (is.null(encoderContext))
+          return(text)
+
+        out <- text
+        out <- gsub("JaspColumn_0_Encoded", "cluster", out, fixed = TRUE)
+        out <- gsub("JaspColumn_1_Encoded", "group", out, fixed = TRUE)
+        out <- gsub("JaspColumn_2_Encoded", "score", out, fixed = TRUE)
+        out
+      },
+      asNamespace("jaspSyntax")
+    )
+    withr::defer(restore(), testthat::teardown_env())
+    invisible(NULL)
+  }
+})
 
 localNamespaceBinding <- function(name, value, namespace) {
   oldValue <- get(name, envir = namespace, inherits = FALSE)
@@ -62,15 +96,18 @@ testthat::test_that("result decoding does not use R mapping replacement when nat
   testthat::skip_if_not_installed("jaspSyntax")
   restoreDecoder <- localNamespaceBinding(
     "decodeColumnText",
-    function(text, decoderSnapshot = NULL) {
+    function(text, encoderContext = NULL) {
       stop("native decode failure", call. = FALSE)
     },
     asNamespace("jaspSyntax")
   )
   on.exit(restoreDecoder(), add = TRUE)
 
+  decodeContext <- jaspBase:::.jaspDecodeContext(
+    columnEncoderContext = testColumnEncoderContext()
+  )
   testthat::expect_error(
-    jaspBase:::.decodeJaspText("JaspColumn_1_Encoded", decodeContext = localDecodeContext()),
+    jaspBase:::.decodeJaspText("JaspColumn_1_Encoded", decodeContext = decodeContext),
     "native decode failure",
     fixed = TRUE
   )
@@ -177,7 +214,7 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
   class(table) <- c("jaspTableWrapper", "jaspWrapper", class(table))
   attr(table, "title") <- "JaspColumn_1_Encoded table"
   attr(table, "footnotes") <- list(list(
-    text = "The following variable is 'JaspColumn_3_Encoded'.",
+    text = "The following variable is 'JaspColumn_0_Encoded'.",
     symbol = "<em>Note.</em>"
   ))
 
@@ -192,7 +229,7 @@ testthat::test_that("toRObject result copies decode tables, footnotes, and plots
     )
   plotWrapper <- list(plotObject = plot)
   class(plotWrapper) <- c("jaspPlotWrapper", "jaspWrapper")
-  attr(plotWrapper, "title") <- "JaspColumn_3_Encoded plot"
+  attr(plotWrapper, "title") <- "JaspColumn_0_Encoded plot"
 
   result <- list(
     JaspColumn_1_Encoded = table,

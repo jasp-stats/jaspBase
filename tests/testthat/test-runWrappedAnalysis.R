@@ -134,7 +134,10 @@ testthat::test_that("wrapped analysis verbosity honors jaspSyntax default option
 testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
   testthat::skip_if_not_installed("jaspSyntax")
   decodeContext <- jaspBase:::.jaspDecodeContext(
-    columns = c(JaspColumn_3_Encoded = "angle")
+    columnEncoderContext = structure(
+      list(columns = list(list(name = "angle", type = "unknown")), extra = list()),
+      class = "jaspSyntaxColumnEncoderContext"
+    )
   )
   restoreContext <- localNamespaceBinding(
     ".currentJaspDecodeContext",
@@ -143,8 +146,8 @@ testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
   )
   restoreDecoder <- localNamespaceBinding(
     "decodeColumnText",
-    function(text, decoderSnapshot = NULL) {
-      gsub("JaspColumn_3_Encoded", "angle", text, fixed = TRUE)
+    function(text, encoderContext = NULL) {
+      gsub("JaspColumn_0_Encoded", "angle", text, fixed = TRUE)
     },
     asNamespace("jaspSyntax")
   )
@@ -152,8 +155,8 @@ testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
   on.exit(restoreDecoder(), add = TRUE)
 
   noisyValue <- function() {
-    message("analysis message: JaspColumn_3_Encoded")
-    warning("analysis warning: JaspColumn_3_Encoded", call. = FALSE)
+    message("analysis message: JaspColumn_0_Encoded")
+    warning("analysis warning: JaspColumn_0_Encoded", call. = FALSE)
     42
   }
 
@@ -170,7 +173,7 @@ testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
 
   testthat::expect_error(
     jaspBase:::.runWrappedAnalysisWithVerbosity(
-      stop("analysis error: JaspColumn_3_Encoded", call. = FALSE),
+      stop("analysis error: JaspColumn_0_Encoded", call. = FALSE),
       verbose = "analysis"
     ),
     "analysis error: angle"
@@ -180,7 +183,10 @@ testthat::test_that("wrapped analysis verbosity decodes analysis conditions", {
 testthat::test_that("wrapped analysis condition decoding propagates native decoder failures", {
   testthat::skip_if_not_installed("jaspSyntax")
   decodeContext <- jaspBase:::.jaspDecodeContext(
-    columns = c(JaspColumn_3_Encoded = "angle")
+    columnEncoderContext = structure(
+      list(columns = list(list(name = "angle", type = "unknown")), extra = list()),
+      class = "jaspSyntaxColumnEncoderContext"
+    )
   )
   restoreContext <- localNamespaceBinding(
     ".currentJaspDecodeContext",
@@ -189,7 +195,7 @@ testthat::test_that("wrapped analysis condition decoding propagates native decod
   )
   restoreDecoder <- localNamespaceBinding(
     "decodeColumnText",
-    function(text, decoderSnapshot = NULL) {
+    function(text, encoderContext = NULL) {
       stop("native decode failure", call. = FALSE)
     },
     asNamespace("jaspSyntax")
@@ -199,7 +205,7 @@ testthat::test_that("wrapped analysis condition decoding propagates native decod
 
   testthat::expect_error(
     jaspBase:::.runWrappedAnalysisWithVerbosity(
-      stop("analysis error: JaspColumn_3_Encoded", call. = FALSE),
+      stop("analysis error: JaspColumn_0_Encoded", call. = FALSE),
       verbose = "analysis"
     ),
     "native decode failure",
