@@ -1,12 +1,10 @@
-.jaspDecodeContext <- function(columns = character(), factors = list(), columnDecoder = NULL,
+.jaspDecodeContext <- function(columnEncoderContext = NULL, factors = list(),
                                source = "manual") {
-  columns <- .normalizeJaspColumnMapping(columns)
-  factors <- .normalizeJaspFactorMappings(factors, columns)
+  factors <- .normalizeJaspFactorMappings(factors, columnEncoderContext)
 
   list(
     version = 1L,
-    columns = columns,
-    columnDecoder = columnDecoder,
+    columnEncoderContext = columnEncoderContext,
     factors = factors,
     source = source,
     warningState = new.env(parent = emptyenv())
@@ -17,8 +15,7 @@
   decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   list(
     version = decodeContext[["version"]],
-    columns = decodeContext[["columns"]],
-    columnDecoder = decodeContext[["columnDecoder"]],
+    columnEncoderContext = decodeContext[["columnEncoderContext"]],
     factors = decodeContext[["factors"]],
     source = decodeContext[["source"]]
   )
@@ -76,8 +73,7 @@
 }
 
 .currentJaspDecodeContext <- function() {
-  columnMapping <- character()
-  columnDecoder <- NULL
+  columnEncoderContext <- NULL
   requestedDataset <- NULL
 
   if (requireNamespace("jaspSyntax", quietly = TRUE)) {
@@ -85,32 +81,15 @@
       getExportedValue("jaspSyntax", "readRequestedDataset")(decode = FALSE, normalize = FALSE),
       error = function(e) NULL
     )
-    columnDecoder <- tryCatch(
-      getExportedValue("jaspSyntax", "columnDecoderSnapshot")(),
+    columnEncoderContext <- tryCatch(
+      getExportedValue("jaspSyntax", "columnEncoderContext")(),
       error = function(e) NULL
-    )
-    defaultMapping <- tryCatch(
-      getExportedValue("jaspSyntax", "columnMapping")(strict = FALSE),
-      error = function(e) character()
-    )
-    requestedMapping <- character()
-    requestedNames <- if (is.data.frame(requestedDataset)) names(requestedDataset) else character()
-    if (length(requestedNames) > 0L && .containsJaspEncodedTokens(requestedNames)) {
-      requestedMapping <- tryCatch(
-        getExportedValue("jaspSyntax", "columnMapping")(requestedNames, strict = FALSE),
-        error = function(e) character()
-      )
-    }
-    columnMapping <- c(
-      requestedMapping,
-      defaultMapping[setdiff(names(defaultMapping), names(requestedMapping))]
     )
   }
 
   .jaspDecodeContext(
-    columns = columnMapping,
-    columnDecoder = columnDecoder,
-    factors = .jaspFactorMappingsFromDataset(requestedDataset, columnMapping),
+    columnEncoderContext = columnEncoderContext,
+    factors = .jaspFactorMappingsFromDataset(requestedDataset, columnEncoderContext),
     source = "jaspSyntax"
   )
 }
@@ -119,8 +98,10 @@
   if (is.null(decodeContext))
     return(.currentJaspDecodeContext())
 
-  decodeContext[["columns"]] <- .normalizeJaspColumnMapping(decodeContext[["columns"]])
-  decodeContext[["factors"]] <- .normalizeJaspFactorMappings(decodeContext[["factors"]], decodeContext[["columns"]])
+  decodeContext[["factors"]] <- .normalizeJaspFactorMappings(
+    decodeContext[["factors"]],
+    decodeContext[["columnEncoderContext"]]
+  )
   if (is.null(decodeContext[["version"]]))
     decodeContext[["version"]] <- 1L
   if (is.null(decodeContext[["source"]]))
@@ -131,18 +112,7 @@
   decodeContext
 }
 
-.normalizeJaspColumnMapping <- function(columnMapping = NULL) {
-  if (is.null(columnMapping) || length(columnMapping) == 0L)
-    return(stats::setNames(character(), character()))
-  if (!is.character(columnMapping) || is.null(names(columnMapping)))
-    return(stats::setNames(character(), character()))
-
-  valid <- !is.na(columnMapping) & nzchar(columnMapping) &
-    !is.na(names(columnMapping)) & nzchar(names(columnMapping))
-  columnMapping[valid]
-}
-
-.normalizeJaspFactorMappings <- function(factorMappings = NULL, columnMapping = character()) {
+.normalizeJaspFactorMappings <- function(factorMappings = NULL, columnEncoderContext = NULL) {
   if (is.null(factorMappings) || length(factorMappings) == 0L)
     return(list())
 
@@ -159,14 +129,13 @@
 
     valid <- !is.na(valueMap) & !is.na(names(valueMap)) & nzchar(names(valueMap))
     valueMap <- valueMap[valid]
-    valueMap <- .decodeJaspColumnText(valueMap, columnMapping)
+    valueMap <- .decodeJaspColumnText(valueMap, columnEncoderContext)
     if (length(valueMap) == 0L)
       next
 
     aliases <- unique(c(
       fieldName,
-      .decodeJaspColumnText(fieldName, columnMapping),
-      names(columnMapping)[!is.na(columnMapping) & columnMapping == fieldName]
+      .decodeJaspColumnText(fieldName, columnEncoderContext)
     ))
     aliases <- aliases[!is.na(aliases) & nzchar(aliases)]
     for (alias in aliases)
@@ -176,7 +145,7 @@
   normalized
 }
 
-.jaspFactorMappingsFromDataset <- function(requestedDataset, columnMapping = character()) {
+.jaspFactorMappingsFromDataset <- function(requestedDataset, columnEncoderContext = NULL) {
   if (!is.data.frame(requestedDataset))
     return(list())
 
@@ -192,10 +161,10 @@
     )
   }
 
-  .normalizeJaspFactorMappings(factorMappings, columnMapping)
+  .normalizeJaspFactorMappings(factorMappings, columnEncoderContext)
 }
 
-.jaspEncodedColumnTokenPattern <- function() "(JaspColumn_[[:alnum:]_]+_Encoded|jaspColumn[0-9]+)"
+.jaspEncodedColumnTokenPattern <- function() "(JaspColumn_[[:alnum:]_]+_Encoded|JaspExtraOptions_[[:alnum:]_]+_Encoded|jaspColumn[0-9]+)"
 
 .containsJaspEncodedTokens <- function(x) {
   if (!is.character(x) || length(x) == 0L)
@@ -203,26 +172,17 @@
   any(grepl(.jaspEncodedColumnTokenPattern(), x, perl = TRUE), na.rm = TRUE)
 }
 
-.decodeJaspColumnText <- function(x, columnMapping = character()) {
+.decodeJaspColumnText <- function(x, columnEncoderContext = NULL) {
   if (!is.character(x) || length(x) == 0L)
     return(x)
   if (!.containsJaspEncodedTokens(x))
     return(x)
 
-  decoderSnapshot <- NULL
-  if (is.list(columnMapping) && (!is.null(columnMapping[["columns"]]) || !is.null(columnMapping[["columnDecoder"]]))) {
-    decoderSnapshot <- columnMapping[["columnDecoder"]]
-    columnMapping <- columnMapping[["columns"]]
-    if (length(columnMapping) == 0L && length(decoderSnapshot[["columns"]]) > 0L)
-      columnMapping <- decoderSnapshot[["columns"]]
-    if (is.null(decoderSnapshot) && length(columnMapping) > 0L)
-      decoderSnapshot <- columnMapping
-  } else if (length(columnMapping) > 0L) {
-    decoderSnapshot <- columnMapping
-  }
+  if (is.list(columnEncoderContext) && "columnEncoderContext" %in% names(columnEncoderContext))
+    columnEncoderContext <- columnEncoderContext[["columnEncoderContext"]]
 
   decoded <- tryCatch(
-    getExportedValue("jaspSyntax", "decodeColumnText")(x, decoderSnapshot),
+    getExportedValue("jaspSyntax", "decodeColumnText")(x, columnEncoderContext),
     error = function(e) {
       stop(
         "jaspBase result decoding requires a working native jaspSyntax column decoder: ",
