@@ -41,6 +41,7 @@ Encoding: UTF-8
 LinkingTo: Rcpp
 RcppModules: jaspResults
 NeedsCompilation: yes
-Suggests: 
+Suggests:
+    jaspSyntax (>= 1.3.3),
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
