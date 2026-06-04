@@ -113,6 +113,29 @@ testthat::test_that("result decoding does not use R mapping replacement when nat
   )
 })
 
+testthat::test_that("missing decode context does not borrow live native decoder state", {
+  testthat::skip_if_not_installed("jaspSyntax")
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, encoderContext = NULL) {
+      if (is.null(encoderContext))
+        return(rep("wrong dataset name", length(text)))
+
+      text
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreDecoder(), add = TRUE)
+
+  state <- list(other = list(label = "JaspColumn_1_Encoded"))
+
+  testthat::expect_warning(
+    decoded <- jaspBase:::.decodeJaspResultState(state, decodeContext = jaspBase:::.jaspDecodeContext()),
+    "no analysis decode context"
+  )
+  testthat::expect_identical(decoded$other$label, "JaspColumn_1_Encoded")
+})
+
 testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
   plot <- ggplot2::ggplot(
     data.frame(x = 1, y = 2),
@@ -128,6 +151,35 @@ testthat::test_that("decodeplot.gg returns decoded labels for R-facing plots", {
 
   testthat::expect_equal(unname(decoded$labels$x), "group")
   testthat::expect_equal(unname(decoded$labels$y), "score")
+})
+
+testthat::test_that("plot decoding propagates native decoder failures", {
+  testthat::skip_if_not_installed("jaspSyntax")
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, encoderContext = NULL) {
+      stop("native decode failure", call. = FALSE)
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreDecoder(), add = TRUE)
+
+  plot <- ggplot2::ggplot(
+    data.frame(x = 1, y = 2),
+    ggplot2::aes(x = x, y = y)
+  ) +
+    ggplot2::geom_point() +
+    ggplot2::labs(x = "JaspColumn_1_Encoded")
+
+  testthat::expect_error(
+    jaspBase:::.decodeJaspPlotObject(
+      plot,
+      returnGrob = FALSE,
+      decodeContext = jaspBase:::.jaspDecodeContext(columnEncoderContext = testColumnEncoderContext())
+    ),
+    "native decode failure",
+    fixed = TRUE
+  )
 })
 
 testthat::test_that("decodeplot.gg decodes plot-owned data, mappings, and metadata", {

@@ -180,6 +180,8 @@
 
   if (is.list(columnEncoderContext) && "columnEncoderContext" %in% names(columnEncoderContext))
     columnEncoderContext <- columnEncoderContext[["columnEncoderContext"]]
+  if (is.null(columnEncoderContext))
+    return(x)
 
   decoded <- tryCatch(
     getExportedValue("jaspSyntax", "decodeColumnText")(x, columnEncoderContext),
@@ -299,16 +301,9 @@
     return(plot)
 
   decodeContext <- .normalizeJaspDecodeContext(decodeContext)
-  decodeFailed <- FALSE
-  decoded <- tryCatch(
-    decodeplot(plot, returnGrob = returnGrob, decodeContext = decodeContext),
-    error = function(e) {
-      decodeFailed <<- TRUE
-      plot
-    }
-  )
+  decoded <- decodeplot(plot, returnGrob = returnGrob, decodeContext = decodeContext)
 
-  if (!isTRUE(returnGrob) && !isTRUE(decodeFailed))
+  if (!isTRUE(returnGrob))
     decoded <- .markJaspDecodedPlotObject(decoded)
 
   decoded
