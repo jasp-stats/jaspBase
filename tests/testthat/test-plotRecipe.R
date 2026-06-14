@@ -11,7 +11,7 @@ test_that("plot recipe arguments are decoded recursively", {
   args <- list(
     data = data.frame(
       encoded_column = factor(c("encoded_a", "encoded_b")),
-      label = "encoded_label"
+      label = c("encoded_label", "encoded_other")
     ),
     nested = list(encoded_name = "encoded_value")
   )
@@ -21,7 +21,7 @@ test_that("plot recipe arguments are decoded recursively", {
   expect_named(decoded, c("data", "nested"))
   expect_named(decoded$data, c("column", "label"))
   expect_equal(levels(decoded$data$column), c("a", "b"))
-  expect_equal(decoded$data$label, "label")
+  expect_equal(decoded$data$label, c("label", "other"))
   expect_named(decoded$nested, "name")
   expect_equal(decoded$nested$name, "value")
 })
