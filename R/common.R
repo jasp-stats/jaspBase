@@ -1105,8 +1105,18 @@ editImage <- function(name, optionsJson) {
         jaspPlotCPP$resizedByUser <- TRUE
       }
 
-    } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
+    } else if (type == "interactive" && jaspGraphs::isJaspPlotRecipe(plot)) {
 
+      newOpts <- optionsList[["editOptions"]]
+      oldOpts       <- jaspGraphs::plotEditingOptions(plot)
+      newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
+      newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
+      newPlot <- jaspGraphs::plotEditing(plot, newOpts)
+      # plot editing did nothing or was canceled
+      if (!identical(plot, newPlot))
+        jaspPlotCPP$plotObject <- newPlot
+
+    } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
 
       # copy plot and check if we edit it
       newPlot <- ggplot2:::plot_clone(plot)
@@ -1186,6 +1196,3 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
      return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
   }
 }
-
-
-
