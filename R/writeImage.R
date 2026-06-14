@@ -47,7 +47,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   setwd(root)
   on.exit(setwd(oldwd))
 
-  if (length(oldPlotInfo) != 0L && !is.null(oldPlotInfo[["editOptions"]]) && ggplot2::is.ggplot(plot)) {
+  if (length(oldPlotInfo) != 0L && !is.null(oldPlotInfo[["editOptions"]]) && (ggplot2::is.ggplot(plot) || jaspGraphs::isJaspPlotRecipe(plot))) {
 
     # uncommenting this applies the edits previously done with plot editing to an older figure to the new figure.
     # see https://github.com/jasp-stats/INTERNAL-jasp/issues/1257 for discussion on what needs to be done before we can do this.
@@ -79,7 +79,12 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   width  <- width  * (ppi / 96)
   height <- height * (ppi / 96)
 
-  plot2draw <- decodeplot(plot)
+  plotForOutput <- if (jaspGraphs::isJaspPlotRecipe(plot)) {
+    .materializeDecodedJaspPlotRecipe(plot)
+  } else {
+    plot
+  }
+  plot2draw <- decodeplot(plotForOutput)
 
   openGrDevice(file = relativePathpng, width = width, height = height, res = 72 * (ppi / 96), background = backgroundColor)#, dpi = ppi)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -120,13 +125,13 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
     image[["obj"]]         <- plot2draw
   }
 
-  image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
+  image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plotForOutput, asJSON = TRUE)
 
-  image[["interactive"]] <- ggplot2::is.ggplot(plot) || inherits(plot, "jaspMatrixPlot")
-  if (image[["interactive"]] )
+  image[["interactive"]] <- ggplot2::is.ggplot(plot) || jaspGraphs::isJaspPlotRecipe(plot) || inherits(plot, "jaspMatrixPlot")
+  if (image[["interactive"]])
     tryCatch(
     {
-      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
+      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plotForOutput)
 
       if (exists(".fromRCPP")) {
         if (isTryError(jsonOrTryError)) {
@@ -157,7 +162,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
     error	= function(e) {
       image[["interactiveConvertError"]]  <- e
     })
-  
+
   return(image)
 }
 
@@ -175,6 +180,42 @@ decodeplot.jaspGraphsPlot <- function(x, ...) {
   return(x)
 }
 
+
+#' @export
+decodeplot.jaspPlotRecipe <- function(x, ...) {
+  decodeplot(.materializeDecodedJaspPlotRecipe(x), ...)
+}
+
+.materializeDecodedJaspPlotRecipe <- function(recipe) {
+  recipe[["args"]] <- .decodeJaspPlotRecipeArguments(recipe[["args"]], decodeNames = FALSE)
+  jaspGraphs::materializeJaspPlotRecipe(recipe)
+}
+
+.decodeJaspPlotRecipeArguments <- function(x, decodeNames = TRUE) {
+  if (is.environment(x))
+    stop("Plot recipe arguments cannot contain environments.", domain = NA)
+
+  if (is.factor(x)) {
+    levels(x) <- decodeColNames(levels(x))
+  } else if (is.character(x)) {
+    x <- decodeColNames(x)
+  } else if (is.data.frame(x)) {
+    x[] <- lapply(x, .decodeJaspPlotRecipeArguments)
+    names(x) <- decodeColNames(names(x))
+    if (is.character(attr(x, "row.names")))
+      row.names(x) <- decodeColNames(row.names(x))
+  } else if (is.list(x)) {
+    x[] <- lapply(x, .decodeJaspPlotRecipeArguments)
+  }
+
+  if (is.array(x) && !is.null(dimnames(x)))
+    dimnames(x) <- lapply(dimnames(x), decodeColNames)
+
+  if (decodeNames && !is.null(names(x)))
+    names(x) <- decodeColNames(names(x))
+
+  x
+}
 
 #' @export
 decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
