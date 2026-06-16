@@ -175,15 +175,13 @@
 .decodeJaspColumnText <- function(x, columnEncoderContext = NULL) {
   if (!is.character(x) || length(x) == 0L)
     return(x)
-  if (!.containsJaspEncodedTokens(x))
-    return(x)
 
   if (is.list(columnEncoderContext) && "columnEncoderContext" %in% names(columnEncoderContext))
     columnEncoderContext <- columnEncoderContext[["columnEncoderContext"]]
   if (is.null(columnEncoderContext))
     return(x)
 
-  decoded <- tryCatch(
+  tryCatch(
     getExportedValue("jaspSyntax", "decodeColumnText")(x, columnEncoderContext),
     error = function(e) {
       stop(
@@ -193,12 +191,6 @@
       )
     }
   )
-  if (is.character(decoded) && length(decoded) == length(x)) {
-    names(decoded) <- names(x)
-    decoded
-  } else {
-    stop("Native jaspSyntax column decoder returned an invalid result.", call. = FALSE)
-  }
 }
 
 .decodeJaspFactorValues <- function(x, fieldName = NULL, decodeContext) {
