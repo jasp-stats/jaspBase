@@ -113,6 +113,32 @@ testthat::test_that("result decoding does not use R mapping replacement when nat
   )
 })
 
+testthat::test_that("result decoding delegates plain text to the native decoder", {
+  testthat::skip_if_not_installed("jaspSyntax")
+  seen <- new.env(parent = emptyenv())
+  restoreDecoder <- localNamespaceBinding(
+    "decodeColumnText",
+    function(text, encoderContext = NULL) {
+      seen$text <- text
+      seen$encoderContext <- encoderContext
+      paste0(text, " decoded")
+    },
+    asNamespace("jaspSyntax")
+  )
+  on.exit(restoreDecoder(), add = TRUE)
+
+  decodeContext <- jaspBase:::.jaspDecodeContext(
+    columnEncoderContext = testColumnEncoderContext()
+  )
+
+  testthat::expect_identical(
+    jaspBase:::.decodeJaspText("plain name", decodeContext = decodeContext),
+    "plain name decoded"
+  )
+  testthat::expect_identical(seen$text, "plain name")
+  testthat::expect_identical(seen$encoderContext, testColumnEncoderContext())
+})
+
 testthat::test_that("missing decode context does not borrow live native decoder state", {
   testthat::skip_if_not_installed("jaspSyntax")
   restoreDecoder <- localNamespaceBinding(
