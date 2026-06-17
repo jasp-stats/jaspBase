@@ -126,11 +126,11 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   if (image[["interactive"]] )
     tryCatch(
     {
-      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
+      plotlyOrTryError <- jaspGraphs::convertGgplotToPlotly(plot, returnJSON = FALSE)
 
       if (exists(".fromRCPP")) {
-        if (isTryError(jsonOrTryError)) {
-          image[["interactiveConvertError"]] = gettextf("The following error occured while converting a ggplot to plotly: %s", .extractErrorMessage(jsonOrTryError))
+        if (isTryError(plotlyOrTryError)) {
+          image[["interactiveConvertError"]] = gettextf("The following error occured while converting a ggplot to plotly: %s", .extractErrorMessage(plotlyOrTryError))
         } else {
 
           if (!is.null(relativePathJson) && nzchar(relativePathJson)) {
@@ -141,7 +141,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
           fullPathPlotly  <- paste(locationPlotly$root, locationPlotly$relativePath, sep="/")
           plotlyJsonFile  <- file(fullPathPlotly)
           on.exit(close(plotlyJsonFile), add = TRUE)
-          writeLines(.decodePlotlyJson(jsonOrTryError), plotlyJsonFile)
+          writeLines(.plotlyToJson(plotlyOrTryError), plotlyJsonFile)
 
           if(file.exists(fullPathPlotly)) {
             image[["interactiveJsonData"]] <- locationPlotly$relativePath
@@ -161,8 +161,13 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   return(image)
 }
 
-.decodePlotlyJson <- function(json) {
-  plotlyJson <- jsonlite::fromJSON(json, simplifyVector = FALSE)
+.plotlyToJson <- function(convertedPlotly) {
+  plotlyJson <- list(
+    data          = convertedPlotly$plotly$x$data,
+    layout        = convertedPlotly$plotly$x$layout,
+    hasRangeFrame = convertedPlotly$hasRangeFrame
+  )
+
   toJSON(.decodeJsonLike(plotlyJson))
 }
 
