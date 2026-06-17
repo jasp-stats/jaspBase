@@ -141,7 +141,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
           fullPathPlotly  <- paste(locationPlotly$root, locationPlotly$relativePath, sep="/")
           plotlyJsonFile  <- file(fullPathPlotly)
           on.exit(close(plotlyJsonFile), add = TRUE)
-          writeLines(jsonOrTryError, plotlyJsonFile)
+          writeLines(.decodePlotlyJson(jsonOrTryError), plotlyJsonFile)
 
           if(file.exists(fullPathPlotly)) {
             image[["interactiveJsonData"]] <- locationPlotly$relativePath
@@ -159,6 +159,24 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
     })
   
   return(image)
+}
+
+.decodePlotlyJson <- function(json) {
+  plotlyJson <- jsonlite::fromJSON(json, simplifyVector = FALSE)
+  toJSON(.decodeJsonLike(plotlyJson))
+}
+
+.decodeJsonLike <- function(x) {
+  if (is.character(x)) {
+    x <- decodeColNames(x)
+  } else if (is.list(x)) {
+    x[] <- lapply(x, .decodeJsonLike)
+  }
+
+  if (!is.null(names(x)))
+    names(x) <- decodeColNames(names(x))
+
+  x
 }
 
 # intentionally not exported
