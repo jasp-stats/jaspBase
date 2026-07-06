@@ -30,16 +30,20 @@ loadJaspResults <- function(name) {
   create_cpp_jaspResults(name, .retrieveState())
 }
 
-finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
+finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE, decodeContext = NULL) {
 
   jaspResultsCPP$prepareForWriting()
+  if (is.null(decodeContext) && !isTRUE(calledFromAnalysis))
+    decodeContext <- .jaspDecodeContext(source = "stored-result-state")
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
 
   newState <- list(
     figures = jaspResultsCPP$getPlotObjectsForState(),
     other   = jaspResultsCPP$getOtherObjectsForState()
   )
+  newState <- .decodeJaspResultState(newState, decodeContext = decodeContext)
 
-  jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
+  jaspResultsCPP$relativePathKeep <- .saveState(newState, decodeContext = decodeContext)$relativePath
 
   returnThis <- NULL
   if (calledFromAnalysis) {
@@ -109,6 +113,12 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   if(preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
 
+  # Capture the analysis decode context after dataset preload: that is when the
+  # bridge exposes the encoded requested-dataset names needed to materialize
+  # R-facing results with original column and factor labels.
+  decodeContext <- .currentJaspDecodeContext()
+  jaspResults$setDecodeContext(decodeContext)
+
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
   emptyRecomputed()
 
@@ -139,7 +149,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
     }
 
-    finishJaspResults(jaspResultsCPP)
+    finishJaspResults(jaspResultsCPP, decodeContext = decodeContext)
     return(jaspResults)
   }
 
@@ -165,7 +175,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     return(paste0("{ \"status\" : \"", errorStatus, "\", \"results\" : { \"title\" : \"error\", \"error\" : 1, \"errorMessage\" : \"", errorMessage, "\" } }", sep=""))
   } else {
 
-    returnThis <- finishJaspResults(jaspResultsCPP)
+    returnThis <- finishJaspResults(jaspResultsCPP, decodeContext = decodeContext)
 
     json <- try({ toJSON(returnThis) })
     if (isTryError(json))
@@ -629,6 +639,7 @@ jaspResultsStrings <- function() {
     ".requestTempFileNameNative",
     ".requestTempRootNameNative",
     ".readDatasetToEndNative",
+    ".readFullDatasetToEnd",
     ".readDataSetHeaderNative",
     ".readDataSetRequestedNative",
     ".requestStateFileNameNative",
@@ -659,19 +670,31 @@ jaspResultsStrings <- function() {
 
 }
 
-.saveState <- function(state) {
+.isNonEmptyString <- function(x) {
+  rlang::is_string(x) && nzchar(x)
+}
+
+.stateFilePath <- function(location) {
+  if (!rlang::is_list(location) || !.isNonEmptyString(location$relativePath))
+    stop("State file callback must return a list with a non-empty `relativePath`.", call. = FALSE)
+
+  # Desktop/native callbacks return `root` plus `relativePath`; standalone callbacks
+  # may only have a relative path, which is then interpreted from the current wd.
+  if (.isNonEmptyString(location$root))
+    return(as.character(fs::path(location$root, location$relativePath)))
+
+  location$relativePath
+}
+
+.saveState <- function(state, decodeContext = NULL) {
   location <- .fromRCPP(".requestStateFileNameNative")
   relativePath <- location$relativePath
+  statePath <- .stateFilePath(location)
+  fs::dir_create(fs::path_dir(statePath))
 
-  # when run through jaspTools do not save the state, but store it internally
-  if ("jaspTools" %in% loadedNamespaces()) {
-    # fool renv so it does not try to install jaspTools
-    .setInternal <- utils::getFromNamespace(".setInternal", asNamespace("jaspTools"))
-    .setInternal("state", state)
-    return(list(relativePath = relativePath))
-  }
+  state <- .decodeJaspResultState(state, decodeContext = decodeContext)
 
-  try(suppressWarnings(base::save(state, file=relativePath, compress=FALSE)), silent = FALSE)
+  try(suppressWarnings(base::save(state, file=statePath, compress=FALSE)), silent = FALSE)
 
   return(list(relativePath = relativePath))
 }
@@ -683,9 +706,10 @@ jaspResultsStrings <- function() {
   if (base::exists(".requestStateFileNameNative")) {
 
     location <- .fromRCPP(".requestStateFileNameNative")
+    statePath <- .stateFilePath(location)
 
     base::tryCatch(
-      base::load(location$relativePath),
+      base::load(statePath),
       error=function(e) e
       #,warning=function(w) w #Commented out because if there *is* a warning, which there of course shouldnt be, the state wont be loaded *at all*.
     )
@@ -820,7 +844,11 @@ saveImage <- function(plotName, format, height, width)
   state           <- .retrieveState()     # Retrieve plot object from state
   plt             <- state[["figures"]][[plotName]][["obj"]]
 
-  plt             <- decodeplot(plt);
+  plt             <- .decodeJaspPlotObject(
+    plt,
+    returnGrob = TRUE,
+    decodeContext = .jaspDecodeContext(source = "stored-result-state")
+  )
 
   location        <- .fromRCPP(".requestTempFileNameNative", "png") # create file location string to extract the root location
   backgroundColor <- .fromRCPP(".imageBackground")
@@ -1026,7 +1054,11 @@ rewriteImages <- function(name, ppi, imageBackground) {
 
       jaspPlotCPP$editing <- TRUE
 
-      plot <- jaspPlotCPP$plotObject
+      plot <- .decodeJaspPlotObject(
+        jaspPlotCPP$plotObject,
+        returnGrob = FALSE,
+        decodeContext = .jaspDecodeContext(source = "stored-result-state")
+      )
 
       # here we can modify general things for all plots (theme, font, etc.).
       # ppi and imageBackground are automatically updated in writeImageJaspResults through .Rcpp magic
@@ -1077,7 +1109,11 @@ editImage <- function(name, optionsJson) {
     jaspPlotCPP$editing <- TRUE
     on.exit({jaspPlotCPP$editing <- FALSE}) # this should not persist!
 
-    plot <- jaspPlotCPP$plotObject
+    plot <- .decodeJaspPlotObject(
+      jaspPlotCPP$plotObject,
+      returnGrob = FALSE,
+      decodeContext = .jaspDecodeContext(source = "stored-result-state")
+    )
     if (is.null(plot))
       stop("no plot object found")
 
@@ -1118,8 +1154,10 @@ editImage <- function(name, optionsJson) {
       newPlot       <- jaspGraphs::plotEditing(newPlot, newOpts)
 
       # plot editing did nothing or was canceled
-      if (!identical(plot, newPlot))
+      if (!identical(plot, newPlot)) {
         jaspPlotCPP$plotObject <- newPlot
+        plot <- newPlot
+      }
 
     }
     interactiveJsonData <- jaspPlotCPP$interactiveJsonData
@@ -1163,27 +1201,191 @@ storeDataSet <- function(dataset) {
   jaspSyntax::loadDataSet(dataset)
 }
 
+.wrappedAnalysisQmlFile <- function(moduleName, qmlFileName, modulePath = NULL, qmlFile = NULL) {
+  if (.isNonEmptyString(qmlFile))
+    return(as.character(fs::path_norm(qmlFile)))
+
+  if (.isNonEmptyString(modulePath)) {
+    qmlCandidates <- fs::path(modulePath, c("inst/qml", "qml"), qmlFileName)
+    existingQml <- qmlCandidates[fs::file_exists(qmlCandidates)]
+    if (length(existingQml) > 0)
+      return(as.character(fs::path_norm(existingQml[[1]])))
+
+    return(as.character(fs::path_norm(qmlCandidates[[1]])))
+  }
+
+  as.character(fs::path_norm(fs::path(find.package(moduleName), "qml", qmlFileName)))
+}
+
+.normalizeRunWrappedAnalysisVerbose <- function(verbose = NULL, quiet = NULL) {
+  if (is.null(verbose) || length(verbose) == 0L) {
+    if (isFALSE(quiet))
+      return("all")
+
+    return("analysis")
+  }
+
+  verbose <- verbose[[1L]]
+  if (is.na(verbose))
+    stop("`verbose` must be one of 'all', 'analysis', 'jasp', 'none', TRUE, or FALSE.", call. = FALSE)
+
+  if (is.logical(verbose))
+    return(if (isTRUE(verbose)) "all" else "none")
+
+  if (is.character(verbose)) {
+    verbose <- tolower(trimws(verbose))
+    if (verbose %in% c("true", "yes", "on", "1"))
+      return("all")
+    if (verbose %in% c("false", "no", "off", "0"))
+      return("none")
+    if (verbose %in% c("all", "analysis", "jasp", "none"))
+      return(verbose)
+  }
+
+  stop("`verbose` must be one of 'all', 'analysis', 'jasp', 'none', TRUE, or FALSE.", call. = FALSE)
+}
+
+.runWrappedAnalysisShowsAnalysis <- function(verbose) {
+  verbose %in% c("all", "analysis")
+}
+
+.runWrappedAnalysisShowsJasp <- function(verbose) {
+  verbose %in% c("all", "jasp")
+}
+
+.decodeRunWrappedAnalysisConditionMessage <- function(condition, decodeContext = NULL) {
+  message <- conditionMessage(condition)
+  if (!is.character(message) || length(message) != 1L || is.na(message) || !nzchar(message))
+    return(message)
+
+  decoded <- .decodeJaspText(message, decodeContext = decodeContext)
+  if (!is.character(decoded) || length(decoded) != 1L || is.na(decoded))
+    return(message)
+
+  decoded
+}
+
+.decodeRunWrappedAnalysisCondition <- function(condition) {
+  decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(condition)
+  if (identical(decodedMessage, conditionMessage(condition)))
+    return(condition)
+
+  if (is.list(condition) && "message" %in% names(condition)) {
+    condition[["message"]] <- decodedMessage
+    return(condition)
+  }
+
+  simpleError(decodedMessage, call = conditionCall(condition))
+}
+
+.runWrappedAnalysisWithDecodedConditions <- function(expr) {
+  replayingCondition <- FALSE
+
+  tryCatch(
+    withCallingHandlers(
+      expr,
+      message = function(messageCondition) {
+        if (isTRUE(replayingCondition))
+          return()
+
+        decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(messageCondition)
+        if (identical(decodedMessage, conditionMessage(messageCondition)))
+          return()
+
+        replayingCondition <<- TRUE
+        on.exit(replayingCondition <<- FALSE, add = TRUE)
+        message(decodedMessage, appendLF = !grepl("\n$", decodedMessage))
+        tryInvokeRestart("muffleMessage")
+      },
+      warning = function(warningCondition) {
+        if (isTRUE(replayingCondition))
+          return()
+
+        decodedMessage <- .decodeRunWrappedAnalysisConditionMessage(warningCondition)
+        if (identical(decodedMessage, conditionMessage(warningCondition)))
+          return()
+
+        replayingCondition <<- TRUE
+        on.exit(replayingCondition <<- FALSE, add = TRUE)
+        warning(decodedMessage, call. = FALSE)
+        tryInvokeRestart("muffleWarning")
+      }
+    ),
+    error = function(errorCondition) {
+      stop(.decodeRunWrappedAnalysisCondition(errorCondition))
+    }
+  )
+}
+
+.runWrappedAnalysisWithVerbosity <- function(expr, verbose = "analysis") {
+  verbose <- .normalizeRunWrappedAnalysisVerbose(verbose)
+  showAnalysis <- .runWrappedAnalysisShowsAnalysis(verbose)
+  showJasp <- .runWrappedAnalysisShowsJasp(verbose)
+
+  if (!showJasp) {
+    outputFile <- tempfile("jaspBase-runWrappedAnalysis-")
+    outputConnection <- file(outputFile, open = "wt")
+    outputSink <- sink.number(type = "output")
+    on.exit({
+      while (sink.number(type = "output") > outputSink)
+        sink(type = "output")
+      close(outputConnection)
+      unlink(outputFile)
+    }, add = TRUE)
+
+    sink(outputConnection, type = "output")
+  }
+
+  if (showAnalysis)
+    return(.runWrappedAnalysisWithDecodedConditions(expr))
+
+  suppressWarnings(suppressMessages(expr))
+}
+
 #' @export
-runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, modulePath = NULL, qmlFile = NULL,
+                               quiet = getOption("jaspBase.runWrappedAnalysis.quiet", NULL),
+                               verbose = getOption("jaspBase.runWrappedAnalysis.verbose", getOption("jaspSyntax.verbose", NULL))) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
     # So here, just give back the parsed options.
-    return(toJSON(list("options" = options, "module" = moduleName, "analysis" = analysisName, "version" = version)))
+    response <- list(
+      "options"         = options,
+      "module"          = moduleName,
+      "analysis"        = analysisName,
+      "version"         = version,
+      "qmlFileName"     = qmlFileName,
+      # `version` is the generated module wrapper version; this is the runtime contract version.
+      "jaspBaseVersion" = as.character(utils::packageVersion("jaspBase")),
+      "source"          = "jaspBase::runWrappedAnalysis"
+    )
+    if (!is.null(modulePath))
+      response[["modulePath"]] <- modulePath
+    if (!is.null(qmlFile))
+      response[["qmlFile"]] <- qmlFile
+    return(toJSON(response))
 
   } else {
-    # The wrapper is called inside an R environment (R Studio probably).
-    # The options must be parsed and checked by the QML form, and then the real analysis can be called.
-    qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
-    # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
-    options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+    verbose <- .normalizeRunWrappedAnalysisVerbose(verbose, quiet = quiet)
+    jaspSyntax::setParameter("verbose", .runWrappedAnalysisShowsJasp(verbose))
 
-    if (options == "")
-      stop("Error when parsing the options")
+    runWrapped <- function() {
+      # The wrapper is called inside an R environment (R Studio probably).
+      # The options must be parsed and checked by the QML form, and then the real analysis can be called.
+      qmlFile <- .wrappedAnalysisQmlFile(moduleName, qmlFileName, modulePath, qmlFile)
+      # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
+      options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
-     internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+      if (options == "")
+        stop("Error when parsing the options")
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+
+      return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+    }
+
+    return(.runWrappedAnalysisWithVerbosity(runWrapped(), verbose = verbose))
   }
 }
 

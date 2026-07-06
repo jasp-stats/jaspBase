@@ -27,7 +27,7 @@ openGrDevice <- function(...) {
 }
 
 writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, relativePathpng = NULL, relativePathJson = NULL, ppi = 300, backgroundColor = "white",
-                                  location = getImageLocation(), oldPlotInfo = list()) {
+                                  location = getImageLocation(), oldPlotInfo = list(), decodeContext = .currentJaspDecodeContext()) {
   # Set values from JASP'S Rcpp when available
   if (exists(".fromRCPP")) {
     location        <- .fromRCPP(".requestTempFileNameNative", "png")
@@ -79,7 +79,12 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   width  <- width  * (ppi / 96)
   height <- height * (ppi / 96)
 
-  plot2draw <- decodeplot(plot)
+  plotObject <- .decodeJaspPlotObject(plot, returnGrob = FALSE, decodeContext = decodeContext)
+  plot2draw  <- if (ggplot2::is.ggplot(plot)) {
+    .decodeJaspPlotObject(plot, returnGrob = TRUE, decodeContext = decodeContext)
+  } else {
+    plotObject
+  }
 
   openGrDevice(file = relativePathpng, width = width, height = height, res = 72 * (ppi / 96), background = backgroundColor)#, dpi = ppi)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -117,16 +122,16 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   image[["png"]] <- relativePathpng
 
   if (obj) {
-    image[["obj"]]         <- plot2draw
+    image[["obj"]]         <- plotObject
   }
 
-  image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plot, asJSON = TRUE)
+  image[["editOptions"]] <- jaspGraphs::plotEditingOptions(plotObject, asJSON = TRUE)
 
-  image[["interactive"]] <- ggplot2::is.ggplot(plot) || inherits(plot, "jaspMatrixPlot")
+  image[["interactive"]] <- ggplot2::is.ggplot(plotObject) || inherits(plotObject, "jaspMatrixPlot")
   if (image[["interactive"]] )
     tryCatch(
     {
-      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
+      jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plotObject)
 
       if (exists(".fromRCPP")) {
         if (isTryError(jsonOrTryError)) {
@@ -168,42 +173,58 @@ decodeplot <- function(x, ...) {
 
 # S3 methods must be registered (done by @export) so that jaspGraphs can call jaspBase:::decodeplot
 #' @export
-decodeplot.jaspGraphsPlot <- function(x, ...) {
+decodeplot.jaspGraphsPlot <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   for (i in seq_along(x$subplots))
-    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = FALSE)
+    x$subplots[[i]] <- decodeplot(x$subplots[[i]], returnGrob = FALSE, decodeContext = decodeContext)
 
   return(x)
 }
 
 
 #' @export
-decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
+decodeplot.gg <- function(x, returnGrob = TRUE, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   # TODO: do not return a grid object!
   # we can do this by automatically replacing the scales and geoms, although this is quite a lot of work.
   # alternatively, those edge cases will need to be handled by the developer.
-  if (packageVersion("ggplot2") < "4.0.0") {
-    labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
-    for (i in seq_along(labels))
-      if (!is.null(labels[[i]]))
-        labels[[i]] <- decodeColNames(labels[[i]])
-    x$labels <- labels
-  } else {
+  x$data    <- .decodeGgplotData(x$data, decodeContext = decodeContext)
+  x$mapping <- .decodeGgplotMapping(x$mapping, decodeContext = decodeContext)
+
+  for (i in seq_along(x$layers)) {
+    x$layers[[i]]$data    <- .decodeGgplotData(x$layers[[i]]$data, decodeContext = decodeContext)
+    x$layers[[i]]$mapping <- .decodeGgplotMapping(x$layers[[i]]$mapping, decodeContext = decodeContext)
+  }
+
+  x$facet$params$facets <- .decodeGgplotMapping(x$facet$params$facets, decodeContext = decodeContext)
+  x$facet$params$rows   <- .decodeGgplotMapping(x$facet$params$rows,   decodeContext = decodeContext)
+  x$facet$params$cols   <- .decodeGgplotMapping(x$facet$params$cols,   decodeContext = decodeContext)
+
+  labels <- x$labels # x[["labels"]] needs to be subsetted by `$`, not `[[`, as patchwork objects would fail if subsetting with `[[`
+  for (i in seq_along(labels))
+    if (!is.null(labels[[i]]))
+      labels[[i]] <- .decodeJaspText(labels[[i]], decodeContext = decodeContext)
+  x$labels <- labels
+
+  if (packageVersion("ggplot2") >= "4.0.0") {
     currentGuides <- x@guides
+    guideDecodeContext <- .serializableJaspDecodeContext(decodeContext)
+    decodeGuideTitle <- function(title) .decodeJaspText(title, decodeContext = guideDecodeContext)
 
     .makeDecodedGuide <- function(axisName, positional = TRUE) {
       existing <- currentGuides$guides[[axisName]]
       if (is.character(existing)) {
-        newTitle <- decodeColNames
+        newTitle <- decodeGuideTitle
       } else {
         title    <- existing$params$title
         newTitle <- if (is.null(title) || ggplot2::is_waiver(title)) {
-          decodeColNames
+          decodeGuideTitle
         } else if (is.character(title)) {
-          decodeColNames(title)
+          decodeGuideTitle(title)
         } else if (is.function(title)) {
-          function(t) decodeColNames(title(t))
+          function(t) decodeGuideTitle(title(t))
         } else {
-          decodeColNames
+          decodeGuideTitle
         }
       }
 
@@ -219,7 +240,8 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
       y     = .makeDecodedGuide("y",      positional = TRUE),
       colour = .makeDecodedGuide("colour", positional = FALSE),
       fill  = .makeDecodedGuide("fill",   positional = FALSE),
-      shape = .makeDecodedGuide("shape",  positional = FALSE)
+      shape = .makeDecodedGuide("shape",  positional = FALSE),
+      linetype = .makeDecodedGuide("linetype", positional = FALSE)
     )
   }
   if (returnGrob) {
@@ -229,56 +251,118 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
       if (file.exists(f))
         file.remove(f)
     })
-    return(decodeplot.gTree(ggplot2::ggplotGrob(x)))
+    return(decodeplot.gTree(ggplot2::ggplotGrob(x), decodeContext = decodeContext))
   } else {
     return(x)
   }
 }
 
+.decodeGgplotData <- function(data, decodeContext = NULL) {
+  if (is.data.frame(data))
+    .decodeJaspRObject(data, decodeContext = decodeContext)
+  else
+    data
+}
+
+.decodeGgplotMapping <- function(mapping, decodeContext = NULL) {
+  if (is.null(mapping) || length(mapping) == 0L)
+    return(mapping)
+
+  oldNames <- names(mapping)
+  for (i in seq_along(mapping))
+    mapping[[i]] <- .decodeGgplotExpression(mapping[[i]], decodeContext = decodeContext)
+  if (!is.null(oldNames))
+    names(mapping) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+
+  mapping
+}
+
+.decodeGgplotExpression <- function(x, decodeContext = NULL) {
+  if (rlang::is_quosure(x)) {
+    return(rlang::new_quosure(
+      .decodeGgplotExpression(rlang::quo_get_expr(x), decodeContext = decodeContext),
+      rlang::quo_get_env(x)
+    ))
+  }
+
+  if (is.name(x)) {
+    decodedName <- .decodeJaspText(as.character(x), decodeContext = decodeContext)
+    if (identical(decodedName, as.character(x)))
+      x
+    else
+      rlang::sym(decodedName)
+  } else if (is.call(x)) {
+    callParts <- as.list(x)
+    if (length(callParts) > 1L)
+      for (i in seq.int(2L, length(callParts)))
+        callParts[[i]] <- .decodeGgplotExpression(callParts[[i]], decodeContext = decodeContext)
+    as.call(callParts)
+  } else if (is.character(x)) {
+    .decodeJaspText(x, decodeContext = decodeContext)
+  } else {
+    x
+  }
+}
+
 #' @export
-decodeplot.patchwork <- function(x, ...) {
+decodeplot.patchwork <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   # the last plot in a patchwork is the "active" plot
   # and is essentially a ggplot (with some extras),
   # so we can decode it as such
-  x <- decodeplot.gg(x, returnGrob = FALSE)
+  x <- decodeplot.gg(x, returnGrob = FALSE, decodeContext = decodeContext)
   # but it also contains annotations, which need to be decoded in addition to the standard gg stuff
-  x$patches$annotation$title    <- decodeColNames(x$patches$annotation$title   )
-  x$patches$annotation$subtitle <- decodeColNames(x$patches$annotation$subtitle)
-  x$patches$annotation$caption  <- decodeColNames(x$patches$annotation$caption )
+  x$patches$annotation$title    <- .decodeJaspText(x$patches$annotation$title,    decodeContext = decodeContext)
+  x$patches$annotation$subtitle <- .decodeJaspText(x$patches$annotation$subtitle, decodeContext = decodeContext)
+  x$patches$annotation$caption  <- .decodeJaspText(x$patches$annotation$caption,  decodeContext = decodeContext)
 
   # each subplot can be either a patchwork or a ggplot object
-  x$patches$plots <-  lapply(x$patches$plots, decodeplot, returnGrob = FALSE)
+  x$patches$plots <-  lapply(x$patches$plots, decodeplot, returnGrob = FALSE, decodeContext = decodeContext)
 
   return(x)
 }
 
 #' @export
-decodeplot.recordedplot <- function(x, ...) {
-  decodeplot.gTree(grid::grid.grabExpr(gridGraphics::grid.echo(x)))
+decodeplot.recordedplot <- function(x, ..., decodeContext = NULL) {
+  decodeplot.gTree(grid::grid.grabExpr(gridGraphics::grid.echo(x)), decodeContext = decodeContext)
 }
 
 #' @export
-decodeplot.gtable <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+decodeplot.gtable <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  rapply(x, f = function(text) .decodeJaspText(text, decodeContext = decodeContext), classes = "character", how = "replace")
+}
 #' @export
-decodeplot.grob   <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+decodeplot.grob   <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  rapply(x, f = function(text) .decodeJaspText(text, decodeContext = decodeContext), classes = "character", how = "replace")
+}
 #' @export
-decodeplot.gTree  <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+decodeplot.gTree  <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  rapply(x, f = function(text) .decodeJaspText(text, decodeContext = decodeContext), classes = "character", how = "replace")
+}
 #' @export
-decodeplot.gDesc  <- function(x, ...) rapply(x, f = decodeColNames, classes = "character", how = "replace")
+decodeplot.gDesc  <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  rapply(x, f = function(text) .decodeJaspText(text, decodeContext = decodeContext), classes = "character", how = "replace")
+}
 
 #' @export
-decodeplot.qgraph <- function(x, ...) {
+decodeplot.qgraph <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
   labels <- x[["graphAttributes"]][["Nodes"]][["labels"]]
   names  <- x[["graphAttributes"]][["Nodes"]][["names"]]
-  labels <- decodeColNames(labels)
-  names  <- decodeColNames(names)
+  labels <- .decodeJaspText(labels, decodeContext = decodeContext)
+  names  <- .decodeJaspText(names,  decodeContext = decodeContext)
   x[["graphAttributes"]][["Nodes"]][["labels"]] <- labels
   x[["graphAttributes"]][["Nodes"]][["names"]]  <- names
   return(x)
 }
 
 #' @export
-decodeplot.function <- function(x, ...) {
+decodeplot.function <- function(x, ..., decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
 
   f <- tempfile()
   on.exit({
@@ -293,7 +377,7 @@ decodeplot.function <- function(x, ...) {
   eval(x())
   out <- grDevices::recordPlot()
 
-  return(decodeplot.recordedplot(out))
+  return(decodeplot.recordedplot(out, decodeContext = decodeContext))
 }
 
 # Some functions that act as a bridge between R and JASP. If JASP isn't running then all columnNames are expected to not be encoded
@@ -325,8 +409,21 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 
   fun <- .findFun(defaults[[type]][[method]])
 
-  if (!is.function(fun))
-    return(function(inIsOut){return(inIsOut)}) # Instead of complaining we just give it a dummy function
+  if (!is.function(fun)) {
+    if (type == "decode") {
+      return(function(inIsOut) {
+        if (.containsJaspEncodedTokens(inIsOut)) {
+          stop(
+            "No JASP column decoder is available for encoded column names.",
+            call. = FALSE
+          )
+        }
+        inIsOut
+      })
+    }
+
+    return(function(inIsOut){return(inIsOut)}) # Outside JASP, raw names do not need encoding.
+  }
 
   return(fun)
 }

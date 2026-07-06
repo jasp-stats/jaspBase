@@ -1429,6 +1429,9 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 		{
 		case Json::nullValue:
 			workingType = cell.type();
+			if (workingType == Json::objectValue &&
+				cell.isMember("value") && cell.isMember("type") && cell.isMember("format"))
+				return jaspTableColumnType::mixed;
 			break;
 
 		case Json::stringValue:
