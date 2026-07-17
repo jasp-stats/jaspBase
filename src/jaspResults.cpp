@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "jaspModuleRegistration.h"
 #include <fstream>
 #include <cmath>
@@ -213,8 +214,20 @@ void jaspResults::saveResults()
 	else
 		rdsPath += ".rds";
 
+	// When JASP_RDS_STRIP is set (by JASP's ProcessHelper), strip bulky
+	// environments and plot objects from the RDS tree before saving.
+	// This keeps the file small (KB) for consumers like RoboReport.
+	// When unset, the full toRObject() tree is saved (for debugging or
+	// use outside JASP).
+	Rcpp::RObject rdsObject = toRObject();
+	if (std::getenv("JASP_RDS_STRIP") != nullptr)
+	{
+		Rcpp::Environment jaspBaseEnv = Rcpp::Environment::namespace_env("jaspBase");
+		Rcpp::Function stripEnv = jaspBaseEnv[".jaspResults_stripEnv"];
+		rdsObject = stripEnv(rdsObject);
+	}
 	Rcpp::Function saveRDS("saveRDS");
-	saveRDS(toRObject(), rdsPath);
+	saveRDS(rdsObject, rdsPath);
 	jaspPrint("Saved jaspResults as RDS to: '" + rdsPath + "'");
 
 	JASP_OBJECT_TIMEREND(saveResults)
