@@ -487,7 +487,13 @@ Rcpp::List jaspTable::toRObject()
 		{
 			Rcpp::IntegerVector values(_data[col].size());
 			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = _data[col][row].asInt();
+			{
+				const Json::Value & cell = _data[col][row];
+				if (cell.isNumeric())
+					values[row] = cell.asInt();
+				else
+					values[row] = NA_INTEGER; // placeholder/null -> NA
+			}
 
 			df[getColName(col)] = values;
 			break;
@@ -496,7 +502,13 @@ Rcpp::List jaspTable::toRObject()
 		{
 			Rcpp::NumericVector values(_data[col].size());
 			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = _data[col][row].asDouble();
+			{
+				const Json::Value & cell = _data[col][row];
+				if (cell.isNumeric())
+					values[row] = cell.asDouble();
+				else
+					values[row] = NA_REAL; // placeholder/null -> NA
+			}
 
 			df[getColName(col)] = values;
 			break;
@@ -1425,6 +1437,18 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 	Json::ValueType workingType = Json::nullValue;
 
 	for(auto & cell : _data[col])
+	{
+		// Skip placeholder strings ("", ".", "NaN", "null") during type
+		// inference. Analyses put these in cells where a value doesn't
+		// apply (e.g., df="" for Mann-Whitney). They represent missing
+		// data, not a string column, and should not influence type derivation.
+		if (cell.type() == Json::stringValue)
+		{
+			const std::string & s = cell.asString();
+			if (s.empty() || s == "." || s == "NaN" || s == "null")
+				continue;
+		}
+
 		switch(workingType)
 		{
 		case Json::nullValue:
@@ -1460,6 +1484,7 @@ jaspTableColumnType jaspTable::deriveColumnType(int col) const
 		default:
 			return jaspTableColumnType::composite; //arrays and objects are not really supported as cells at the moment but maybe we could add that in the future?
 		}
+	} // end for each cell
 
 	switch(workingType)
 	{
