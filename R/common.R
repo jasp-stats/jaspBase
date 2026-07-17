@@ -1105,11 +1105,19 @@ editImage <- function(name, optionsJson) {
         jaspPlotCPP$resizedByUser <- TRUE
       }
 
-    } else if (type == "interactive" && ggplot2::is.ggplot(plot)) {
+    } else if (type == "interactive") {
 
 
       # copy plot and check if we edit it
-      newPlot <- ggplot2:::plot_clone(plot)
+      if (ggplot2::is_ggplot(plot)) {
+        newPlot <- ggplot2:::plot_clone(plot)
+      } else {
+        # jaspGraphsPlot(plot) of length 1 is only supported, but this should work
+        # for any length
+        newPlot <- plot$clone()
+        for (i in seq_along(newPlot))
+          newPlot[[i]] <- ggplot2:::plot_clone(newPlot[[i]])
+      }
 
       newOpts       <- optionsList[["editOptions"]]
       oldOpts       <- jaspGraphs::plotEditingOptions(plot)
@@ -1118,8 +1126,14 @@ editImage <- function(name, optionsJson) {
       newPlot       <- jaspGraphs::plotEditing(newPlot, newOpts)
 
       # plot editing did nothing or was canceled
-      if (!identical(plot, newPlot))
+      isDifferent <- if (ggplot2::is_ggplot(plot)) {
+        !identical(plot, newPlot)
+      } else {
+        !all(vapply(seq_along(plot), \(i) identical(plot[[i]], newPlot[[i]]), FUN.VALUE = logical(1L)))
+      }
+      if (isDifferent) {
         jaspPlotCPP$plotObject <- newPlot
+      }
 
     }
     interactiveJsonData <- jaspPlotCPP$interactiveJsonData
