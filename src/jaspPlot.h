@@ -22,6 +22,12 @@ public:
 				_interactiveJsonData = "";
 	Json::Value _editOptions = Json::nullValue;
 
+	///Machine-readable data exported by analysis authors for consumers
+	///like RoboReport (e.g., median effect size, credible intervals,
+	///BF at specific prior widths). Survives RDS stripping because it's
+	///a plain JSON value, not an environment or ggplot object.
+	Json::Value _export = Json::nullValue;
+
 	///For safekeeping (aka state replacement?)
 	void setPlotObject(Rcpp::RObject plotSerialized);
 	void renderPlot();
@@ -73,6 +79,12 @@ public:
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, bool,			_editing,				Editing)
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, bool,			_resizedByUser,			ResizedByUser)
 	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, std::string,	_interactiveJsonData,	InteractiveJsonData)
+
+	///Set/export machine-readable data from R:
+	///  plot$export <- list(medianDelta = 0.45, ciLow = 0.12, ciHigh = 0.78)
+	///Appears in both the JSON results and the RDS (survives stripping).
+	void		setExport(Rcpp::List exportData);
+	Rcpp::List	getExport();
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspPlot_Interface)
