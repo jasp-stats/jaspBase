@@ -214,13 +214,18 @@ void jaspResults::saveResults()
 	else
 		rdsPath += ".rds";
 
-	// When JASP_RDS_STRIP is set (by JASP's ProcessHelper), strip bulky
-	// environments and plot objects from the RDS tree before saving.
-	// This keeps the file small (KB) for consumers like RoboReport.
-	// When unset, the full toRObject() tree is saved (for debugging or
-	// use outside JASP).
+	// By default, strip bulky environments and plot objects from the
+	// RDS tree before saving. This keeps the file small (KB) for
+	// consumers like RoboReport.
+	// Users can opt out to get the full toRObject() tree (e.g. for
+	// debugging) by setting the env var: JASP_RDS_STRIP=FALSE (or 0/no)
 	Rcpp::RObject rdsObject = toRObject();
-	if (std::getenv("JASP_RDS_STRIP") != nullptr)
+	const char* stripEnvVal = std::getenv("JASP_RDS_STRIP");
+	bool shouldStrip = (stripEnvVal == nullptr) ||
+		(strcmp(stripEnvVal, "FALSE") != 0 && strcmp(stripEnvVal, "0") != 0 &&
+		 strcmp(stripEnvVal, "NO")   != 0 && strcmp(stripEnvVal, "no")   != 0 &&
+		 strcmp(stripEnvVal, "No")   != 0);
+	if (shouldStrip)
 	{
 		Rcpp::Environment jaspBaseEnv = Rcpp::Environment::namespace_env("jaspBase");
 		Rcpp::Function stripEnv = jaspBaseEnv[".jaspResults_stripEnv"];

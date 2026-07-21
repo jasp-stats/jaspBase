@@ -5,9 +5,10 @@
 #' Called from C++ (jaspResults::saveResults) via:
 #'   Rcpp::Environment::namespace_env("jaspBase")[".jaspResults_stripEnv"]
 #'
-#' Only called when the JASP_RDS_STRIP environment variable is set
-#' (by JASP's ProcessHelper when launching engines). When unset, the
-#' full toRObject() tree is saved unchanged.
+#' Called by default when saving results as RDS. Users can opt out
+#' to preserve the full toRObject() tree (e.g. for debugging) by
+#' setting the environment variable:
+#'   JASP_RDS_STRIP=FALSE  (or 0, NO, no, No)
 #'
 #' What gets stripped:
 #'   - jaspObjectEnvironment attributes (XPtrs to live C++ objects that
