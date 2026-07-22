@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "jaspModuleRegistration.h"
 #include <fstream>
 #include <cmath>
@@ -177,8 +178,8 @@ void jaspResults::complete()
 	if(getStatus() == "running" || getStatus() == "waiting")
 		setStatus("complete");
 
-	send();
 	saveResults();
+	send();
 	finishWriting();
 }
 
@@ -204,6 +205,35 @@ void jaspResults::saveResults()
 
 	saveHere << convertToJSON() << std::flush;
 	saveHere.close();
+
+	// Also write results as an RDS file alongside the JSON
+	std::string rdsPath = _saveResultsRoot + _saveResultsHere;
+	size_t dotPos = rdsPath.rfind(".json");
+	if(dotPos != std::string::npos)
+		rdsPath.replace(dotPos, 5, ".rds");
+	else
+		rdsPath += ".rds";
+
+	// By default, strip bulky environments and plot objects from the
+	// RDS tree before saving. This keeps the file small (KB) for
+	// consumers like RoboReport.
+	// Users can opt out to get the full toRObject() tree (e.g. for
+	// debugging) by setting the env var: JASP_RDS_STRIP=FALSE (or 0/no)
+	Rcpp::RObject rdsObject = toRObject();
+	const char* stripEnvVal = std::getenv("JASP_RDS_STRIP");
+	bool shouldStrip = (stripEnvVal == nullptr) ||
+		(strcmp(stripEnvVal, "FALSE") != 0 && strcmp(stripEnvVal, "0") != 0 &&
+		 strcmp(stripEnvVal, "NO")   != 0 && strcmp(stripEnvVal, "no")   != 0 &&
+		 strcmp(stripEnvVal, "No")   != 0);
+	if (shouldStrip)
+	{
+		Rcpp::Environment jaspBaseEnv = Rcpp::Environment::namespace_env("jaspBase");
+		Rcpp::Function stripEnv = jaspBaseEnv[".jaspResults_stripEnv"];
+		rdsObject = stripEnv(rdsObject);
+	}
+	Rcpp::Function saveRDS("saveRDS");
+	saveRDS(rdsObject, rdsPath);
+	jaspPrint("Saved jaspResults as RDS to: '" + rdsPath + "'");
 
 	JASP_OBJECT_TIMEREND(saveResults)
 }
@@ -517,6 +547,16 @@ Rcpp::List jaspResults::getKeepList()
 	keep.push_front(std::string(_saveResultsHere));
 	keep.push_front(std::string(_writeSealRelative));
 	keep.push_front(_relativePathKeep);
+
+	// Also keep jaspResults.rds if it was saved alongside the JSON
+	if (!_saveResultsHere.empty())
+	{
+		std::string rdsPath = _saveResultsHere;
+		size_t dot = rdsPath.rfind('.');
+		if (dot != std::string::npos)
+			rdsPath.replace(dot, std::string::npos, ".rds");
+		keep.push_front(rdsPath);
+	}
 
 	return keep;
 }

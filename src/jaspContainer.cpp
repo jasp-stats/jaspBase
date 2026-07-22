@@ -427,7 +427,7 @@ Rcpp::List jaspContainer::toRObject() /*const*/
 
 		Rcpp::List Robj = child->toRObject();
 		if (Robj.length() > 0)
-			lst.push_back(Robj, child->_title);
+			lst.push_back(Robj, key);
 	}
 
 	lst.attr("class") = Rcpp::CharacterVector({"jaspContainerWrapper", "jaspWrapper"});
