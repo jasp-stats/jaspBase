@@ -1122,9 +1122,17 @@ editImage <- function(name, optionsJson) {
     interactiveJsonData <- jaspPlotCPP$interactiveJsonData
     revision <- jaspPlotCPP$revision
 
-    cat("DEBUG editImage: interactiveJsonData path =", interactiveJsonData, "\n", file = stderr())
+    cat("DEBUG editImage: BEFORE finishJaspResults — interactiveJsonData ='", interactiveJsonData, "' nchar=", nchar(interactiveJsonData), "\n", file = stderr())
+    cat("DEBUG editImage: revision =", revision, "\n", file = stderr())
+    cat("DEBUG editImage: plot changed =", !identical(plot, jaspPlotCPP$plotObject), "\n", file = stderr())
+    if (!is.null(jaspPlotCPP$plotObject)) {
+      editOpts <- jaspGraphs::plotEditingOptions(jaspPlotCPP$plotObject)
+      cat("DEBUG editImage: final editOptions xAxis title =", editOpts$xAxis$settings$name, "\n", file = stderr())
+    }
 
     finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
+
+    cat("DEBUG editImage: AFTER finishJaspResults — interactiveJsonData ='", jaspPlotCPP$interactiveJsonData, "' nchar=", nchar(jaspPlotCPP$interactiveJsonData), "\n", file = stderr())
 
   })
 
@@ -1153,6 +1161,8 @@ editImage <- function(name, optionsJson) {
     response[["results"]][["errorMessage"]] <- errorMessage
 
   }
+
+  cat("DEBUG editImage: building response - plotName=", plotName, " type=", type, " hasInteractiveJsonData=", !is.null(interactiveJsonData), " revision=", revision, "\n", file = stderr())
 
   return(toJSON(response))
 }
