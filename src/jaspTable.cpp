@@ -575,8 +575,9 @@ Rcpp::List jaspTable::toRObject()
 	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
 
 	std::vector<std::string> rowNames;
-	rowNames.reserve(_data[0].size());
-	for (size_t i = 0; i < _data[0].size(); i++)
+	const size_t rowCount = _data.empty() ? 0 : _data[0].size(); // empty table (e.g. no variables selected) has no rows
+	rowNames.reserve(rowCount);
+	for (size_t i = 0; i < rowCount; i++)
 		rowNames.push_back(_rowNames[i] != "" ? decodeColumnNames(_rowNames[i]) : std::to_string(i + 1)); // R numbers from 1 to n by default
 
 	df.attr("row.names") = rowNames;
