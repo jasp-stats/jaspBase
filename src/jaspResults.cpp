@@ -205,6 +205,8 @@ void jaspResults::saveResults()
 
 	saveHere << convertToJSON() << std::flush;
 	saveHere.close();
+	if (std::getenv("JASP_RESULTS_RDS") == nullptr) { JASP_OBJECT_TIMEREND(saveResults); return; }
+
 
 	// Also write results as an RDS file alongside the JSON
 	std::string rdsPath = _saveResultsRoot + _saveResultsHere;
