@@ -48,6 +48,7 @@ Json::Value jaspPlot::dataEntry(std::string & errorMessage) const
 	data["interactiveConvertError"]	= _interactiveConvertError;
 	data["interactiveJsonData"]		= _interactiveJsonData;
 
+	data["export"]					= _export;
 
 	return data;
 }
@@ -256,6 +257,8 @@ Json::Value jaspPlot::convertToJSON() const
 	obj["interactiveConvertError"]	= _interactiveConvertError;
 	obj["interactiveJsonData"]		= _interactiveJsonData;
 
+	obj["export"]					= _export;
+
 	return obj;
 }
 
@@ -276,6 +279,8 @@ void jaspPlot::convertFromJSON_SetFields(Json::Value in)
 	_interactive				= in.get("interactive", 				false).asBool();
 	_interactiveConvertError	= in.get("interactiveConvertError", 	"").asString();
 	_interactiveJsonData		= in.get("interactiveJsonData", 		"").asString();
+
+	_export						= in.get("export",					Json::nullValue);
 
 	setUserPlotChangesFromRStateObject();
 
@@ -313,10 +318,46 @@ Rcpp::List jaspPlot::toRObject()
 	lst.attr("title") = _title;
 	lst.attr("class") = Rcpp::CharacterVector({"jaspPlotWrapper", "jaspWrapper"});
 
+	// Include the export field so RoboReport and other RDS consumers can
+	// access machine-readable data (e.g., computed effect sizes) that the
+	// analysis author tagged onto the plot. Survives RDS stripping.
+	if (!_export.isNull())
+	{
+		static Rcpp::Function fromJSON_export = Rcpp::Environment::namespace_env("jaspBase")["fromJSON"];
+		Json::StreamWriterBuilder builder;
+		std::string exportJson = Json::writeString(builder, _export);
+		lst["export"] = Rcpp::as<Rcpp::List>(fromJSON_export(exportJson));
+	}
+
 	// the reason this function is not const
 	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();
 	jaspObjectEnvironment.assign("jaspObject", Rcpp::as<Rcpp::RObject>(Rcpp::wrap(jaspPlot_Interface(this))));
 	lst.attr("jaspObjectEnvironment") = jaspObjectEnvironment;
 
 	return lst;
+}
+
+// ---- jaspPlot_Interface::setExport / getExport ----
+// Defined here (not inline in the header) because the conversions between
+// Rcpp::List and Json::Value require non-trivial logic.
+
+void jaspPlot_Interface::setExport(Rcpp::List exportData)
+{
+	jaspPlot* plot = (jaspPlot*)myJaspObject;
+	plot->_export = plot->RObject_to_JsonValue(exportData);
+	myJaspObject->notifyParentOfChanges();
+}
+
+Rcpp::List jaspPlot_Interface::getExport()
+{
+	jaspPlot* plot = (jaspPlot*)myJaspObject;
+	if (plot->_export.isNull() || plot->_export.empty())
+		return Rcpp::List();
+
+	// Convert Json::Value -> string -> R list via jsonlite (jaspBase dep).
+	static Rcpp::Function fromJSON_getExport =
+		Rcpp::Environment::namespace_env("jaspBase")["fromJSON"];
+	Json::StreamWriterBuilder builder;
+	std::string jsonStr = Json::writeString(builder, plot->_export);
+	return Rcpp::as<Rcpp::List>(fromJSON_getExport(jsonStr));
 }

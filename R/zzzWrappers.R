@@ -613,6 +613,7 @@ jaspPlotR <- R6::R6Class(
   ),
   active = list(
     plotObject  = function(x) if (missing(x)) private$jaspObject$plotObject   else private$setPlotObject(x, setNull = TRUE),
+    export      = function(x) if (missing(x)) private$jaspObject$export       else private$jaspObject$export       <- x,
     aspectRatio = function(x) if (missing(x)) private$jaspObject$aspectRatio  else private$jaspObject$aspectRatio  <- x,
     width       = function(x) if (missing(x)) private$jaspObject$width        else private$jaspObject$width        <- x,
     height      = function(x) if (missing(x)) private$jaspObject$height       else private$jaspObject$height       <- x,
