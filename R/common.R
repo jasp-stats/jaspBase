@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2013-2018 University of Amsterdam
+# Copyright (C) 2013-2026 University of Amsterdam
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-#' @importFrom stats na.omit
-
 fromJSON <- function(x) jsonlite::fromJSON(x, TRUE, FALSE, FALSE)
 toJSON   <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE, digits = NA, null="null")
 
@@ -1150,12 +1147,15 @@ editImage <- function(name, optionsJson) {
     status  = "imageEdited",
     results = list(
       name     = plotName,
+      uniqueName = uniqueName,
+      pngFile  = jaspPlotCPP$filePathPng,
+      jsonFile = interactiveJsonData,
       resized  = type == "resize",
       width    = width,
       height   = height,
       revision = revision,
       error    = FALSE,
-      editOptions         = jaspGraphs::plotEditingOptions(plot),
+      editOptions         = jaspGraphs::plotEditingOptions(jaspPlotCPP$plotObject),
       interactiveJsonData = interactiveJsonData
     )
   )

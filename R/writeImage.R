@@ -1,5 +1,19 @@
-#Originally in common.R in package JASP, extracted here and changed for standalone use in jaspResults/jaspTools
-
+#
+# Copyright (C) 2013-2026 University of Amsterdam
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 tryToWriteImageJaspResults <- function(...) {
   tryCatch(
     suppressWarnings(return(writeImageJaspResults(...))),
@@ -127,6 +141,7 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
     tryCatch(
     {
       jsonOrTryError <- jaspGraphs::convertGgplotToPlotly(plot)
+      cat("DEBUG writeImage: plotly generated, nchar=", nchar(jsonOrTryError), " isTryError=", isTryError(jsonOrTryError), "\n", file = stderr())
 
       if (exists(".fromRCPP")) {
         if (isTryError(jsonOrTryError)) {
@@ -135,8 +150,10 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
           if (!is.null(relativePathJson) && nzchar(relativePathJson)) {
             locationPlotly <- list(root = location$root, relativePath = relativePathJson)
+            cat("DEBUG writeImage: reusing interactiveJsonData path='", relativePathJson, "'\n", file = stderr())
           } else {
             locationPlotly <- .fromRCPP(".requestTempFileNameNative", "json")
+            cat("DEBUG writeImage: NEW interactiveJsonData path='", locationPlotly$relativePath, "'\n", file = stderr())
           }
           fullPathPlotly  <- paste(locationPlotly$root, locationPlotly$relativePath, sep="/")
           plotlyJsonFile  <- file(fullPathPlotly)
@@ -145,11 +162,13 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 
           if(file.exists(fullPathPlotly)) {
             image[["interactiveJsonData"]] <- locationPlotly$relativePath
+            cat("DEBUG writeImage: file written OK, interactiveJsonData='", locationPlotly$relativePath, "'\n", file = stderr())
           }
           else
           {
             image[["interactiveJsonData"]]      <- ""
             image[["interactiveConvertError"]]  <- gettext("No interactive plot generated...")
+            cat("DEBUG writeImage: file NOT found after write! fullPathPlotly='", fullPathPlotly, "'\n", file = stderr())
           }
         }
       }
