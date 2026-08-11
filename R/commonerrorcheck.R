@@ -46,6 +46,37 @@
   signalCondition(e)
 }
 
+.addWarnings <- function(w) {
+  .internal[["warnings"]] <- c(.internal[["warnings"]], list(w))
+}
+
+.appendOutputFromR <- function(container) {
+  warnings <- .internal[["warnings"]]
+  # display only in developer mode
+  # currently adds only warnings, do we also want messages or something?
+  if (!getDeveloperMode() || identical(warnings, list())) return()
+
+  output <- createJaspContainer(title = gettext("Output from R"), initCollapsed = TRUE)
+
+  # Adds a warning element to a jaspContainer
+  text <- vapply(warnings, function(w) {
+    # oh lord forgive me for the code I am about to write right now:
+    # as.character can produce special symbols that are used to render the text in a different format in the R console, so the warning may become unintelligible
+    # so instead we `cat()` the output which prints the formatted text
+    # and capture the output as text again (without formatting)
+    w <- capture.output(cat(as.character(w)))
+    w <- paste0(w, collapse = "<br>")
+    return(w)
+  }, character(1))
+
+  text <- paste0("<li><p class='jasp-code'>", text, "</p></li>", collapse = "")
+  text <- paste0("<ul>", text, "</ul>")
+
+  output[["warnings"]] <- createJaspHtml(title = gettext("Warnings"), text = text)
+
+  container[[".outputFromR"]] <- output
+}
+
 
 .generateErrorMessage <- function(type, opening=FALSE, concatenate=NULL, grouping=NULL, ...) {
   # Generic function to create an error message (mostly used by .hasErrors() but it can be called directly).
