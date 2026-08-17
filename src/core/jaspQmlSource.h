@@ -1,9 +1,12 @@
 #ifndef JASPQMLSOURCE_H
 #define JASPQMLSOURCE_H
 
+// CORE (R-free) version of jaspQmlSource.h. setValue() takes Json::Value (the
+// Rcpp conversion happens in jaspQmlSource_Interface); the unused Rcpp-only
+// RcppVector_to_ArrayJson helper was dropped. jaspQmlSource_Interface moved to
+// src/adapters/rcpp/rcppInterfaces.h.
+
 #include "jaspObject.h"
-#include "jaspObjectInterface.h"
-#include "rcppConversions.h"
 
 class jaspQmlSource : public jaspObject
 {
@@ -12,7 +15,7 @@ public:
 
 	void			setSourceID(const std::string & sourceID)							{ _sourceID = sourceID; }
 	std::string		sourceID()										const;
-	void			setValue(Rcpp::RObject Robj)										{ _json = RObject_to_JsonValue(Robj, _escapeHtml); _changed = true;	}
+	void			setValue(Json::Value json)											{ _json = json; _changed = true;	}
 	std::string		getValue()										const				{ return _json.toStyledString();		}
 
 	Json::Value		metaEntry()										const	override;
@@ -24,8 +27,6 @@ public:
 	std::string		dataToString(std::string prefix)				const	override	{ return jsonToPrefixedStrings(prefix + "\t"); }
 	std::string		jsonToPrefixedStrings(std::string prefix = "")	const				{ return jsonToPrefixedStrings(_json, prefix); }
 	std::string		jsonToPrefixedStrings(Json::Value val, std::string prefix) const;
-
-	Json::Value		RcppVector_to_ArrayJson(Rcpp::RObject obj, bool throwError=true)	{ return VectorJson_to_ArrayJson(RcppVector_to_VectorJson(obj, _escapeHtml, throwError)); }
 
 	bool			shouldBePartOfResultsJson(bool meta = false)	const	override;
 
@@ -39,20 +40,5 @@ protected:
 					_changed	= false;
 
 };
-
-
-class jaspQmlSource_Interface : public jaspObject_Interface
-{
-public:
-	jaspQmlSource_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
-
-	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspQmlSource, std::string,	_sourceID,	SourceID)
-
-	void			setValue(Rcpp::RObject obj)			{ ((jaspQmlSource*)myJaspObject)->setValue(obj);		}
-	std::string		getValue()							{ return ((jaspQmlSource*)myJaspObject)->getValue();	}
-};
-
-RCPP_EXPOSED_CLASS_NODECL(jaspQmlSource_Interface)
-
 
 #endif // JASPQMLSOURCE_H

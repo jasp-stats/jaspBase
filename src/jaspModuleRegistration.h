@@ -2,6 +2,7 @@
 #include "jaspResults.h"
 #include "jaspColumn.h"
 #include "jaspObjectInterface.h"
+#include "rcppInterfaces.h"
 #include "rcppHost.h"
 
 JASP_OBJECT_CREATOR(jaspHtml)

@@ -1,5 +1,6 @@
 #include "jaspContainer.h"
 #include "rcppToRObject.h"
+#include "rcppInterfaces.h"
 
 void jaspContainer::insert(std::string field, Rcpp::RObject value)
 {
