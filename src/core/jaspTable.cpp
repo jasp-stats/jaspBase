@@ -12,54 +12,34 @@ std::string jaspColRowCombination::toString()
 	return out.str();
 }
 
-size_t jaspTable::lengthFromRObject(Rcpp::RObject rObj)
+void jaspTable::setDataColumns(const jaspTableData & newData)
 {
-	if(rObj.isNULL())								return 0;
-	else if(Rcpp::is<Rcpp::List>(rObj))				return lengthFromList((Rcpp::List)						rObj);
-	else if(Rcpp::is<Rcpp::NumericVector>(rObj))	return lengthFromVector<REALSXP>((Rcpp::NumericVector)	rObj);
-	else if(Rcpp::is<Rcpp::LogicalVector>(rObj))	return lengthFromVector<LGLSXP>((Rcpp::LogicalVector)	rObj);
-	else if(Rcpp::is<Rcpp::IntegerVector>(rObj))	return lengthFromVector<INTSXP>((Rcpp::IntegerVector)	rObj);
-	else if(Rcpp::is<Rcpp::StringVector>(rObj))		return lengthFromVector<STRSXP>((Rcpp::StringVector)	rObj);
-	else if(Rcpp::is<Rcpp::CharacterVector>(rObj))	return lengthFromVector<STRSXP>((Rcpp::CharacterVector)	rObj);
-	else Rf_error("Unexpected type..");
+	_data.clear();
 
-	return 0;
+	for(size_t col=0; col<newData.columns.size(); col++)
+		addOrSetColumnInData(newData.columns[col], newData.colNames.size() > col ? newData.colNames[col] : "");
 
+	for(size_t row=0; row<newData.rowNames.size(); row++)
+		if(newData.rowNames[row] != "" && (_rowNames.rowCount() <= row || _rowNames[row] == "")) //Add new rowNames or overwrite unset ones
+			_rowNames[row] = newData.rowNames[row];
 }
 
-
-void jaspTable::setData(Rcpp::RObject newData)
+void jaspTable::setColumnCellsAt(std::vector<Json::Value> column, size_t col)
 {
-#ifdef JASP_RESULTS_DEBUG_TRACES
-	jaspPrint("jaspTable::setData");
-#endif
-	if(newData.isNULL())
+	if(_data.size() <= col)
+		_data.resize(col + 1);
+	_data[col] = std::move(column);
+}
+
+void jaspTable::setRowNamesWhereApplicable(std::vector<std::string> rowNamesList)
+{
+	for(size_t row=0; row<rowNamesList.size(); row++)
 	{
-		_data.clear();
-		return;
+		if(rowNamesList[row] != "" && (_rowNames.rowCount() <= row || _rowNames[row] == "")) //Add new rowNames or overwrite unset ones but if the user took the trouble to manually set it then just leave it I guess?
+			_rowNames[row] = rowNamesList[row];
 	}
-
-	//Maybe this is overkill?
-	if(Rcpp::is<Rcpp::DataFrame>(newData))				setDataFromList(convertFactorsToCharacters((Rcpp::DataFrame)	newData));
-	else if(Rcpp::is<Rcpp::List>(newData))				setDataFromList((Rcpp::List)									newData);
-
-	else if(Rcpp::is<Rcpp::NumericMatrix>(newData))		setDataFromMatrix<REALSXP>((Rcpp::NumericMatrix)	newData);
-	else if(Rcpp::is<Rcpp::LogicalMatrix>(newData))		setDataFromMatrix<LGLSXP>((Rcpp::LogicalMatrix)		newData);
-	else if(Rcpp::is<Rcpp::IntegerMatrix>(newData))		setDataFromMatrix<INTSXP>((Rcpp::IntegerMatrix)		newData);
-	else if(Rcpp::is<Rcpp::StringMatrix>(newData))		setDataFromMatrix<STRSXP>((Rcpp::StringMatrix)		newData);
-	else if(Rcpp::is<Rcpp::CharacterMatrix>(newData))	setDataFromMatrix<STRSXP>((Rcpp::CharacterMatrix)	newData);
-
-	else if(Rcpp::is<Rcpp::NumericVector>(newData))		setDataFromVector<REALSXP>((Rcpp::NumericVector)	newData);
-	else if(Rcpp::is<Rcpp::LogicalVector>(newData))		setDataFromVector<LGLSXP>((Rcpp::LogicalVector)		newData);
-	else if(Rcpp::is<Rcpp::IntegerVector>(newData))		setDataFromVector<INTSXP>((Rcpp::IntegerVector)		newData);
-	else if(Rcpp::is<Rcpp::StringVector>(newData))		setDataFromVector<STRSXP>((Rcpp::StringVector)		newData);
-	else if(Rcpp::is<Rcpp::CharacterVector>(newData))	setDataFromVector<STRSXP>((Rcpp::CharacterVector)	newData);
-
-	else
-		Rf_error("Cannot set this kind of data to a jaspTable, it is not understood. Try a list, dataframe, vector or matrix instead.");
-
-	notifyParentOfChanges();
 }
+
 
 
 void jaspTable::addOrSetColumnInData(std::vector<Json::Value> column, std::string colName)
@@ -138,169 +118,6 @@ int jaspTable::getDesiredColumnIndexFromNameForRowAdding(std::string colName, in
 			return col;
 
 	return std::max(_colNames.rowCount(), _data.size());
-}
-
-void jaspTable::setColumn(std::string columnName, Rcpp::RObject column)
-{
-	int colIndex = getDesiredColumnIndexFromNameForColumnAdding(columnName);
-
-	if(Rcpp::is<Rcpp::NumericVector>(column))			setColumnFromVector<REALSXP>((Rcpp::NumericVector)	column, colIndex);
-	else if(Rcpp::is<Rcpp::LogicalVector>(column))		setColumnFromVector<LGLSXP>((Rcpp::LogicalVector)	column, colIndex);
-	else if(Rcpp::is<Rcpp::IntegerVector>(column))		setColumnFromVector<INTSXP>((Rcpp::IntegerVector)	column, colIndex);
-	else if(Rcpp::is<Rcpp::StringVector>(column))		setColumnFromVector<STRSXP>((Rcpp::StringVector)	column, colIndex);
-	else if(Rcpp::is<Rcpp::CharacterVector>(column))	setColumnFromVector<STRSXP>((Rcpp::CharacterVector)	column, colIndex);
-	else if(isMixedRObject(column))						setColumnFromMixedVector((Rcpp::List)				column, colIndex);
-	else if(Rcpp::is<Rcpp::List>(column))				setColumnFromList((Rcpp::List)						column,	colIndex);
-	else Rf_error("Did not get a vector or list as column..");
-
-	notifyParentOfChanges();
-}
-
-void jaspTable::addColumns(Rcpp::RObject newData)
-{
-	if(newData.isNULL())
-		return;
-
-	//Maybe this is overkill?
-	if(Rcpp::is<Rcpp::DataFrame>(newData))				addColumnsFromList(convertFactorsToCharacters((Rcpp::DataFrame)	newData));
-	else if(Rcpp::is<Rcpp::List>(newData))				addColumnsFromList((Rcpp::List)									newData);
-
-	else if(Rcpp::is<Rcpp::NumericMatrix>(newData))		addColumnsFromMatrix<REALSXP>((Rcpp::NumericMatrix)	newData);
-	else if(Rcpp::is<Rcpp::LogicalMatrix>(newData))		addColumnsFromMatrix<LGLSXP>((Rcpp::LogicalMatrix)	newData);
-	else if(Rcpp::is<Rcpp::IntegerMatrix>(newData))		addColumnsFromMatrix<INTSXP>((Rcpp::IntegerMatrix)	newData);
-	else if(Rcpp::is<Rcpp::StringMatrix>(newData))		addColumnsFromMatrix<STRSXP>((Rcpp::StringMatrix)	newData);
-	else if(Rcpp::is<Rcpp::CharacterMatrix>(newData))	addColumnsFromMatrix<STRSXP>((Rcpp::CharacterMatrix)newData);
-
-	else if(Rcpp::is<Rcpp::NumericVector>(newData))		addColumnFromVector<REALSXP>((Rcpp::NumericVector)	newData);
-	else if(Rcpp::is<Rcpp::LogicalVector>(newData))		addColumnFromVector<LGLSXP>((Rcpp::LogicalVector)	newData);
-	else if(Rcpp::is<Rcpp::IntegerVector>(newData))		addColumnFromVector<INTSXP>((Rcpp::IntegerVector)	newData);
-	else if(Rcpp::is<Rcpp::StringVector>(newData))		addColumnFromVector<STRSXP>((Rcpp::StringVector)	newData);
-	else if(Rcpp::is<Rcpp::CharacterVector>(newData))	addColumnFromVector<STRSXP>((Rcpp::CharacterVector)	newData);
-
-	else
-		Rf_error("Cannot add this kind of data as a column to a jaspTable, it is not understood. Try a list, dataframe, vector or matrix instead.");
-
-	notifyParentOfChanges();
-}
-
-void jaspTable::addRows(Rcpp::RObject newData, Rcpp::CharacterVector rowNames)
-{
-	if(newData.isNULL())
-		return;
-
-	//Maybe this is overkill?
-	if(Rcpp::is<Rcpp::DataFrame>(newData))				addRowsFromDataFrame((Rcpp::DataFrame)				newData);
-	else if(Rcpp::is<Rcpp::List>(newData))				addRowsFromList((Rcpp::List)						newData, rowNames);
-
-	else if(Rcpp::is<Rcpp::NumericMatrix>(newData))		addRowsFromMatrix<REALSXP>((Rcpp::NumericMatrix)	newData, rowNames);
-	else if(Rcpp::is<Rcpp::LogicalMatrix>(newData))		addRowsFromMatrix<LGLSXP>((Rcpp::LogicalMatrix)		newData, rowNames);
-	else if(Rcpp::is<Rcpp::IntegerMatrix>(newData))		addRowsFromMatrix<INTSXP>((Rcpp::IntegerMatrix)		newData, rowNames);
-	else if(Rcpp::is<Rcpp::StringMatrix>(newData))		addRowsFromMatrix<STRSXP>((Rcpp::StringMatrix)		newData, rowNames);
-	else if(Rcpp::is<Rcpp::CharacterMatrix>(newData))	addRowsFromMatrix<STRSXP>((Rcpp::CharacterMatrix)	newData, rowNames);
-
-	else
-		Rf_error("Cannot add this kind of data as rows to a jaspTable, it is not understood. Try a list, dataframe or matrix instead.");
-
-	notifyParentOfChanges();
-}
-
-void jaspTable::addRow(Rcpp::RObject newData, Rcpp::CharacterVector rowName)
-{
-	if(newData.isNULL())
-		return;
-
-	if		(Rcpp::is<Rcpp::List>(newData))				addRowFromList((Rcpp::List)							newData, rowName);
-
-	else if	(Rcpp::is<Rcpp::NumericVector>(newData))	addRowFromVector<REALSXP>((Rcpp::NumericVector)		newData, rowName);
-	else if	(Rcpp::is<Rcpp::LogicalVector>(newData))	addRowFromVector<LGLSXP>((Rcpp::LogicalVector)		newData, rowName);
-	else if	(Rcpp::is<Rcpp::IntegerVector>(newData))	addRowFromVector<INTSXP>((Rcpp::IntegerVector)		newData, rowName);
-	else if	(Rcpp::is<Rcpp::StringVector>(newData))		addRowFromVector<STRSXP>((Rcpp::StringVector)		newData, rowName);
-	else if	(Rcpp::is<Rcpp::CharacterVector>(newData))	addRowFromVector<STRSXP>((Rcpp::CharacterVector)	newData, rowName);
-
-	else
-		Rf_error("Cannot add this kind of data as a row to a jaspTable, it is not understood. Try a list or vector instead.");
-
-	notifyParentOfChanges();
-}
-
-void jaspTable::addRowFromList(Rcpp::List newData, Rcpp::CharacterVector newRowNames)
-{
-	Rcpp::List newRowList;
-	auto shield = new Rcpp::Shield<Rcpp::List>(newRowList);
-	newRowList.push_back(newData);
-	addRowsFromList(newRowList, newRowNames);
-	delete shield;
-}
-
-void jaspTable::addRowsFromList(Rcpp::List newData, Rcpp::CharacterVector newRowNames)
-{
-	int equalizedColumnsLength		= equalizeColumnsLengths(),
-		previouslyAddedUnnamedCols	= 0;
-
-	std::vector<std::string> localRowNames = extractElementOrColumnNames(newData);
-
-	for(size_t row=0; row<localRowNames.size(); row++)
-		_rowNames[row + equalizedColumnsLength] = localRowNames[row];
-
-	for(size_t row=0; row<newRowNames.size(); row++)
-		_rowNames[row + equalizedColumnsLength] = newRowNames[row];
-
-	for(size_t row=0; row<newData.size(); row++)
-	{
-		Rcpp::RObject rij = (Rcpp::RObject)newData[row];
-		std::vector<std::string> localColNames;
-
-		if(Rcpp::is<Rcpp::List>(rij))
-			localColNames = extractElementOrColumnNames<Rcpp::List>(Rcpp::as<Rcpp::List>(rij));
-
-		auto jsonRij = RcppVector_to_VectorJson(rij, _escapeHtml);
-
-		for(size_t col=0; col<jsonRij.size(); col++)
-			previouslyAddedUnnamedCols	= pushbackToColumnInData(std::vector<Json::Value>({jsonRij[col]}), localColNames.size() > col ? localColNames[col] : "", equalizedColumnsLength, previouslyAddedUnnamedCols);
-
-		equalizedColumnsLength = equalizeColumnsLengths();
-	}
-}
-
-void jaspTable::addColumnsFromList(Rcpp::List newData)
-{
-	size_t elementLenghts = 0;
-	for(int el=0; el<newData.size(); el++)
-		elementLenghts = std::max(lengthFromRObject((Rcpp::RObject)newData[el]), elementLenghts);
-
-	if(elementLenghts <= 1 && newData.size() > 1) //each entry is 1 or 0, this must be a single row with columnnames and not a set of rows with rownames..
-	{
-		Rcpp::List newColList;
-		auto shield = new Rcpp::Shield<Rcpp::List>(newColList);
-		newColList.push_back(newData);
-		addColumnsFromList(newColList);
-		delete shield;
-
-		return;
-	}
-
-	std::vector<std::string> localColNames = extractElementOrColumnNames(newData);
-	extractRowNames(newData, true);
-
-	for(int col=0; col<newData.size(); col++)
-		addOrSetColumnInData(RcppVector_to_VectorJson((Rcpp::RObject)newData[col], _escapeHtml, false), localColNames.size() > col ? localColNames[col] : "");
-}
-
-///Logically we must assume that each entry in the list is a single element vector
-void jaspTable::setColumnFromList(Rcpp::List column, int colIndex)
-{
-	std::vector<std::string> localRowNames = extractElementOrColumnNames(column);
-	setRowNamesWhereApplicable(localRowNames);
-
-	if(_data.size() <= colIndex)
-		_data.resize(colIndex+1);
-	_data[colIndex].clear();
-
-	for(int row=0; row<column.size(); row++)
-	{
-		std::vector<Json::Value> jsonVec = RcppVector_to_VectorJson((Rcpp::RObject)column[row], _escapeHtml, false);
-		_data[colIndex].push_back(jsonVec.size() > 0 ? jsonVec[0u] : Json::nullValue);
-	}
 }
 
 int jaspTable::equalizeColumnsLengths()
@@ -468,126 +285,6 @@ void jaspTable::calculateMaxColRow(size_t & maxCol, size_t & maxRow) const
 	}
 
 	maxCol = std::max(maxCol, _expectedColumnCount);
-}
-
-Rcpp::List jaspTable::toRObject()
-{
-	Rcpp::DataFrame df;
-
-	for (size_t col = 0; col < _data.size(); col++)
-	{
-
-		jaspTableColumnType type = deriveColumnType(col);
-
-		switch(type)
-		{
-
-		// this could be a templated or overloaded function?
-		case jaspTableColumnType::integer:
-		{
-			Rcpp::IntegerVector values(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-			{
-				const Json::Value & cell = _data[col][row];
-				if (cell.isNumeric())
-					values[row] = cell.asInt();
-				else
-					values[row] = NA_INTEGER; // placeholder/null -> NA
-			}
-
-			df[getColName(col)] = values;
-			break;
-		}
-		case jaspTableColumnType::number:
-		{
-			Rcpp::NumericVector values(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-			{
-				const Json::Value & cell = _data[col][row];
-				if (cell.isNumeric())
-					values[row] = cell.asDouble();
-				else
-					values[row] = NA_REAL; // placeholder/null -> NA
-			}
-
-			df[getColName(col)] = values;
-			break;
-		}
-		case jaspTableColumnType::logical:
-		{
-			Rcpp::LogicalVector values(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = _data[col][row].asBool();
-
-			df[getColName(col)] = values;
-
-			break;
-		}
-		case jaspTableColumnType::string:
-		case jaspTableColumnType::various:
-		case jaspTableColumnType::unknown:
-		case jaspTableColumnType::composite:
-		{
-			Rcpp::StringVector values(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-				values[row] = decodeColumnNames(_data[col][row].asString());
-
-			df[decodeColumnNames(getColName(col))] = values;
-			break;
-		}
-		case jaspTableColumnType::mixed:
-		{
-
-			Rcpp::List valuesData(_data[col].size());
-			Rcpp::StringVector valuesTypes(_data[col].size());
-			Rcpp::List valuesFormats(_data[col].size());
-			for (size_t row = 0; row < _data[col].size(); row++)
-			{
-				valuesTypes[row] = _data[col][row]["type"].asString();
-
-				if		(valuesTypes[row] == "number")	valuesData[row] = _data[col][row]["value"].asDouble();
-				else if (valuesTypes[row] == "pvalue")	valuesData[row] = _data[col][row]["value"].asDouble();
-				else if (valuesTypes[row] == "integer")	valuesData[row] = _data[col][row]["value"].asInt();
-				else if (valuesTypes[row] == "string")	valuesData[row] = decodeColumnNames(_data[col][row]["value"].asString());
-
-				if (!_data[col][row]["format"].isNull())
-					valuesFormats[row] = _data[col][row]["format"].asString();
-			}
-
-			Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
-			Rcpp::Function createMixedColumn = jaspBase["createMixedColumn"];
-			Rcpp::List values = createMixedColumn(valuesData, valuesTypes, valuesFormats);
-			df[decodeColumnNames(getColName(col))] = values;
-			break;
-		}
-		// this case is probably unnecessary
-		case jaspTableColumnType::null:
-		{
-			df[getColName(col)] = R_NilValue;
-			break;
-		}
-
-		}
-	}
-
-	df.attr("footnotes")  = _footnotes.toRObject();
-	df.attr("title") = decodeColumnNames(_title);
-	df.attr("class") = Rcpp::CharacterVector({"jaspTableWrapper", "jaspWrapper", "data.frame"});
-
-	std::vector<std::string> rowNames;
-	const size_t rowCount = _data.empty() ? 0 : _data[0].size(); // empty table (e.g. no variables selected) has no rows
-	rowNames.reserve(rowCount);
-	for (size_t i = 0; i < rowCount; i++)
-		rowNames.push_back(_rowNames[i] != "" ? decodeColumnNames(_rowNames[i]) : std::to_string(i + 1)); // R numbers from 1 to n by default
-
-	df.attr("row.names") = rowNames;
-
-	// the reason this function is not const
-	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();
-	jaspObjectEnvironment.assign("jaspObject", Rcpp::as<Rcpp::RObject>(Rcpp::wrap(jaspTable_Interface(this))));
-	df.attr("jaspObjectEnvironment") = jaspObjectEnvironment;
-
-	return df;
 }
 
 std::vector<std::vector<std::string>> jaspTable::dataToRectangularVector(bool normalizeColLengths, bool normalizeRowLengths) const
@@ -1214,28 +911,6 @@ void footnotes::convertToJSONOrdered(std::map<std::string, size_t> rowNames, std
 	mergedList	= jaspObject::VectorJson_to_ArrayJson(notesToOrderMerged);
 }
 
-Rcpp::List footnotes::toRObject() const
-{
-
-	// this is not very efficient
-	Rcpp::List	notes;
-
-	for (const auto & textRest : _data)
-		for(const auto & symbolRest : textRest.second)
-			for(const tableFields & fields : symbolRest.second)
-			{
-				Rcpp::List note = Rcpp::List::create(
-					Rcpp::Named("text")		= textRest.first,
-					Rcpp::Named("symbol")	= symbolRest.first
-//					TODO: I do not understand the data in here, or how to convert it to R...
-//					Rcpp::Named("rows")		= fields.rowsToJSON(),
-//					Rcpp::Named("cols")		= fields.colsToJSON()
-				);
-				notes.push_back(note);
-			}
-	return notes;
-}
-
 void footnotes::convertFromJSON_SetFields(Json::Value footnotes)
 {
 	if (footnotes.isArray())
@@ -1261,23 +936,9 @@ void footnotes::insert(std::string text, std::string symbol, std::vector<Json::V
 	);
 }
 
-void jaspTable::addFootnote(Rcpp::RObject message, Rcpp::RObject symbol, Rcpp::RObject col_names, Rcpp::RObject row_names)
-{		
-	if (message.isNULL())
-		Rf_error("One would expect a footnote to at least contain a message..");
-		
-	std::string strMessage	= Rcpp::String(message);
-	std::string strSymbol	= symbol.isNULL() ? "" : Rcpp::String(symbol);
-	
-	std::vector<Json::Value> colNames;
-	if (!col_names.isNULL())
-		colNames = RcppVector_to_VectorJson(col_names, _escapeHtml, false);
-	
-	std::vector<Json::Value> rowNames;
-	if (!row_names.isNULL())
-		rowNames = RcppVector_to_VectorJson(row_names, _escapeHtml, false);
-	
-	_footnotes.insert(strMessage, strSymbol, colNames, rowNames);
+void jaspTable::addFootnote(std::string message, std::string symbol, std::vector<Json::Value> col_names, std::vector<Json::Value> row_names)
+{
+	_footnotes.insert(message, symbol, col_names, row_names);
 }
 
 Json::Value jaspTable::dataEntry(std::string & errorMessage) const
@@ -1511,20 +1172,23 @@ std::string jaspTable::getColType(size_t col) const
 }
 
 ///Going to assume it is called like addColumInfo(name=NULL, title=NULL, type=NULL, format=NULL, combine=NULL)
-void jaspTable::addColumnInfo(Rcpp::RObject name, Rcpp::RObject title, Rcpp::RObject type, Rcpp::RObject format, Rcpp::RObject combine, Rcpp::RObject overtitle)
+///Neutral version for non-R hosts: empty string means "unset" (R's NULL
+///semantics preserved byte-identically by the R adapter, which keeps its own
+///faithful NULL-based implementation in rcppTableIngest.cpp).
+void jaspTable::addColumnInfo(std::string name, std::string title, std::string type, std::string format, bool hasCombine, bool combine, std::string overtitle)
 {
-	std::string colName = name.isNULL() ? defaultColName(_colNames.rowCount()) : Rcpp::as<std::string>(name);
+	std::string colName = name == "" ? defaultColName(_colNames.rowCount()) : name;
 	_specifiedColumns.insert(colName);
 
 	_colNames.add(colName);
 
 	std::string lastAddedColName = getColName(_colNames.rowCount() - 1);
 
-	if(!title.isNULL())		_colTitles[		lastAddedColName ] = Rcpp::String(title);
-	if(!type.isNULL())		_colTypes[		lastAddedColName ] = Rcpp::String(type);
-	if(!format.isNULL())	_colFormats[	lastAddedColName ] = Rcpp::String(format);
-	if(!overtitle.isNULL())	_colOvertitles[	lastAddedColName ] = Rcpp::String(overtitle);
-	if(!combine.isNULL())	_colCombines[	lastAddedColName ] = Rcpp::as<bool>(combine);
+	if(title != "")		_colTitles[		lastAddedColName ] = title;
+	if(type != "")		_colTypes[		lastAddedColName ] = type;
+	if(format != "")	_colFormats[	lastAddedColName ] = format;
+	if(overtitle != "")	_colOvertitles[	lastAddedColName ] = overtitle;
+	if(hasCombine)		_colCombines[	lastAddedColName ] = combine;
 }
 
 

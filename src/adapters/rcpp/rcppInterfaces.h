@@ -8,12 +8,15 @@
 #include "rcppConversions.h"
 #include "rcppPlot.h"
 #include "rcppContainer.h"
+#include "rcppTableIngest.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
 #include "jaspReport.h"
 #include "jaspState.h"
 #include "jaspPlot.h"
 #include "jaspContainer.h"
+#include "jaspList.h"
+#include "jaspTable.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -135,3 +138,134 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspContainer_Interface)
+
+template<typename T>
+class jaspList_Interface : public jaspObject_Interface
+{
+public:
+	jaspList_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	void insert(Rcpp::RObject field, T value)
+	{
+		if(Rcpp::is<Rcpp::NumericVector>(field) || Rcpp::is<Rcpp::IntegerVector>(field))
+			static_cast<jaspList<T>*>(myJaspObject)->insertIndex(Rcpp::as<int>(field) - 1, value);
+		else if(Rcpp::is<Rcpp::CharacterVector>(field) || Rcpp::is<Rcpp::StringVector>(field))
+			static_cast<jaspList<T>*>(myJaspObject)->insertField(Rcpp::as<std::string>(field), value);
+		else
+			Rf_error("Did not get a number, integer or string to index on.");
+	}
+
+	T at(Rcpp::RObject field)
+	{
+		if(Rcpp::is<Rcpp::NumericVector>(field) || Rcpp::is<Rcpp::IntegerVector>(field))
+			return static_cast<jaspList<T>*>(myJaspObject)->atIndex(Rcpp::as<int>(field) - 1);
+		else if(Rcpp::is<Rcpp::CharacterVector>(field) || Rcpp::is<Rcpp::StringVector>(field))
+			return static_cast<jaspList<T>*>(myJaspObject)->atField(Rcpp::as<std::string>(field));
+		else
+			Rf_error("Did not get a number, integer or string to index on.");
+
+		return T();
+	}
+
+	void add(T value)	{ static_cast<jaspList<T>*>(myJaspObject)->add(value); }
+};
+
+typedef jaspList_Interface<std::string>	jaspStringlist_Interface;
+typedef jaspList_Interface<double>		jaspDoublelist_Interface;
+typedef jaspList_Interface<int>			jaspIntlist_Interface;
+typedef jaspList_Interface<bool>		jaspBoollist_Interface;
+
+RCPP_EXPOSED_CLASS_NODECL(jaspStringlist_Interface)
+RCPP_EXPOSED_CLASS_NODECL(jaspDoublelist_Interface)
+RCPP_EXPOSED_CLASS_NODECL(jaspIntlist_Interface)
+RCPP_EXPOSED_CLASS_NODECL(jaspBoollist_Interface)
+
+#define JASPLIST_MODULE_EXPORT(CLASS_NAME_CPP, CLASS_NAME_R)														\
+Rcpp::class_<CLASS_NAME_CPP>(CLASS_NAME_R)																			\
+	.derives<jaspObject_Interface>("jaspObject")																	\
+	.method( "[[",		&CLASS_NAME_CPP::at,		"Access element by fieldname (string) or index (int) ")			\
+	.method( "[[<-",	&CLASS_NAME_CPP::insert,	"Insert an element under index (int) or fieldname (string)")	\
+	.method( "insert",	&CLASS_NAME_CPP::insert,	"Insert an element under index (int) or fieldname (string)")	\
+	.method( "add",		&CLASS_NAME_CPP::add,		"Add an element at the end of the indexable list")				\
+	JASP_OBJECT_FINALIZER_LAMBDA(CLASS_NAME_CPP)																	\
+;
+
+class jaspTable_Interface : public jaspObject_Interface
+{
+public:
+	jaspTable_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	jaspStringlist_Interface	getColNames()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_colNames)		); }
+	jaspStringlist_Interface	getColTypes()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_colTypes)		); }
+	jaspStringlist_Interface	getColTitles()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_colTitles)		); }
+	jaspStringlist_Interface	getColOvertitles()		{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_colOvertitles)	); }
+	jaspStringlist_Interface	getColFormats()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_colFormats)		); }
+	jaspBoollist_Interface		getColCombines()		{ return jaspBoollist_Interface(	&(((jaspTable*)myJaspObject)->_colCombines)		); }
+	jaspStringlist_Interface	getRowNames()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_rowNames)		); }
+	jaspStringlist_Interface	getRowTitles()			{ return jaspStringlist_Interface(	&(((jaspTable*)myJaspObject)->_rowTitles)		); }
+
+	void setColNames(Rcpp::List newNames)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newNames);
+		((jaspTable*)myJaspObject)->setColNames(rf.first, rf.second);
+	}
+	void setColTypes(Rcpp::List newTypes)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newTypes);
+		((jaspTable*)myJaspObject)->setColTypes(rf.first, rf.second);
+	}
+	void setColTitles(Rcpp::List newTitles)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newTitles);
+		((jaspTable*)myJaspObject)->setColTitles(rf.first, rf.second);
+	}
+	void setColOvertitles(Rcpp::List newTitles)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newTitles);
+		((jaspTable*)myJaspObject)->setColOvertitles(rf.first, rf.second);
+	}
+	void setColFormats(Rcpp::List newFormats)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newFormats);
+		((jaspTable*)myJaspObject)->setColFormats(rf.first, rf.second);
+	}
+	void setColCombines(Rcpp::List newCombines)
+	{
+		auto rf = rcppListToRowsAndFields<bool>(newCombines);
+		((jaspTable*)myJaspObject)->setColCombines(rf.first, rf.second);
+	}
+	void setRowNames(Rcpp::List newNames)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newNames);
+		((jaspTable*)myJaspObject)->setRowNames(rf.first, rf.second);
+	}
+	void setRowTitles(Rcpp::List newTitles)
+	{
+		auto rf = rcppListToRowsAndFields<std::string>(newTitles);
+		((jaspTable*)myJaspObject)->setRowTitles(rf.first, rf.second);
+	}
+
+	void addColumnInfo(Rcpp::RObject name, Rcpp::RObject title, Rcpp::RObject type, Rcpp::RObject format, Rcpp::RObject combine, Rcpp::RObject overtitle)	{ rcppTableAddColumnInfo((jaspTable*)myJaspObject, name, title, type, format, combine, overtitle); }
+	void addFootnote(Rcpp::RObject message, Rcpp::RObject symbol, Rcpp::RObject col_names, Rcpp::RObject row_names)											{ rcppTableAddFootnote((jaspTable*)myJaspObject, message, symbol, col_names, row_names); }
+
+	void setData(Rcpp::RObject newData)							{ rcppTableSetData((jaspTable*)myJaspObject, newData);			}
+	void addColumns(Rcpp::RObject newColumns)					{ rcppTableAddColumns((jaspTable*)myJaspObject, newColumns);	}
+
+	void addRows(				Rcpp::RObject newRows,	Rcpp::CharacterVector rowNames)	{ rcppTableAddRows((jaspTable*)myJaspObject, newRows, rowNames);		}
+	void addRowsWithoutNames(	Rcpp::RObject newRows)									{ rcppTableAddRows((jaspTable*)myJaspObject, newRows, Rcpp::CharacterVector());		}
+	void addRow(				Rcpp::RObject newRow,	Rcpp::CharacterVector rowNames)	{ rcppTableAddRow((jaspTable*)myJaspObject, newRow, rowNames);			}
+	void addRowWithoutNames(	Rcpp::RObject newRow)									{ rcppTableAddRow((jaspTable*)myJaspObject, newRow, Rcpp::CharacterVector());			}
+	void setColumn(				std::string columnName, Rcpp::RObject column)			{ rcppTableSetColumn((jaspTable*)myJaspObject, columnName, column);	}
+
+	void setExpectedSize(size_t columns, size_t rows)	{ ((jaspTable*)myJaspObject)->setExpectedSize(columns, rows);	}
+	void setExpectedRows(size_t rows)					{ ((jaspTable*)myJaspObject)->setExpectedRows(rows);			}
+	void setExpectedColumns(size_t columns)				{ ((jaspTable*)myJaspObject)->setExpectedColumns(columns);		}
+
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspTable, bool,			_transposeTable,				TransposeTable)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspTable, bool,			_transposeWithOvertitle,		TransposeWithOvertitle)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspTable, std::string,	_status,						Status)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspTable, bool,			_showSpecifiedColumnsOnly,		ShowSpecifiedColumnsOnly)
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspTable_Interface)

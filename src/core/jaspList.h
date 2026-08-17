@@ -1,6 +1,12 @@
 #pragma once
+
+// CORE (R-free) version of jaspList.h. R-facing index/insert dispatch (1-based
+// [[ints]] / fieldnames via Rcpp::RObject), setRows(Rcpp::List) and the
+// jaspList_Interface + JASPLIST_MODULE_EXPORT live in
+// src/adapters/rcpp/rcppInterfaces.h. Storage is plain vector/map and JSON is
+// built here, so hosts (R, Python) only differ in how they index into it.
+
 #include "jaspObject.h"
-#include "jaspObjectInterface.h"
 
 template<typename T>
 class jaspList : public jaspObject
@@ -11,25 +17,20 @@ public:
 		allocatedObjects->erase(this); // lists are never newed!
 	}
 
-	void insert(Rcpp::RObject field, T value)
+	///zero-based index insert; resizes the row vector when needed
+	void insertIndex(size_t row, T value)
 	{
-		if(Rcpp::is<Rcpp::NumericVector>(field) || Rcpp::is<Rcpp::IntegerVector>(field))
-		{
-			int row = Rcpp::as<int>(field) - 1;
+		if(_rows.size() <= row)
+			_rows.resize(row+1);
 
-			if(_rows.size() <= row)
-				_rows.resize(row+1);
+		_rows[row] = value;
 
-			_rows[row] = value;
-		}
-		else if(Rcpp::is<Rcpp::CharacterVector>(field) || Rcpp::is<Rcpp::StringVector>(field))
-		{
-			std::string fieldName = Rcpp::as<std::string>(field);
+		notifyParentOfChanges();
+	}
 
-			_field_to_val[fieldName] = value;
-		}
-		else
-			Rf_error("Did not get a number, integer or string to index on.");
+	void insertField(std::string fieldName, T value)
+	{
+		_field_to_val[fieldName] = value;
 
 		notifyParentOfChanges();
 	}
@@ -40,28 +41,19 @@ public:
 		notifyParentOfChanges();
 	}
 
-	///using [] (in c++) will give you normal zero-based array but also grows the vector if your request lies outside of it, at() ([[]] in R) however gives you 1-based access and just returns a dummy value if you request something out of range.
-	T at(Rcpp::RObject field) const
+	///zero-based index access; returns a default value when out of range.
+	T atIndex(size_t row) const
 	{
-		if(Rcpp::is<Rcpp::NumericVector>(field) || Rcpp::is<Rcpp::IntegerVector>(field))
-		{
-			int row = Rcpp::as<int>(field) - 1;
+		if(row >= _rows.size())
+			return T();
 
-			if(row > _rows.size())
-				return T();
+		return _rows[row];
+	}
 
-			return _rows[row];
-		}
-		else if(Rcpp::is<Rcpp::CharacterVector>(field) || Rcpp::is<Rcpp::StringVector>(field))
-		{
-			std::string fieldName = Rcpp::as<std::string>(field);
-
-			return _field_to_val.at(fieldName);
-		}
-		else
-			Rf_error("Did not get a number, integer or string to index on.");
-
-		return T();
+	///field access; throws std::out_of_range for unknown fields (today's R behavior).
+	T atField(std::string fieldName) const
+	{
+		return _field_to_val.at(fieldName);
 	}
 
 	std::string dataToString(std::string prefix) const override
@@ -104,29 +96,21 @@ public:
 		return out.str();
 	}
 
-	void setRows(Rcpp::List vec)
+	///clears the rows and appends the named entries to the existing fields
+	///(no clearing of _field_to_val, no notify: exactly today's setRows)
+	void setRows(const std::vector<T> & vec, const std::map<std::string, T> & fields = {})
 	{
 		_rows.clear();
-		for(auto v : vec)
-			_rows.push_back(Rcpp::as<T>(v));
+		_rows.insert(_rows.end(), vec.begin(), vec.end());
 
-		Rcpp::RObject namesListRObject = vec.names();
-
-		if(!namesListRObject.isNULL())
-		{
-			Rcpp::CharacterVector namesList;
-			namesList = namesListRObject;
-
-			for(int row=0; row<namesList.size(); row++)
-				if(namesList[row] != "")
-					_field_to_val[Rcpp::as<std::string>(namesList[row])] = Rcpp::as<T>(vec[row]);
-		}
+		for(const auto & keyval : fields)
+			_field_to_val[keyval.first] = keyval.second;
 	}
 
 	size_t rowCount()	const { return _rows.size(); }
 	size_t fieldCount()	const { return _field_to_val.size(); }
 
-	///using [] (in c++) will give you normal zero-based array but also grows the vector if your request lies outside of it, at() ([[]] in R) however gives you 1-based access and just returns a dummy value if you request something out of range.
+	///using [] (in c++) will give you normal zero-based array but also grows the vector if your request lies outside of it
 	T & operator[](size_t index)
 	{
 		if(_rows.size() <= index)
@@ -224,37 +208,3 @@ typedef jaspList<std::string>	jaspStringlist;
 typedef jaspList<double>		jaspDoublelist;
 typedef jaspList<int>			jaspIntlist;
 typedef jaspList<bool>			jaspBoollist;
-
-template<typename T>
-class jaspList_Interface : public jaspObject_Interface
-{
-public:
-	jaspList_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
-
-	void insert(Rcpp::RObject field, T value)	{			static_cast<jaspList<T>*>(myJaspObject)->insert(field, value);	}
-	T at(Rcpp::RObject field)					{ return	static_cast<jaspList<T>*>(myJaspObject)->at(field);				}
-	void add(T value)							{			static_cast<jaspList<T>*>(myJaspObject)->add(value);			}
-};
-
-typedef jaspList_Interface<std::string>	jaspStringlist_Interface;
-typedef jaspList_Interface<double>		jaspDoublelist_Interface;
-typedef jaspList_Interface<int>			jaspIntlist_Interface;
-typedef jaspList_Interface<bool>		jaspBoollist_Interface;
-
-RCPP_EXPOSED_CLASS_NODECL(jaspStringlist_Interface)
-RCPP_EXPOSED_CLASS_NODECL(jaspDoublelist_Interface)
-RCPP_EXPOSED_CLASS_NODECL(jaspIntlist_Interface)
-RCPP_EXPOSED_CLASS_NODECL(jaspBoollist_Interface)
-
-//.constructor(									"Default constructor without setting the title explicitly")
-//.constructor<std::string>(						"Constructor that sets the title explicitly")
-
-#define JASPLIST_MODULE_EXPORT(CLASS_NAME_CPP, CLASS_NAME_R)														\
-Rcpp::class_<CLASS_NAME_CPP>(CLASS_NAME_R)																			\
-	.derives<jaspObject_Interface>("jaspObject")																	\
-	.method( "[[",		&CLASS_NAME_CPP::at,		"Access element by fieldname (string) or index (int) ")			\
-	.method( "[[<-",	&CLASS_NAME_CPP::insert,	"Insert an element under index (int) or fieldname (string)")	\
-	.method( "insert",	&CLASS_NAME_CPP::insert,	"Insert an element under index (int) or fieldname (string)")	\
-	.method( "add",		&CLASS_NAME_CPP::add,		"Add an element at the end of the indexable list")				\
-	JASP_OBJECT_FINALIZER_LAMBDA(CLASS_NAME_CPP)																	\
-;

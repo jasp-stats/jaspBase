@@ -9,6 +9,8 @@
 #include <json/json.h>
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 #include <limits>
 #include "stringutils.h"
 
@@ -161,3 +163,27 @@ template <typename RCPP_CLASS> inline std::vector<std::string> extractElementOrC
 }
 
 Rcpp::DataFrame convertFactorsToCharacters(Rcpp::DataFrame df);
+
+///Split an R list into a positional vector and a name->value map (named
+///entries with a non-empty name), mirroring today's jaspList::setRows(Rcpp::List).
+template<typename T> inline std::pair<std::vector<T>, std::map<std::string, T>> rcppListToRowsAndFields(Rcpp::List vec)
+{
+	std::vector<T>				rows;
+	std::map<std::string, T>	fields;
+
+	for(auto v : vec)
+		rows.push_back(Rcpp::as<T>(v));
+
+	Rcpp::RObject namesListRObject = vec.names();
+
+	if(!namesListRObject.isNULL())
+	{
+		Rcpp::CharacterVector namesList = Rcpp::as<Rcpp::CharacterVector>(namesListRObject);
+
+		for(int row=0; row<namesList.size(); row++)
+			if(namesList[row] != "")
+				fields[Rcpp::as<std::string>(namesList[row])] = Rcpp::as<T>(vec[row]);
+	}
+
+	return {rows, fields};
+}
