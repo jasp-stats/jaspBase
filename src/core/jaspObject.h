@@ -54,6 +54,7 @@ public:
 			bool		getError()								{ return _error; }
 	virtual void		setError()								{ _error = true; }
 	virtual void		setError(std::string message)			{ _errorMessage = message; _error = true; }
+	virtual void		clearError()							{ _error = false; _errorMessage.clear(); }
 	virtual bool		canShowErrorMessage()			const	{ return false; }
 
 			void		print()									{ try { jaspPrint(toString()); } catch(std::exception e) { jaspPrint(std::string("toString failed because of: ") + e.what()); } }
@@ -100,6 +101,7 @@ public:
 			std::string getUniqueNestedName() const;
 			void		getUniqueNestedNameVector(std::vector<std::string> & names)	const;
 			void		setName(std::string name) { _name = name; }
+			const std::string & name() const { return _name; }
 
 			void		childrenUpdatedCallback(bool ignoreSendTimer);
 	virtual void		childFinalizedHandler(jaspObject * child) {}

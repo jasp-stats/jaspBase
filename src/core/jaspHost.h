@@ -19,24 +19,7 @@
 #include <functional>
 #include <string>
 
-struct jaspPlotRenderRequest
-{
-	std::string envName;				///< key of the plot object in the object store
-	std::string pngRelativePathIn,		///< set when editing an existing plot
-				interactiveJsonPathIn;
-	int			width = 0, height = 0;
-	float		aspectRatio = 0.f;
-	bool		editing = false;
-};
-
-struct jaspPlotRenderResult
-{
-	std::string pngRelativePath,
-				editOptionsJson,
-				interactiveConvertError,
-				interactiveJsonRelativePath;
-	bool		interactive = false;
-};
+class jaspPlot;
 
 class jaspHost
 {
@@ -63,7 +46,12 @@ public:
 	static std::function<void()>								clearObjects;
 
 	// plotting ------------------------------------------------------------------
-	static std::function<jaspPlotRenderResult(const jaspPlotRenderRequest &)> renderPlot;
+	// renderPlot owns the whole render pass (the R adapter reproduces the old
+	// tryToWriteImageJaspResults flow incl. old-plot info; the Python adapter
+	// will render plotly/matplotlib). plotStateSync re-applies user plot changes
+	// (width/height/revision) from the stored object after convertFromJSON.
+	static std::function<void(jaspPlot &)> renderPlot;
+	static std::function<void(jaspPlot &)> plotStateSync;
 
 	// state archive (R: RDS alongside jaspResults.json; Python: pickle) ---------
 	static std::function<void(const std::string & path)> saveStateArchive;

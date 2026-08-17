@@ -50,5 +50,6 @@ std::function<void()>								jaspHost::clearObjects	= []()
 	jaspHostDefaultObjectStore().clear();
 };
 
-std::function<jaspPlotRenderResult(const jaspPlotRenderRequest &)>	jaspHost::renderPlot		= nullptr;
+std::function<void(jaspPlot &)>						jaspHost::renderPlot		= nullptr;
+std::function<void(jaspPlot &)>						jaspHost::plotStateSync		= nullptr;
 std::function<void(const std::string &)>							jaspHost::saveStateArchive	= nullptr;

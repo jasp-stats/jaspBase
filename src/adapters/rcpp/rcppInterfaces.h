@@ -6,10 +6,12 @@
 #include <Rcpp.h>
 #include "jaspObjectInterface.h"
 #include "rcppConversions.h"
+#include "rcppPlot.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
 #include "jaspReport.h"
 #include "jaspState.h"
+#include "jaspPlot.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -77,3 +79,42 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspState_Interface)
+
+class jaspPlot_Interface : public jaspObject_Interface
+{
+public:
+	jaspPlot_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	void setPlotObject(Rcpp::RObject plotObject)
+	{
+		jaspPlot * plot = static_cast<jaspPlot*>(myJaspObject);
+		Rcpp::List plotInfo = Rcpp::List::create(
+			Rcpp::_["obj"] = plotObject,
+			Rcpp::_["width"] = plot->_width,
+			Rcpp::_["height"] = plot->_height,
+			Rcpp::_["revision"] = plot->_revision);
+		plot->setPlotObject(std::any((Rcpp::RObject)plotInfo));
+	}
+	Rcpp::RObject getPlotObject() { return rcppGetPlotObject(static_cast<jaspPlot*>(myJaspObject)); }
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, std::string,	_filePathPng,	FilePathPng)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, std::string,	_status,		Status)
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, float,			_aspectRatio,	AspectRatio)
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, int,			_width,			Width)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, int,			_height,		Height)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspPlot, int,			_revision,		Revision)
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, bool,			_editing,				Editing)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, bool,			_resizedByUser,			ResizedByUser)
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR_NO_NOTIFY(jaspPlot, std::string,	_interactiveJsonData,	InteractiveJsonData)
+
+	///Set/export machine-readable data from R:
+	///  plot$export <- list(medianDelta = 0.45, ciLow = 0.12, ciHigh = 0.78)
+	///Appears in both the JSON results and the RDS (survives stripping).
+	void		setExport(Rcpp::List exportData);
+	Rcpp::List	getExport();
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspPlot_Interface)

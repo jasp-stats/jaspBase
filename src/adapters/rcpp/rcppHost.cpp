@@ -1,11 +1,10 @@
 // R-backed implementations of the jaspHost seam.
-// Phase 1 starts with the log function; send/poll/abort/decode/render/state
-// follow as their core classes move (commits 04-08).
 
 #include <Rcpp.h>
 #include "jaspObject.h"
 #include "jaspHost.h"
 #include "jaspResults.h"
+#include "rcppPlot.h"
 
 void setJaspLogFunction(Rcpp::XPtr<logFuncDef> func)
 {
@@ -36,5 +35,15 @@ void rcppWireHostStore()
 	jaspHost::clearObjects = []()
 	{
 		// The R storage environment is cleared from the R side (.onAttach in zzzWrappers.R)
+	};
+
+	jaspHost::renderPlot = [](jaspPlot & plot)
+	{
+		rcppRenderPlot(plot);
+	};
+
+	jaspHost::plotStateSync = [](jaspPlot & plot)
+	{
+		rcppSetUserPlotChangesFromRStateObject(plot);
 	};
 }

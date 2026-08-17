@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include "jaspModuleRegistration.h"
+#include "rcppPlot.h"
 #include <fstream>
 #include <cmath>
 
@@ -452,7 +453,7 @@ void jaspResults::addSerializedPlotObjsForStateFromJaspObject(jaspObject * obj, 
 		if(plot->_filePathPng != "")
 		{
 			Rcpp::List pngImg;
-			pngImg["obj"]					= plot->getPlotObject();
+			pngImg["obj"]					= rcppGetPlotObject(plot);
 			pngImg["width"]					= plot->_width;
 			pngImg["height"]				= plot->_height;
 			pngImg["revision"]				= plot->_revision;
