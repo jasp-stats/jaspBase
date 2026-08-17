@@ -21,7 +21,7 @@ if [ "${1:-}" != "--skip-build" ]; then
 	echo "==> staging Common + installing jaspBase (working tree) into $RLIB"
 	mkdir -p "$PKG_ROOT/inst/include"
 	rm -rf "$PKG_ROOT/inst/include/Common"
-	cp -R "$PKG_ROOT/../Common" "$PKG_ROOT/inst/include/Common"
+	cp -R "$PKG_ROOT/../../Common" "$PKG_ROOT/inst/include/Common"
 	mkdir -p "$RLIB"
 	( cd "$PKG_ROOT" && R CMD INSTALL --library="$RLIB" \
 		--configure-vars="INCLUDE_DIR=$PKG_ROOT/inst/include/Common" . >/dev/null )

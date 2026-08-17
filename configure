@@ -95,7 +95,7 @@ location of the parent directory (e.g., the default is '-I\"../inst/include/jasp
 	exit 1
 fi
 
-SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
+SRC_SOURCES="$(cd src/ && ls *.cpp core/*.cpp 2>/dev/null | tr '\n' ' ')"
 JASPCOMMON_SOURCES="../${COMMON_DIR}/columntype.cpp"
 
 if [ "${JASP_R_INTERFACE_LIBRARY}" != "" ]; then
