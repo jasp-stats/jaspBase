@@ -9,5 +9,6 @@ class jaspPlot;
 
 void			rcppRenderPlot(jaspPlot & plot);
 Rcpp::RObject	rcppGetPlotObject(jaspPlot * plot);
+Rcpp::RObject	rcppGetPlotObjectFromEnvName(const std::string & envName);
 Rcpp::List		rcppPlotToRObject(jaspPlot * plot);
 void			rcppSetUserPlotChangesFromRStateObject(jaspPlot & plot);

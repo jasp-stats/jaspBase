@@ -1,12 +1,22 @@
+// CORE (R-free) version of jaspResults.cpp.
+// R-specific parts (R storage environment, RDS export, Rcpp::List state
+// harvest, XPtr registration, signalAnalysisAbort R call) moved to
+// src/adapters/rcpp/rcppResults.cpp.
+
 #include <cstdlib>
-#include "jaspModuleRegistration.h"
-#include "rcppPlot.h"
-#include "rcppToRObject.h"
 #include <fstream>
 #include <cmath>
-
-
 #include <cstdio>
+
+#include "jaspResults.h"
+#include "jaspTable.h"
+#include "jaspColumn.h"
+#include "jaspHtml.h"
+#include "jaspState.h"
+#include "jaspPlot.h"
+#include "jaspQmlSource.h"
+#include "jaspReport.h"
+
 typedef std::ofstream bofstream;
 typedef std::ifstream bifstream;
 #define BREMOVE std::remove //Also not a type
@@ -19,18 +29,17 @@ std::string			jaspResults::_saveResultsRoot	= "";
 std::string			jaspResults::_writeSealRoot		= "";
 std::string			jaspResults::_writeSealRelative	= "";
 std::string			jaspResults::_baseCitation		= "";
-Rcpp::Environment*	jaspResults::_RStorageEnv		= nullptr;
 bool				jaspResults::_insideJASP		= false;
 jaspResults*		jaspResults::_jaspResults		= nullptr;
 
-void jaspResults::setSendFunc(Rcpp::XPtr<sendFuncDef> sendFunc)
+void jaspResults::setSendFunc(sendFuncDef sendFunc)
 {
-	_ipccSendFunc = *sendFunc;
+	_ipccSendFunc = sendFunc;
 }
 
-void jaspResults::setPollMessagesFunc(Rcpp::XPtr<pollMessagesFuncDef> pollFunc)
+void jaspResults::setPollMessagesFunc(pollMessagesFuncDef pollFunc)
 {
-	_ipccPollFunc = *pollFunc;
+	_ipccPollFunc = pollFunc;
 }
 
 
@@ -80,48 +89,35 @@ void jaspResults::setInsideJASP()
 	_insideJASP = true;
 }
 
-jaspResults::jaspResults(Rcpp::String title, Rcpp::RObject oldState)
+jaspResults::jaspResults(std::string title)
 	: jaspContainer(title, jaspObjectType::results)
 {
 	_jaspResults = this;
 
-	if(_RStorageEnv != nullptr)
-		delete _RStorageEnv;
+	if(_insideJASP && _writeSealRoot + _writeSealRelative == "")
+		throw std::runtime_error("Write seal location not given and we are running in JASP, this should never happen!");
 
-	if(_insideJASP)
-	{
-		Rcpp::Environment::global_env()["RStorageEnv"] = Rcpp::Environment::global_env().new_child(true);
-		_RStorageEnv = new Rcpp::Environment(Rcpp::Environment::global_env()["RStorageEnv"]);
-
-		if(_writeSealRoot + _writeSealRelative == "")
-			throw std::runtime_error("Write seal location not given and we are running in JASP, this should never happen!");
-	}
-	else
-		_RStorageEnv = new Rcpp::Environment(Rcpp::as<Rcpp::Environment>(Rcpp::Environment::namespace_env("jaspBase")[".plotStateStorage"]));
-
-	// Point the R-free jaspHost object store at _RStorageEnv (idempotent).
-	rcppWireHostStore();
-
-	bool imNotReincarnatedAfterBeingMurdered = lastWriteWorked();
-
-	if(imNotReincarnatedAfterBeingMurdered && !oldState.isNULL() && Rcpp::is<Rcpp::List>(oldState))
-		fillEnvironmentWithStateObjects(Rcpp::as<Rcpp::List>(oldState));
+	// The host adapter is expected to have set up its object store (R build:
+	// _RStorageEnv + rcppWireHostStore, see adapters/rcpp/rcppResults.cpp) and
+	// to fill it with old state objects before calling
+	// loadResultsIfLastWriteWorked(), exactly as the old constructor did.
 
 	setStatus("running");
 
 	if(_baseCitation != "")
 		addCitation(_baseCitation);
-
-	if(imNotReincarnatedAfterBeingMurdered && _saveResultsHere != "")
-		loadResults();
 }
 
 jaspResults::~jaspResults()
 {
-	if(_RStorageEnv != nullptr)
-		delete _RStorageEnv;
-	
-	_RStorageEnv = nullptr;
+	if(jaspHost::destroyObjectStore)
+		jaspHost::destroyObjectStore();
+}
+
+void jaspResults::loadResultsIfLastWriteWorked()
+{
+	if(lastWriteWorked() && _saveResultsHere != "")
+		loadResults();
 }
 
 void jaspResults::setStatus(std::string status)
@@ -204,42 +200,16 @@ void jaspResults::saveResults()
 	{
 		static std::string error;
 		error = "Could not open file for saving jaspResults! File: '" + _saveResultsRoot + _saveResultsHere + "'";
-		Rf_error("%s", error.c_str());;
+		throw std::runtime_error(error);
 	}
 
 	saveHere << convertToJSON() << std::flush;
 	saveHere.close();
-	if (std::getenv("JASP_RESULTS_RDS") == nullptr) { JASP_OBJECT_TIMEREND(saveResults); return; }
 
-
-	// Also write results as an RDS file alongside the JSON
-	std::string rdsPath = _saveResultsRoot + _saveResultsHere;
-	size_t dotPos = rdsPath.rfind(".json");
-	if(dotPos != std::string::npos)
-		rdsPath.replace(dotPos, 5, ".rds");
-	else
-		rdsPath += ".rds";
-
-	// By default, strip bulky environments and plot objects from the
-	// RDS tree before saving. This keeps the file small (KB) for
-	// consumers like RoboReport.
-	// Users can opt out to get the full toRObject() tree (e.g. for
-	// debugging) by setting the env var: JASP_RDS_STRIP=FALSE (or 0/no)
-	Rcpp::RObject rdsObject = rcppToRObject(this);
-	const char* stripEnvVal = std::getenv("JASP_RDS_STRIP");
-	bool shouldStrip = (stripEnvVal == nullptr) ||
-		(strcmp(stripEnvVal, "FALSE") != 0 && strcmp(stripEnvVal, "0") != 0 &&
-		 strcmp(stripEnvVal, "NO")   != 0 && strcmp(stripEnvVal, "no")   != 0 &&
-		 strcmp(stripEnvVal, "No")   != 0);
-	if (shouldStrip)
-	{
-		Rcpp::Environment jaspBaseEnv = Rcpp::Environment::namespace_env("jaspBase");
-		Rcpp::Function stripEnv = jaspBaseEnv[".jaspResults_stripEnv"];
-		rdsObject = stripEnv(rdsObject);
-	}
-	Rcpp::Function saveRDS("saveRDS");
-	saveRDS(rdsObject, rdsPath);
-	jaspPrint("Saved jaspResults as RDS to: '" + rdsPath + "'");
+	// Host-specific state archive (R: RDS alongside the JSON; Python: pickle).
+	// The host decides whether/what to write; see adapters.
+	if(jaspHost::saveStateArchive)
+		jaspHost::saveStateArchive(*this, _saveResultsRoot + _saveResultsHere);
 
 	JASP_OBJECT_TIMEREND(saveResults)
 }
@@ -265,7 +235,7 @@ void jaspResults::loadResults()
 	{
 		static std::string error;
 		error = "loading jaspResults had a problem, '" + _saveResultsRoot + _saveResultsHere + "' wasn't a JSON object!";
-		Rf_error("%s", error.c_str());;
+		throw std::runtime_error(error);
 	}
 
 	convertFromJSON_SetFields(val);
@@ -328,8 +298,8 @@ void jaspResults::checkForAnalysisChanged()
 	{
 		jaspPrint("Polling for analysis changes found a change, analysis should restart!");
 		setStatus("changed");
-		static Rcpp::Function signalAnalysisAbort = Rcpp::Environment::namespace_env("jaspBase")["signalAnalysisAbort"];
-		signalAnalysisAbort();
+		if(jaspHost::signalAnalysisAbort)
+			jaspHost::signalAnalysisAbort();
 	}
 }
 
@@ -429,112 +399,71 @@ Json::Value jaspResults::dataEntry(std::string &) const
 
 
 
-void jaspResults::setErrorMessage(Rcpp::String msg, std::string errorStatus)
+void jaspResults::setErrorMessage(std::string msg, std::string errorStatus)
 {
 	errorMessage = msg;
 	setStatus(errorStatus);
 }
 
-Rcpp::List jaspResults::getPlotObjectsForState()
+std::vector<jaspPlotStateEntry> jaspResults::harvestPlotObjects()
 {
-	Rcpp::List returnThis;
-	Rcpp::Shield<Rcpp::List> protectList(returnThis);
+	std::vector<jaspPlotStateEntry> entries;
 
 	JASP_OBJECT_TIMERBEGIN
-	addSerializedPlotObjsForStateFromJaspObject(this, returnThis);
+	addPlotStateEntriesFromJaspObject(this, entries);
 	JASP_OBJECT_TIMEREND(getting plot objects)
-	return returnThis;
+
+	return entries;
 }
 
-void jaspResults::addSerializedPlotObjsForStateFromJaspObject(jaspObject * obj, Rcpp::List & pngImgObj)
+void jaspResults::addPlotStateEntriesFromJaspObject(jaspObject * obj, std::vector<jaspPlotStateEntry> & entries)
 {
 	if(obj->getType() == jaspObjectType::plot)
 	{
 		jaspPlot * plot = (jaspPlot*)obj;
 		if(plot->_filePathPng != "")
-		{
-			Rcpp::List pngImg;
-			pngImg["obj"]					= rcppGetPlotObject(plot);
-			pngImg["width"]					= plot->_width;
-			pngImg["height"]				= plot->_height;
-			pngImg["revision"]				= plot->_revision;
-			pngImg["envName"]				= plot->_envName;
-			pngImg["getUnique"]				= plot->getUniqueNestedName();
-			pngImgObj[plot->_filePathPng]	= pngImg;
-		}
+			entries.push_back({ plot->_filePathPng, plot->_envName, plot->getUniqueNestedName(), plot->_width, plot->_height, plot->_revision });
 	}
 
 	for(auto c : obj->getChildren())
-		addSerializedPlotObjsForStateFromJaspObject(c, pngImgObj);
+		addPlotStateEntriesFromJaspObject(c, entries);
 }
 
-Rcpp::List jaspResults::getOtherObjectsForState()
+std::vector<std::string> jaspResults::harvestStateEnvNames()
 {
-	Rcpp::List returnThis;
-	Rcpp::Shield<Rcpp::List> protectList(returnThis);
+	std::vector<std::string> envNames;
 
 	JASP_OBJECT_TIMERBEGIN
-	addSerializedOtherObjsForStateFromJaspObject(this, returnThis);
+	addStateEnvNamesFromJaspObject(this, envNames);
 	JASP_OBJECT_TIMEREND(getting other objects)
-	return returnThis;
+
+	return envNames;
 }
 
-void jaspResults::addSerializedOtherObjsForStateFromJaspObject(jaspObject * obj, Rcpp::List & cumulativeList)
+void jaspResults::addStateEnvNamesFromJaspObject(jaspObject * obj, std::vector<std::string> & envNames)
 {
 	if(obj->getType() == jaspObjectType::state)
 	{
-		jaspState * state				= (jaspState*)obj; //If other objects are needed this code can be generalized
+		jaspState * state = (jaspState*)obj; //If other objects are needed this code can be generalized
 
 		if(jaspHost::objectExists(state->_envName))
-		{
-			std::any stored = state->getObject();
-			if(stored.has_value())
-				cumulativeList[state->_envName]	= std::any_cast<Rcpp::RObject>(stored);
-		}
+			envNames.push_back(state->_envName);
 	}
 
 	for(auto child : obj->getChildren())
-		addSerializedOtherObjsForStateFromJaspObject(child, cumulativeList);
+		addStateEnvNamesFromJaspObject(child, envNames);
 }
 
-void jaspResults::fillEnvironmentWithStateObjects(Rcpp::List state)
+std::vector<std::string> jaspResults::harvestPlotPathsForKeep()
 {
-	if(state.containsElementNamed("figures"))
-	{
-		//Let's try to load all previous plots from the state!
-		Rcpp::List figures = state["figures"];
+	std::vector<std::string> plotPaths;
 
-		for(Rcpp::List plotInfo : figures)
-			if(plotInfo.containsElementNamed("envName") && plotInfo.containsElementNamed("obj"))
-			{
-				std::string envName = Rcpp::as<std::string>(plotInfo["envName"]);
-				(*_RStorageEnv)[envName] = plotInfo;
-			}
-	}
+	addPlotPathsForKeepFromJaspObject(this, plotPaths);
 
-	if(state.containsElementNamed("other"))
-	{
-		//Let's try to load all previous plots from the state!
-		Rcpp::List others = state["other"];
-		Rcpp::List names  = others.names();
-
-		for(std::string name : names)
-			(*_RStorageEnv)[name] = others[name];
-	}
+	return plotPaths;
 }
 
-Rcpp::List jaspResults::getPlotPathsForKeep()
-{
-	Rcpp::List returnThis;
-	auto * protectList  = new Rcpp::Shield<Rcpp::List>(returnThis);
-
-	addPlotPathsForKeepFromJaspObject(this, returnThis);
-
-	delete protectList;
-	return returnThis;
-}
-
-void jaspResults::addPlotPathsForKeepFromJaspObject(jaspObject * obj, Rcpp::List & pngPlotPaths)
+void jaspResults::addPlotPathsForKeepFromJaspObject(jaspObject * obj, std::vector<std::string> & pngPlotPaths)
 {
 	if(obj->getType() == jaspObjectType::plot)
 	{
@@ -551,12 +480,13 @@ void jaspResults::addPlotPathsForKeepFromJaspObject(jaspObject * obj, Rcpp::List
 		addPlotPathsForKeepFromJaspObject(c, pngPlotPaths);
 }
 
-Rcpp::List jaspResults::getKeepList()
+std::vector<std::string> jaspResults::getKeepListVector()
 {
-	Rcpp::List keep = getPlotPathsForKeep();
-	keep.push_front(std::string(_saveResultsHere));
-	keep.push_front(std::string(_writeSealRelative));
-	keep.push_front(_relativePathKeep);
+	std::vector<std::string> keep = harvestPlotPathsForKeep();
+
+	keep.insert(keep.begin(), _saveResultsHere);
+	keep.insert(keep.begin(), _writeSealRelative);
+	keep.insert(keep.begin(), _relativePathKeep);
 
 	// Also keep jaspResults.rds if it was saved alongside the JSON
 	if (!_saveResultsHere.empty())
@@ -565,7 +495,7 @@ Rcpp::List jaspResults::getKeepList()
 		size_t dot = rdsPath.rfind('.');
 		if (dot != std::string::npos)
 			rdsPath.replace(dot, std::string::npos, ".rds");
-		keep.push_front(rdsPath);
+		keep.insert(keep.begin(), rdsPath);
 	}
 
 	return keep;
@@ -592,7 +522,7 @@ void jaspResults::convertFromJSON_SetFields(Json::Value in)
 
 
 
-void jaspResults::startProgressbar(int expectedTicks, Rcpp::String label)
+void jaspResults::startProgressbar(int expectedTicks, std::string label)
 {
 	_progressbarExpectedTicks		= expectedTicks;
 	_progressbarLastUpdateTime		= getCurrentTimeMs();
@@ -600,7 +530,7 @@ void jaspResults::startProgressbar(int expectedTicks, Rcpp::String label)
 
 	Json::Value progress;
 	progress["value"]		= 0;
-	progress["label"]		= std::string(label);
+	progress["label"]		= label;
 	_response["progress"]	= progress;
 
 	send();
@@ -649,21 +579,4 @@ jaspObject * jaspObject::convertFromJSON(Json::Value in)
 	if(newObject != nullptr) newObject->convertFromJSON_SetFields(in);
 
 	return newObject;
-}
-
-Rcpp::RObject jaspResults::getObjectFromEnv(std::string envName)
-{
-	if(_RStorageEnv->exists(envName))
-		return (*_RStorageEnv)[envName];
-	return R_NilValue;
-}
-
-void jaspResults::setObjectInEnv(std::string envName, Rcpp::RObject obj)
-{
-	(*_RStorageEnv)[envName] = obj;
-}
-
-bool jaspResults::objectExistsInEnv(std::string envName)
-{
-	return _RStorageEnv->exists(envName);
 }

@@ -25,9 +25,9 @@ static Rcpp::RObject anyToRObject(const std::any & obj)
 	}
 }
 
-Rcpp::RObject rcppGetPlotObject(jaspPlot * plot)
+Rcpp::RObject rcppGetPlotObjectFromEnvName(const std::string & envName)
 {
-	Rcpp::RObject plotInfoObj = anyToRObject(jaspHost::fetchObject(plot->_envName));
+	Rcpp::RObject plotInfoObj = anyToRObject(jaspHost::fetchObject(envName));
 
 	if (!plotInfoObj.isNULL() && Rcpp::is<Rcpp::List>(plotInfoObj))
 	{
@@ -38,6 +38,11 @@ Rcpp::RObject rcppGetPlotObject(jaspPlot * plot)
 
 	}
 	return R_NilValue;
+}
+
+Rcpp::RObject rcppGetPlotObject(jaspPlot * plot)
+{
+	return rcppGetPlotObjectFromEnvName(plot->_envName);
 }
 
 void rcppSetUserPlotChangesFromRStateObject(jaspPlot & plot)

@@ -20,6 +20,7 @@
 #include <string>
 
 class jaspPlot;
+class jaspResults;
 
 class jaspHost
 {
@@ -44,6 +45,7 @@ public:
 	static std::function<std::any(const std::string &)>			fetchObject;
 	static std::function<bool(const std::string &)>				objectExists;
 	static std::function<void()>								clearObjects;
+	static std::function<void()>								destroyObjectStore;	///< called by ~jaspResults (R: releases the storage env wrapper)
 
 	// plotting ------------------------------------------------------------------
 	// renderPlot owns the whole render pass (the R adapter reproduces the old
@@ -54,7 +56,7 @@ public:
 	static std::function<void(jaspPlot &)> plotStateSync;
 
 	// state archive (R: RDS alongside jaspResults.json; Python: pickle) ---------
-	static std::function<void(const std::string & path)> saveStateArchive;
+	static std::function<void(jaspResults &, const std::string & path)> saveStateArchive;
 
 private:
 	static int _analysisId;

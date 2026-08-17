@@ -6,6 +6,7 @@
 #include "rcppInterfaces.h"
 #include "rcppHost.h"
 #include "rcppColumn.h"
+#include "rcppResults.h"
 
 JASP_OBJECT_CREATOR(jaspHtml)
 JASP_OBJECT_CREATOR(jaspPlot)
@@ -15,7 +16,9 @@ JASP_OBJECT_CREATOR_ARG(jaspColumn, computed)
 JASP_OBJECT_CREATOR(jaspReport)
 JASP_OBJECT_CREATOR(jaspContainer)
 JASP_OBJECT_CREATOR(jaspQmlSource)
-JASP_OBJECT_CREATOR_ARG(jaspResults, oldState)
+// The R-side of the old jaspResults(title, oldState) constructor (R storage
+// env, old-state fill, loadResults) lives in rcppCreateJaspResults.
+jaspResults_Interface * create_jaspResults(Rcpp::String title, Rcpp::RObject oldState) { return new jaspResults_Interface(rcppCreateJaspResults(title, oldState)); }
 
 RCPP_MODULE(jaspResults)
 {
@@ -30,16 +33,16 @@ RCPP_MODULE(jaspResults)
 	JASP_OBJECT_CREATOR_FUNCTIONREGISTRATION(jaspQmlSource);
 
 
-	Rcpp::function("cpp_startProgressbar",				jaspResults::staticStartProgressbar);
+	Rcpp::function("cpp_startProgressbar",				rcppStaticStartProgressbar);
 	Rcpp::function("cpp_progressbarTick",				jaspResults::staticProgressbarTick);
 
 	Rcpp::function("destroyAllAllocatedObjects",		jaspObject::destroyAllAllocatedObjects);
-	Rcpp::function("setSendFunc",						jaspResults::setSendFunc);
-	Rcpp::function("setPollMessagesFunc",				jaspResults::setPollMessagesFunc);
+	Rcpp::function("setSendFunc",						rcppSetSendFunc);
+	Rcpp::function("setPollMessagesFunc",				rcppSetPollMessagesFunc);
 	Rcpp::function("setBaseCitation",					jaspResults::setBaseCitation);
 	Rcpp::function("setInsideJasp",						jaspResults::setInsideJASP);
 	Rcpp::function("isInsideJASP",						jaspResults::isInsideJASP);
-	Rcpp::function("writeSealFilename",					jaspResults::writeSealFilename);
+	Rcpp::function("writeSealFilename",					rcppWriteSealFilename);
 	Rcpp::function("setResponseData",					jaspResults::setResponseData);
 	Rcpp::function("setDeveloperMode",					jaspResults::setDeveloperMode);
 	Rcpp::function("setSaveLocation",					jaspResults::setSaveLocation);
