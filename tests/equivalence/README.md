@@ -17,6 +17,9 @@ Regression gate guaranteeing the R-visible behavior of jaspBase stays
     dependency (exercises pruning + old-results merge; the pruned table's status
     flips `complete`→`running`),
   - `golden_saved.json` — the `saveResults()` file (`convertToJSON()` tree).
+- `toRObjectBaseline.R` — structural fingerprint of the `toRObject()` conversion
+  tree (S3 classes, names, data.frame column types/titles). Locks down the R-side
+  object conversion, which the JSON goldens do not cover.
 - `fixtures/` — committed baselines, generated from the pre-refactor build.
 - `runGate.sh` — rebuilds jaspBase from the working tree into a temp library,
   regenerates everything, and byte-compares against `fixtures/`.
