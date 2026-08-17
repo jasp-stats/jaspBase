@@ -1,5 +1,8 @@
+// CORE (R-free) version of jaspState.cpp. Storage goes through the jaspHost
+// object store; the R engine wires that store to jaspResults::_RStorageEnv so
+// R's GC keeps the objects alive (see adapters/rcpp/rcppHost.cpp).
+
 #include "jaspState.h"
-#include "jaspResults.h"
 
 Json::Value jaspState::convertToJSON() const
 {
@@ -16,21 +19,26 @@ void jaspState::convertFromJSON_SetFields(Json::Value in)
 }
 
 
-void jaspState::setObject(Rcpp::RObject obj)
+void jaspState::setObject(std::any obj)
 {
-	jaspResults::setObjectInEnv(_envName, obj);
+	jaspHost::storeObject(_envName, std::move(obj));
 }
 
-Rcpp::RObject jaspState::getObject()
+std::any jaspState::getObject()
 {
-	return jaspResults::getObjectFromEnv(_envName);
+	return jaspHost::fetchObject(_envName);
+}
+
+bool jaspState::hasObject() const
+{
+	return jaspHost::objectExists(_envName);
 }
 
 std::string jaspState::dataToString(std::string prefix) const
 {
 	std::stringstream out;
 
-	out << prefix << "object stored: "	<< ( jaspResults::objectExistsInEnv(_envName) ? "no" : "yes") << "\n";
+	out << prefix << "object stored: "	<< ( jaspHost::objectExists(_envName) ? "no" : "yes") << "\n"; // (bug-for-bug: the yes/no inversion is fixed in a later commit)
 
 	return out.str();
 }

@@ -97,6 +97,9 @@ jaspResults::jaspResults(Rcpp::String title, Rcpp::RObject oldState)
 	else
 		_RStorageEnv = new Rcpp::Environment(Rcpp::as<Rcpp::Environment>(Rcpp::Environment::namespace_env("jaspBase")[".plotStateStorage"]));
 
+	// Point the R-free jaspHost object store at _RStorageEnv (idempotent).
+	rcppWireHostStore();
+
 	bool imNotReincarnatedAfterBeingMurdered = lastWriteWorked();
 
 	if(imNotReincarnatedAfterBeingMurdered && !oldState.isNULL() && Rcpp::is<Rcpp::List>(oldState))
@@ -480,8 +483,12 @@ void jaspResults::addSerializedOtherObjsForStateFromJaspObject(jaspObject * obj,
 	{
 		jaspState * state				= (jaspState*)obj; //If other objects are needed this code can be generalized
 
-		if(objectExistsInEnv(state->_envName))
-			cumulativeList[state->_envName]	= state->getObject();
+		if(jaspHost::objectExists(state->_envName))
+		{
+			std::any stored = state->getObject();
+			if(stored.has_value())
+				cumulativeList[state->_envName]	= std::any_cast<Rcpp::RObject>(stored);
+		}
 	}
 
 	for(auto child : obj->getChildren())

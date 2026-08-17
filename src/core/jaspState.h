@@ -1,14 +1,22 @@
 #pragma once
+
+// CORE (R-free) version of jaspState.h. Object payloads travel through the
+// jaspHost object store as opaque std::any handles (Rcpp::RObject in the R
+// build, py::object in the Python build); jaspState_Interface in
+// src/adapters/rcpp/rcppInterfaces.h keeps the R-facing SEXP API.
+
 #include "jaspObject.h"
-#include "jaspObjectInterface.h"
+#include "jaspHost.h"
+#include <any>
 
 class jaspState : public jaspObject
 {
 public:
 	jaspState(std::string title = "") : jaspObject(jaspObjectType::state, title) { initEnvName(); }
 
-	void			setObject(Rcpp::RObject obj);
-	Rcpp::RObject	getObject();
+	void			setObject(std::any obj);
+	std::any		getObject();
+	bool			hasObject() const;
 
 	Json::Value		convertToJSON()								const	override;
 	void			convertFromJSON_SetFields(Json::Value in)			override;
@@ -18,17 +26,3 @@ public:
 private:
 	void initEnvName();
 };
-
-
-
-class jaspState_Interface : public jaspObject_Interface
-{
-public:
-	jaspState_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
-
-	void setObject(Rcpp::RObject obj)	{			((jaspState*)(myJaspObject))->setObject(obj);	}
-	Rcpp::RObject getObject()			{ return	((jaspState*)(myJaspObject))->getObject();		}
-};
-
-RCPP_EXPOSED_CLASS_NODECL(jaspState_Interface)
-

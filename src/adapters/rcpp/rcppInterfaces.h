@@ -9,6 +9,7 @@
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
 #include "jaspReport.h"
+#include "jaspState.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -52,3 +53,27 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspReport_Interface)
+
+class jaspState_Interface : public jaspObject_Interface
+{
+public:
+	jaspState_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	void setObject(Rcpp::RObject obj)	{			static_cast<jaspState*>(myJaspObject)->setObject(std::any(obj));	}
+	Rcpp::RObject getObject()
+	{
+		std::any obj = static_cast<jaspState*>(myJaspObject)->getObject();
+		if(!obj.has_value())
+			return R_NilValue;
+		try
+		{
+			return std::any_cast<Rcpp::RObject>(obj);
+		}
+		catch(const std::bad_any_cast &)
+		{
+			return R_NilValue;
+		}
+	}
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspState_Interface)

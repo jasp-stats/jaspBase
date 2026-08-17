@@ -8,3 +8,8 @@
 #include "jaspObject.h" // logFuncDef
 
 void		setJaspLogFunction( Rcpp::XPtr<logFuncDef> func );
+
+/// Points the jaspHost object store at jaspResults::_RStorageEnv so that
+/// R objects stored by jaspState/jaspPlot stay protected from R's GC.
+/// Idempotent; called from the jaspResults constructor.
+void		rcppWireHostStore();
