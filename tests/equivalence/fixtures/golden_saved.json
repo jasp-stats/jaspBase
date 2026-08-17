@@ -1,0 +1,503 @@
+{
+	"citations" : [],
+	"data" : 
+	{
+		"boxplot" : 
+		{
+			"aspectRatio" : 1.5,
+			"citations" : [],
+			"editOptions" : null,
+			"environmentName" : "plot_0",
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"export" : null,
+			"filePathPng" : "state/figures/plot_0.png",
+			"height" : 320,
+			"interactive" : false,
+			"interactiveConvertError" : "",
+			"interactiveJsonData" : "",
+			"messages" : [],
+			"name" : "boxplot",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"resizedByUser" : false,
+			"revision" : 0,
+			"status" : "complete",
+			"title" : "Boxplot",
+			"type" : "plot",
+			"width" : 480
+		},
+		"cache" : 
+		{
+			"citations" : [],
+			"environmentName" : "state_0",
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"messages" : [],
+			"name" : "cache",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"title" : "model cache",
+			"type" : "state"
+		},
+		"checks" : 
+		{
+			"citations" : [],
+			"data" : 
+			{
+				"homog" : 
+				{
+					"citations" : [],
+					"class" : "",
+					"elementType" : "p",
+					"error" : false,
+					"errorMessage" : "",
+					"escapeHtml" : true,
+					"maxWidth" : "15cm",
+					"messages" : [],
+					"name" : "homog",
+					"nestedOptionMustBe" : {},
+					"nestedOptionMustContain" : {},
+					"optionMustBe" : {},
+					"optionMustContain" : {},
+					"position" : 1,
+					"rawtext" : "variances are equal",
+					"text" : "<p>variances are equal </p>",
+					"title" : "Homogeneity",
+					"type" : "html"
+				},
+				"norm" : 
+				{
+					"citations" : [],
+					"class" : "",
+					"elementType" : "p",
+					"error" : false,
+					"errorMessage" : "",
+					"escapeHtml" : true,
+					"maxWidth" : "15cm",
+					"messages" : [],
+					"name" : "norm",
+					"nestedOptionMustBe" : {},
+					"nestedOptionMustContain" : {},
+					"optionMustBe" : {},
+					"optionMustContain" : {},
+					"position" : 2,
+					"rawtext" : "normality looks fine",
+					"text" : "<p>normality looks fine </p>",
+					"title" : "Normality",
+					"type" : "html"
+				}
+			},
+			"data_order" : 
+			{
+				"homog" : 1,
+				"norm" : 0
+			},
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"initCollapsed" : true,
+			"messages" : [],
+			"name" : "checks",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"order_increment" : 2,
+			"position" : 9999,
+			"title" : "Assumption Checks",
+			"type" : "container"
+		},
+		"col" : 
+		{
+			"citations" : [],
+			"columnName" : "computedCol",
+			"columnType" : "unknown",
+			"encoded" : "",
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"messages" : [],
+			"name" : "col",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"title" : "jaspColumn for computedCol",
+			"type" : "column"
+		},
+		"desc" : 
+		{
+			"citations" : [],
+			"colCombines" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "bool",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : [],
+				"title" : "",
+				"type" : "list"
+			},
+			"colFormats" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : [],
+				"title" : "colFormats",
+				"type" : "list"
+			},
+			"colNames" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : 
+				[
+					"num",
+					"int",
+					"txt",
+					"lgl"
+				],
+				"title" : "colNames",
+				"type" : "list"
+			},
+			"colOvertitles" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : [],
+				"title" : "colOvertitles",
+				"type" : "list"
+			},
+			"colRowCombinations" : [],
+			"colTitles" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : 
+				[
+					"Numeric",
+					"Integer",
+					"Text",
+					"Logical"
+				],
+				"title" : "colTitles",
+				"type" : "list"
+			},
+			"colTypes" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : 
+				[
+					"number",
+					"integer",
+					"string",
+					"logical"
+				],
+				"title" : "colTypes",
+				"type" : "list"
+			},
+			"data" : 
+			[
+				[
+					1.5,
+					2.5,
+					"",
+					4.5
+				],
+				[
+					1,
+					2,
+					3,
+					4
+				],
+				[
+					"a &lt; b",
+					"x &amp; y",
+					"",
+					"plain"
+				],
+				[
+					true,
+					false,
+					true,
+					""
+				]
+			],
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"expectedColumnCount" : 0,
+			"expectedRowCount" : 0,
+			"footnotes" : 
+			[
+				{
+					"cols" : 
+					[
+						"txt"
+					],
+					"rows" : 
+					[
+						"r2"
+					],
+					"symbol" : "#",
+					"text" : "cell note"
+				},
+				{
+					"cols" : 
+					[
+						"num"
+					],
+					"rows" : null,
+					"symbol" : "*",
+					"text" : "column note"
+				},
+				{
+					"cols" : null,
+					"rows" : null,
+					"symbol" : "",
+					"text" : "table-level note"
+				}
+			],
+			"messages" : [],
+			"name" : "desc",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"rowNames" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : 
+				[
+					"r1",
+					"r2",
+					"r3",
+					"r4"
+				],
+				"title" : "rowNames",
+				"type" : "list"
+			},
+			"rowTitles" : 
+			{
+				"citations" : [],
+				"error" : false,
+				"errorMessage" : "",
+				"escapeHtml" : true,
+				"fields" : {},
+				"listType" : "string",
+				"messages" : [],
+				"name" : "",
+				"nestedOptionMustBe" : {},
+				"nestedOptionMustContain" : {},
+				"optionMustBe" : {},
+				"optionMustContain" : {},
+				"position" : 9999,
+				"rows" : [],
+				"title" : "rowTitles",
+				"type" : "list"
+			},
+			"showSpecifiedColumnsOnly" : false,
+			"specifiedColumns" : [],
+			"status" : "complete",
+			"title" : "Descriptives",
+			"transposeTable" : false,
+			"transposeWithOvertitle" : false,
+			"type" : "table"
+		},
+		"intro" : 
+		{
+			"citations" : 
+			[
+				"JASP Team (2026). Golden baseline."
+			],
+			"class" : "",
+			"elementType" : "h2",
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"maxWidth" : "15cm",
+			"messages" : 
+			[
+				"a message that only shows in convertToJSON"
+			],
+			"name" : "intro",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"rawtext" : "Intro with <b>tags</b>, a < b & c > d.",
+			"text" : "<h2>Intro with <b>tags</b>, a < b & c > d. </h2>",
+			"title" : "Introduction",
+			"type" : "html"
+		},
+		"qml" : 
+		{
+			"citations" : [],
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : false,
+			"json" : 
+			{
+				"changed" : true,
+				"value" : 0.70699999999999996
+			},
+			"messages" : [],
+			"name" : "qml",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"sourceID" : "priorWidthSlider",
+			"title" : "",
+			"type" : "qmlSource"
+		},
+		"report" : 
+		{
+			"citations" : [],
+			"error" : false,
+			"errorMessage" : "",
+			"escapeHtml" : true,
+			"messages" : [],
+			"name" : "report",
+			"nestedOptionMustBe" : {},
+			"nestedOptionMustContain" : {},
+			"optionMustBe" : {},
+			"optionMustContain" : {},
+			"position" : 9999,
+			"rawtext" : "A warning worth reporting.",
+			"report" : false,
+			"title" : "Report",
+			"type" : "report",
+			"warningIndex" : 0,
+			"warnings" : 0
+		}
+	},
+	"data_order" : 
+	{
+		"boxplot" : 3,
+		"cache" : 4,
+		"checks" : 2,
+		"col" : 6,
+		"desc" : 1,
+		"intro" : 0,
+		"qml" : 7,
+		"report" : 5
+	},
+	"error" : false,
+	"errorMessage" : "",
+	"escapeHtml" : true,
+	"initCollapsed" : false,
+	"messages" : [],
+	"name" : "",
+	"nestedOptionMustBe" : {},
+	"nestedOptionMustContain" : {},
+	"optionMustBe" : {},
+	"optionMustContain" : {},
+	"options" : 
+	{
+		"hypothesis" : "less",
+		"pairs" : 
+		[
+			{
+				"a" : "x",
+				"b" : "y"
+			}
+		],
+		"priorWidth" : 0.70699999999999996
+	},
+	"order_increment" : 10,
+	"position" : 9999,
+	"relativePathKeep" : "",
+	"title" : "Golden Baseline",
+	"type" : "results"
+}
