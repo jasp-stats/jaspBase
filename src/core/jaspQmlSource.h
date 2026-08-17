@@ -30,7 +30,7 @@ public:
 
 	bool			shouldBePartOfResultsJson(bool meta = false)	const	override;
 
-	void			complete()	{ _complete = true; }
+	void			complete()	override							{ _complete = true; }
 	bool			changed()										const				{ return _changed; }
 	std::string		_sourceID;
 

@@ -7,11 +7,13 @@
 #include "jaspObjectInterface.h"
 #include "rcppConversions.h"
 #include "rcppPlot.h"
+#include "rcppContainer.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
 #include "jaspReport.h"
 #include "jaspState.h"
 #include "jaspPlot.h"
+#include "jaspContainer.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -118,3 +120,18 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspPlot_Interface)
+
+class jaspContainer_Interface : public jaspObject_Interface
+{
+public:
+	jaspContainer_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	int length()																	{ return ((jaspContainer*)myJaspObject)->length(); }
+	Rcpp::RObject	at(std::string field)											{ return rcppContainerAt((jaspContainer*)myJaspObject, field); }
+	void			insert(std::string field, Rcpp::RObject value)					{ rcppContainerInsert((jaspContainer*)myJaspObject, field, value); }
+	Rcpp::RObject	findObjectWithUniqueNestedName(std::string uniqueNestedName);
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspContainer, bool,	_initiallyCollapsed,	InitiallyCollapsed)
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspContainer_Interface)

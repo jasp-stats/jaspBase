@@ -130,8 +130,8 @@ public:
 
 	std::string dataToString(std::string prefix)		const	override;
 
-	void		complete()	{ if(_status == "running") _status = "complete"; }
-	void		letRun()	{ _status = "running"; }
+	void		complete()	override	{ if(_status == "running") _status = "complete"; }
+	void		letRun()	override	{ _status = "running"; }
 
 	bool		canShowErrorMessage()					const	override { return true; }
 

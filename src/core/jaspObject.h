@@ -57,6 +57,9 @@ public:
 	virtual void		clearError()							{ _error = false; _errorMessage.clear(); }
 	virtual bool		canShowErrorMessage()			const	{ return false; }
 
+	virtual void		letRun()								{}	///< overriden by jaspTable/jaspPlot; jaspContainer::letChildrenRun dispatches on it
+	virtual void		complete()							{}	///< idem for jaspContainer::completeChildren
+
 			void		print()									{ try { jaspPrint(toString()); } catch(std::exception e) { jaspPrint(std::string("toString failed because of: ") + e.what()); } }
 			void		addMessage(std::string msg)				{ _messages.push_back(msg); }
 	virtual void		childrenUpdatedCallbackHandler(bool)	{} ///Can be called by jaspResults to send changes and stuff like that.

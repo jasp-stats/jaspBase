@@ -6,6 +6,7 @@
 #include "jaspHtml.h"
 #include "rcppInterfaces.h" // jaspHtml_Interface (and later interfaces)
 #include "rcppPlot.h"
+#include "rcppContainer.h"
 
 static Rcpp::List jaspHtmlToRObject(jaspHtml * html)
 {
@@ -37,7 +38,7 @@ Rcpp::List rcppToRObject(jaspObject * obj)
 	switch(obj->getType())
 	{
 	case jaspObjectType::container:
-	case jaspObjectType::results:		return static_cast<jaspContainer*>(obj)->toRObject();
+	case jaspObjectType::results:		return rcppContainerToRObject(static_cast<jaspContainer*>(obj));
 	case jaspObjectType::table:			return static_cast<jaspTable*>(obj)->toRObject();
 	case jaspObjectType::plot:			return rcppPlotToRObject(static_cast<jaspPlot*>(obj));
 	case jaspObjectType::html:			return jaspHtmlToRObject(static_cast<jaspHtml*>(obj));

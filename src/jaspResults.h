@@ -1,6 +1,7 @@
 #pragma once
 #include "jaspContainer.h"
 #include "jaspHost.h"
+#include "rcppInterfaces.h"
 
 //copied from jasprcpp_interface.h
 typedef void (*sendFuncDef)(const char *);
@@ -37,7 +38,7 @@ public:
 	void			childrenUpdatedCallbackHandler(bool ignoreSendTimer) override;
 
 	void			finalizedHandler() override { complete(); }
-	void			complete();
+	void			complete() override;
 
 	void			prepareForWriting();
 	void			finishWriting();

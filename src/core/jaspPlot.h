@@ -52,8 +52,8 @@ public:
 
 	bool		canShowErrorMessage()						const	override { return true; }
 
-	void		complete()	{ if(_status == "running" || _status == "waiting") _status = "complete"; }
-	void		letRun()	{ _status = "running"; }
+	void		complete()	override	{ if(_status == "running" || _status == "waiting") _status = "complete"; }
+	void		letRun()	override	{ _status = "running"; }
 
 private:
 	void initEnvName();

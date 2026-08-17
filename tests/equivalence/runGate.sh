@@ -22,6 +22,9 @@ if [ "${1:-}" != "--skip-build" ]; then
 	mkdir -p "$PKG_ROOT/inst/include"
 	rm -rf "$PKG_ROOT/inst/include/Common"
 	cp -R "$PKG_ROOT/../../Common" "$PKG_ROOT/inst/include/Common"
+	# R's make does not track header dependencies, so stale .o files survive
+	# header-only changes (vtable/layout drift); build from scratch every time.
+	find "$PKG_ROOT/src" \( -name '*.o' -o -name '*.so' \) -delete
 	mkdir -p "$RLIB"
 	( cd "$PKG_ROOT" && R CMD INSTALL --library="$RLIB" \
 		--configure-vars="INCLUDE_DIR=$PKG_ROOT/inst/include/Common" . >/dev/null )

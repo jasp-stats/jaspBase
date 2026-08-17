@@ -1,21 +1,18 @@
 #pragma once
+
+// CORE (R-free) version of jaspContainer.h. The Rcpp-facing insert dispatch,
+// wrapJaspObject, list-construction and toRObject live in
+// src/adapters/rcpp/rcppContainer; jaspContainer_Interface lives in
+// src/adapters/rcpp/rcppInterfaces.h. Core children only: insert(jaspObject*)
+// and at() -> jaspObject*.
+
 #include "jaspObject.h"
-#include "jaspObjectInterface.h"
-#include "jaspColumn.h"
-#include "jaspPlot.h"
-#include "jaspTable.h"
-#include "jaspState.h"
-#include "jaspHtml.h"
-#include "jaspQmlSource.h"
-#include "jaspReport.h"
 #include <map>
-
-
 
 class jaspContainer : public jaspObject
 {
 public:
-	jaspContainer(Rcpp::String title = "", jaspObjectType type = jaspObjectType::container) : jaspObject(type, title)
+	jaspContainer(std::string title = "", jaspObjectType type = jaspObjectType::container) : jaspObject(type, title)
 	{
 #ifdef JASP_RESULTS_DEBUG_TRACES
 		std::cout << "JASPcontainer constructor for title: " << _title << std::endl;
@@ -27,8 +24,8 @@ public:
 	std::string dataToString(std::string prefix = "")						const	override;
 	std::string toHtml()													const	override;
 
-	void			insert(std::string field, Rcpp::RObject value);
-	Rcpp::RObject	at(std::string field);
+	void			insert(std::string field, jaspObject * value);
+	jaspObject *	at(std::string field);
 
 	Json::Value	metaEntry(jaspObject * oldResult)							const	override;
 	Json::Value	dataEntry(jaspObject * oldResult, std::string & errorMsg)	const	override;
@@ -38,8 +35,6 @@ public:
 	int	length() { return _data.size(); }
 
 	void childFinalizedHandler(jaspObject *child)									override;
-
-	static jaspContainer * jaspContainerFromRcppList(Rcpp::List convertThis);
 
 	Json::Value convertToJSON()												const	override;
 	void		convertFromJSON_SetFields(Json::Value in)							override;
@@ -53,7 +48,6 @@ public:
 
 	bool		containsNonContainer();
 	bool		canShowErrorMessage()										const	override;
-	Rcpp::List	toRObject()													/*const*/;
 
 	bool		_initiallyCollapsed = false;
 
@@ -67,7 +61,6 @@ public:
 
 	jaspObject *								findObjectWithNestedNameVector(const std::vector<std::string> &uniqueName, const size_t position = 0);
 	jaspObject *								findObjectWithUniqueNestedName(const std::string & uniqueNestedName);
-	static	Rcpp::RObject						wrapJaspObject(jaspObject * ref);
 
 protected:
 	std::map<std::string, jaspObject*>	_data;
@@ -75,18 +68,3 @@ protected:
 	int									_order_increment = 0;
 
 };
-
-class jaspContainer_Interface : public jaspObject_Interface
-{
-public:
-	jaspContainer_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
-
-	int length()																	{ return ((jaspContainer*)myJaspObject)->length(); }
-	Rcpp::RObject	at(std::string field)											{ return ((jaspContainer*)myJaspObject)->at(field); }
-	void			insert(std::string field, Rcpp::RObject value)					{ ((jaspContainer*)myJaspObject)->insert(field, value); }
-	Rcpp::RObject	findObjectWithUniqueNestedName(std::string uniqueNestedName);
-
-	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspContainer, bool,	_initiallyCollapsed,	InitiallyCollapsed)
-};
-
-RCPP_EXPOSED_CLASS_NODECL(jaspContainer_Interface)

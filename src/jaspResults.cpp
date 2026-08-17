@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include "jaspModuleRegistration.h"
 #include "rcppPlot.h"
+#include "rcppToRObject.h"
 #include <fstream>
 #include <cmath>
 
@@ -224,7 +225,7 @@ void jaspResults::saveResults()
 	// consumers like RoboReport.
 	// Users can opt out to get the full toRObject() tree (e.g. for
 	// debugging) by setting the env var: JASP_RDS_STRIP=FALSE (or 0/no)
-	Rcpp::RObject rdsObject = toRObject();
+	Rcpp::RObject rdsObject = rcppToRObject(this);
 	const char* stripEnvVal = std::getenv("JASP_RDS_STRIP");
 	bool shouldStrip = (stripEnvVal == nullptr) ||
 		(strcmp(stripEnvVal, "FALSE") != 0 && strcmp(stripEnvVal, "0") != 0 &&

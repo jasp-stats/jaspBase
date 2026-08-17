@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include "jaspResults.h"
+#include "jaspTable.h"
 #include "jaspColumn.h"
 #include "jaspObjectInterface.h"
 #include "rcppInterfaces.h"
