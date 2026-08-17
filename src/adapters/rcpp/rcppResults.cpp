@@ -46,8 +46,19 @@ void rcppDestroyStorageEnv()
 	_RStorageEnv = nullptr;
 }
 
+/// The storage env used to be created only in the jaspResults constructor,
+/// so a jaspState/jaspPlot store access before any jaspResults existed
+/// dereferenced nullptr. Lazily create it with the same inside/outside-JASP
+/// selection instead.
+static void rcppEnsureStorageEnv()
+{
+	if(_RStorageEnv == nullptr)
+		rcppCreateStorageEnv();
+}
+
 Rcpp::RObject rcppGetObjectFromEnv(std::string envName)
 {
+	rcppEnsureStorageEnv();
 	if(_RStorageEnv->exists(envName))
 		return (*_RStorageEnv)[envName];
 	return R_NilValue;
@@ -55,11 +66,13 @@ Rcpp::RObject rcppGetObjectFromEnv(std::string envName)
 
 void rcppSetObjectInEnv(std::string envName, Rcpp::RObject obj)
 {
+	rcppEnsureStorageEnv();
 	(*_RStorageEnv)[envName] = obj;
 }
 
 bool rcppObjectExistsInEnv(std::string envName)
 {
+	rcppEnsureStorageEnv();
 	return _RStorageEnv->exists(envName);
 }
 

@@ -38,7 +38,7 @@ std::string jaspState::dataToString(std::string prefix) const
 {
 	std::stringstream out;
 
-	out << prefix << "object stored: "	<< ( jaspHost::objectExists(_envName) ? "no" : "yes") << "\n"; // (bug-for-bug: the yes/no inversion is fixed in a later commit)
+	out << prefix << "object stored: "	<< ( jaspHost::objectExists(_envName) ? "yes" : "no") << "\n";
 
 	return out.str();
 }

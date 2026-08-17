@@ -17,10 +17,10 @@ public:
 
 	~jaspPlot();
 
-	float		_aspectRatio;
-	int			_width,
-				_height,
-				_revision = 0;
+	float		_aspectRatio	= 0.0f;
+	int			_width			= 0,
+				_height			= 0,
+				_revision		= 0;
 	bool		_editing = false,
 				_resizedByUser = false,
 				_interactive = false;
