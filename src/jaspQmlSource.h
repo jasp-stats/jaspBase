@@ -2,6 +2,8 @@
 #define JASPQMLSOURCE_H
 
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
+#include "rcppConversions.h"
 
 class jaspQmlSource : public jaspObject
 {
@@ -10,7 +12,7 @@ public:
 
 	void			setSourceID(const std::string & sourceID)							{ _sourceID = sourceID; }
 	std::string		sourceID()										const;
-	void			setValue(Rcpp::RObject Robj)										{ _json = RObject_to_JsonValue(Robj); _changed = true;	}
+	void			setValue(Rcpp::RObject Robj)										{ _json = RObject_to_JsonValue(Robj, _escapeHtml); _changed = true;	}
 	std::string		getValue()										const				{ return _json.toStyledString();		}
 
 	Json::Value		metaEntry()										const	override;
@@ -23,7 +25,7 @@ public:
 	std::string		jsonToPrefixedStrings(std::string prefix = "")	const				{ return jsonToPrefixedStrings(_json, prefix); }
 	std::string		jsonToPrefixedStrings(Json::Value val, std::string prefix) const;
 
-	Json::Value		RcppVector_to_ArrayJson(Rcpp::RObject obj, bool throwError=true)	{ return VectorJson_to_ArrayJson(RcppVector_to_VectorJson(obj, throwError)); }
+	Json::Value		RcppVector_to_ArrayJson(Rcpp::RObject obj, bool throwError=true)	{ return VectorJson_to_ArrayJson(RcppVector_to_VectorJson(obj, _escapeHtml, throwError)); }
 
 	bool			shouldBePartOfResultsJson(bool meta = false)	const	override;
 

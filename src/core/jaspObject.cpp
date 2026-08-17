@@ -1,29 +1,38 @@
-#include "jaspObject.h"
-#include <chrono>
+// CORE (R-free) version of jaspObject.cpp.
+// SEXP->Json conversions moved to src/adapters/rcpp/rcppConversions.cpp;
+// logging/column-name decoding go through jaspHost.
 
-#ifdef BUILDING_JASP
-#include <json/json.h>
-#else
+#include "jaspObject.h"
+#include "jaspHost.h"
 #include "json/json_value.cpp" // hacky way to get libjson in the code ^^
 #include "json/json_reader.cpp"
 #include "json/json_writer.cpp"
-#endif
 
+#include <iostream>
+#include <chrono>
+#include <cctype>
+#include <stdexcept>
 
 
 std::string stringExtend(std::string & str, size_t len, char kar)
 {
-	if(str.size() < len)
-		str += std::string(len - str.size(), kar);
+	std::string uit(str);
 
-	return str;
+	while(uit.size() < len)
+		uit += kar;
+
+	return uit;
 }
 
 std::string stringRemove(std::string str, char kar)
 {
-	for(size_t removeMe = str.find_first_of(kar); removeMe != std::string::npos; removeMe = str.find_first_of(kar))
-		str.erase(removeMe, 1);
-	return str;
+	std::string uit;
+
+	for(char k : str)
+		if(k != kar)
+			uit.push_back(k);
+
+	return uit;
 }
 
 std::vector<std::string> stringSplit(std::string str, char kar)
@@ -40,36 +49,20 @@ std::vector<std::string> stringSplit(std::string str, char kar)
 	return strs;
 }
 
-logFuncDef _jaspRCPP_logString = nullptr;
-
-void		setJaspLogFunction(Rcpp::XPtr<logFuncDef> func)
-{
-	_jaspRCPP_logString = * func;
-
-	_jaspRCPP_logString("Log string function received loud and clear!");
-}
-
 void jaspPrint(std::string msg)
 {
 	msg = decodeColumnNames(msg);
 
-#ifdef JASP_R_INTERFACE_LIBRARY
-	_jaspRCPP_logString(msg + "\n");
-#else
-	Rcpp::Rcout << msg << "\n";
-#endif
+	if(jaspHost::logString)
+		jaspHost::logString(msg + "\n");
+	else
+		std::cout << msg << "\n";
 }
 
 std::string decodeColumnNames(const std::string & str)
 {
-	static Rcpp::Environment jaspBase = Rcpp::Environment::namespace_env("jaspBase");
-	static Rcpp::Function decodeAll = jaspBase["decodeColNames"];
-
-	if (!decodeAll.isNULL())
-	{
-		Rcpp::String decodeStr = decodeAll(str);
-		return decodeStr;
-	}
+	if(jaspHost::decodeColumnNames)
+		return jaspHost::decodeColumnNames(str);
 
 	return str;
 }
@@ -101,8 +94,6 @@ void jaspObject::destroyAllAllocatedObjects()
 	while(allocatedObjects->size() > 0)
 	{
 		jaspObject * p = *(allocatedObjects->begin());
-
-		//std::cout << "p == "<<p->objectTitleString()<<"!\n"<<std::flush;
 
 		allocatedObjects->erase(allocatedObjects->begin());
 		delete p;
@@ -156,7 +147,6 @@ Json::Value jaspObject::getObjectFromNestedOption(std::vector<std::string> neste
 
 		if (obj.isNull())
 			return ifNotFound;
-
 	}
 	return obj;
 }
@@ -301,35 +291,6 @@ std::string jaspObject::toString(std::string prefix) const
 {
 	std::string dataString = dataToString(prefix + "\t");
 	return objectTitleString(prefix) + (dataString == "" ? "\n" : ":\n" + dataString);
-}
-
-Rcpp::DataFrame jaspObject::convertFactorsToCharacters(Rcpp::DataFrame df)
-{
-
-	for(int col=0; col<df.length(); col++)
-		if(Rf_isFactor(df[col]))
-		{
-			Rcpp::IntegerVector		originalColumn	= df[col];
-
-			Rcpp::CharacterVector	factorLevels	= originalColumn.attr("levels");
-
-/*#ifdef JASP_DEBUG
-			//In ifdef because we dont really have access to log here.
-			std::cout	<< "converting factors to characters for dataframe\n"
-						<< "originalColumn: " << originalColumn << "\n"
-						<< "factorLevels: " << factorLevels << std::endl;
-#endif*/
-
-			Rcpp::CharacterVector	charCol(originalColumn.size());
-
-			for(int i=0; i<originalColumn.size(); i++)
-				if(originalColumn[i] > 0) //it can be INT_MIN at least, but if we are doing a -1 on it anyhow it should just be bigger than 0
-					charCol[i] = factorLevels[originalColumn[i] - 1];
-
-			df[col] = charCol;
-		}
-
-	return df;
 }
 
 Json::Value	jaspObject::constructMetaEntry(std::string type, std::string meta) const
@@ -479,13 +440,12 @@ void jaspObject::convertFromJSON_SetFields(Json::Value in)
 
 Json::Value jaspObject::currentOptions = Json::nullValue;
 
-void jaspObject::dependOnOptions(Rcpp::CharacterVector listOptions)
+void jaspObject::dependOnOptions(std::vector<std::string> listOptions)
 {
-	if(currentOptions.isNull()) Rf_error("No options known!");
+	if(currentOptions.isNull()) throw std::runtime_error("No options known!");
 
-	for(auto & nameOption : listOptions)
+	for(auto & name : listOptions)
 	{
-		std::string name = Rcpp::as<std::string>(nameOption);
 		std::string nameTypes = name + ".types";
 		_optionMustBe[name] = currentOptions.get(name, Json::nullValue);
 		if (currentOptions.isMember(nameTypes))
@@ -493,40 +453,39 @@ void jaspObject::dependOnOptions(Rcpp::CharacterVector listOptions)
 	}
 }
 
-void jaspObject::setOptionMustBeDependency(std::string optionName, Rcpp::RObject mustBeThis)
+void jaspObject::setOptionMustBeDependency(std::string optionName, Json::Value mustBeThis)
 {
-	_optionMustBe[optionName]	= RObject_to_JsonValue(mustBeThis);
+	_optionMustBe[optionName]	= mustBeThis;
 }
 
-void jaspObject::setOptionMustContainDependency(std::string optionName, Rcpp::RObject mustContainThis)
+void jaspObject::setOptionMustContainDependency(std::string optionName, Json::Value mustContainThis)
 {
-	if (mustContainThis.isNULL())
-		Rf_error("setOptionMustContainDependency expected not null!");
+	if (mustContainThis.isNull())
+		throw std::runtime_error("setOptionMustContainDependency expected not null!");
 
-	_optionMustContain[optionName] = RObject_to_JsonValue(mustContainThis);
+	_optionMustContain[optionName] = mustContainThis;
 }
 
-void jaspObject::dependOnNestedOptions(Rcpp::CharacterVector nestedOptionName)
+void jaspObject::dependOnNestedOptions(std::vector<std::string> nestedKey)
 {
-	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
-		Rf_error("nested key \"%s\" does not exist in the options!", nestedKeyToString(nestedKey, "$").c_str());
+		throw std::runtime_error("nested key \"" + nestedKeyToString(nestedKey, "$") + "\" does not exist in the options!");
 
 	_nestedOptionMustBe[nestedKey] = obj;
 }
 
-void jaspObject::setNestedOptionMustContainDependency(Rcpp::CharacterVector nestedOptionName, Rcpp::RObject mustContainThis)
+void jaspObject::setNestedOptionMustContainDependency(std::vector<std::string> nestedOptionName, Json::Value mustContainThis)
 {
-	if (mustContainThis.isNULL())
-		Rf_error("setNestedOptionMustContainDependency expected not null!");
+	if (mustContainThis.isNull())
+		throw std::runtime_error("setNestedOptionMustContainDependency expected not null!");
 
-	std::vector<std::string> nestedKey = Rcpp::as<std::vector<std::string>>(nestedOptionName);
+	std::vector<std::string> nestedKey = nestedOptionName;
 	Json::Value obj = getObjectFromNestedOption(nestedKey);
 	if (obj.isNull())
-		Rf_error("nested key \"%s\" does not exist in the options!", nestedKeyToString(nestedKey, "$").c_str());
+		throw std::runtime_error("nested key \"" + nestedKeyToString(nestedKey, "$") + "\" does not exist in the options!");
 
-	_nestedOptionMustContain[nestedKey] = RObject_to_JsonValue(mustContainThis);
+	_nestedOptionMustContain[nestedKey] = mustContainThis;
 }
 
 
@@ -662,86 +621,6 @@ std::map<std::string, std::set<std::string>> jaspObject::nestedMustContains() co
 	return out;
 }
 
-std::vector<Json::Value> jaspObject::RList_to_VectorJson(Rcpp::List obj)
-{
-	std::vector<Json::Value> vec;
-
-	for(int row=0; row<obj.size(); row++)
-		vec.push_back(RObject_to_JsonValue((Rcpp::RObject)obj[row]));
-
-	return vec;
-}
-
-Json::Value jaspObject::RObject_to_JsonValue(Rcpp::RObject obj)
-{
-	if(obj.isNULL())								return Json::nullValue;
-	else if(isMixedRObject(obj))					return MixedRObject_to_JsonValue((Rcpp::List)				obj);
-	else if(Rcpp::is<Rcpp::List>(obj))				return RObject_to_JsonValue((Rcpp::List)					obj);
-	else if(Rcpp::is<Rcpp::DataFrame>(obj))			return RObject_to_JsonValue((Rcpp::List)					obj);
-	else if(Rcpp::is<Rcpp::NumericMatrix>(obj))		return RObject_to_JsonValue<REALSXP>((Rcpp::NumericMatrix)	obj);
-	else if(Rcpp::is<Rcpp::NumericVector>(obj))		return RObject_to_JsonValue<REALSXP>((Rcpp::NumericVector)	obj);
-	else if(Rcpp::is<Rcpp::IntegerVector>(obj))		return RObject_to_JsonValue<INTSXP>((Rcpp::IntegerVector)	obj);
-	else if(Rcpp::is<Rcpp::LogicalVector>(obj))		return RObject_to_JsonValue<LGLSXP>((Rcpp::LogicalVector)	obj);
-	else if(Rcpp::is<Rcpp::CharacterVector>(obj))	return RObject_to_JsonValue<STRSXP>((Rcpp::CharacterVector)	obj);
-	else if(Rcpp::is<Rcpp::StringVector>(obj))		return RObject_to_JsonValue<STRSXP>((Rcpp::StringVector)	obj);
-	else if(obj.isS4())								return "an S4, which is too complicated for jaspResults now.";
-	else											return "something that is not understood by jaspResults right now..";
-}
-
-Json::Value jaspObject::MixedRObject_to_JsonValue(Rcpp::List obj)
-{
-
-	Json::Value value(Json::objectValue);
-
-	// sometimes we receive list(mixed) and sometimes mixed, ideally we always just get mixed but I'm not sure that's possible with addRows.
-	Rcpp::List data = obj.length() != 3 ? obj[0] : obj;
-
-	value["value"]  = RObject_to_JsonValue((Rcpp::RObject)data["value"]);
-	value["type"]   = RObject_to_JsonValue((Rcpp::RObject)data["type"]);
-	value["format"] = RObject_to_JsonValue((Rcpp::RObject)data["format"]);
-	
-
-	return value;
-
-}
-
-
-Json::Value jaspObject::RObject_to_JsonValue(Rcpp::List obj)
-{
-	bool atLeastOneNamed = false;
-
-	Rcpp::RObject namesListRObject = obj.names();
-	Rcpp::CharacterVector namesList;
-
-	if(!namesListRObject.isNULL())
-	{
-		namesList = namesListRObject;
-
-		for(int row=0; row<obj.size(); row++)
-			if(namesList[row] != "")
-				atLeastOneNamed = true;
-	}
-
-	Json::Value val = atLeastOneNamed ? Json::objectValue : Json::arrayValue;
-
-	if(atLeastOneNamed)
-		for(int row=obj.size() - 1; row>=0; row--) //We go backwards because in R the first entry of a name in a list is used. So to emulate this we go backwars and we override an earlier occurence. (aka you have two elements with the name "a" in a list and in R list$a returns the first occurence. This is now also the element visible in the json.)
-		{
-			std::string name(namesList[row]);
-
-			if(name == "")
-				name = "element_" + std::to_string(row);
-
-			val[name] = RObject_to_JsonValue((Rcpp::RObject)obj[row]);
-		}
-	else
-		for(int row=0; row<obj.size(); row++)
-			val.append(RObject_to_JsonValue((Rcpp::RObject)obj[row]));
-
-
-	return val;
-}
-
 Json::Value jaspObject::SetJson_to_ArrayJson(std::set<Json::Value> set)
 {
 	Json::Value array(Json::arrayValue);
@@ -765,5 +644,3 @@ Json::Value jaspObject::VectorJson_to_ArrayJson(std::vector<Json::Value> vec)
 		array.append(val);
 	return array;
 }
-
-

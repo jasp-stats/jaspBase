@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 #include "jaspColumn.h"
 #include "jaspPlot.h"
 #include "jaspTable.h"
@@ -47,12 +48,12 @@ public:
 	void		completeChildren();
 	void		letChildrenRun();
 	void		setError()															override;
-	void		setError(Rcpp::String message)										override;
+	void		setError(std::string message)										override;
 	void		renderPlotsOfChildren();
 
 	bool		containsNonContainer();
 	bool		canShowErrorMessage()										const	override;
-	Rcpp::List	toRObject()													/*const*/ override;
+	Rcpp::List	toRObject()													/*const*/;
 
 	bool		_initiallyCollapsed = false;
 

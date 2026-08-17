@@ -1,4 +1,5 @@
 #include "jaspContainer.h"
+#include "rcppToRObject.h"
 
 void jaspContainer::insert(std::string field, Rcpp::RObject value)
 {
@@ -425,7 +426,7 @@ Rcpp::List jaspContainer::toRObject() /*const*/
 
 		jaspObject* child = _data.at(key);
 
-		Rcpp::List Robj = child->toRObject();
+		Rcpp::List Robj = rcppToRObject(child);
 		if (Robj.length() > 0)
 			lst.push_back(Robj, key);
 	}
@@ -505,7 +506,7 @@ void jaspContainer::setError()
 		d.second->setError();
 }
 
-void jaspContainer::setError(Rcpp::String message)
+void jaspContainer::setError(std::string message)
 {
 	_errorMessage = message;
 	setError();

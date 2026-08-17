@@ -2,6 +2,7 @@
 #define _JASPCOLUMN_HEADER
 
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 #include "columntype.h"
 #include <Rcpp.h>
 

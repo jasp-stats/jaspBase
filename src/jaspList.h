@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 
 template<typename T>
 class jaspList : public jaspObject

@@ -344,7 +344,7 @@ Rcpp::List jaspPlot::toRObject()
 void jaspPlot_Interface::setExport(Rcpp::List exportData)
 {
 	jaspPlot* plot = (jaspPlot*)myJaspObject;
-	plot->_export = plot->RObject_to_JsonValue(exportData);
+	plot->_export = RObject_to_JsonValue(exportData, plot->getEscapeHtml());
 	myJaspObject->notifyParentOfChanges();
 }
 

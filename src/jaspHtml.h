@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 
 class jaspHtml : public jaspObject
 {
@@ -26,7 +27,7 @@ public:
     std::string getText();
     std::string getHtml();
 
-	Rcpp::List toRObject() /*const*/ override;
+	Rcpp::List toRObject() /*const*/;
 
 };
 

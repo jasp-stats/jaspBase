@@ -1,6 +1,8 @@
 #include <Rcpp.h>
 #include "jaspResults.h"
 #include "jaspColumn.h"
+#include "jaspObjectInterface.h"
+#include "rcppHost.h"
 
 JASP_OBJECT_CREATOR(jaspHtml)
 JASP_OBJECT_CREATOR(jaspPlot)

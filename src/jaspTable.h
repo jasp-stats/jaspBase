@@ -1,5 +1,7 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
+#include "rcppConversions.h"
 #include "jaspList.h"
 #include <functional>
 
@@ -156,7 +158,7 @@ public:
 	void		setExpectedRows(size_t rows)					{ _expectedRowCount = rows;								}
 	void		setExpectedColumns(size_t columns)				{ _expectedColumnCount = columns;						}
 
-	Rcpp::List	toRObject()			/*const*/	override;
+	Rcpp::List	toRObject()			/*const*/;
 
 protected:
 	std::vector<std::string>	getDisplayableColTitles(bool normalizeLengths = true, bool onlySpecifiedColumns = true)		const;
@@ -192,7 +194,7 @@ protected:
 		extractRowNames(newData, true);
 
 		_data.clear();
-		auto cols = RcppVector_to_VectorJson<RTYPE>(newData);
+		auto cols = RcppVector_to_VectorJson<RTYPE>(newData, _escapeHtml);
 
 		for(int col=0; col<cols.size(); col++)
 			addOrSetColumnInData(std::vector<Json::Value>({cols[col]}), localColNames.size() > col ? localColNames[col] : "");
@@ -205,7 +207,7 @@ protected:
 
 		_data.clear();
 		for(size_t col=0; col<newData.size(); col++)
-			addOrSetColumnInData(RcppVector_to_VectorJson((Rcpp::RObject)newData[col]), localColNames.size() > col ? localColNames[col] : "");
+			addOrSetColumnInData(RcppVector_to_VectorJson((Rcpp::RObject)newData[col], _escapeHtml), localColNames.size() > col ? localColNames[col] : "");
 	}
 
 	template<int RTYPE> void setDataFromMatrix(Rcpp::Matrix<RTYPE> newData)
@@ -213,7 +215,7 @@ protected:
 		std::vector<std::string> localColNames = extractElementOrColumnNames(newData);
 		extractRowNames(newData, true);
 
-		std::vector<std::vector<Json::Value>> jsonMat = RcppMatrix_to_Vector2Json<RTYPE>(newData);
+		std::vector<std::vector<Json::Value>> jsonMat = RcppMatrix_to_Vector2Json<RTYPE>(newData, _escapeHtml);
 
 		_data.clear();
 		for(size_t col=0; col<jsonMat.size(); col++)
@@ -226,7 +228,7 @@ protected:
 	{
 		setRowNamesWhereApplicable(extractElementOrColumnNames(newData));
 
-		_data.push_back(RcppVector_to_VectorJson<RTYPE>(newData));
+		_data.push_back(RcppVector_to_VectorJson<RTYPE>(newData, _escapeHtml));
 	}
 
 	template<int RTYPE>	void setColumnFromVector(Rcpp::Vector<RTYPE> newData, size_t col)
@@ -235,7 +237,7 @@ protected:
 
 		if(_data.size() <= col)
 			_data.resize(col+1);
-		_data[col] = RcppVector_to_VectorJson<RTYPE>(newData);
+		_data[col] = RcppVector_to_VectorJson<RTYPE>(newData, _escapeHtml);
 	}
 
 	void setColumnFromMixedVector(Rcpp::List newData, size_t col)
@@ -244,7 +246,7 @@ protected:
 
 		if(_data.size() <= col)
 			_data.resize(col+1);
-		_data[col] = MixedRcppVector_to_VectorJson(newData);
+		_data[col] = MixedRcppVector_to_VectorJson(newData, _escapeHtml);
 
 	}
 
@@ -257,7 +259,7 @@ protected:
 		std::vector<std::string> localColNames = extractElementOrColumnNames(newData);
 		extractRowNames(newData, true);
 
-		std::vector<std::vector<Json::Value>> jsonMat = RcppMatrix_to_Vector2Json<RTYPE>(newData);
+		std::vector<std::vector<Json::Value>> jsonMat = RcppMatrix_to_Vector2Json<RTYPE>(newData, _escapeHtml);
 
 		for(size_t col=0; col<jsonMat.size(); col++)
 			addOrSetColumnInData(jsonMat[col], localColNames.size() > col ? localColNames[col] : "");
@@ -267,7 +269,7 @@ protected:
 	{
 		std::vector<std::string> localColNames = extractElementOrColumnNames(newData);
 
-		auto row = RcppVector_to_VectorJson<RTYPE>(newData);
+		auto row = RcppVector_to_VectorJson<RTYPE>(newData, _escapeHtml);
 
 		int equalizedColumnsLength = equalizeColumnsLengths();
 		int previouslyAddedUnnamedCols = 0;
@@ -299,7 +301,7 @@ protected:
 		for(size_t col=0; col<newData.size(); col++)
 		{
 			Rcpp::RObject kolom			= (Rcpp::RObject)newData[col];
-			auto jsonKolom				= RcppVector_to_VectorJson(kolom);
+			auto jsonKolom				= RcppVector_to_VectorJson(kolom, _escapeHtml);
 			previouslyAddedUnnamedCols	= pushbackToColumnInData(jsonKolom, localColNames.size() > col ? localColNames[col] : "", equalizedColumnsLength, previouslyAddedUnnamedCols);
 		}
 
@@ -316,7 +318,7 @@ protected:
 		for(int row=0; row<newRowNames.size(); row++)
 			_rowNames[row + equalizedColumnsLength] = newRowNames[row];
 
-		auto jsonMatrix = RcppMatrix_to_Vector2Json<RTYPE>(newData);
+		auto jsonMatrix = RcppMatrix_to_Vector2Json<RTYPE>(newData, _escapeHtml);
 
 		for(int col=0; col<jsonMatrix.size(); col++)
 			previouslyAddedUnnamedCols = pushbackToColumnInData(std::vector<Json::Value>({jsonMatrix[col]}), localColNames.size() > col ? localColNames[col] : "", equalizedColumnsLength, previouslyAddedUnnamedCols);
@@ -334,7 +336,7 @@ protected:
 	///The general case might work for matrices and dataframes?
 	template <typename RCPP_CLASS> std::vector<std::string> extractElementOrColumnNames(RCPP_CLASS rObj, bool setColNamesInTable=false)
 	{
-		std::vector<std::string> colNamesVec = jaspObject::extractElementOrColumnNames(rObj);
+		std::vector<std::string> colNamesVec = ::extractElementOrColumnNames(rObj);
 
 		for(size_t col=0; col<colNamesVec.size(); col++)
 			if(setColNamesInTable && colNamesVec[col] != "" && (_colNames.rowCount() <= col || _colNames[col] == "")) //Add new columnNames or overwrite unset ones but if the user took the trouble to manually set it then just leave it I guess?

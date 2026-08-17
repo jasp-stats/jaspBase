@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 
 class jaspReport : public jaspObject
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspObject.h"
+#include "jaspObjectInterface.h"
 
 class jaspPlot : public jaspObject
 {
@@ -47,7 +48,7 @@ public:
 	void		complete()	{ if(_status == "running" || _status == "waiting") _status = "complete"; }
 	void		letRun()	{ _status = "running"; }
 
-	Rcpp::List	toRObject()									/*const*/ override;
+	Rcpp::List	toRObject()									/*const*/;
 
 private:
 	void initEnvName();
