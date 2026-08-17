@@ -1,0 +1,6 @@
+state roundtrip identical: TRUE
+harvest names: state_0,state_1
+harvest length: 2
+harvest state_0 identical to val: TRUE
+harvest state_1 identical to vec: TRUE
+keep length: 3

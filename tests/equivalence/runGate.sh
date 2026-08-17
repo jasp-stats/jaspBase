@@ -30,13 +30,14 @@ fi
 export JASP_EQUIV_RLIB="$RLIB"
 
 echo "==> regenerating fingerprint + goldens into $SCRATCH"
-Rscript "$EQ_DIR/moduleFingerprint.R" "$SCRATCH/moduleFingerprint.txt" >/dev/null
-Rscript "$EQ_DIR/goldenBaseline.R"    "$SCRATCH" >/dev/null
-Rscript "$EQ_DIR/toRObjectBaseline.R" "$SCRATCH/toRObject_fingerprint.txt" >/dev/null
+Rscript "$EQ_DIR/moduleFingerprint.R"   "$SCRATCH/moduleFingerprint.txt" >/dev/null
+Rscript "$EQ_DIR/goldenBaseline.R"      "$SCRATCH" >/dev/null
+Rscript "$EQ_DIR/toRObjectBaseline.R"   "$SCRATCH/toRObject_fingerprint.txt" >/dev/null
+Rscript "$EQ_DIR/stateStoreBaseline.R"  "$SCRATCH/stateStore_fingerprint.txt" >/dev/null
 
 echo "==> comparing against committed fixtures"
 fail=0
-for f in moduleFingerprint.txt golden_response.json golden_pruned.json golden_saved.json toRObject_fingerprint.txt; do
+for f in moduleFingerprint.txt golden_response.json golden_pruned.json golden_saved.json toRObject_fingerprint.txt stateStore_fingerprint.txt; do
 	if cmp -s "$EQ_DIR/fixtures/$f" "$SCRATCH/$f"; then
 		echo "  $f  IDENTICAL"
 	else
