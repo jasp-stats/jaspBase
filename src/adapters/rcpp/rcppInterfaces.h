@@ -9,6 +9,7 @@
 #include "rcppPlot.h"
 #include "rcppContainer.h"
 #include "rcppTableIngest.h"
+#include "rcppColumn.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
 #include "jaspReport.h"
@@ -17,6 +18,7 @@
 #include "jaspContainer.h"
 #include "jaspList.h"
 #include "jaspTable.h"
+#include "jaspColumn.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -269,3 +271,17 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspTable_Interface)
+
+class jaspColumn_Interface : public jaspObject_Interface
+{
+public:
+	jaspColumn_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+	bool setScale(		Rcpp::RObject scalarData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setScale(std::any(scalarData),		computed);		}
+	bool setOrdinal(	Rcpp::RObject ordinalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setOrdinal(std::any(ordinalData),	computed);		}
+	bool setNominal(	Rcpp::RObject nominalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(std::any(nominalData),	computed);		}
+	bool setNominalText(Rcpp::RObject nominalData,	bool computed = false)	{ return static_cast<jaspColumn*>(myJaspObject)->setNominal(std::any(nominalData),	computed);		}
+	//void removeFromData()							{ return static_cast<jaspColumn*>(myJaspObject)->removeFromData();				}
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspColumn_Interface)

@@ -1,3 +1,9 @@
+// CORE (R-free) version of jaspColumn.cpp. Column-data payloads travel as
+// opaque std::any (R adapter: Rcpp::RObject end-to-end; Python adapter:
+// py::object). The Rcpp::XPtr-based registration that the desktop engine
+// calls lives in adapters/rcpp/rcppColumn.cpp and bridges into
+// setColumnFuncs() below.
+
 #include "jaspColumn.h"
 #include "jaspHost.h"
 
@@ -50,19 +56,19 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 	colGetTF colType, colGetAIF colAnId, colGetAIF colIndex, colCreateF colCreate, colDeleteF colDelete, colExistsF colExists,
 	encDecodeF encode, encDecodeF decode, shouldEncDecodeF shouldEncode, shouldEncDecodeF shouldDecode)
 {
-	_createColumnFunc				= * colCreate;
-	_deleteColumnFunc				= * colDelete;
-	_getColumnTypeFunc 				= * colType;
-	_getColumnAnalysisIdFunc		= * colAnId;
-	_getColumnOriginalIndexFunc		= * colIndex;
-	_setColumnDataAsScaleFunc 		= * scalar;
-	_setColumnDataAsOrdinalFunc 	= * ordinal;
-	_setColumnDataAsNominalFunc 	= * nominal;
-	_getColumnExistsFunc			= * colExists;
-	_encodeFunc						= * encode;
-	_decodeFunc						= * decode;
-	_shouldEncodeFunc				= * shouldEncode;
-	_shouldDecodeFunc				= * shouldDecode;
+	_createColumnFunc				= colCreate;
+	_deleteColumnFunc				= colDelete;
+	_getColumnTypeFunc 				= colType;
+	_getColumnAnalysisIdFunc		= colAnId;
+	_getColumnOriginalIndexFunc		= colIndex;
+	_setColumnDataAsScaleFunc 		= scalar;
+	_setColumnDataAsOrdinalFunc 	= ordinal;
+	_setColumnDataAsNominalFunc 	= nominal;
+	_getColumnExistsFunc			= colExists;
+	_encodeFunc						= encode;
+	_decodeFunc						= decode;
+	_shouldEncodeFunc				= shouldEncode;
+	_shouldDecodeFunc				= shouldDecode;
 }
 
 #define SET_COLUMN_DATA_BASE(FUNC)														\
@@ -78,10 +84,10 @@ void jaspColumn::setColumnFuncs(colDataF scalar, colDataF ordinal, colDataF nomi
 		return (*FUNC)(columnName, data, computed);												\
 }																						\
 
-bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
-bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
-bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
-bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, Rcpp::RObject data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsScale(		const std::string & columnName, const std::any & data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsScaleFunc)
+bool	jaspColumn::setColumnDataAsOrdinal(		const std::string & columnName, const std::any & data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsOrdinalFunc)
+bool	jaspColumn::setColumnDataAsNominal(		const std::string & columnName, const std::any & data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
+bool	jaspColumn::setColumnDataAsNominalText(	const std::string & columnName, const std::any & data, bool computed) SET_COLUMN_DATA_BASE(_setColumnDataAsNominalFunc)
 
 
 columnType jaspColumn::getColumnType(const std::string & columnName)
@@ -216,25 +222,19 @@ bool jaspColumn::deleteColumn(const std::string &columnName)
 		return (*_deleteColumnFunc)(columnName); 
 }
 
-Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
+std::vector<std::string> jaspColumn::createColumns(const std::vector<std::string> & columnNames)
 {
 	jaspPrint("jaspBase::createColumns aka jaspColumn::createColumnsCPP is deprecated. jaspColumn is all you need!");
 	
-	Rcpp::StringVector result;
+	std::vector<std::string> result;
 
 	if(!_createColumnFunc)
 	{
 		jaspPrint("jaspColumn does nothing in R stand-alone!");
 		return result;
 	}
-	
-	stringvec colNames;
-	colNames.reserve(columnNames.size());
-	
-	for(const Rcpp::String columnName : columnNames)
-		colNames.push_back(columnName);
 
-	for(const std::string & columnName : colNames)
+	for(const std::string & columnName : columnNames)
 		if(getColumnExists(columnName) && !columnIsMine(columnName))
 		{
 			jaspPrint("Column '"+columnName+"' already exists and does NOT belong to this analysis...");
@@ -242,7 +242,7 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 		}
 
 	
-	for(const std::string & columnName : colNames)
+	for(const std::string & columnName : columnNames)
 		if(!getColumnExists(columnName))
 			result.push_back((*_createColumnFunc)(columnName, false));
 		else
@@ -251,7 +251,7 @@ Rcpp::StringVector jaspColumn::createColumnsCPP(Rcpp::StringVector columnNames)
 	return result;
 }
 
-bool jaspColumn::setScale(Rcpp::RObject scalarData, bool computed)
+bool jaspColumn::setScale(std::any scalarData, bool computed)
 {
 	if(!columnIsMine(_columnName))
 		return false;
@@ -266,7 +266,7 @@ bool jaspColumn::setScale(Rcpp::RObject scalarData, bool computed)
 	return true;
 }
 
-bool jaspColumn::setOrdinal(Rcpp::RObject ordinalData, bool computed)
+bool jaspColumn::setOrdinal(std::any ordinalData, bool computed)
 {
 	if(!columnIsMine(_columnName))
 		return false;
@@ -281,7 +281,7 @@ bool jaspColumn::setOrdinal(Rcpp::RObject ordinalData, bool computed)
 	return true;
 }
 
-bool jaspColumn::setNominal(Rcpp::RObject nominalData, bool computed)
+bool jaspColumn::setNominal(std::any nominalData, bool computed)
 {
 	if(!columnIsMine(_columnName))
 		return false;
@@ -296,7 +296,7 @@ bool jaspColumn::setNominal(Rcpp::RObject nominalData, bool computed)
 	return true;
 }
 
-bool jaspColumn::setNominalText(Rcpp::RObject nominalData, bool computed)
+bool jaspColumn::setNominalText(std::any nominalData, bool computed)
 {
 	return setNominal(nominalData, computed);
 }

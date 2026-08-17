@@ -5,6 +5,7 @@
 #include "jaspObjectInterface.h"
 #include "rcppInterfaces.h"
 #include "rcppHost.h"
+#include "rcppColumn.h"
 
 JASP_OBJECT_CREATOR(jaspHtml)
 JASP_OBJECT_CREATOR(jaspPlot)
@@ -44,8 +45,8 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("setSaveLocation",					jaspResults::setSaveLocation);
 	Rcpp::function("setWriteSealLocation",				jaspResults::setWriteSealLocation);
 
-	Rcpp::function("setColumnFuncs",					jaspColumn::setColumnFuncs);
-	Rcpp::function("createColumnsCPP",					jaspColumn::createColumnsCPP);
+	Rcpp::function("setColumnFuncs",					rcppSetColumnFuncs);
+	Rcpp::function("createColumnsCPP",					rcppCreateColumnsCPP);
 	Rcpp::function("columnDelete",						jaspColumn::deleteColumn);
 	Rcpp::function("columnIsMine",						jaspColumn::columnIsMine);
 	Rcpp::function("columnExists",						jaspColumn::columnExists);
