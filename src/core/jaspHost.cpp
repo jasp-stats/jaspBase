@@ -7,36 +7,48 @@ std::function<bool()>								jaspHost::pollMessages			= nullptr;
 std::function<void()>								jaspHost::signalAnalysisAbort	= nullptr;
 std::function<std::string(const std::string &)>		jaspHost::decodeColumnNames		= [](const std::string & str) { return str; };
 
-std::function<jaspPlotRenderResult(const jaspPlotRenderRequest &)>	jaspHost::renderPlot		= nullptr;
-std::function<void(const std::string &)>							jaspHost::saveStateArchive	= nullptr;
+int jaspHost::_analysisId = -1;
+
+int jaspHost::analysisId()
+{
+	return _analysisId;
+}
+
+void jaspHost::setAnalysisId(int id)
+{
+	_analysisId = id;
+}
 
 namespace
 {
-	std::map<std::string, std::any> & jaspHostObjectStore()
+	std::map<std::string, std::any> & jaspHostDefaultObjectStore()
 	{
 		static std::map<std::string, std::any> store;
 		return store;
 	}
 }
 
-void jaspHost::storeObject(const std::string & envName, std::any obj)
+std::function<void(const std::string &, std::any)>	jaspHost::storeObject	= [](const std::string & envName, std::any obj)
 {
-	jaspHostObjectStore()[envName] = std::move(obj);
-}
+	jaspHostDefaultObjectStore()[envName] = std::move(obj);
+};
 
-std::any jaspHost::fetchObject(const std::string & envName)
+std::function<std::any(const std::string &)>		jaspHost::fetchObject	= [](const std::string & envName) -> std::any
 {
-	auto & store = jaspHostObjectStore();
+	auto & store = jaspHostDefaultObjectStore();
 	auto it = store.find(envName);
 	return it == store.end() ? std::any() : it->second;
-}
+};
 
-bool jaspHost::objectExists(const std::string & envName)
+std::function<bool(const std::string &)>			jaspHost::objectExists	= [](const std::string & envName)
 {
-	return jaspHostObjectStore().count(envName) > 0;
-}
+	return jaspHostDefaultObjectStore().count(envName) > 0;
+};
 
-void jaspHost::clearObjects()
+std::function<void()>								jaspHost::clearObjects	= []()
 {
-	jaspHostObjectStore().clear();
-}
+	jaspHostDefaultObjectStore().clear();
+};
+
+std::function<jaspPlotRenderResult(const jaspPlotRenderRequest &)>	jaspHost::renderPlot		= nullptr;
+std::function<void(const std::string &)>							jaspHost::saveStateArchive	= nullptr;

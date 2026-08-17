@@ -8,6 +8,7 @@
 #include "rcppConversions.h"
 #include "jaspHtml.h"
 #include "jaspQmlSource.h"
+#include "jaspReport.h"
 
 class jaspHtml_Interface : public jaspObject_Interface
 {
@@ -38,3 +39,16 @@ public:
 };
 
 RCPP_EXPOSED_CLASS_NODECL(jaspQmlSource_Interface)
+
+class jaspReport_Interface : public jaspObject_Interface
+{
+public:
+	jaspReport_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
+
+    void			setText(Rcpp::String newRawText) { 			static_cast<jaspReport *>(myJaspObject)->setText(std::string(newRawText)); }
+    Rcpp::String	getText() 						{ return 	static_cast<jaspReport *>(myJaspObject)->getText(); }
+
+	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspReport, bool,	_report,	Report)
+};
+
+RCPP_EXPOSED_CLASS_NODECL(jaspReport_Interface)

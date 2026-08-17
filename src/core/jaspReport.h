@@ -1,11 +1,14 @@
 #pragma once
+
+// CORE (R-free) version of jaspReport.h. jaspReport_Interface moved to
+// src/adapters/rcpp/rcppInterfaces.h; analysisId comes from jaspHost.
+
 #include "jaspObject.h"
-#include "jaspObjectInterface.h"
 
 class jaspReport : public jaspObject
 {
 public:
-  jaspReport(Rcpp::String text = "", bool report = false) 
+  jaspReport(std::string text = "", bool report = false) 
   : jaspObject(jaspObjectType::report, ""), _rawText(text), _report(report)
   {}
 
@@ -21,7 +24,7 @@ public:
 	Json::Value 	convertToJSON()								const	override;
 	void			convertFromJSON_SetFields(Json::Value in)			override;
 
-	void			setText(Rcpp::String newRawText) 					{ _rawText 	= newRawText;	}
+	void			setText(std::string newRawText) 					{ _rawText 	= newRawText;	}
 	std::string 	getText() 									const 	{ return _rawText;			}
 
 	std::string 	_rawText;
@@ -34,19 +37,3 @@ private:
 	size_t			_warningIndex = 0;
 	static	size_t	_totalWarnings;
 };
-
-
-
-class jaspReport_Interface : public jaspObject_Interface
-{
-public:
-	jaspReport_Interface(jaspObject * dataObj) : jaspObject_Interface(dataObj) {}
-
-    void			setText(Rcpp::String newRawText) { 			static_cast<jaspReport *>(myJaspObject)->setText(newRawText); }
-    Rcpp::String	getText() 						{ return 	static_cast<jaspReport *>(myJaspObject)->getText(); }
-
-	JASPOBJECT_INTERFACE_PROPERTY_FUNCTIONS_GENERATOR(jaspReport, bool,	_report,	Report)
-};
-
-RCPP_EXPOSED_CLASS_NODECL(jaspReport_Interface)
-

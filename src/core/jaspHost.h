@@ -48,15 +48,26 @@ public:
 	static std::function<void()>							signalAnalysisAbort;
 	static std::function<std::string(const std::string &)>	decodeColumnNames;		///< default: identity
 
-	// object store (plot + state objects), keyed by envName --------------------
-	static void			storeObject(const std::string & envName, std::any obj);
-	static std::any		fetchObject(const std::string & envName);
-	static bool			objectExists(const std::string & envName);
-	static void			clearObjects();
+	// identity of the running analysis (set from setResponseData). Used by
+	// jaspReport (positioning) and jaspColumn (ownership) without needing the
+	// jaspResults object. -1 == none/unknown.
+	static int	analysisId();
+	static void	setAnalysisId(int id);
+
+	// object store (plot + state objects), keyed by envName. Default is a plain
+	// in-process map; hosts can override, e.g. the R engine stores objects in an
+	// R environment so R's GC keeps them alive (installed by jaspResults).
+	static std::function<void(const std::string &, std::any)>	storeObject;
+	static std::function<std::any(const std::string &)>			fetchObject;
+	static std::function<bool(const std::string &)>				objectExists;
+	static std::function<void()>								clearObjects;
 
 	// plotting ------------------------------------------------------------------
 	static std::function<jaspPlotRenderResult(const jaspPlotRenderRequest &)> renderPlot;
 
 	// state archive (R: RDS alongside jaspResults.json; Python: pickle) ---------
 	static std::function<void(const std::string & path)> saveStateArchive;
+
+private:
+	static int _analysisId;
 };

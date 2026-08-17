@@ -1,5 +1,5 @@
 #include "jaspColumn.h"
-#include "jaspResults.h"
+#include "jaspHost.h"
 
 createColumnFuncDef		jaspColumn::_createColumnFunc					= nullptr;
 deleteColumnFuncDef		jaspColumn::_deleteColumnFunc					= nullptr;
@@ -110,13 +110,13 @@ int jaspColumn::getColumnOriginalIndex(const std::string &columnName)
 
 bool jaspColumn::columnIsMine(	const std::string & columnName)
 {
-	if(jaspResults::analysisId() == -1)
+	if(jaspHost::analysisId() == -1)
 		return true;
 
-	//jaspPrint("jaspColumn::columnIsMine?\njaspResults::analysisId(): " + std::to_string(jaspResults::analysisId()));
+	//jaspPrint("jaspColumn::columnIsMine?\njaspHost::analysisId(): " + std::to_string(jaspHost::analysisId()));
 	//jaspPrint("getColumnAnalysisId("+columnName+"): " + std::to_string(getColumnAnalysisId(columnName)));
 
-	return jaspResults::analysisId() == getColumnAnalysisId(columnName);
+	return jaspHost::analysisId() == getColumnAnalysisId(columnName);
 }
 
 bool jaspColumn::getColumnExists(const std::string & columnName)

@@ -1,6 +1,6 @@
 #include "jaspReport.h"
 #include "jaspHtml.h"
-#include "jaspResults.h"
+#include "jaspHost.h"
 
 size_t  jaspReport::_totalWarnings = 0;
 
@@ -43,7 +43,7 @@ Json::Value jaspReport::dataEntry(std::string & errorMessage) const
     data["report"]			= _report;
 	data["warningIndex"]	= int(_warningIndex);
 	data["warningsTotal"]	= int(_totalWarnings);
-    data["analysisId"]		= jaspResults::analysisId(); //Used to find analysis position in js and reposition topnodes
+    data["analysisId"]		= jaspHost::analysisId(); //Used to find analysis position in js and reposition topnodes
 
 	return data;
 }

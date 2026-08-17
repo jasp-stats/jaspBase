@@ -1,5 +1,6 @@
 #pragma once
 #include "jaspContainer.h"
+#include "jaspHost.h"
 
 //copied from jasprcpp_interface.h
 typedef void (*sendFuncDef)(const char *);
@@ -70,7 +71,7 @@ public:
 	static Rcpp::RObject	getObjectFromEnv(std::string envName);
 	static void				setObjectInEnv(std::string envName, Rcpp::RObject obj);
 	static bool				objectExistsInEnv(std::string envName);
-    static int              analysisId() { return _analysisId; } ///< To pass analysisId to jaspReport easily
+    static int              analysisId() { return jaspHost::analysisId(); } ///< To pass analysisId to jaspReport easily
 
 	jaspContainer *			getOldResults()		const	{ return _oldResults; }
 
@@ -115,8 +116,6 @@ private:
 			_sendingFeedbackLastTime		= -1,
             _progressbarBetweenUpdatesTime	= 500,
             _sendingFeedbackInterval		= 1000;
-
-    static int _analysisId;
 };
 
 void JASPresultFinalizer(jaspResults * obj);

@@ -20,7 +20,6 @@ std::string			jaspResults::_baseCitation		= "";
 Rcpp::Environment*	jaspResults::_RStorageEnv		= nullptr;
 bool				jaspResults::_insideJASP		= false;
 jaspResults*		jaspResults::_jaspResults		= nullptr;
-int                 jaspResults::_analysisId        = -1;
 
 void jaspResults::setSendFunc(Rcpp::XPtr<sendFuncDef> sendFunc)
 {
@@ -40,7 +39,7 @@ void jaspResults::setBaseCitation(std::string baseCitation)
 
 void jaspResults::setAnalysisId(int analysisId)
 {
-    _analysisId = analysisId;
+    jaspHost::setAnalysisId(analysisId);
 }
 
 void jaspResults::setResponseData(int analysisID, int revision)
