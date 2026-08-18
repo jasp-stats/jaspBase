@@ -95,8 +95,11 @@ location of the parent directory (e.g., the default is '-I\"../inst/include/jasp
 	exit 1
 fi
 
-SRC_SOURCES="$(cd src/ && ls *.cpp | tr '\n' ' ')"
+SRC_SOURCES="$(cd src/ && { ls *.cpp 2>/dev/null; ls core/*.cpp 2>/dev/null; ls adapters/rcpp/*.cpp 2>/dev/null; } | tr '\n' ' ')"
 JASPCOMMON_SOURCES="../${COMMON_DIR}/columntype.cpp"
+
+# core/ is the R-free middle, adapters/rcpp the R binding layer (python-interface refactor)
+PKG_CXXFLAGS="${PKG_CXXFLAGS} -I\".\" -I\"core\" -I\"adapters/rcpp\""
 
 if [ "${JASP_R_INTERFACE_LIBRARY}" != "" ]; then
 	PKG_CXXFLAGS=-DJASP_R_INTERFACE_LIBRARY\ ${PKG_CXXFLAGS}

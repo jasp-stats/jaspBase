@@ -65,3 +65,6 @@ _processedLockFile.lock
 R/jaspColumnEncoderVersion.R
 
 inst/include/Common
+
+# scratch space (python-interface work)
+/tmp/
