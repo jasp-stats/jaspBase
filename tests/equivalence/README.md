@@ -23,6 +23,14 @@ Regression gate guaranteeing the R-visible behavior of jaspBase stays
 - `fixtures/` — committed baselines, generated from the pre-refactor build.
 - `runGate.sh` — rebuilds jaspBase from the working tree into a temp library,
   regenerates everything, and byte-compares against `fixtures/`.
+- `tableGoldens.R` / `tableGoldens.py` — Phase-2 golden-table matrix: 20 paired
+  cases (cell types, NA/NaN/Inf, escaping, mixed columns, footnotes, addRow(s),
+  addColumns, transpose, expected-size, matrix/vector/DataFrame/Categorical
+  ingest) built through the R module and the Python `_jaspresults` extension
+  respectively; outputs (`*_results.json`, `*_toHtml.txt`) must be
+  byte-identical.
+- `runTableGoldens.sh` — builds the Python extension (via the `python/`
+  package), runs both generators, and byte-compares every produced file.
 
 ## Usage
 
