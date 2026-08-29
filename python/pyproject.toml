@@ -1,0 +1,19 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.13"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "jaspresults"
+version = "0.20.0"
+description = "JASP results engine driven from Python: same R-free C++ core that backs the R engine (jaspBase)."
+readme = { text = "Python interface for the jaspResults C++ core, see tmp/plan-python-interface.md in the jaspBase repo.", content-type = "text/plain" }
+requires-python = ">=3.10"
+license = { text = "GPL-2.0-or-later" }
+
+[project.optional-dependencies]
+data = ["numpy", "pandas"]
+test = ["pytest", "numpy", "pandas"]
+
+[tool.scikit-build]
+cmake.version = ">=3.20"
+wheel.packages = ["src/jaspresults"]

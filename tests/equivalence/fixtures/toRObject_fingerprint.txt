@@ -1,0 +1,78 @@
+OBJECT intro (type=html)
+  class=jaspHtmlWrapper,jaspWrapper length=5 names=rawtext,text,class,maxWidth,elementType
+    title=Introduction
+    [rawtext]
+      class=character values=Intro with <b>tags</b>.
+    [text]
+      class=character values=<p>Intro with <b>tags</b>. </p>
+    [class]
+      class=character values=
+    [maxWidth]
+      class=character values=15cm
+    [elementType]
+      class=character values=p
+
+OBJECT desc (type=table)
+  class=jaspTableWrapper,jaspWrapper,data.frame nrow=3 ncol=4
+    columns: num:numeric | int:integer | txt:character | lgl:logical
+    has footnotes attr
+    title=Descriptives
+
+OBJECT inner (type=container)
+  class=jaspContainerWrapper,jaspWrapper length=1 names=nested
+    title=Inner
+    [nested]
+      class=jaspHtmlWrapper,jaspWrapper length=5 names=rawtext,text,class,maxWidth,elementType
+        title=Nested
+        [rawtext]
+          class=character values=nested
+        [text]
+          class=character values=<p>nested </p>
+        [class]
+          class=character values=
+        [maxWidth]
+          class=character values=15cm
+        [elementType]
+          class=character values=p
+
+OBJECT report (type=report)
+  class=list length=0
+
+OBJECT results (type=results)
+  class=jaspContainerWrapper,jaspWrapper length=3 names=intro,desc,inner
+    title=toRObject baseline
+    [intro]
+      class=jaspHtmlWrapper,jaspWrapper length=5 names=rawtext,text,class,maxWidth,elementType
+        title=Introduction
+        [rawtext]
+          class=character values=Intro with <b>tags</b>.
+        [text]
+          class=character values=<p>Intro with <b>tags</b>. </p>
+        [class]
+          class=character values=
+        [maxWidth]
+          class=character values=15cm
+        [elementType]
+          class=character values=p
+    [desc]
+      class=jaspTableWrapper,jaspWrapper,data.frame nrow=3 ncol=4
+        columns: num:numeric | int:integer | txt:character | lgl:logical
+        has footnotes attr
+        title=Descriptives
+    [inner]
+      class=jaspContainerWrapper,jaspWrapper length=1 names=nested
+        title=Inner
+        [nested]
+          class=jaspHtmlWrapper,jaspWrapper length=5 names=rawtext,text,class,maxWidth,elementType
+            title=Nested
+            [rawtext]
+              class=character values=nested
+            [text]
+              class=character values=<p>nested </p>
+            [class]
+              class=character values=
+            [maxWidth]
+              class=character values=15cm
+            [elementType]
+              class=character values=p
+

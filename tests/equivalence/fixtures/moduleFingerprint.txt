@@ -1,0 +1,1945 @@
+# jaspResults RCPP_MODULE surface fingerprint
+# jaspBase version: 0.20.4
+
+## module functions
+FUN columnDelete
+  signature: bool columnDelete(std::string)
+  docstring: 
+FUN columnExists
+  signature: bool columnExists(std::string)
+  docstring: 
+FUN columnIndexInData
+  signature: int columnIndexInData(std::string)
+  docstring: 
+FUN columnIsMine
+  signature: bool columnIsMine(std::string)
+  docstring: 
+FUN cpp_progressbarTick
+  signature: void cpp_progressbarTick()
+  docstring: 
+FUN cpp_startProgressbar
+  signature: void cpp_startProgressbar(int, Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspColumn
+  signature: jaspColumn_Interface* create_cpp_jaspColumn(Rcpp::String, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+  docstring: 
+FUN create_cpp_jaspContainer
+  signature: jaspContainer_Interface* create_cpp_jaspContainer(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspHtml
+  signature: jaspHtml_Interface* create_cpp_jaspHtml(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspPlot
+  signature: jaspPlot_Interface* create_cpp_jaspPlot(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspQmlSource
+  signature: jaspQmlSource_Interface* create_cpp_jaspQmlSource(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspReport
+  signature: jaspReport_Interface* create_cpp_jaspReport(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspResults
+  signature: jaspResults_Interface* create_cpp_jaspResults(Rcpp::String, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+  docstring: 
+FUN create_cpp_jaspState
+  signature: jaspState_Interface* create_cpp_jaspState(Rcpp::String)
+  docstring: 
+FUN create_cpp_jaspTable
+  signature: jaspTable_Interface* create_cpp_jaspTable(Rcpp::String)
+  docstring: 
+FUN createColumnsCPP
+  signature: Rcpp::CharacterVector createColumnsCPP(Rcpp::CharacterVector)
+  docstring: 
+FUN destroyAllAllocatedObjects
+  signature: void destroyAllAllocatedObjects()
+  docstring: 
+FUN isInsideJASP
+  signature: bool isInsideJASP()
+  docstring: 
+FUN setBaseCitation
+  signature: void setBaseCitation(std::string)
+  docstring: 
+FUN setColumnFuncs
+  signature: void setColumnFuncs(Rcpp::XPtr<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)>(bool (**)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)), false>, Rcpp::XPtr<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)>(bool (**)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)), false>, Rcpp::XPtr<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)>(bool (**)(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)), false>, Rcpp::XPtr<columnType (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<columnType (*)(std::string)>(columnType (**)(std::string)), false>, Rcpp::XPtr<int (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<int (*)(std::string)>(int (**)(std::string)), false>, Rcpp::XPtr<int (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<int (*)(std::string)>(int (**)(std::string)), false>, Rcpp::XPtr<std::string (*)(std::string, bool), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<std::string (*)(std::string, bool)>(std::string (**)(std::string, bool)), false>, Rcpp::XPtr<bool (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string)>(bool (**)(std::string)), false>, Rcpp::XPtr<bool (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string)>(bool (**)(std::string)), false>, Rcpp::XPtr<std::string (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<std::string (*)(std::string)>(std::string (**)(std::string)), false>, Rcpp::XPtr<std::string (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<std::string (*)(std::string)>(std::string (**)(std::string)), false>, Rcpp::XPtr<bool (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string)>(bool (**)(std::string)), false>, Rcpp::XPtr<bool (*)(std::string), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)(std::string)>(bool (**)(std::string)), false>)
+  docstring: 
+FUN setDeveloperMode
+  signature: void setDeveloperMode(bool)
+  docstring: 
+FUN setInsideJasp
+  signature: void setInsideJasp()
+  docstring: 
+FUN setJaspLogFunction
+  signature: void setJaspLogFunction(Rcpp::XPtr<void (*)(std::string const&), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<void (*)(std::string const&)>(void (**)(std::string const&)), false>)
+  docstring: 
+FUN setPollMessagesFunc
+  signature: void setPollMessagesFunc(Rcpp::XPtr<bool (*)(), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<bool (*)()>(bool (**)()), false>)
+  docstring: 
+FUN setResponseData
+  signature: void setResponseData(int, int)
+  docstring: 
+FUN setSaveLocation
+  signature: void setSaveLocation(std::string, std::string)
+  docstring: 
+FUN setSendFunc
+  signature: void setSendFunc(Rcpp::XPtr<void (*)(char const*), Rcpp::PreserveStorage, &void Rcpp::standard_delete_finalizer<void (*)(char const*)>(void (**)(char const*)), false>)
+  docstring: 
+FUN setWriteSealLocation
+  signature: void setWriteSealLocation(std::string, std::string)
+  docstring: 
+FUN writeSealFilename
+  signature: Rcpp::String writeSealFilename()
+  docstring: 
+
+## classes
+CLASS jaspBoollist
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: bool [[(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Access element by fieldname (string) or index (int)
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD add
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void add(bool)
+    docstring: Add an element at the end of the indexable list
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD insert
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void insert(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspColumn
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setNominal
+    nargs: 2
+    void: FALSE
+    const: FALSE
+    signature: bool setNominal(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Overwrite the contents of the specified column with nominal data.
+  METHOD setNominalText
+    nargs: 2
+    void: FALSE
+    const: FALSE
+    signature: bool setNominalText(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Overwrite the contents of the specified column with nominal text data.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOrdinal
+    nargs: 2
+    void: FALSE
+    const: FALSE
+    signature: bool setOrdinal(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Overwrite the contents of the specified column with ordinal data.
+  METHOD setScale
+    nargs: 2
+    void: FALSE
+    const: FALSE
+    signature: bool setScale(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, bool)
+    docstring: Overwrite the contents of the specified column with scalar data.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspContainer
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD initCollapsed
+    cpp_class: bool
+    docstring: If this is set true the container will be collapsed initially.
+  FIELD length
+    cpp_class: int
+    docstring: Returns how many objects are stored in this container.
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::RObject_Impl<Rcpp::PreserveStorage> [[(std::string)
+    docstring: Retrieve an object from this container as specified under the fieldname.
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Insert an object into this container under a fieldname, if this object is a jaspObject and without a title it will get the fieldname as title.
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD findObjectWithUniqueNestedName
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::RObject_Impl<Rcpp::PreserveStorage> findObjectWithUniqueNestedName(std::string)
+    docstring: Find a jasp object from its unique name
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspDoublelist
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: double [[(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Access element by fieldname (string) or index (int)
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, double)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD add
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void add(double)
+    docstring: Add an element at the end of the indexable list
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD insert
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void insert(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, double)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspHtml
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD class
+    cpp_class: std::string
+    docstring: The Css-class of this element, for monospace one could use jasp-code or simply leave it empty.
+  FIELD elementType
+    cpp_class: std::string
+    docstring: The type of this html element, default is 'p' but other useful values include 'H1', 'h2' etc. If you want to write your own html element completely set this to ""
+  FIELD html
+    cpp_class: std::string
+    docstring: The text of this element
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD maxWidth
+    cpp_class: std::string
+    docstring: The Css-max-width property. It will be set on a span around your html.
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD text
+    cpp_class: Rcpp::String
+    docstring: The text of this element
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspIntlist
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: int [[(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Access element by fieldname (string) or index (int)
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, int)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD add
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void add(int)
+    docstring: Add an element at the end of the indexable list
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD insert
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void insert(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, int)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspObject
+  docstring: 
+  parents: 
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspPlot
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD aspectRatio
+    cpp_class: float
+    docstring: Stores the aspect ratio used to make the plot, will not redraw the plot on change.
+  FIELD editing
+    cpp_class: bool
+    docstring: If set to true will overwrite current png file when rendering a plot.
+  FIELD export
+    cpp_class: Rcpp::Vector<19, Rcpp::PreserveStorage>
+    docstring: Machine-readable context tagged onto this plot.
+  FIELD filePathPng
+    cpp_class: std::string
+    docstring: Stores the filepath to the image-file generated by the plot.
+  FIELD height
+    cpp_class: int
+    docstring: Stores the height used to make the plot, will not redraw the plot on change.
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD interactiveJsonData
+    cpp_class: std::string
+    docstring: Returns the relative path to the interactive plotly JSON data file.
+  FIELD plotObject
+    cpp_class: Rcpp::RObject_Impl<Rcpp::PreserveStorage>
+    docstring: Stores the plotObj used to generate the graphic, will (should) be stored in a way that is later accesible to saveImage an editImage.
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD resizedByUser
+    cpp_class: bool
+    docstring: If set to true, a user resized the plot and its width and height may be recycled in future runs of this analysis.
+  FIELD revision
+    cpp_class: int
+    docstring: return the current revision of the plot.
+  FIELD status
+    cpp_class: std::string
+    docstring: Stores the status of the plot, default is complete, set to 'running' if it takes a long time to calculate it.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  FIELD width
+    cpp_class: int
+    docstring: Stores the width used to make the plot, will not redraw the plot on change.
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspQmlSource
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD sourceID
+    cpp_class: std::string
+    docstring: The name of the qml object for which this r-source is meant.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD getValue
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string getValue()
+    docstring: Get json string encoded value
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setValue
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setValue(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Set R object to value
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspReport
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD report
+    cpp_class: bool
+    docstring: Should a report be sent/made?
+  FIELD text
+    cpp_class: Rcpp::String
+    docstring: The text of this element
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspResultsClass
+  docstring: 
+  parents: Rcpp_jaspContainer
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD initCollapsed
+    cpp_class: bool
+    docstring: If this is set true the container will be collapsed initially.
+  FIELD length
+    cpp_class: int
+    docstring: Returns how many objects are stored in this container.
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD relativePathKeep
+    cpp_class: std::string
+    docstring: The relative path to where state is kept
+  FIELD status
+    cpp_class: std::string
+    docstring: The status of the jaspResults object
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::RObject_Impl<Rcpp::PreserveStorage> [[(std::string)
+    docstring: Retrieve an object from this container as specified under the fieldname.
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Insert an object into this container under a fieldname, if this object is a jaspObject and without a title it will get the fieldname as title.
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD changeOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void changeOptions(std::string)
+    docstring: Changes the currently set options and removes all objects that depend on the changed options. Mostly useful for unit tests because this we we can simulate re-running the analysis. Should not be used in an analysis!
+  METHOD complete
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void complete()
+    docstring: Constructs the results/response-json and sends it to Desktop but sets status to complete first.
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD findObjectWithUniqueNestedName
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::RObject_Impl<Rcpp::PreserveStorage> findObjectWithUniqueNestedName(std::string)
+    docstring: Find a jasp object from its unique name
+  METHOD finishWriting
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void finishWriting()
+    docstring: Set seal for writing
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD getKeepList
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List getKeepList()
+    docstring: Builds a list of filenames to keep.
+  METHOD getOtherObjectsForState
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List getOtherObjectsForState()
+    docstring: Retrieves all non-plot objects to store them in state (currently only jaspState objects) . Makes a list with the envName of the object as name of the element.
+  METHOD getPlotObjectsForState
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List getPlotObjectsForState()
+    docstring: Retrieves all plot objects and stores them in a list with the filePath of the plot as name of the element.
+  METHOD getResults
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string getResults()
+    docstring: Returns the latest version of the results json as a string
+  METHOD prepareForWriting
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void prepareForWriting()
+    docstring: Remove seal for writing
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD saveResults
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void saveResults()
+    docstring: save results
+  METHOD send
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void send()
+    docstring: Constructs the results/response-json and sends it to Desktop, but only if jaspResults::setSendFunc was called with an appropriate sendFuncDef first.
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setErrorMessage
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setErrorMessage(Rcpp::String, std::string)
+    docstring: Sets an errormessage on the results.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setOptions(std::string)
+    docstring: Tells jaspResults which options are currently set, should not be used in an analysis!
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspState
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD object
+    cpp_class: Rcpp::RObject_Impl<Rcpp::PreserveStorage>
+    docstring: The object that you might want to keep for the next revision of your analysis.
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspStringlist
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[
+    nargs: 1
+    void: FALSE
+    const: FALSE
+    signature: std::string [[(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Access element by fieldname (string) or index (int)
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, std::string)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD add
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void add(std::string)
+    docstring: Add an element at the end of the indexable list
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD insert
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void insert(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, std::string)
+    docstring: Insert an element under index (int) or fieldname (string)
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.
+CLASS jaspTable
+  docstring: 
+  parents: Rcpp_jaspObject
+  FIELD colCombines
+    cpp_class: jaspList_Interface<bool>
+    docstring: List of column combines, single elements can be get and set here directly through [['']] notation but setting all columncombines at once should be done through setColFormats
+  FIELD colFormats
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of columnformats, single elements can be get and set here directly through [['']] notation but setting all columnformats at once should be done through setColFormats
+  FIELD colNames
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of columnnames, single elements can be get and set here directly through [['']] notation but setting all columnnames at once should be done through setColNames
+  FIELD colOvertitles
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of columnovertitles, single elements can be get and set here directly through [['']] notation but setting all columntitles at once should be done through setColTitles. If fieldnames are used to set the title (aka aTable$colOvertitles[['some text']]) then this will override any columntitle set by index for that specific columnname. What this means is that if the first column is named 'a' and you set both "colTitles[[0]] <- 'one'" and "colTitles[['a']] <- 'two'" than the first column will have 'two' as its title if it's name is 'a'.
+  FIELD colTitles
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of columntitles, single elements can be get and set here directly through [['']] notation but setting all columntitles at once should be done through setColTitles. If fieldnames are used to set the title (aka aTable$colTitles[['some text']]) then this will override any columntitle set by index for that specific columnname. What this means is that if the first column is named 'a' and you set both "colTitles[[0]] <- 'one'" and "colTitles[['a']] <- 'two'" than the first column will have 'two' as its title if it's name is 'a'.
+  FIELD colTypes
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of columntypes, single elements can be get and set here directly through [['']] notation but setting all columntypes at once should be done through setColTypes
+  FIELD info
+    cpp_class: Rcpp::String
+    docstring: Set info aka help MD for this object
+  FIELD position
+    cpp_class: int
+    docstring: Set the position of this object in it's container. By default this is at the end in the order of adding. You can specify any other value, they do not need to be next to each other or unique. The rule is: lower values (including negative) are higher in the container and when multiple objects in a container have the same position-value order is derived from adding-order.
+  FIELD rowNames
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of rownames, single elements can be get and set here directly through [['']] notation but setting all rownames at once should be done through setRowNames
+  FIELD rowTitles
+    cpp_class: jaspList_Interface<std::string>
+    docstring: List of rowtitles, single elements can be get and set here directly through [['']] notation but setting all rowtitles at once should be done through setRowTitles. This will respond in a similar manner to conflicts between an indexed title and a fieldnamed title. See documentation of colTitles.
+  FIELD showSpecifiedColumnsOnly
+    cpp_class: bool
+    docstring: If set to true will make only the specified columns (through addColumnInfo etc) show in the results.
+  FIELD status
+    cpp_class: std::string
+    docstring: The status of the table, usually (and by default) 'complete'
+  FIELD title
+    cpp_class: Rcpp::String
+    docstring: Set the title of this object
+  FIELD transpose
+    cpp_class: bool
+    docstring: If set to true will swap rows and columns in the results.
+  FIELD transposeWithOvertitle
+    cpp_class: bool
+    docstring: If set to true in combination with transpose == true it will use the first column of the data as overtitle.
+  FIELD type
+    cpp_class: std::string
+    docstring: The type of this jaspObject as a string, something like: container, table, plot, json, list, results, html, state
+  METHOD [[<-
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void [[<-(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Insert a single column into the table, if a string is used then it will look for an existing column name and set that column with the new data and otherwise will just add it at the end. If it is indexed by integer it will simply set it there.
+  METHOD addCitation
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addCitation(Rcpp::String)
+    docstring: Add a citation to this object
+  METHOD addColumnInfoHelper
+    nargs: 6
+    void: TRUE
+    const: FALSE
+    signature: void addColumnInfoHelper(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: addColumnInfoHelper(name=NULL, title=NULL, type=NULL, format=NULL, combine=NULL) -> Adds column info, an entry to columName wether you specify it or not and if the others are not NULL then they are set for the column
+  METHOD addColumns
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addColumns(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Add one or more columns to the object, this class accepts the same datatypes as setdata. Column- and rownames will be extracted as well but used only if the corresponding names aren't set yet.
+  METHOD addFootnoteHelper
+    nargs: 4
+    void: TRUE
+    const: FALSE
+    signature: void addFootnoteHelper(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: addFootnoteHelper(message=, symbol=NULL, column=NULL, row=NULL) === Add a footnote to the table, if column or row is not -1 it will be added to the specified column or row, if both are changed then it will be a footnote on a cell and otherwise it will just be a footnote of the entire table. A symbol may also be specified.
+  METHOD addMessage
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void addMessage(Rcpp::String)
+    docstring: Add a message to this object
+  METHOD addRow
+    nargs: 2 | 1
+    void: TRUE | TRUE
+    const: FALSE | FALSE
+    signature: void addRow(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::CharacterVector)
+    signature: void addRow(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Add a row to the table, where 'rows' is a list (of values) or vector. Before the data is added all existing columns will be made the same length by appending null-values. If the new data contains more columns than currently present empty columns will be added. Columnnames will be extracted and used to place the data in the correct column, they can be specified through the elementnames of a list, names of a data.frame and colnames of a matrix. To also set the rownames you can fill pass a characterVector with the desired names in the second argument.
+    docstring: Add a row to the table, where 'rows' is a list (of values) or vector. Before the data is added all existing columns will be made the same length by appending null-values. If the new data contains more columns than currently present empty columns will be added. Columnnames will be extracted and used to place the data in the correct column, they can be specified through the elementnames of a list, names of a data.frame and colnames of a matrix. To also set the rownames you can fill pass a characterVector with the desired names in the second argument.
+  METHOD addRows
+    nargs: 2 | 1
+    void: TRUE | TRUE
+    const: FALSE | FALSE
+    signature: void addRows(Rcpp::RObject_Impl<Rcpp::PreserveStorage>, Rcpp::CharacterVector)
+    signature: void addRows(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Add rows to the table, where 'rows' is a list (of rows), dataframe or matrix. Before the data is added all existing columns will be made the same length by appending null-values. If the new data contains more columns than currently present empty columns will be added. Columnnames will be extracted and used to place the data in the correct column, they can be specified through the elementnames of a list, names of a data.frame and colnames of a matrix. To also set the rownames you can fill pass a characterVector with the desired names in the second argument.
+    docstring: Add rows to the table, where 'rows' is a list (of rows), dataframe or matrix. Before the data is added all existing columns will be made the same length by appending null-values. If the new data contains more columns than currently present empty columns will be added. Columnnames will be extracted and used to place the data in the correct column, they can be specified through the elementnames of a list, names of a data.frame and colnames of a matrix. To also set the rownames you can fill pass a characterVector with the desired names in the second argument.
+  METHOD copyDependenciesFromJaspObject
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void copyDependenciesFromJaspObject(jaspObject_Interface*)
+    docstring: Will make the object depend on whatever the other jaspObject depends.
+  METHOD dependOnNestedOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnNestedOptions(Rcpp::CharacterVector)
+    docstring: Same as dependOnOptions but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD dependOnOptions
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void dependOnOptions(Rcpp::CharacterVector)
+    docstring: Will make the object depend on the current values of the options specified in the charactervector.
+  METHOD getError
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: bool getError()
+    docstring: Get the error status of this object.
+  METHOD print
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void print()
+    docstring: Prints the contents of the jaspObject
+  METHOD printHtml
+    nargs: 0
+    void: TRUE
+    const: FALSE
+    signature: void printHtml()
+    docstring: Prints the contents of the jaspObject nicely formatted as html
+  METHOD setColCombiness
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColCombiness(Rcpp::List)
+    docstring: Accepts a list of logicals to be used as columncombines, if the elements are named they will be accessible later through fieldname.
+  METHOD setColFormats
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColFormats(Rcpp::List)
+    docstring: Accepts a list of strings to be used as columnformats, if the elements are named they will be accessible later through fieldname.
+  METHOD setColNames
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColNames(Rcpp::List)
+    docstring: Accepts a list of strings to be used as columnnames, if the elements are named they will be accessible later through fieldname.
+  METHOD setColOvertitles
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColOvertitles(Rcpp::List)
+    docstring: Accepts a list of strings to be used as columnovertitles, if the elements are named they will be accessible later through fieldname.
+  METHOD setColTitles
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColTitles(Rcpp::List)
+    docstring: Accepts a list of strings to be used as columntitles, if the elements are named they will be accessible later through fieldname.
+  METHOD setColTypes
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setColTypes(Rcpp::List)
+    docstring: Accepts a list of strings to be used as columntypes, if the elements are named they will be accessible later through fieldname.
+  METHOD setData
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setData(Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Set the data of the table, this accepts lists, dataframes, matrices and vectors. If any column- or rownames are specified they are set on the object, but only if they aren't set yet. Any one-dimensional data given will be assumed to be a row.
+  METHOD setError
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setError(Rcpp::String)
+    docstring: Set an error message on this object that which be shown in JASP. Errors set on jaspContainers or jaspResults are propagated to children, such that the first child shows the error and the others are greyed out.
+  METHOD setExpectedColumns
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setExpectedColumns(unsigned long)
+    docstring: Set the expected size of this table to the specified columnCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.
+  METHOD setExpectedRows
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setExpectedRows(unsigned long)
+    docstring: Set the expected size of this table to the specified rowCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.
+  METHOD setExpectedSize
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setExpectedSize(unsigned long, unsigned long)
+    docstring: Set the expected size of this table to the specified columnCount and rowCount. It will make your table show up, filled with dots, at this size and as you add data the dots will be replaced with it.
+  METHOD setNestedOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setNestedOptionMustContainDependency(Rcpp::CharacterVector, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Same as setOptionMustContainDependency but the input vector is treated as a vector of keys that indicate a nested option.
+  METHOD setOptionMustBeDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustBeDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option and it's required value, if the analysis is restarted and this option is no longer defined (like that) it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setOptionMustContainDependency
+    nargs: 2
+    void: TRUE
+    const: FALSE
+    signature: void setOptionMustContainDependency(std::string, Rcpp::RObject_Impl<Rcpp::PreserveStorage>)
+    docstring: Specifies an option that should define an array and a required value that should be in it, if the analysis is restarted and this option is no longer defined or no longer contains the specified value it will automatically destroy the object. Otherwise it will keep it.
+  METHOD setRowNames
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setRowNames(Rcpp::List)
+    docstring: Accepts a list of strings to be used as rownames, if the elements are named they will be accessible later through fieldname.
+  METHOD setRowTitles
+    nargs: 1
+    void: TRUE
+    const: FALSE
+    signature: void setRowTitles(Rcpp::List)
+    docstring: Accepts a list of strings to be used as rowtitles, if the elements are named they will be accessible later through fieldname.
+  METHOD toHtml
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: std::string toHtml()
+    docstring: gives a string with the contents of the jaspObject nicely formatted as html
+  METHOD toRObject
+    nargs: 0
+    void: FALSE
+    const: FALSE
+    signature: Rcpp::List toRObject()
+    docstring: convert this jaspResults object (and possibly it's children) to R objects.

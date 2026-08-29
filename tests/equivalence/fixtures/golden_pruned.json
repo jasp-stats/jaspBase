@@ -1,0 +1,322 @@
+{
+	"id" : 42,
+	"progress" : 
+	{
+		"label" : "",
+		"value" : -1
+	},
+	"results" : 
+	{
+		".meta" : 
+		[
+			{
+				"info" : "some help text",
+				"name" : "intro",
+				"title" : "Introduction",
+				"type" : "htmlNode"
+			},
+			{
+				"info" : "",
+				"name" : "desc",
+				"title" : "Descriptives",
+				"type" : "table"
+			},
+			{
+				"info" : "",
+				"meta" : 
+				[
+					{
+						"info" : "",
+						"name" : "checks_homog",
+						"title" : "Homogeneity",
+						"type" : "htmlNode"
+					},
+					{
+						"info" : "",
+						"name" : "checks_norm",
+						"title" : "Normality",
+						"type" : "htmlNode"
+					}
+				],
+				"name" : "checks",
+				"title" : "Assumption Checks",
+				"type" : "collection"
+			},
+			{
+				"info" : "",
+				"name" : "boxplot",
+				"title" : "Boxplot",
+				"type" : "image"
+			},
+			{
+				"info" : "",
+				"name" : "report",
+				"title" : "Report",
+				"type" : "reportNode"
+			},
+			{
+				"info" : "",
+				"name" : "col",
+				"title" : "jaspColumn for computedCol",
+				"type" : "column"
+			},
+			{
+				"info" : "",
+				"name" : "qml",
+				"sourceID" : "priorWidthSlider",
+				"title" : "",
+				"type" : "qmlSource"
+			},
+			{
+				"info" : "",
+				"name" : "kept",
+				"title" : "Kept",
+				"type" : "htmlNode"
+			},
+			{
+				"info" : "",
+				"name" : "prunedTable",
+				"title" : "Pruned table",
+				"type" : "table"
+			}
+		],
+		"boxplot" : 
+		{
+			"aspectRatio" : 1.5,
+			"convertible" : true,
+			"data" : "state/figures/plot_0.png",
+			"editOptions" : null,
+			"editable" : false,
+			"errorType" : "fatalError",
+			"export" : null,
+			"height" : 320,
+			"interactive" : false,
+			"interactiveConvertError" : "",
+			"interactiveJsonData" : "",
+			"name" : "boxplot",
+			"reasonNotEditable" : "unknown reason",
+			"revision" : 0,
+			"status" : "complete",
+			"title" : "Boxplot",
+			"width" : 480
+		},
+		"checks" : 
+		{
+			"collection" : 
+			{
+				"checks_homog" : 
+				{
+					"class" : "",
+					"elementType" : "p",
+					"maxWidth" : "15cm",
+					"name" : "checks_homog",
+					"rawtext" : "variances are equal",
+					"text" : "<p>variances are equal </p>",
+					"title" : "Homogeneity"
+				},
+				"checks_norm" : 
+				{
+					"class" : "",
+					"elementType" : "p",
+					"maxWidth" : "15cm",
+					"name" : "checks_norm",
+					"rawtext" : "normality looks fine",
+					"text" : "<p>normality looks fine </p>",
+					"title" : "Normality"
+				}
+			},
+			"initCollapsed" : true,
+			"name" : "checks",
+			"title" : "Assumption Checks"
+		},
+		"col" : 
+		{
+			"columnName" : "computedCol",
+			"columnType" : "unknown",
+			"dataChanged" : false,
+			"removed" : false,
+			"typeChanged" : false
+		},
+		"desc" : 
+		{
+			"casesAcrossColumns" : false,
+			"data" : 
+			[
+				{
+					"int" : 1,
+					"lgl" : true,
+					"num" : 1.5,
+					"txt" : "a &lt; b"
+				},
+				{
+					".footnotes" : 
+					{
+						"txt" : 
+						[
+							2
+						]
+					},
+					"int" : 2,
+					"lgl" : false,
+					"num" : 2.5,
+					"txt" : "x &amp; y"
+				},
+				{
+					"int" : 3,
+					"lgl" : true,
+					"num" : "",
+					"txt" : ""
+				},
+				{
+					"int" : 4,
+					"lgl" : "",
+					"num" : 4.5,
+					"txt" : "plain"
+				}
+			],
+			"footnotes" : 
+			[
+				{
+					"cols" : null,
+					"myOrder" : 0,
+					"rows" : null,
+					"symbol" : 0,
+					"text" : "table-level note"
+				},
+				{
+					"cols" : 
+					[
+						"num"
+					],
+					"myOrder" : 8,
+					"rows" : null,
+					"symbol" : "*",
+					"text" : "column note"
+				},
+				{
+					"cols" : 
+					[
+						"txt"
+					],
+					"myOrder" : 18,
+					"rows" : 
+					[
+						"r2"
+					],
+					"symbol" : "#",
+					"text" : "cell note"
+				}
+			],
+			"name" : "desc",
+			"overTitle" : false,
+			"schema" : 
+			{
+				"fields" : 
+				[
+					{
+						".footnotes" : 
+						[
+							1
+						],
+						"name" : "num",
+						"title" : "Numeric",
+						"type" : "number"
+					},
+					{
+						"name" : "int",
+						"title" : "Integer",
+						"type" : "integer"
+					},
+					{
+						"name" : "txt",
+						"title" : "Text",
+						"type" : "string"
+					},
+					{
+						"name" : "lgl",
+						"title" : "Logical",
+						"type" : "logical"
+					}
+				]
+			},
+			"status" : "complete",
+			"title" : "Descriptives"
+		},
+		"intro" : 
+		{
+			"citation" : 
+			[
+				"JASP Team (2026). Golden baseline."
+			],
+			"class" : "",
+			"elementType" : "h2",
+			"maxWidth" : "15cm",
+			"name" : "intro",
+			"rawtext" : "Intro with <b>tags</b>, a < b & c > d.",
+			"text" : "<h2>Intro with <b>tags</b>, a < b & c > d. </h2>",
+			"title" : "Introduction"
+		},
+		"kept" : 
+		{
+			"class" : "",
+			"elementType" : "p",
+			"maxWidth" : "15cm",
+			"name" : "kept",
+			"rawtext" : "depends on hypothesis",
+			"text" : "<p>depends on hypothesis </p>",
+			"title" : "Kept"
+		},
+		"name" : "",
+		"prunedTable" : 
+		{
+			"casesAcrossColumns" : false,
+			"data" : 
+			[
+				{
+					"v" : 1.0
+				},
+				{
+					"v" : 2.0
+				},
+				{
+					"v" : 3.0
+				}
+			],
+			"footnotes" : [],
+			"name" : "prunedTable",
+			"overTitle" : false,
+			"schema" : 
+			{
+				"fields" : 
+				[
+					{
+						"name" : "v",
+						"title" : "v",
+						"type" : "number"
+					}
+				]
+			},
+			"status" : "running",
+			"title" : "Pruned table"
+		},
+		"qml" : 
+		{
+			"sourceID" : "priorWidthSlider"
+		},
+		"report" : 
+		{
+			"analysisId" : 42,
+			"html" : "<div class=\"jaspReport jaspReportDont\"><div class=\"jaspReportTitleRow\"> <div class=\"jaspReportIcon jaspReportIconDont\" alt=\"Info: \"/><h1 class=\"jaspReportTitle\">Report</h1></div><p>A warning worth reporting.</p></div>",
+			"name" : "report",
+			"rawtext" : "A warning worth reporting.",
+			"report" : false,
+			"title" : "hide me",
+			"topHtml" : "",
+			"warningIndex" : 0,
+			"warningsTotal" : 0
+		}
+	},
+	"revision" : 7,
+	"status" : "running",
+	"typeRequest" : "analysis"
+}

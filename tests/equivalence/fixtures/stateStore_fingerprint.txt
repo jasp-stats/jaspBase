@@ -1,0 +1,10 @@
+pre-results state roundtrip identical: TRUE
+fresh plot dims: 0x0 aspectRatio=0
+state roundtrip identical: TRUE
+state print says object stored yes: TRUE
+empty state print says object stored no: TRUE
+harvest names: state_1,state_2
+harvest length: 2
+harvest state_1 identical to val: TRUE
+harvest state_2 identical to vec: TRUE
+keep length: 3
