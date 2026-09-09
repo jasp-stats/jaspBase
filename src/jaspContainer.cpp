@@ -78,6 +78,9 @@ Rcpp::RObject jaspContainer::at(std::string field)
 
 Rcpp::RObject jaspContainer::wrapJaspObject(jaspObject * ref)
 {
+	if(ref == nullptr) //findObjectWithUniqueNestedName and friends return nullptr when they find nothing, R checks for NULL
+		return R_NilValue;
+
 	switch(ref->getType())
 	{
 	case jaspObjectType::container:	return Rcpp::wrap(jaspContainer_Interface(ref));
