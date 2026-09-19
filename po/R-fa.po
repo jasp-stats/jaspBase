@@ -2,89 +2,107 @@ msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.20.4\n"
 "POT-Creation-Date: 2026-04-11 04:23\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2026-09-15 03:59+0000\n"
+"Last-Translator: Sohrab Delshad <sdel4030@gmail.com>\n"
+"Language-Team: Persian <https://hosted.weblate.org/projects/jasp/jaspbase/"
+"fa/>\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 2026.10.dev0\n"
 
 msgid "<em>Note.</em>"
-msgstr ""
+msgstr "<em>یادداشت.</em>"
 
 msgid "no plot object was found"
-msgstr ""
+msgstr "هیچ شیء نموداری یافت نشد"
 
 msgid "The following problem(s) occurred while running the analysis:"
-msgstr ""
+msgstr "مشکل(های) زیر هنگام اجرای تحلیل رخ داد:"
 
 msgid "after grouping on %s"
-msgstr ""
+msgstr "پس از گروه‌بندی بر اساس %s"
 
 msgid "This analysis terminated unexpectedly. %s To receive assistance with this problem, please report the message above at: https://jasp-stats.org/bug-reports"
 msgstr ""
+"این تحلیل به طور غیرمنتظره‌ای متوقف شد. %s برای دریافت کمک در مورد این مشکل، "
+"لطفاً پیام بالا را در آدرس زیر گزارش دهید: https://jasp-stats.org/bug-reports"
 
 msgid "Infinity found in %s"
-msgstr ""
+msgstr "بی‌نهایت در %s یافت شد"
 
 msgid "Number of factor levels is %1$s in %2$s"
-msgstr ""
+msgstr "تعداد سطوح عامل در %2$s برابر با %1$s است"
 
 msgid "The variance in %1$s is equal to %2$s"
-msgstr ""
+msgstr "واریانس در %1$s برابر با %2$s است"
 
 msgid "Number of observations is %1$s in %2$s"
-msgstr ""
+msgstr "تعداد مشاهدات در %2$s برابر با %1$s است"
 
 msgid "Cannot compute statistic reliably: number of observations is %1$s in %2$s"
 msgstr ""
+"نمی‌توان آماره را به طور قابل اعتمادی محاسبه کرد: تعداد مشاهدات در %2$s برابر "
+"با %1$s است"
 
 msgid "Values in %1$s outside interval [%2$s, %3$s]"
-msgstr ""
+msgstr "مقادیر در %1$s خارج از بازه [%2$s، %3$s] هستند"
 
 msgid "Dataset is not a proper variance-covariance matrix. Please load only a positive definite symmetrical matrix as your dataset."
 msgstr ""
+"مجموعه‌داده یک ماتریس واریانس-کوواریانس مناسب نیست. لطفاً فقط یک ماتریس متقارن "
+"معین مثبت را به عنوان مجموعه‌داده خود بارگذاری کنید."
 
 msgid "The variance-covariance matrix of the supplied data is not positive-definite. Please check if variables have many missings observations or are collinear"
 msgstr ""
+"ماتریس واریانس-کوواریانس داده‌های ارائه‌شده معین مثبت نیست. لطفاً بررسی کنید که "
+"آیا متغیرها دارای مشاهدات گم‌شده زیادی هستند یا هم‌خطی دارند"
 
 msgid "Main effects and lower-order interactions must be included whenever the corresponding higher-order interaction is included"
 msgstr ""
+"اثرات اصلی و تعاملات مرتبه پایین‌تر باید هر زمان که تعامل مرتبه بالاتر مربوطه "
+"گنجانده می‌شود، لحاظ گردند"
 
 msgid "Negative numbers found in %s"
-msgstr ""
+msgstr "اعداد منفی در %s یافت شد"
 
 msgid "Missing values encountered in %s"
-msgstr ""
+msgstr "مقادیر گم‌شده در %s مشاهده شد"
 
 msgid "Duplicate variables encountered in %s"
-msgstr ""
+msgstr "متغیرهای تکراری در %s مشاهده شد"
 
 msgid "Over %s%% of the rows consist entirely of missing values. Please remove these rows from the data set if you wish to continue."
 msgstr ""
+"بیش از %s%% از ردیف‌ها کاملاً از مقادیر گم‌شده تشکیل شده‌اند. در صورت تمایل به "
+"ادامه، لطفاً این ردیف‌ها را از مجموعه‌داده حذف کنید."
 
 msgid "Levene's test is significant (p < .05), suggesting a violation of the equal variance assumption"
 msgstr ""
+"آزمون لوین معنادار است (p < .05)، که نشان‌دهنده نقض فرض برابری واریانس‌ها است."
 
 msgid "Vovk-Sellke Maximum <em>p</em>-Ratio: Based on the <em>p</em>-value, the maximum possible odds in favor of H%1$s over H%2$s equals 1/(-e <em>p</em> log(<em>p</em>)) for <em>p</em> %3$s .37 (Sellke, Bayarri, & Berger, 2001)."
 msgstr ""
+"حداکثر نسبت <em>p</em> ووک-سلکه: بر اساس مقدار <em>p</em>، حداکثر شانس ممکن "
+"به نفع H%1$s در برابر H%2$s برابر با 1/(-e <em>p</em> log(<em>p</em>)) برای "
+"<em>p</em> %3$s .37 است (سلکه، بایاری و برگر، 2001)."
 
 msgid "Proportions tested against value: %s"
-msgstr ""
+msgstr "نسبت‌های آزمون‌شده در برابر مقدار: %s"
 
 msgid "For all tests, the alternative hypothesis specifies that the proportion is less than %s"
-msgstr ""
+msgstr "برای همه آزمون‌ها، فرض مقابل مشخص می‌کند که نسبت کمتر از %s است"
 
 msgid "For all tests, the alternative hypothesis specifies that the proportion is greater than %s"
-msgstr ""
+msgstr "برای همه آزمون‌ها، فرض مقابل مشخص می‌کند که نسبت بیشتر از %s است"
 
 msgid "Could not find message for class %1$s and type %2$s"
-msgstr ""
+msgstr "پیامی برای کلاس %1$s و نوع %2$s یافت نشد"
 
 msgid "The following error occured while converting a ggplot to plotly: %s"
-msgstr ""
+msgstr "خطای زیر هنگام تبدیل یک ggplot به plotly رخ داد: %s"
 
 msgid "No interactive plot generated..."
-msgstr ""
+msgstr "هیچ نمودار تعاملی تولید نشد..."
