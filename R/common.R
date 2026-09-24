@@ -30,16 +30,20 @@ loadJaspResults <- function(name) {
   create_cpp_jaspResults(name, .retrieveState())
 }
 
-finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
+finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE, saveState = TRUE) {
 
-  jaspResultsCPP$prepareForWriting()
+  if (saveState) {
 
-  newState <- list(
-    figures = jaspResultsCPP$getPlotObjectsForState(),
-    other   = jaspResultsCPP$getOtherObjectsForState()
-  )
+    jaspResultsCPP$prepareForWriting()
 
-  jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
+    newState <- list(
+      figures = jaspResultsCPP$getPlotObjectsForState(),
+      other   = jaspResultsCPP$getOtherObjectsForState()
+    )
+
+    jaspResultsCPP$relativePathKeep <- .saveState(newState)$relativePath
+
+  }
 
   returnThis <- NULL
   if (calledFromAnalysis) {
@@ -1119,11 +1123,29 @@ editImage <- function(name, optionsJson) {
           newPlot[[i]] <- ggplot2:::plot_clone(newPlot[[i]])
       }
 
-      newOpts       <- optionsList[["editOptions"]]
-      oldOpts       <- jaspGraphs::plotEditingOptions(plot)
-      newOpts$xAxis <- list(type = oldOpts$xAxis$type, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
-      newOpts$yAxis <- list(type = oldOpts$yAxis$type, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
-      newPlot       <- jaspGraphs::plotEditing(newPlot, newOpts)
+      newOpts <- optionsList[["editOptions"]]
+
+      # Read axis types from the C++ JSON instead of calling
+      # plotEditingOptions(plot) which would trigger an expensive
+      # ggplot_build() just to extract the types.
+      xType <- newOpts[["xAxis"]][["type"]]
+      yType <- newOpts[["yAxis"]][["type"]]
+
+      # If types are missing from the JSON (shouldn't happen in normal
+      # operation), fall back to the old behaviour.
+      if (is.null(xType) || is.null(yType) || !nzchar(xType) || !nzchar(yType)) {
+        oldOpts       <- jaspGraphs::plotEditingOptions(plot)
+        xType         <- oldOpts[["xAxis"]][["type"]]
+        yType         <- oldOpts[["yAxis"]][["type"]]
+      }
+
+      newOpts$xAxis <- list(type = xType, settings = newOpts$xAxis$settings[names(newOpts$xAxis$settings) != "type"])
+      newOpts$yAxis <- list(type = yType, settings = newOpts$yAxis$settings[names(newOpts$yAxis$settings) != "type"])
+
+      # Build the plot once and pass the result to plotEditing so that
+      # ggplot_build() is called exactly once instead of twice.
+      ggbuild <- ggplot2::ggplot_build(newPlot)
+      newPlot <- jaspGraphs::plotEditing(newPlot, newOpts, ggbuild = ggbuild)
 
       # plot editing did nothing or was canceled
       isDifferent <- if (ggplot2::is_ggplot(plot)) {
@@ -1139,7 +1161,11 @@ editImage <- function(name, optionsJson) {
     interactiveJsonData <- jaspPlotCPP$interactiveJsonData
     revision <- jaspPlotCPP$revision
 
-    finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE)
+    # Debounced (intermediate) edits skip the state save: the edits are
+    # applied from scratch each time using the JSON options, so persisting
+    # state after every preview is unnecessary overhead.
+    intermediate <- isTRUE(optionsList[["intermediate"]])
+    finishJaspResults(jaspResultsCPP, calledFromAnalysis = FALSE, saveState = !intermediate)
 
   })
 
