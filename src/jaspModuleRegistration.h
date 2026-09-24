@@ -37,6 +37,7 @@ RCPP_MODULE(jaspResults)
 	Rcpp::function("writeSealFilename",					jaspResults::writeSealFilename);
 	Rcpp::function("setResponseData",					jaspResults::setResponseData);
 	Rcpp::function("setDeveloperMode",					jaspResults::setDeveloperMode);
+	Rcpp::function("getDeveloperMode",					jaspResults::getDeveloperMode);
 	Rcpp::function("setSaveLocation",					jaspResults::setSaveLocation);
 	Rcpp::function("setWriteSealLocation",				jaspResults::setWriteSealLocation);
 
