@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -105,8 +105,25 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
   dataset     <- NULL
+  datasets    <- NULL
 
-  if(preloadData)
+  multiDataSet <- .isMultiDataSetJson(multiDataSetJson)
+
+  if (multiDataSet) {
+    # Multi-dataset aware run: the engine queued every dataset this analysis references (see
+    # Engine::runAnalysis), one read per queued call below. Keyed by dataset id, with the user facing
+    # titles attached as an attribute; the datasets arrive as a parameter, readDataSet* is broken here.
+    dsInfo <- fromJSON(multiDataSetJson)
+    ids    <- as.character(dsInfo$ids)
+
+    .multiDataSetMode(TRUE)
+    on.exit(.multiDataSetMode(FALSE), add = TRUE)
+
+    datasets <- lapply(ids, function(id) .fromRCPP(".readDataSetRequestedNative"))
+    names(datasets) <- ids
+    attr(datasets, "dataSetNames") <- dsInfo$names
+
+  } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
@@ -114,7 +131,10 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysisResult <-
     tryCatch(
-      expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
+      expr=withCallingHandlers(expr=if (multiDataSet)
+                                       analysis(jaspResults=jaspResults, dataset=NULL, options=options, datasets=datasets)
+                                     else
+                                       analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
@@ -260,6 +280,34 @@ isTryError <- function(obj){
   return(cols);
 }
 
+# ---------------------------------------------------------------------------
+# Multi-dataset aware runs
+#
+# A multiDataSetAware analysis gets every dataset it needs as the `datasets` parameter of
+# runJaspResults (and thus of the analysis function), instead of reading "the" dataset through
+# the readDataSet* functions below. While such a run is active those read functions stop: the
+# very notion of one current dataset is meaningless when an analysis runs on several.
+# ---------------------------------------------------------------------------
+
+.multiDataSetState <- new.env(parent = emptyenv())
+
+.multiDataSetMode <- function(set = NULL) {
+  if (!is.null(set)) .multiDataSetState$active <- set
+  isTRUE(.multiDataSetState$active)
+}
+
+.stopIfMultiDataSetMode <- function(what) {
+  if (.multiDataSetMode())
+    stop(sprintf(paste0("%s() is not available in multi-dataset aware analyses; those get the datasets they ",
+                        "need as the `datasets` argument (a named list, keyed by dataset id; ",
+                        "attr(datasets, \"dataSetNames\") maps those ids to the dataset titles)."), what),
+         call. = FALSE)
+}
+
+.isMultiDataSetJson <- function(multiDataSetJson) {
+  !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
+}
+
 #' @title readDataSetByVariableTypes
 #'
 #' @param options options from QML.
@@ -271,6 +319,8 @@ isTryError <- function(obj){
 #'
 #' @export
 readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL) {
+
+  .stopIfMultiDataSetMode("readDataSetByVariableTypes")
 
   if (!is.list(options))
     stop(".readDataSetByVariableTypes received `options` that are not a list.")
@@ -375,6 +425,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 #' @export
 .readDataSetToEnd <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
 
+  .stopIfMultiDataSetMode("readDataSet")
+
   columns              <- .readDataSetCleanNAs(columns)
   columns.as.numeric   <- .readDataSetCleanNAs(columns.as.numeric)
   columns.as.ordinal   <- .readDataSetCleanNAs(columns.as.ordinal)
@@ -393,6 +445,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 #' @export
 .readFullDataset <- function(exclude.na.listwise=NULL, ...) {
 
+  .stopIfMultiDataSetMode("readFullDataset")
+
   exclude.na.listwise  <- .readDataSetCleanNAs(exclude.na.listwise)
 
   dataset <- .fromRCPP(".readFullDatasetToEnd")
@@ -403,6 +457,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 
 #' @export
 .readDataSetHeader <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
+
+  .stopIfMultiDataSetMode("readDataSetHeader")
 
   columns              <- .readDataSetCleanNAs(columns)
   columns.as.numeric   <- .readDataSetCleanNAs(columns.as.numeric)
