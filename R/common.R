@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL, datasets = NULL) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -107,9 +107,21 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   dataset     <- NULL
   datasets    <- NULL
 
-  multiDataSet <- .isMultiDataSetJson(multiDataSetJson)
+  multiDataSet <- !is.null(datasets) || .isMultiDataSetJson(multiDataSetJson)
 
-  if (multiDataSet) {
+  if (!is.null(datasets)) {
+    # R-side handout (jaspSyntax wrappers / jaspTools): the user delivered the datasets as a
+    # named list themselves, which already carries all the information multiDataSetJson would:
+    # the names are the dataset ids (a title attribute is optional), so everything is derived
+    # from here and no queued engine reads are involved.
+    names(datasets) <- as.character(names(datasets))
+    if (is.null(attr(datasets, "dataSetNames")))
+      attr(datasets, "dataSetNames") <- as.list(names(datasets))
+
+    .multiDataSetMode(TRUE)
+    on.exit(.multiDataSetMode(FALSE), add = TRUE)
+
+  } else if (multiDataSet) {
     # Multi-dataset aware run: the engine queued every dataset this analysis references (see
     # Engine::runAnalysis), one read per queued call below. Keyed by dataset id, with the user facing
     # titles attached as an attribute; the datasets arrive as a parameter, readDataSet* is broken here.
@@ -488,14 +500,20 @@ getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
       return(dataSet)
   }
 
-  # No (or dangling) id: the primary dataset, which is what unencoded names belong to.
+  # No (or dangling) id: unencoded names belong to the primary dataset if it has such a
+  # column, else to the first dataset that does (R wrapper mode hands over plain names and
+  # cannot encode per dataset), else to `default` (which by default is the primary again).
   primary <- datasets[[1]]
   if (is.null(primary))
     return(default)
 
   name <- sub("\\.(scale|ordinal|nominal)$", "", as.character(encoded))
-  if (name %in% names(primary) || identical(primary, default))
+  if (name %in% names(primary))
     return(primary)
+
+  for (candidate in datasets)
+    if (name %in% names(candidate))
+      return(candidate)
 
   default
 }
@@ -1425,8 +1443,22 @@ storeDataSet <- function(dataset) {
   jaspSyntax::loadDataSet(dataset)
 }
 
+#' @title storeDataSets
+#'
+#' @description Store several datasets in the JASP syntax bridge at once, for a
+#'   multiDataSetAware analysis run from R (the wrapper form of
+#'   `for (ds in datasets) jaspSyntax::loadDataSet(ds)`).
+#'
+#' @param datasets named list of dataframes, keyed by dataset id.
+#'
 #' @export
-runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData) {
+storeDataSets <- function(datasets) {
+  for (ds in datasets) jaspSyntax::loadDataSet(ds)
+  invisible(NULL)
+}
+
+#' @export
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, datasets = NULL) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
@@ -1437,7 +1469,14 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     # The wrapper is called inside an R environment (R Studio probably).
     # The options must be parsed and checked by the QML form, and then the real analysis can be called.
     qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
-    # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
+
+    # A multiDataSetAware wrapper hands over its datasets as a named list instead of a single
+    # data: store them all in the syntax bridge (so the QML form and any readDataSet-free
+    # column lookups see them) and run the analysis in multi-dataset mode. runJaspResults
+    # derives ids and titles from the list itself, so no multiDataSetJson is needed here.
+    if (!is.null(datasets))
+      storeDataSets(datasets)
+
     options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
     if (options == "")
@@ -1445,7 +1484,7 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
 
      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData, datasets=datasets))
   }
 }
 
