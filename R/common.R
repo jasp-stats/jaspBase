@@ -308,6 +308,117 @@ isTryError <- function(obj){
   !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
 }
 
+# ---- dataset-aware decoding of encoded column names --------------------------------------------
+#
+# Every DataSet has its own ColumnEncoder whose prefix embeds the dataset id
+# (DataSet::setupEncoderPrefix in jasp-desktop: "JASPColumn_<dataSetId>_<counter>"), so an encoded
+# column name intrinsically tells you which dataset its column belongs to. Names encoded before the
+# id was embedded ("JASPColumn_<counter>", the legacy single-dataset form) carry no id and belong to
+# the primary dataset. These functions mirror ColumnEncoder::dataSetIdFromEncoded in C++, but stay
+# pure R so that analyses and unit tests can route values without an engine roundtrip.
+
+.dataSetIdFromEncodedOne <- function(encoded) {
+  if (!is.character(encoded) || length(encoded) != 1L || is.na(encoded))
+    return(NA_integer_)
+
+  # An option value may carry the column type as a suffix ("...scale/.ordinal/.nominal") and, while
+  # the encoder is busy replacing names, a "_For_Replacement" postfix; neither is part of the id.
+  name <- sub("_(For_Replacement)?$", "", sub("\\.(scale|ordinal|nominal)$", "", encoded))
+
+  match <- regmatches(name, regexec("^JASPColumn_([0-9]+)_([0-9]+)$", name))[[1]]
+  if (length(match) == 3L)
+    return(as.integer(match[2]))
+
+  # Legacy "JASPColumn_<counter>" has no dataset id embedded; an unencoded column name neither.
+  NA_integer_
+}
+
+#' @title dataSetIdFromEncoded
+#'
+#' @description Recover the dataset id from an encoded column name.
+#'
+#' @param encoded character vector, (possibly type-suffixed) encoded column names like they show up
+#'   in the options of a multiDataSetAware analysis.
+#'
+#' @details
+#' Encoded names embed the id of the dataset they belong to ("JASPColumn_<dataSetId>_<counter>"),
+#' so this routes any option value to its dataset: `datasets[[dataSetIdFromEncoded(x)]]`. Names
+#' without an embedded id (legacy "JASPColumn_<counter>" or plain column names) yield NA; use
+#' [getDataSetFor()] if you want those to fall back to the primary dataset.
+#'
+#' @return integer vector, the dataset ids (NA where no id is embedded).
+#'
+#' @export
+dataSetIdFromEncoded <- function(encoded) vapply(encoded, .dataSetIdFromEncodedOne, integer(1L), USE.NAMES = FALSE)
+
+#' @title dataSetNameFromEncoded
+#'
+#' @description Recover the title of the dataset an encoded column name belongs to.
+#'
+#' @param encoded character, one (possibly type-suffixed) encoded column name.
+#' @param datasets the `datasets` list of a multiDataSetAware analysis (ids as names, titles in
+#'   `attr(datasets, "dataSetNames")`).
+#'
+#' @details
+#' Looks up `dataSetIdFromEncoded(encoded)` in `attr(datasets, "dataSetNames")`. Without an embedded
+#' id (legacy or plain names) the title of the primary (first) dataset is returned, which is what
+#' those names belong to.
+#'
+#' @return character vector with the dataset titles (NA when the id is not in `datasets`).
+#'
+#' @export
+dataSetNameFromEncoded <- function(encoded, datasets) {
+  titles <- attr(datasets, "dataSetNames")
+  ids    <- dataSetIdFromEncoded(encoded)
+
+  vapply(seq_along(encoded), function(i) {
+    id <- ids[[i]]
+    if (is.na(id)) id <- names(datasets)[[1]]
+    key <- as.character(id)
+    if (!is.null(titles) && key %in% names(titles)) as.character(titles[[key]]) else NA_character_
+  }, character(1L), USE.NAMES = FALSE)
+}
+
+#' @title getDataSetFor
+#'
+#' @description The dataset a particular (encoded) column name came from.
+#'
+#' @param encoded character, one (possibly type-suffixed) encoded column name.
+#' @param datasets the `datasets` list of a multiDataSetAware analysis.
+#' @param default dataset to return when `encoded` carries no dataset id and could not be found in
+#'   the primary dataset either; by default the primary (first) dataset itself.
+#'
+#' @details
+#' `datasets[[dataSetIdFromEncoded(encoded)]]` with the obvious fallbacks: names without an embedded
+#' id (and ids of datasets that are not in `datasets`, should they ever show up) end up at the
+#' primary dataset, and when that does not have such a column either `default` is returned. Note
+#' that the dataframes in `datasets` carry their original column names, so a still-encoded value is
+#' tried against those names decoded as far as possible (the trailing ".type" is dropped).
+#'
+#' @return the data.frame of the dataset this column belongs to.
+#'
+#' @export
+getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
+  id <- dataSetIdFromEncoded(encoded)
+
+  if (!is.na(id)) {
+    dataSet <- datasets[[as.character(id)]]
+    if (!is.null(dataSet))
+      return(dataSet)
+  }
+
+  # No (or dangling) id: the primary dataset, which is what unencoded names belong to.
+  primary <- datasets[[1]]
+  if (is.null(primary))
+    return(default)
+
+  name <- sub("\\.(scale|ordinal|nominal)$", "", as.character(encoded))
+  if (name %in% names(primary) || identical(primary, default))
+    return(primary)
+
+  default
+}
+
 #' @title readDataSetByVariableTypes
 #'
 #' @param options options from QML.
