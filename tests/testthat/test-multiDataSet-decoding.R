@@ -57,6 +57,40 @@ test_that("getDataSetFor falls back to default for columns the primary lacks", {
   expect_identical(getDataSetFor("age", datasets, default = fallback), datasets[[1]])
 })
 
+makeDatasetsWithEncoded <- function() {
+  datasets <- makeDatasets()
+  # the map runJaspResults snapshots while each slice's encoder is current: original -> encoded
+  attr(datasets, "dataSetEncodedNames") <- list(
+    "11" = c(age = "JASPColumn_11_0"),
+    "12" = c(age = "JASPColumn_12_1", score = "JASPColumn_12_0")
+  )
+  datasets
+}
+
+test_that("dataSetColumnFromEncoded resolves through the snapshotted maps (no engine)", {
+  datasets <- makeDatasetsWithEncoded()
+
+  expect_equal(dataSetColumnFromEncoded("JASPColumn_12_0", datasets), "score")
+  expect_equal(dataSetColumnFromEncoded("JASPColumn_12_1.nominal", datasets), "age")
+  expect_equal(dataSetColumnFromEncoded("JASPColumn_11_0", datasets), "age")
+})
+
+test_that("dataSetColumnFromEncoded degrades to the stripped name without maps or engine", {
+  datasets <- makeDatasets()  # no dataSetEncodedNames attribute
+
+  expect_equal(dataSetColumnFromEncoded("JASPColumn_12_0.scale", datasets), "JASPColumn_12_0")
+  expect_equal(dataSetColumnFromEncoded("age", datasets), "age")           # plain name as-is
+})
+
+test_that("getDataSetColumn grabs the data out of the right dataset", {
+  datasets <- makeDatasetsWithEncoded()
+
+  expect_identical(getDataSetColumn("JASPColumn_12_1", datasets), c(3, 4))     # age of Beta
+  expect_identical(getDataSetColumn("JASPColumn_12_0.nominal", datasets), c(5, 6)) # score of Beta
+  expect_identical(getDataSetColumn("JASPColumn_11_0", datasets), c(1, 2))     # age of Alpha
+  expect_null(getDataSetColumn("JASPColumn_99_0", datasets))                   # dangling -> primary has no score
+})
+
 test_that("the helpers work on the datasets list runJaspResults builds", {
   # same shape as the real handout: keyed by dataset id, titles as attribute
   datasets <- list(data.frame(Sepal.Length = 1:3), data.frame(Sepal.Length = 4:6))

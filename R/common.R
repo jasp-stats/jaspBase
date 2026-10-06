@@ -119,9 +119,24 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     .multiDataSetMode(TRUE)
     on.exit(.multiDataSetMode(FALSE), add = TRUE)
 
-    datasets <- lapply(ids, function(id) .fromRCPP(".readDataSetRequestedNative"))
-    names(datasets) <- ids
-    attr(datasets, "dataSetNames") <- dsInfo$names
+    # The engine switches its current encoder to the slice's dataset for every read (see
+    # rbridge_readDataSetRequested), so right after a read is the only moment this dataset's
+    # encoded names can be resolved. Snapshot an encoded -> original name map per dataset now;
+    # dataSetColumnFromEncoded() uses those maps later, when the analysis runs and the current
+    # encoder is whatever the last read left behind.
+    datasets            <- list()
+    encodedNamesPerDs   <- list()
+
+    for (id in ids) {
+      df <- .fromRCPP(".readDataSetRequestedNative")
+      encodedNamesPerDs[[id]] <- vapply(names(df), function(columnName) {
+        tryCatch(as.character(.encodeColNamesStrict(columnName)), error = function(e) NA_character_)
+      }, character(1L), USE.NAMES = TRUE)
+      datasets[[id]] <- df
+    }
+
+    attr(datasets, "dataSetNames")        <- dsInfo$names
+    attr(datasets, "dataSetEncodedNames") <- encodedNamesPerDs
 
   } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
@@ -377,6 +392,72 @@ dataSetNameFromEncoded <- function(encoded, datasets) {
     key <- as.character(id)
     if (!is.null(titles) && key %in% names(titles)) as.character(titles[[key]]) else NA_character_
   }, character(1L), USE.NAMES = FALSE)
+}
+
+#' @title dataSetColumnFromEncoded
+#'
+#' @description Recover the original column name of an encoded column name.
+#'
+#' @param encoded character, one (possibly type-suffixed) encoded column name.
+#' @param datasets the `datasets` list of a multiDataSetAware analysis.
+#'
+#' @details
+#' Decoding goes through the engine so the right dataset's encoder is used: inside the engine the
+#' `.decodeColNamesForDataSet` callback decodes against the encoder of the dataset named in the
+#' encoded value itself (falling back to the current encoder for legacy names). Outside the engine
+#' the maps that runJaspResults snapshotted per read (`attr(datasets, "dataSetEncodedNames")`) are
+#' consulted; failing both the name is returned with at most the type suffix stripped.
+#'
+#' @return character, the original column name.
+#'
+#' @export
+dataSetColumnFromEncoded <- function(encoded, datasets) {
+  id  <- dataSetIdFromEncoded(encoded)
+  if (is.na(id)) id <- names(datasets)[[1]]
+
+  native <- .findFun(".decodeColNamesForDataSet")
+  if (!is.null(native)) {
+    decoded <- tryCatch(as.character(native(encoded, as.integer(id))), error = function(e) NA_character_)
+    if (!is.na(decoded) && !identical(decoded, ""))
+      return(sub("\\.(scale|ordinal|nominal)$", "", decoded))
+  }
+
+  stripped <- sub("\\.(scale|ordinal|nominal)$", "", as.character(encoded))
+
+  map <- attr(datasets, "dataSetEncodedNames")[[as.character(id)]]
+  if (!is.null(map)) {
+    hit <- names(map)[map == stripped]
+    if (length(hit) > 0)
+      return(hit[[1]])
+  }
+
+  stripped
+}
+
+#' @title getDataSetColumn
+#'
+#' @description The column an option value refers to, straight out of the right dataset.
+#'
+#' @param encoded character, one (possibly type-suffixed) encoded column name from the options of
+#'   a multiDataSetAware analysis.
+#' @param datasets the `datasets` list of that analysis.
+#'
+#' @details `getDataSetColumn(encoded, datasets)` is short for
+#' `getDataSetFor(encoded, datasets)[[dataSetColumnFromEncoded(encoded, datasets)]]`: routing to the
+#' dataset and resolving the original column name in one go. NULL when that dataset has no such
+#' column (deleted after the options were bound, say).
+#'
+#' @return the column (vector), or NULL.
+#'
+#' @export
+getDataSetColumn <- function(encoded, datasets) {
+  dataSet  <- getDataSetFor(encoded, datasets)
+  column   <- dataSetColumnFromEncoded(encoded, datasets)
+
+  if (is.null(dataSet) || !column %in% names(dataSet))
+    return(NULL)
+
+  dataSet[[column]]
 }
 
 #' @title getDataSetFor
