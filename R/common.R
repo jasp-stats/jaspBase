@@ -105,7 +105,8 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
   dataset     <- NULL
-  datasets    <- NULL
+  # datasets comes in either from the caller (R wrapper handout) or from the queued engine
+  # reads below; do NOT null the parameter here.
 
   multiDataSet <- !is.null(datasets) || .isMultiDataSetJson(multiDataSetJson)
 
@@ -456,20 +457,25 @@ dataSetColumnFromEncoded <- function(encoded, datasets) {
 #'
 #' @details `getDataSetColumn(encoded, datasets)` is short for
 #' `getDataSetFor(encoded, datasets)[[dataSetColumnFromEncoded(encoded, datasets)]]`: routing to the
-#' dataset and resolving the original column name in one go. NULL when that dataset has no such
-#' column (deleted after the options were bound, say).
+#' dataset and resolving the original column name in one go. When that leaves us without the column
+#' (an id-less value routed to a dataset that hasn't got it), every dataset is scanned for the
+#' resolved name. NULL when no dataset has such a column (deleted after the options were bound, say).
 #'
 #' @return the column (vector), or NULL.
 #'
 #' @export
 getDataSetColumn <- function(encoded, datasets) {
-  dataSet  <- getDataSetFor(encoded, datasets)
   column   <- dataSetColumnFromEncoded(encoded, datasets)
+  dataSet  <- getDataSetFor(encoded, datasets)
 
-  if (is.null(dataSet) || !column %in% names(dataSet))
-    return(NULL)
+  if (!is.null(dataSet) && column %in% names(dataSet))
+    return(dataSet[[column]])
 
-  dataSet[[column]]
+  for (candidate in datasets)
+    if (column %in% names(candidate))
+      return(candidate[[column]])
+
+  NULL
 }
 
 #' @title getDataSetFor
