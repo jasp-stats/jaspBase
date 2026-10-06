@@ -48,13 +48,16 @@ test_that("getDataSetFor routes values to the right dataframe", {
   expect_identical(getDataSetFor("JASPColumn_99_0", datasets), datasets[[1]]) # dangling -> primary
 })
 
-test_that("getDataSetFor falls back to default for columns the primary lacks", {
+test_that("getDataSetFor falls back through the other datasets for plain names", {
   datasets <- makeDatasets()
 
+  # 'score' is not in the primary but lives in the second dataset: plain-name lookup finds it there
+  expect_identical(getDataSetFor("score", datasets), datasets[["12"]])
+  # ...while 'age', which the primary has, stays routed to the primary
+  expect_identical(getDataSetFor("age", datasets), datasets[[1]])
+  # nowhere to be found -> default
   fallback <- data.frame(x = 0)
-  expect_identical(getDataSetFor("score", datasets, default = fallback), fallback)
-  # ...while a column the primary does have still lands there:
-  expect_identical(getDataSetFor("age", datasets, default = fallback), datasets[[1]])
+  expect_identical(getDataSetFor("nonexistent", datasets, default = fallback), fallback)
 })
 
 makeDatasetsWithEncoded <- function() {
