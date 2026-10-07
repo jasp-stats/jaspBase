@@ -132,24 +132,16 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     .multiDataSetMode(TRUE)
     on.exit(.multiDataSetMode(FALSE), add = TRUE)
 
-    # The engine switches its current encoder to the slice's dataset for every read (see
-    # rbridge_readDataSetRequested), so right after a read is the only moment this dataset's
-    # encoded names can be resolved. Snapshot an encoded -> original name map per dataset now;
-    # dataSetColumnFromEncoded() uses those maps later, when the analysis runs and the current
-    # encoder is whatever the last read left behind.
-    datasets            <- list()
-    encodedNamesPerDs   <- list()
+    # The slices arrive with their column names ENCODED by the same per-dataset encoder that encoded
+    # the options (rbridge_readDataSetRequested), so an option value indexes its column in
+    # datasets[[id]] as-is - the same encoded namespace a classic single-dataset run lives in.
+    # Result strings are decoded on their way back to the GUI by Engine::sendString.
+    datasets <- list()
 
-    for (id in ids) {
-      df <- .fromRCPP(".readDataSetRequestedNative")
-      encodedNamesPerDs[[id]] <- vapply(names(df), function(columnName) {
-        tryCatch(as.character(.encodeColNamesStrict(columnName)), error = function(e) NA_character_)
-      }, character(1L), USE.NAMES = TRUE)
-      datasets[[id]] <- df
-    }
+    for (id in ids)
+      datasets[[id]] <- .fromRCPP(".readDataSetRequestedNative")
 
-    attr(datasets, "dataSetNames")        <- dsInfo$names
-    attr(datasets, "dataSetEncodedNames") <- encodedNamesPerDs
+    attr(datasets, "dataSetNames") <- dsInfo$names
 
   } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
@@ -336,28 +328,33 @@ isTryError <- function(obj){
   !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
 }
 
-# ---- dataset-aware decoding of encoded column names --------------------------------------------
+# ---- dataset-aware routing of encoded column names ---------------------------------------------
 #
-# Every DataSet has its own ColumnEncoder whose prefix embeds the dataset id
-# (DataSet::setupEncoderPrefix in jasp-desktop: "JASPColumn_<dataSetId>_<counter>"), so an encoded
-# column name intrinsically tells you which dataset its column belongs to. Names encoded before the
-# id was embedded ("JASPColumn_<counter>", the legacy single-dataset form) carry no id and belong to
-# the primary dataset. These functions mirror ColumnEncoder::dataSetIdFromEncoded in C++, but stay
-# pure R so that analyses and unit tests can route values without an engine roundtrip.
+# Options and datasets meet in the ENCODED namespace: the engine encodes every variable option
+# against the encoder of the dataset it was selected from, and rbridge_readDataSetRequested encodes
+# the slice's column names against that very same encoder. Both sides are therefore the same
+# strings - "JASPColumn_<dataSetId>_<counter>_Encoded" (DataSet::setupEncoderPrefix embeds the
+# dataset id, the "_Encoded" postfix is the encoder default) - and an analysis indexes its data
+# with the option value as-is: datasets[[id]][[value]]. Results are decoded on the way back to the
+# GUI (Engine::sendString runs them past the encoder of every dataset the analysis references), so
+# nothing in R ever has to decode; the only thing worth recovering here is the dataset id, which
+# tells you WHICH element of `datasets` a value belongs to. Legacy names ("JaspColumn_<counter>",
+# encoded before ids were embedded) and plain syntax-mode names carry no id and belong to the
+# primary dataset.
 
 .dataSetIdFromEncodedOne <- function(encoded) {
   if (!is.character(encoded) || length(encoded) != 1L || is.na(encoded))
     return(NA_integer_)
 
-  # An option value may carry the column type as a suffix ("...scale/.ordinal/.nominal") and, while
-  # the encoder is busy replacing names, a "_For_Replacement" postfix; neither is part of the id.
-  name <- sub("_(For_Replacement)?$", "", sub("\\.(scale|ordinal|nominal)$", "", encoded))
+  # The real form is "JASPColumn_<dataSetId>_<counter>_Encoded"; a type suffix
+  # ("...scale/.ordinal/.nominal") and the encoder's temporary "_For_Replacement" postfix are
+  # tolerated, though neither survives into an option value.
+  name <- sub("_(Encoded|For_Replacement)$", "", sub("\\.(scale|ordinal|nominal)$", "", encoded))
 
   match <- regmatches(name, regexec("^JASPColumn_([0-9]+)_([0-9]+)$", name))[[1]]
   if (length(match) == 3L)
     return(as.integer(match[2]))
 
-  # Legacy "JASPColumn_<counter>" has no dataset id embedded; an unencoded column name neither.
   NA_integer_
 }
 
@@ -365,14 +362,15 @@ isTryError <- function(obj){
 #'
 #' @description Recover the dataset id from an encoded column name.
 #'
-#' @param encoded character vector, (possibly type-suffixed) encoded column names like they show up
-#'   in the options of a multiDataSetAware analysis.
+#' @param encoded character vector, encoded column names like they show up in the options of a
+#'   multiDataSetAware analysis.
 #'
 #' @details
-#' Encoded names embed the id of the dataset they belong to ("JASPColumn_<dataSetId>_<counter>"),
-#' so this routes any option value to its dataset: `datasets[[dataSetIdFromEncoded(x)]]`. Names
-#' without an embedded id (legacy "JASPColumn_<counter>" or plain column names) yield NA; use
-#' [getDataSetFor()] if you want those to fall back to the primary dataset.
+#' Encoded names embed the id of the dataset they belong to
+#' ("JASPColumn_<dataSetId>_<counter>_Encoded"), so this routes any option value to its dataset:
+#' `datasets[[as.character(dataSetIdFromEncoded(x))]]`. Names without an embedded id (legacy
+#' "JaspColumn_<counter>" or plain column names) yield NA; use [getDataSetFor()] if you want those
+#' to fall back to the primary dataset.
 #'
 #' @return integer vector, the dataset ids (NA where no id is embedded).
 #'
@@ -383,7 +381,7 @@ dataSetIdFromEncoded <- function(encoded) vapply(encoded, .dataSetIdFromEncodedO
 #'
 #' @description Recover the title of the dataset an encoded column name belongs to.
 #'
-#' @param encoded character, one (possibly type-suffixed) encoded column name.
+#' @param encoded character vector, encoded column names.
 #' @param datasets the `datasets` list of a multiDataSetAware analysis (ids as names, titles in
 #'   `attr(datasets, "dataSetNames")`).
 #'
@@ -407,92 +405,20 @@ dataSetNameFromEncoded <- function(encoded, datasets) {
   }, character(1L), USE.NAMES = FALSE)
 }
 
-#' @title dataSetColumnFromEncoded
-#'
-#' @description Recover the original column name of an encoded column name.
-#'
-#' @param encoded character, one (possibly type-suffixed) encoded column name.
-#' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#'
-#' @details
-#' Decoding goes through the engine so the right dataset's encoder is used: inside the engine the
-#' `.decodeColNamesForDataSet` callback decodes against the encoder of the dataset named in the
-#' encoded value itself (falling back to the current encoder for legacy names). Outside the engine
-#' the maps that runJaspResults snapshotted per read (`attr(datasets, "dataSetEncodedNames")`) are
-#' consulted; failing both the name is returned with at most the type suffix stripped.
-#'
-#' @return character, the original column name.
-#'
-#' @export
-dataSetColumnFromEncoded <- function(encoded, datasets) {
-  id  <- dataSetIdFromEncoded(encoded)
-  if (is.na(id)) id <- names(datasets)[[1]]
-
-  native <- .findFun(".decodeColNamesForDataSet")
-  if (!is.null(native)) {
-    decoded <- tryCatch(as.character(native(encoded, as.integer(id))), error = function(e) NA_character_)
-    if (!is.na(decoded) && !identical(decoded, ""))
-      return(sub("\\.(scale|ordinal|nominal)$", "", decoded))
-  }
-
-  stripped <- sub("\\.(scale|ordinal|nominal)$", "", as.character(encoded))
-
-  map <- attr(datasets, "dataSetEncodedNames")[[as.character(id)]]
-  if (!is.null(map)) {
-    hit <- names(map)[map == stripped]
-    if (length(hit) > 0)
-      return(hit[[1]])
-  }
-
-  stripped
-}
-
-#' @title getDataSetColumn
-#'
-#' @description The column an option value refers to, straight out of the right dataset.
-#'
-#' @param encoded character, one (possibly type-suffixed) encoded column name from the options of
-#'   a multiDataSetAware analysis.
-#' @param datasets the `datasets` list of that analysis.
-#'
-#' @details `getDataSetColumn(encoded, datasets)` is short for
-#' `getDataSetFor(encoded, datasets)[[dataSetColumnFromEncoded(encoded, datasets)]]`: routing to the
-#' dataset and resolving the original column name in one go. When that leaves us without the column
-#' (an id-less value routed to a dataset that hasn't got it), every dataset is scanned for the
-#' resolved name. NULL when no dataset has such a column (deleted after the options were bound, say).
-#'
-#' @return the column (vector), or NULL.
-#'
-#' @export
-getDataSetColumn <- function(encoded, datasets) {
-  column   <- dataSetColumnFromEncoded(encoded, datasets)
-  dataSet  <- getDataSetFor(encoded, datasets)
-
-  if (!is.null(dataSet) && column %in% names(dataSet))
-    return(dataSet[[column]])
-
-  for (candidate in datasets)
-    if (column %in% names(candidate))
-      return(candidate[[column]])
-
-  NULL
-}
-
 #' @title getDataSetFor
 #'
 #' @description The dataset a particular (encoded) column name came from.
 #'
-#' @param encoded character, one (possibly type-suffixed) encoded column name.
+#' @param encoded character, one encoded column name.
 #' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#' @param default dataset to return when `encoded` carries no dataset id and could not be found in
-#'   the primary dataset either; by default the primary (first) dataset itself.
+#' @param default dataset to return when `encoded` carries no dataset id and no dataset has such a
+#'   column; by default the primary (first) dataset itself.
 #'
 #' @details
-#' `datasets[[dataSetIdFromEncoded(encoded)]]` with the obvious fallbacks: names without an embedded
-#' id (and ids of datasets that are not in `datasets`, should they ever show up) end up at the
-#' primary dataset, and when that does not have such a column either `default` is returned. Note
-#' that the dataframes in `datasets` carry their original column names, so a still-encoded value is
-#' tried against those names decoded as far as possible (the trailing ".type" is dropped).
+#' `datasets[[as.character(dataSetIdFromEncoded(encoded))]]` when the embedded id is one of the
+#' datasets handed over. Without an id (or with a dangling one) the primary dataset wins when it
+#' has such a column, else the first dataset that does (syntax-mode handovers pass plain names and
+#' cannot encode per dataset), else `default`.
 #'
 #' @return the data.frame of the dataset this column belongs to.
 #'
@@ -501,20 +427,15 @@ getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
   id <- dataSetIdFromEncoded(encoded)
 
   if (!is.na(id)) {
-    dataSet <- datasets[[as.character(id)]]
-    if (!is.null(dataSet))
-      return(dataSet)
+    key <- as.character(id)
+    if (key %in% names(datasets))   # [[ on a named list ERRORS for absent names, guard properly
+      return(datasets[[key]])
   }
 
-  # No (or dangling) id: unencoded names belong to the primary dataset if it has such a
-  # column, else to the first dataset that does (R wrapper mode hands over plain names and
-  # cannot encode per dataset), else to `default` (which by default is the primary again).
-  primary <- datasets[[1]]
-  if (is.null(primary))
-    return(default)
+  name <- as.character(encoded)
 
-  name <- sub("\\.(scale|ordinal|nominal)$", "", as.character(encoded))
-  if (name %in% names(primary))
+  primary <- datasets[[1]]
+  if (!is.null(primary) && name %in% names(primary))
     return(primary)
 
   for (candidate in datasets)
@@ -522,6 +443,36 @@ getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
       return(candidate)
 
   default
+}
+
+#' @title getDataSetColumn
+#'
+#' @description The column an option value refers to, straight out of the right dataset.
+#'
+#' @param encoded character, one encoded column name from the options of a multiDataSetAware
+#'   analysis.
+#' @param datasets the `datasets` list of that analysis.
+#'
+#' @details Short for `getDataSetFor(encoded, datasets)[[encoded]]`: options and column names share
+#' the encoded namespace, so no decoding is involved. When the routed dataset does not have the
+#' column (deleted after the options were bound, say), every other dataset is scanned before
+#' giving up with NULL.
+#'
+#' @return the column (vector), or NULL.
+#'
+#' @export
+getDataSetColumn <- function(encoded, datasets) {
+  name <- as.character(encoded)
+
+  dataSet <- getDataSetFor(encoded, datasets)
+  if (!is.null(dataSet) && name %in% names(dataSet))
+    return(dataSet[[name]])
+
+  for (candidate in datasets)
+    if (name %in% names(candidate))
+      return(candidate[[name]])
+
+  NULL
 }
 
 #' @title readDataSetByVariableTypes
