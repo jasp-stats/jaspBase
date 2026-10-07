@@ -1410,7 +1410,11 @@ storeDataSet <- function(dataset) {
 #'
 #' @export
 storeDataSets <- function(datasets) {
-  for (ds in datasets) jaspSyntax::loadDataSet(ds)
+  # Load every dataset into the syntax bridge's workspace (jaspSyntax::loadDataSets): each list
+  # name becomes a DataSet title and every dataset gets a real id and column encoder, so the
+  # VariablesForms can select them by name and the bridge can encode per dataset.
+  # (jaspTools runs hand their datasets to runJaspResults directly and never come here.)
+  jaspSyntax::loadDataSets(datasets)
   invisible(NULL)
 }
 
@@ -1427,21 +1431,35 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     # The options must be parsed and checked by the QML form, and then the real analysis can be called.
     qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
 
-    # A multiDataSetAware wrapper hands over its datasets as a named list instead of a single
-    # data: store them all in the syntax bridge (so the QML form and any readDataSet-free
-    # column lookups see them) and run the analysis in multi-dataset mode. runJaspResults
-    # derives ids and titles from the list itself, so no multiDataSetJson is needed here.
-    if (!is.null(datasets))
+    multiDataSetJson <- NULL
+
+    if (!is.null(datasets)) {
+      # MultiDataSetAware wrapper: load every dataset into the bridge workspace (names become
+      # DataSet titles), let the QML forms select them through their dataSetSelectionOption
+      # (depends-ordered, so the column options bind against the selected dataset and the
+      # controls stamp the .meta provenance), and have the bridge encode per dataset and queue
+      # the slices - the exact preparation a desktop run gets from Engine::runAnalysis (shared
+      # through DataBridge::prepareMultiDataSetRun). runJaspResults then reads the slices from
+      # the queue: encoded columns matching the encoded options, keyed by dataset id.
       storeDataSets(datasets)
 
-    options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+      status           <- jaspSyntax::loadQmlAndParseOptionsStatus(moduleName, analysisName, qmlFile,
+                                                                   as.character(toJSON(options)), version, preloadData)
+      options          <- status$options
+      multiDataSetJson <- if (nzchar(status$multiDataSetJson)) status$multiDataSetJson else NULL
 
-    if (options == "")
-      stop("Error when parsing the options")
+      if (!length(options) || !nzchar(options))
+        stop("Error when parsing the options")
+    } else {
+      options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+
+      if (options == "")
+        stop("Error when parsing the options")
+    }
 
      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData, datasets=datasets))
+     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData, multiDataSetJson = multiDataSetJson))
   }
 }
 
