@@ -118,6 +118,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     names(datasets) <- as.character(names(datasets))
     if (is.null(attr(datasets, "dataSetNames")))
       attr(datasets, "dataSetNames") <- as.list(names(datasets))
+    attr(datasets, "dataSetIds") <- as.list(names(datasets))  # handout keys are dataset ids
 
     .multiDataSetMode(TRUE)
     on.exit(.multiDataSetMode(FALSE), add = TRUE)
@@ -127,21 +128,26 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     # Engine::runAnalysis), one read per queued call below. Keyed by dataset id, with the user facing
     # titles attached as an attribute; the datasets arrive as a parameter, readDataSet* is broken here.
     dsInfo <- fromJSON(multiDataSetJson)
-    ids    <- as.character(dsInfo$ids)
+    ids    <- as.character(dsInfo$ids)   # slice keys: the resolved FILTER id of each slice
 
     .multiDataSetMode(TRUE)
     on.exit(.multiDataSetMode(FALSE), add = TRUE)
 
     # The slices arrive with their column names ENCODED by the same per-dataset encoder that encoded
     # the options (rbridge_readDataSetRequested), so an option value indexes its column in
-    # datasets[[id]] as-is - the same encoded namespace a classic single-dataset run lives in.
-    # Result strings are decoded on their way back to the GUI by Engine::sendString.
+    # datasets[[key]] as-is - the same encoded namespace a classic single-dataset run lives in.
+    # Keys are filter ids (per-form selections are filter selections), one slice per distinct
+    # (dataset, filter) the options reference: a form's selection option indexes ITS slice
+    # directly with datasets[[as.character(as.integer(options$dataSetA))]]. attr "dataSetIds"
+    # maps every slice key back to its dataset id. Result strings are decoded on their way back
+    # to the GUI by Engine::sendString.
     datasets <- list()
 
     for (id in ids)
       datasets[[id]] <- .fromRCPP(".readDataSetRequestedNative")
 
     attr(datasets, "dataSetNames") <- dsInfo$names
+    attr(datasets, "dataSetIds")   <- dsInfo$dataSetIds
 
   } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
@@ -358,6 +364,25 @@ isTryError <- function(obj){
   NA_integer_
 }
 
+# Find the slice key of `datasets` that carries the given dataset id: the id itself when the
+# list is keyed by dataset (jaspTools-style handout), else the first filter-keyed slice of that
+# dataset (engine queue branch: one slice per distinct dataset+filter). NULL when absent.
+.sliceKeyForDataSet <- function(datasets, idStr) {
+  idStr <- as.character(idStr)
+  if (idStr %in% names(datasets))
+    return(idStr)
+
+  dsIds <- attr(datasets, "dataSetIds")
+
+  if (!is.null(dsIds)) {
+    hit <- which(vapply(dsIds, function(x) as.character(x) == idStr, logical(1)))
+    if (length(hit) > 0)
+      return(names(dsIds)[[hit[[1]]]])
+  }
+
+  NULL
+}
+
 #' @title dataSetIdFromEncoded
 #'
 #' @description Recover the dataset id from an encoded column name.
@@ -399,9 +424,8 @@ dataSetNameFromEncoded <- function(encoded, datasets) {
 
   vapply(seq_along(encoded), function(i) {
     id <- ids[[i]]
-    if (is.na(id)) id <- names(datasets)[[1]]
-    key <- as.character(id)
-    if (!is.null(titles) && key %in% names(titles)) as.character(titles[[key]]) else NA_character_
+    key <- if (is.na(id)) names(datasets)[[1]] else .sliceKeyForDataSet(datasets, as.character(id))
+    if (!is.null(titles) && !is.null(key) && key %in% names(titles)) as.character(titles[[key]]) else NA_character_
   }, character(1L), USE.NAMES = FALSE)
 }
 
@@ -427,8 +451,8 @@ getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
   id <- dataSetIdFromEncoded(encoded)
 
   if (!is.na(id)) {
-    key <- as.character(id)
-    if (key %in% names(datasets))   # [[ on a named list ERRORS for absent names, guard properly
+    key <- .sliceKeyForDataSet(datasets, as.character(id))
+    if (!is.null(key) && key %in% names(datasets))   # [[ on a named list ERRORS for absent names, guard properly
       return(datasets[[key]])
   }
 
