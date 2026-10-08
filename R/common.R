@@ -124,9 +124,11 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     on.exit(.multiDataSetMode(FALSE), add = TRUE)
 
   } else if (multiDataSet) {
-    # Multi-dataset aware run: the engine queued every dataset this analysis references (see
-    # Engine::runAnalysis), one read per queued call below. Keyed by dataset id, with the user facing
-    # titles attached as an attribute; the datasets arrive as a parameter, readDataSet* is broken here.
+    # Multi-dataset aware run: the engine queued every (dataset, filter) pair this analysis
+    # references (see Engine::runAnalysis), one read per queued call below. Keyed by SLICE id -
+    # the resolved filter id - with the dataset titles in attr "dataSetNames", each slice's
+    # dataset id in attr "dataSetIds" and the analysis' primary slice in attr "primarySliceKey";
+    # the datasets arrive as a parameter, readDataSet* is broken here.
     dsInfo <- fromJSON(multiDataSetJson)
     ids    <- as.character(dsInfo$ids)   # slice keys: the resolved FILTER id of each slice
 
@@ -148,6 +150,7 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
     attr(datasets, "dataSetNames") <- dsInfo$names
     attr(datasets, "dataSetIds")   <- dsInfo$dataSetIds
+    attr(datasets, "primarySliceKey") <- if (!is.null(dsInfo$primary)) as.character(dsInfo$primary) else NULL
 
   } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
@@ -325,7 +328,7 @@ isTryError <- function(obj){
 .stopIfMultiDataSetMode <- function(what) {
   if (.multiDataSetMode())
     stop(sprintf(paste0("%s() is not available in multi-dataset aware analyses; those get the datasets they ",
-                        "need as the `datasets` argument (a named list, keyed by dataset id; ",
+                        "need as the `datasets` argument (a named list, keyed by slice id; ",
                         "attr(datasets, \"dataSetNames\") maps those ids to the dataset titles)."), what),
          call. = FALSE)
 }
@@ -364,23 +367,122 @@ isTryError <- function(obj){
   NA_integer_
 }
 
-# Find the slice key of `datasets` that carries the given dataset id: the id itself when the
-# list is keyed by dataset (jaspTools-style handout), else the first filter-keyed slice of that
-# dataset (engine queue branch: one slice per distinct dataset+filter). NULL when absent.
-.sliceKeyForDataSet <- function(datasets, idStr) {
+# All slice keys of `datasets` that carry the given dataset id (attr "dataSetIds" maps every
+# slice to its dataset; handout lists are identity-keyed).
+.sliceKeysForDataSet <- function(datasets, idStr) {
   idStr <- as.character(idStr)
-  if (idStr %in% names(datasets))
-    return(idStr)
-
   dsIds <- attr(datasets, "dataSetIds")
 
-  if (!is.null(dsIds)) {
-    hit <- which(vapply(dsIds, function(x) as.character(x) == idStr, logical(1)))
-    if (length(hit) > 0)
-      return(names(dsIds)[[hit[[1]]]])
+  names(datasets)[vapply(names(datasets), function(k)
+    identical(as.character(if (!is.null(dsIds)) dsIds[[k]] else k), idStr), logical(1))]
+}
+
+# The single slice key for a dataset id: NULL when absent, and an ERROR when the dataset is
+# present as multiple filtered slices - an encoded column name alone cannot tell filters apart
+# and silently picking one would serve wrong rows. Callers with a form selection must route
+# through getSliceKey() instead.
+.sliceKeyForDataSet <- function(datasets, idStr) {
+  hits <- .sliceKeysForDataSet(datasets, idStr)
+
+  if (length(hits) == 0L)
+    return(NULL)
+
+  if (length(hits) > 1L)
+    stop("dataset ", idStr, " is present as ", length(hits), " filtered slices (",
+         paste(hits, collapse = ", "), "); an encoded column name cannot tell them apart - ",
+         "index the intended slice with the form's selection option via ",
+         "getSliceKey(options, datasets, '<selectionOption>', column = <value>).", call. = FALSE)
+
+  hits[[1L]]
+}
+
+#' @title getSliceKey
+#'
+#' @description The slice of `datasets` a per-form dataset selection option points at.
+#'
+#' @param options the analysis options; the selection option holds a filter id (plain or in the
+#'   wrapper default shape list(types=, value=)).
+#' @param datasets the `datasets` list of a multiDataSetAware analysis (engine queue runs are
+#'   keyed by slice/filter id, jaspTools handouts by dataset id).
+#' @param optionName name of the selection option (the VariablesForm's dataSetSelectionOption).
+#' @param column optional encoded column name to fall back on when the selection is absent or
+#'   points at no slice: routes by the dataset id embedded in the name, and ERRORS when that
+#'   dataset is present as several filtered slices (which one it is cannot be derived from a
+#'   column name alone).
+#'
+#' @details The selection option of a form IS a filter id, and filter ids index the engine's
+#' slice queue directly - two forms selecting two filters of one dataset get two different
+#' slices this way.
+#'
+#' @return the slice key (character) or NULL when nothing resolves.
+#'
+#' @export
+getSliceKey <- function(options, datasets, optionName, column = NULL) {
+  selVal <- utils::tail(unlist(options[[optionName]]), 1L)
+
+  if (!is.null(selVal) && !is.na(selVal)) {
+    selVal <- trimws(as.character(selVal))
+    if (!is.na(suppressWarnings(as.integer(selVal))) && selVal %in% names(datasets))
+      return(selVal)
+  }
+
+  if (!is.null(column)) {
+    id <- dataSetIdFromEncoded(column)
+    if (!is.na(id))
+      return(.sliceKeyForDataSet(datasets, as.character(id)))
+
+    hits <- names(datasets)[vapply(datasets, function(df) as.character(column) %in% names(df), logical(1))]
+
+    if (length(hits) == 1L)
+      return(hits[[1L]])
+
+    if (length(hits) > 1L)
+      stop("column '", column, "' exists in several slices (", paste(hits, collapse = ", "),
+           "); use the form's selection option (getSliceKey) to say which one.", call. = FALSE)
   }
 
   NULL
+}
+
+#' @title getSlice
+#'
+#' @description The dataframe of one slice, by key (a filter id in engine queue runs, a dataset
+#'   id in jaspTools handouts); errors listing the available keys when absent.
+#'
+#' @param datasets the `datasets` list of a multiDataSetAware analysis.
+#' @param key slice key.
+#'
+#' @export
+getSlice <- function(datasets, key) {
+  key <- as.character(key)
+
+  if (!key %in% names(datasets))
+    stop("no slice '", key, "' in datasets (available: ", paste(names(datasets), collapse = ", "),
+         ")", call. = FALSE)
+
+  datasets[[key]]
+}
+
+#' @title sliceDataSetId
+#'
+#' @description The dataset id a slice key belongs to (attr "dataSetIds").
+#' @param datasets the `datasets` list of a multiDataSetAware analysis.
+#' @param key slice key.
+#' @export
+sliceDataSetId <- function(datasets, key) {
+  dsIds <- attr(datasets, "dataSetIds")
+  as.character(if (!is.null(dsIds) && !is.null(dsIds[[as.character(key)]])) dsIds[[as.character(key)]] else as.character(key))
+}
+
+#' @title sliceTitle
+#'
+#' @description The user-facing dataset title a slice key belongs to (attr "dataSetNames").
+#' @param datasets the `datasets` list of a multiDataSetAware analysis.
+#' @param key slice key.
+#' @export
+sliceTitle <- function(datasets, key) {
+  titles <- attr(datasets, "dataSetNames")
+  as.character(if (!is.null(titles) && !is.null(titles[[as.character(key)]])) titles[[as.character(key)]] else as.character(key))
 }
 
 #' @title dataSetIdFromEncoded
@@ -1430,7 +1532,7 @@ storeDataSet <- function(dataset) {
 #'   multiDataSetAware analysis run from R (the wrapper form of
 #'   `for (ds in datasets) jaspSyntax::loadDataSet(ds)`).
 #'
-#' @param datasets named list of dataframes, keyed by dataset id.
+#' @param datasets named list of dataframes, keyed by slice id.
 #'
 #' @export
 storeDataSets <- function(datasets) {
