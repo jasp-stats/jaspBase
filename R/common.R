@@ -1464,7 +1464,7 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
       # controls stamp the .meta provenance), and have the bridge encode per dataset and queue
       # the slices - the exact preparation a desktop run gets from Engine::runAnalysis (shared
       # through DataBridge::prepareMultiDataSetRun). runJaspResults then reads the slices from
-      # the queue: encoded columns matching the encoded options, keyed by dataset id.
+      # the queue: encoded columns matching the encoded options, keyed by slice (filter) id.
       storeDataSets(datasets)
 
       status           <- jaspSyntax::loadQmlAndParseOptionsStatus(moduleName, analysisName, qmlFile,
