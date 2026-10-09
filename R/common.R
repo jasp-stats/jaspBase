@@ -571,36 +571,6 @@ getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
   default
 }
 
-#' @title getDataSetColumn
-#'
-#' @description The column an option value refers to, straight out of the right dataset.
-#'
-#' @param encoded character, one encoded column name from the options of a multiDataSetAware
-#'   analysis.
-#' @param datasets the `datasets` list of that analysis.
-#'
-#' @details Short for `getDataSetFor(encoded, datasets)[[encoded]]`: options and column names share
-#' the encoded namespace, so no decoding is involved. When the routed dataset does not have the
-#' column (deleted after the options were bound, say), every other dataset is scanned before
-#' giving up with NULL.
-#'
-#' @return the column (vector), or NULL.
-#'
-#' @export
-getDataSetColumn <- function(encoded, datasets) {
-  name <- as.character(encoded)
-
-  dataSet <- getDataSetFor(encoded, datasets)
-  if (!is.null(dataSet) && name %in% names(dataSet))
-    return(dataSet[[name]])
-
-  for (candidate in datasets)
-    if (name %in% names(candidate))
-      return(candidate[[name]])
-
-  NULL
-}
-
 #' @title readDataSetByVariableTypes
 #'
 #' @param options options from QML.
