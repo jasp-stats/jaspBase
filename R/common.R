@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL, datasets = NULL) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -105,30 +105,15 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
   dataset     <- NULL
-  # datasets comes in either from the caller (R wrapper handout) or from the queued engine
-  # reads below; do NOT null the parameter here.
+  multiDataSet <- .isMultiDataSetJson(multiDataSetJson)
 
-  multiDataSet <- !is.null(datasets) || .isMultiDataSetJson(multiDataSetJson)
-
-  if (!is.null(datasets)) {
-    # R-side handout (jaspSyntax wrappers / jaspTools): the user delivered the datasets as a
-    # named list themselves, which already carries all the information multiDataSetJson would:
-    # the names are the dataset ids (a title attribute is optional), so everything is derived
-    # from here and no queued engine reads are involved.
-    names(datasets) <- as.character(names(datasets))
-    if (is.null(attr(datasets, "dataSetNames")))
-      attr(datasets, "dataSetNames") <- as.list(names(datasets))
-    attr(datasets, "dataSetIds") <- as.list(names(datasets))  # handout keys are dataset ids
-
-    .multiDataSetMode(TRUE)
-    on.exit(.multiDataSetMode(FALSE), add = TRUE)
-
-  } else if (multiDataSet) {
-    # Multi-dataset aware run: the engine queued every (dataset, filter) pair this analysis
-    # references (see Engine::runAnalysis), one read per queued call below. Keyed by SLICE id -
-    # the resolved filter id - with the dataset titles in attr "dataSetNames", each slice's
-    # dataset id in attr "dataSetIds" and the analysis' primary slice in attr "primarySliceKey";
-    # the datasets arrive as a parameter, readDataSet* is broken here.
+  if (multiDataSet) {
+    # Multi-dataset aware run: the engine queued every filter this analysis references, one read
+    # per queued call below (see DataBridge::prepareMultiDataSetRun). The list is keyed by filter
+    # id - exactly what a per-form dataset selection option carries - with the dataset titles in
+    # attr "dataSetNames", each slice's dataset id in attr "dataSetIds" and the analysis' own
+    # slice in attr "primarySliceKey". readDataSet* is broken while this mode is active: there is
+    # no single "the" dataset.
     dsInfo <- fromJSON(multiDataSetJson)
     ids    <- as.character(dsInfo$ids)   # slice keys: the resolved FILTER id of each slice
 
@@ -138,11 +123,11 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
     # The slices arrive with their column names ENCODED by the same per-dataset encoder that encoded
     # the options (rbridge_readDataSetRequested), so an option value indexes its column in
     # datasets[[key]] as-is - the same encoded namespace a classic single-dataset run lives in.
-    # Keys are filter ids (per-form selections are filter selections), one slice per distinct
-    # (dataset, filter) the options reference: a form's selection option indexes ITS slice
-    # directly with datasets[[as.character(as.integer(options$dataSetA))]]. attr "dataSetIds"
-    # maps every slice key back to its dataset id. Result strings are decoded on their way back
-    # to the GUI by Engine::sendString.
+    # Keys are filter ids (per-form selections ARE filter selections, and a filter implies its
+    # dataset), one slice per distinct filter the options reference: a form's selection option
+    # indexes ITS slice directly, datasets[[as.character(options$dataSetA$value)]. attr
+    # "dataSetIds" maps every slice key back to its dataset id. Result strings are decoded on
+    # their way back to the GUI by Engine::sendString.
     datasets <- list()
 
     for (id in ids)
@@ -328,8 +313,9 @@ isTryError <- function(obj){
 .stopIfMultiDataSetMode <- function(what) {
   if (.multiDataSetMode())
     stop(sprintf(paste0("%s() is not available in multi-dataset aware analyses; those get the datasets they ",
-                        "need as the `datasets` argument (a named list, keyed by slice id; ",
-                        "attr(datasets, \"dataSetNames\") maps those ids to the dataset titles)."), what),
+                        "need as the `datasets` argument (a named list, keyed by FILTER id - the same id ",
+                        "the form's dataset selection option holds; attr(datasets, \"dataSetNames\") maps ",
+                        "those keys to the dataset titles)."), what),
          call. = FALSE)
 }
 
@@ -337,240 +323,28 @@ isTryError <- function(obj){
   !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
 }
 
-# ---- dataset-aware routing of encoded column names ---------------------------------------------
+# ---- the datasets contract (NO accessors; CTO zero-export decision 2026-10-09) ------------------
 #
 # Options and datasets meet in the ENCODED namespace: the engine encodes every variable option
-# against the encoder of the dataset it was selected from, and rbridge_readDataSetRequested encodes
-# the slice's column names against that very same encoder. Both sides are therefore the same
-# strings - "JASPColumn_<dataSetId>_<counter>_Encoded" (DataSet::setupEncoderPrefix embeds the
-# dataset id, the "_Encoded" postfix is the encoder default) - and an analysis indexes its data
-# with the option value as-is: datasets[[id]][[value]]. Results are decoded on the way back to the
-# GUI (Engine::sendString runs them past the encoder of every dataset the analysis references), so
-# nothing in R ever has to decode; the only thing worth recovering here is the dataset id, which
-# tells you WHICH element of `datasets` a value belongs to. Legacy names ("JaspColumn_<counter>",
-# encoded before ids were embedded) and plain syntax-mode names carry no id and belong to the
-# primary dataset.
-
-.dataSetIdFromEncodedOne <- function(encoded) {
-  if (!is.character(encoded) || length(encoded) != 1L || is.na(encoded))
-    return(NA_integer_)
-
-  # The real form is "JASPColumn_<dataSetId>_<counter>_Encoded"; a type suffix
-  # ("...scale/.ordinal/.nominal") and the encoder's temporary "_For_Replacement" postfix are
-  # tolerated, though neither survives into an option value.
-  name <- sub("_(Encoded|For_Replacement)$", "", sub("\\.(scale|ordinal|nominal)$", "", encoded))
-
-  match <- regmatches(name, regexec("^JASPColumn_([0-9]+)_([0-9]+)$", name))[[1]]
-  if (length(match) == 3L)
-    return(as.integer(match[2]))
-
-  NA_integer_
-}
-
-# All slice keys of `datasets` that carry the given dataset id (attr "dataSetIds" maps every
-# slice to its dataset; handout lists are identity-keyed).
-.sliceKeysForDataSet <- function(datasets, idStr) {
-  idStr <- as.character(idStr)
-  dsIds <- attr(datasets, "dataSetIds")
-
-  names(datasets)[vapply(names(datasets), function(k)
-    identical(as.character(if (!is.null(dsIds)) dsIds[[k]] else k), idStr), logical(1))]
-}
-
-# The single slice key for a dataset id: NULL when absent, and an ERROR when the dataset is
-# present as multiple filtered slices - an encoded column name alone cannot tell filters apart
-# and silently picking one would serve wrong rows. Callers with a form selection must route
-# through getSliceKey() instead.
-.sliceKeyForDataSet <- function(datasets, idStr) {
-  hits <- .sliceKeysForDataSet(datasets, idStr)
-
-  if (length(hits) == 0L)
-    return(NULL)
-
-  if (length(hits) > 1L)
-    stop("dataset ", idStr, " is present as ", length(hits), " filtered slices (",
-         paste(hits, collapse = ", "), "); an encoded column name cannot tell them apart - ",
-         "index the intended slice with the form's selection option via ",
-         "getSliceKey(options, datasets, '<selectionOption>', column = <value>).", call. = FALSE)
-
-  hits[[1L]]
-}
-
-#' @title getSliceKey
-#'
-#' @description The slice of `datasets` a per-form dataset selection option points at.
-#'
-#' @param options the analysis options; the selection option holds a filter id (plain or in the
-#'   wrapper default shape list(types=, value=)).
-#' @param datasets the `datasets` list of a multiDataSetAware analysis (engine queue runs are
-#'   keyed by slice/filter id, jaspTools handouts by dataset id).
-#' @param optionName name of the selection option (the VariablesForm's dataSetSelectionOption).
-#' @param column optional encoded column name to fall back on when the selection is absent or
-#'   points at no slice: routes by the dataset id embedded in the name, and ERRORS when that
-#'   dataset is present as several filtered slices (which one it is cannot be derived from a
-#'   column name alone).
-#'
-#' @details The selection option of a form IS a filter id, and filter ids index the engine's
-#' slice queue directly - two forms selecting two filters of one dataset get two different
-#' slices this way.
-#'
-#' @return the slice key (character) or NULL when nothing resolves.
-#'
-#' @export
-getSliceKey <- function(options, datasets, optionName, column = NULL) {
-  selVal <- utils::tail(unlist(options[[optionName]]), 1L)
-
-  if (!is.null(selVal) && !is.na(selVal)) {
-    selVal <- trimws(as.character(selVal))
-    if (!is.na(suppressWarnings(as.integer(selVal))) && selVal %in% names(datasets))
-      return(selVal)
-  }
-
-  if (!is.null(column)) {
-    id <- dataSetIdFromEncoded(column)
-    if (!is.na(id))
-      return(.sliceKeyForDataSet(datasets, as.character(id)))
-
-    hits <- names(datasets)[vapply(datasets, function(df) as.character(column) %in% names(df), logical(1))]
-
-    if (length(hits) == 1L)
-      return(hits[[1L]])
-
-    if (length(hits) > 1L)
-      stop("column '", column, "' exists in several slices (", paste(hits, collapse = ", "),
-           "); use the form's selection option (getSliceKey) to say which one.", call. = FALSE)
-  }
-
-  NULL
-}
-
-#' @title getSlice
-#'
-#' @description The dataframe of one slice, by key (a filter id in engine queue runs, a dataset
-#'   id in jaspTools handouts); errors listing the available keys when absent.
-#'
-#' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#' @param key slice key.
-#'
-#' @export
-getSlice <- function(datasets, key) {
-  key <- as.character(key)
-
-  if (!key %in% names(datasets))
-    stop("no slice '", key, "' in datasets (available: ", paste(names(datasets), collapse = ", "),
-         ")", call. = FALSE)
-
-  datasets[[key]]
-}
-
-#' @title sliceDataSetId
-#'
-#' @description The dataset id a slice key belongs to (attr "dataSetIds").
-#' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#' @param key slice key.
-#' @export
-sliceDataSetId <- function(datasets, key) {
-  dsIds <- attr(datasets, "dataSetIds")
-  as.character(if (!is.null(dsIds) && !is.null(dsIds[[as.character(key)]])) dsIds[[as.character(key)]] else as.character(key))
-}
-
-#' @title sliceTitle
-#'
-#' @description The user-facing dataset title a slice key belongs to (attr "dataSetNames").
-#' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#' @param key slice key.
-#' @export
-sliceTitle <- function(datasets, key) {
-  titles <- attr(datasets, "dataSetNames")
-  as.character(if (!is.null(titles) && !is.null(titles[[as.character(key)]])) titles[[as.character(key)]] else as.character(key))
-}
-
-#' @title dataSetIdFromEncoded
-#'
-#' @description Recover the dataset id from an encoded column name.
-#'
-#' @param encoded character vector, encoded column names like they show up in the options of a
-#'   multiDataSetAware analysis.
-#'
-#' @details
-#' Encoded names embed the id of the dataset they belong to
-#' ("JASPColumn_<dataSetId>_<counter>_Encoded"), so this routes any option value to its dataset:
-#' `datasets[[as.character(dataSetIdFromEncoded(x))]]`. Names without an embedded id (legacy
-#' "JaspColumn_<counter>" or plain column names) yield NA; use [getDataSetFor()] if you want those
-#' to fall back to the primary dataset.
-#'
-#' @return integer vector, the dataset ids (NA where no id is embedded).
-#'
-#' @export
-dataSetIdFromEncoded <- function(encoded) vapply(encoded, .dataSetIdFromEncodedOne, integer(1L), USE.NAMES = FALSE)
-
-#' @title dataSetNameFromEncoded
-#'
-#' @description Recover the title of the dataset an encoded column name belongs to.
-#'
-#' @param encoded character vector, encoded column names.
-#' @param datasets the `datasets` list of a multiDataSetAware analysis (ids as names, titles in
-#'   `attr(datasets, "dataSetNames")`).
-#'
-#' @details
-#' Looks up `dataSetIdFromEncoded(encoded)` in `attr(datasets, "dataSetNames")`. Without an embedded
-#' id (legacy or plain names) the title of the primary (first) dataset is returned, which is what
-#' those names belong to.
-#'
-#' @return character vector with the dataset titles (NA when the id is not in `datasets`).
-#'
-#' @export
-dataSetNameFromEncoded <- function(encoded, datasets) {
-  titles <- attr(datasets, "dataSetNames")
-  ids    <- dataSetIdFromEncoded(encoded)
-
-  vapply(seq_along(encoded), function(i) {
-    id <- ids[[i]]
-    key <- if (is.na(id)) names(datasets)[[1]] else .sliceKeyForDataSet(datasets, as.character(id))
-    if (!is.null(titles) && !is.null(key) && key %in% names(titles)) as.character(titles[[key]]) else NA_character_
-  }, character(1L), USE.NAMES = FALSE)
-}
-
-#' @title getDataSetFor
-#'
-#' @description The dataset a particular (encoded) column name came from.
-#'
-#' @param encoded character, one encoded column name.
-#' @param datasets the `datasets` list of a multiDataSetAware analysis.
-#' @param default dataset to return when `encoded` carries no dataset id and no dataset has such a
-#'   column; by default the primary (first) dataset itself.
-#'
-#' @details
-#' `datasets[[as.character(dataSetIdFromEncoded(encoded))]]` when the embedded id is one of the
-#' datasets handed over. Without an id (or with a dangling one) the primary dataset wins when it
-#' has such a column, else the first dataset that does (syntax-mode handovers pass plain names and
-#' cannot encode per dataset), else `default`.
-#'
-#' @return the data.frame of the dataset this column belongs to.
-#'
-#' @export
-getDataSetFor <- function(encoded, datasets, default = datasets[[1]]) {
-  id <- dataSetIdFromEncoded(encoded)
-
-  if (!is.na(id)) {
-    key <- .sliceKeyForDataSet(datasets, as.character(id))
-    if (!is.null(key) && key %in% names(datasets))   # [[ on a named list ERRORS for absent names, guard properly
-      return(datasets[[key]])
-  }
-
-  name <- as.character(encoded)
-
-  primary <- datasets[[1]]
-  if (!is.null(primary) && name %in% names(primary))
-    return(primary)
-
-  for (candidate in datasets)
-    if (name %in% names(candidate))
-      return(candidate)
-
-  default
-}
-
+# against the encoder of the dataset it was selected from, and the slice reads hand back columns
+# encoded by that very same encoder. Both sides are the same strings
+# ("JASPColumn_<dataSetId>_<counter>_Encoded" - DataSet::setupEncoderPrefix embeds the dataset
+# id), so an analysis indexes directly: datasets[[key]][[optionValue]].
+#
+#   datasets            named list, ONE ENTRY PER FILTER the analysis references; the name (key)
+#                       is that filter's id - exactly what a per-form dataset selection option
+#                       (the qml's dataSetSelectionOption) holds:
+#                         key <- as.character(options$dataSetA$value)  # or tail(unlist(...), 1)
+#                         slice <- datasets[[key]]
+#   attr "dataSetNames"  key -> dataset title (display only - titles are user-editable)
+#   attr "dataSetIds"    key -> dataset id
+#   attr "primarySliceKey" the analysis' own slice (its filter, else the primary dataset's default)
+#
+# Results are decoded on the way back to the GUI (Engine::sendString), so nothing in R ever has
+# to decode; there is nothing to look up beyond the key. There are deliberately NO accessor
+# helpers (no getSlice/getSliceKey/getDataSetColumn family): earlier generations of them scanned
+# every dataset for a name and could silently serve the wrong one. If an analysis needs the
+# column of its selection, it indexes it - and gets an honest error when the key is wrong.
 #' @title readDataSetByVariableTypes
 #'
 #' @param options options from QML.
@@ -1498,18 +1272,17 @@ storeDataSet <- function(dataset) {
 
 #' @title storeDataSets
 #'
-#' @description Store several datasets in the JASP syntax bridge at once, for a
-#'   multiDataSetAware analysis run from R (the wrapper form of
-#'   `for (ds in datasets) jaspSyntax::loadDataSet(ds)`).
+#' @description Internal: store several datasets in the JASP syntax bridge at once, for
+#'   runWrappedAnalysis (the wrapper form of `jaspSyntax::loadDataSets(datasets)`).
 #'
-#' @param datasets named list of dataframes, keyed by slice id.
+#' @param datasets named list of dataframes; the names become the dataset titles.
 #'
-#' @export
+#' @noRd
 storeDataSets <- function(datasets) {
   # Load every dataset into the syntax bridge's workspace (jaspSyntax::loadDataSets): each list
   # name becomes a DataSet title and every dataset gets a real id and column encoder, so the
-  # VariablesForms can select them by name and the bridge can encode per dataset.
-  # (jaspTools runs hand their datasets to runJaspResults directly and never come here.)
+  # VariablesForms can select them by name and the bridge can encode per dataset. The analysis
+  # then gets the slices from the bridge's queue (keyed by filter id), never from R-side hands.
   jaspSyntax::loadDataSets(datasets)
   invisible(NULL)
 }
