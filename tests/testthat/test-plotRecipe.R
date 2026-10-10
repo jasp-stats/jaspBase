@@ -1,12 +1,13 @@
 test_that("plot recipe arguments are decoded recursively", {
-  oldDecoder <- get0(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
-  assign(".decodeColNamesLax", function(x) sub("^encoded_", "", x), envir = .GlobalEnv)
-  on.exit({
-    if (is.null(oldDecoder))
-      rm(".decodeColNamesLax", envir = .GlobalEnv)
-    else
-      assign(".decodeColNamesLax", oldDecoder, envir = .GlobalEnv)
-  })
+  seenContexts <- list()
+  testthat::local_mocked_bindings(
+    .decodeJaspText = function(x, decodeContext = NULL, fieldName = NULL) {
+      seenContexts[[length(seenContexts) + 1L]] <<- decodeContext
+      sub("^encoded_", "", x)
+    },
+    .package = "jaspBase"
+  )
+  decodeContext <- list(source = "test")
 
   args <- list(
     data = data.frame(
@@ -16,7 +17,7 @@ test_that("plot recipe arguments are decoded recursively", {
     nested = list(encoded_name = "encoded_value")
   )
 
-  decoded <- jaspBase:::.decodeJaspPlotRecipeArguments(args, decodeNames = FALSE)
+  decoded <- jaspBase:::.decodeJaspPlotRecipeArguments(args, decodeNames = FALSE, decodeContext = decodeContext)
 
   expect_named(decoded, c("data", "nested"))
   expect_named(decoded$data, c("column", "label"))
@@ -24,6 +25,8 @@ test_that("plot recipe arguments are decoded recursively", {
   expect_equal(decoded$data$label, c("label", "other"))
   expect_named(decoded$nested, "name")
   expect_equal(decoded$nested$name, "value")
+  expect_true(length(seenContexts) > 0L)
+  expect_true(all(vapply(seenContexts, identical, logical(1), decodeContext)))
 })
 
 test_that("plot recipe arguments reject environments", {

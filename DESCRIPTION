@@ -1,7 +1,7 @@
 Package: jaspBase
 Type: Package
 Title: JASP Base
-Version: 0.20.4
+Version: 0.20.5
 Author: JASP Team
 Maintainer: Bruno Boutin <B.Boutin@uva.nl>
 Description: Package contains the JASP Bayesian and Frequentist analyses.
@@ -11,6 +11,7 @@ Imports:
   cli,
   codetools,
   compiler,
+  fs,
   ggplot2,
   grDevices,
   grid,
@@ -26,9 +27,11 @@ Imports:
   ragg,
   R6,
   Rcpp (>= 0.12.14),
+  rlang,
   rvg,
   svglite,
   systemfonts,
+  vctrs,
   withr
 Remotes:
   jasp-stats/jaspGraphs
@@ -38,6 +41,7 @@ Encoding: UTF-8
 LinkingTo: Rcpp
 RcppModules: jaspResults
 NeedsCompilation: yes
-Suggests: 
+Suggests:
+    jaspSyntax (>= 1.3.3),
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

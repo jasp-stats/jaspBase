@@ -46,13 +46,10 @@ progressbarTick <- function() {
 # we need to decode all the names for jaspObjects before going to CPP to avoid some problems. This because otherwise some jaspPlots (and others) might contain encoded columnnames. Which breaks plot-resizing-persistence
 #' @export
 decodeName <- function(name) {
-  if(jaspBase::jaspResultsCalledFromJasp())    {
-  tryCatch(
-    suppressWarnings(return(.getDefaultEnDeCoderFun("decode", FALSE)(name))),
-    error	= function(e) { return(name) }
-  )
-    
-  } else                             return(name)
+  if(jaspBase::jaspResultsCalledFromJasp())
+    return(suppressWarnings(.getDefaultEnDeCoderFun("decode", FALSE)(name)))
+
+  name
 }
 
 #' @export
@@ -163,6 +160,13 @@ jaspObjR <- R6::R6Class(
   public    = list(
     initialize = function()	stop("You should not create a new jaspObject!", domain = NA),
     print      = function()	private$jaspObject$print(),
+    setDecodeContext = function(decodeContext = NULL) {
+      private$decodeContext <- if (is.null(decodeContext)) NULL else .serializableJaspDecodeContext(decodeContext)
+      invisible(self)
+    },
+    getDecodeContext = function() {
+      private$decodeContext
+    },
     dependOn   = function(options=NULL, optionsFromObject=NULL, optionContainsValue=NULL, nestedOptions = NULL, nestedOptionsContainsValue = NULL) {
 
       if (is.jaspDeps(options)) {
@@ -299,6 +303,7 @@ jaspObjR <- R6::R6Class(
   ),
   private = list(
     jaspObject    = NULL,
+    decodeContext = NULL,
     getJaspObject = function(R6obj) R6obj$.__enclos_env__$private$jaspObject
   )
 )
@@ -306,6 +311,132 @@ jaspObjR <- R6::R6Class(
 #' @export
 print.jaspObjR <- function(x, ...) 	# TODO: print actual information depending on object type
   x$print()
+
+#' @export
+print.jaspOutputObjR <- function(x, ...) {
+  print(x$toRObject(), ...)
+  invisible(x)
+}
+
+.jaspWrapperTitle <- function(x) {
+  title <- attr(x, "title", exact = TRUE)
+  if (is.null(title) || !is.character(title) || length(title) == 0L)
+    return(NULL)
+  title[[1L]]
+}
+
+.jaspWrapperHasTitle <- function(x) {
+  title <- .jaspWrapperTitle(x)
+  !is.null(title) && nzchar(title)
+}
+
+.jaspWrapperPrintTitle <- function(x) {
+  title <- .jaspWrapperTitle(x)
+  if (!is.null(title) && nzchar(title))
+    cat(title, "\n", sep = "")
+}
+
+.jaspWrapperFormatName <- function(name) {
+  if (is.null(name) || !is.character(name) || length(name) == 0L || is.na(name[[1L]]) || !nzchar(name[[1L]]))
+    return("[[1]]")
+
+  name <- name[[1L]]
+  if (make.names(name) == name)
+    return(name)
+
+  paste0("`", gsub("`", "\\\\`", name, fixed = TRUE), "`")
+}
+
+.jaspWrapperChildPath <- function(path, name, index = 1L) {
+  formattedName <- .jaspWrapperFormatName(name)
+  if (identical(formattedName, "[[1]]"))
+    return(paste0(path, "[[", index, "]]"))
+
+  paste0(path, "$", formattedName)
+}
+
+.jaspWrapperPlainDataFrame <- function(x) {
+  class(x) <- setdiff(class(x), c("jaspTableWrapper", "jaspWrapper"))
+  x
+}
+
+.jaspWrapperHasPrintPath <- function(x) {
+  inherits(x, c("jaspContainerWrapper", "jaspTableWrapper", "jaspPlotWrapper"))
+}
+
+.jaspWrapperStripHtml <- function(x) {
+  if (is.null(x) || !is.character(x) || length(x) == 0L)
+    return("")
+
+  gsub("<[^>]+>", "", x[[1L]])
+}
+
+.jaspWrapperPrintFootnotes <- function(x) {
+  footnotes <- attr(x, "footnotes", exact = TRUE)
+  if (is.null(footnotes) || length(footnotes) == 0L)
+    return(invisible(NULL))
+
+  cat("\nFootnotes:\n")
+  for (footnote in footnotes) {
+    if (!is.list(footnote) || is.null(footnote[["text"]]))
+      next
+
+    symbol <- .jaspWrapperStripHtml(footnote[["symbol"]])
+    prefix <- if (nzchar(symbol)) paste0(symbol, " ") else ""
+    cat("- ", prefix, footnote[["text"]][[1L]], "\n", sep = "")
+  }
+
+  invisible(NULL)
+}
+
+#' @export
+print.jaspContainerWrapper <- function(x, ..., path = "x") {
+  .jaspWrapperPrintTitle(x)
+
+  childNames <- names(x)
+  for (i in seq_along(x)) {
+    if (i > 1L || .jaspWrapperHasTitle(x))
+      cat("\n")
+
+    childName <- if (!is.null(childNames) && length(childNames) >= i) childNames[[i]] else ""
+    childPath <- .jaspWrapperChildPath(path, childName, i)
+    if (.jaspWrapperHasPrintPath(x[[i]])) {
+      print(x[[i]], ..., path = childPath)
+    } else {
+      if (nzchar(childName))
+        cat(childName, "\n", sep = "")
+      print(x[[i]], ...)
+    }
+  }
+
+  invisible(x)
+}
+
+#' @export
+print.jaspTableWrapper <- function(x, ..., path = "x") {
+  .jaspWrapperPrintTitle(x)
+  cat("<jasp table: use ", path, " as a data.frame; footnotes are in attr(", path, ", \"footnotes\")>\n\n", sep = "")
+  print(.jaspWrapperPlainDataFrame(x), ...)
+  .jaspWrapperPrintFootnotes(x)
+  invisible(x)
+}
+
+#' @export
+print.jaspPlotWrapper <- function(x, ..., path = NULL, display = NULL) {
+  directPrint <- is.null(path)
+  if (is.null(display))
+    display <- directPrint
+  if (directPrint)
+    path <- "x"
+
+  .jaspWrapperPrintTitle(x)
+  cat("<jasp plot: use ", path, "$plotObject to display or modify>\n", sep = "")
+
+  if (isTRUE(display) && !is.null(x[["plotObject"]]))
+    print(x[["plotObject"]], ...)
+
+  invisible(x)
+}
 
 jaspStateR <- R6::R6Class(
   classname = "jaspStateR",
@@ -352,7 +483,7 @@ jaspOutputObjR <- R6::R6Class(
       for (i in seq_along(x))
         private$jaspObject$addCitation(x[i])
     },
-    toRObject   = function() private$jaspObject$toRObject(),
+    toRObject   = function() .decodeJaspRObjectFromCpp(private$jaspObject, decodeContext = self$getDecodeContext()),
     toHtml      = function() private$jaspObject$toHtml()
   ),
   active = list(
@@ -361,6 +492,134 @@ jaspOutputObjR <- R6::R6Class(
     info     = function(x) { if (missing(x)) private$jaspObject$info     else private$jaspObject$info     <- x }
   )
 )
+
+.decodeJaspRObject <- function(x, fieldName = NULL, decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+
+  if (is.null(x))
+    return(x)
+
+  if (inherits(x, "jaspPlotWrapper")) {
+    if (!is.null(x[["plotObject"]]))
+      x[["plotObject"]] <- .decodeJaspPlotObject(x[["plotObject"]], returnGrob = FALSE, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
+  }
+
+  if (is.character(x))
+    return(.decodeJaspText(x, fieldName = fieldName, decodeContext = decodeContext))
+
+  if (is.factor(x)) {
+    levels(x) <- .decodeJaspText(levels(x), fieldName = fieldName, decodeContext = decodeContext)
+    return(x)
+  }
+
+  if (.isJaspMixedObject(x))
+    return(.decodeJaspMixedObject(x, fieldName = fieldName, decodeContext = decodeContext))
+
+  if (is.data.frame(x)) {
+    oldNames <- names(x)
+    for (name in oldNames)
+      x[[name]] <- .decodeJaspRObject(x[[name]], fieldName = name, decodeContext = decodeContext)
+    names(x) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+    rowNames <- row.names(x)
+    if (is.character(rowNames))
+      row.names(x) <- .decodeJaspText(rowNames, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
+  }
+
+  # Decode only JASP-owned result wrappers and plain R result payloads here.
+  # Model objects from analysis packages can be S3/S4 lists internally; rewriting
+  # their slots, attributes, or names mutates package-owned state and can break
+  # invariants such as lme4 response objects. In particular, external packages
+  # may use class names that overlap with JASP display helpers.
+  if (isS4(x) || is.call(x) || is.name(x))
+    return(x)
+
+  if (is.object(x) && !inherits(x, "jaspWrapper"))
+    return(x)
+
+  if (is.list(x)) {
+    oldNames <- names(x)
+    for (i in seq_along(x))
+      x[[i]] <- .decodeJaspRObject(
+        x[[i]],
+        fieldName = if (!is.null(oldNames) && length(oldNames) >= i) oldNames[[i]] else NULL,
+        decodeContext = decodeContext
+      )
+    names(x) <- .decodeJaspText(oldNames, decodeContext = decodeContext)
+    return(.decodeJaspRObjectAttributes(x, decodeContext = decodeContext))
+  }
+
+  decodedFactorValues <- .decodeJaspFactorValues(x, fieldName = fieldName, decodeContext = decodeContext)
+  if (!identical(decodedFactorValues, x))
+    return(decodedFactorValues)
+
+  dimNames <- dimnames(x)
+  if (!is.null(dimNames)) {
+    dimnames(x) <- lapply(dimNames, .decodeJaspText, decodeContext = decodeContext)
+  }
+
+  objectNames <- names(x)
+  if (!is.null(objectNames))
+    names(x) <- .decodeJaspText(objectNames, decodeContext = decodeContext)
+
+  .decodeJaspRObjectAttributes(x, decodeContext = decodeContext)
+}
+
+.isJaspMixedObject <- function(x) {
+  if (!inherits(x, "mixed"))
+    return(FALSE)
+
+  if (inherits(x, "vctrs_vctr"))
+    return(!is.null(attr(x, "column", exact = TRUE)))
+
+  is.list(x) && all(c("value", "type", "format") %in% names(x))
+}
+
+.decodeJaspMixedObject <- function(x, fieldName = NULL, decodeContext = NULL) {
+  if (!inherits(x, "vctrs_vctr")) {
+    oldNames <- names(x)
+    for (i in seq_along(x))
+      x[[i]] <- .decodeJaspRObject(
+        x[[i]],
+        fieldName = if (!is.null(oldNames) && length(oldNames) >= i && identical(oldNames[[i]], "value")) fieldName else NULL,
+        decodeContext = decodeContext
+      )
+    return(x)
+  }
+
+  data <- vctrs::vec_data(x)
+  for (i in seq_along(data)) {
+    cell <- data[[i]]
+    if (is.list(cell) && !is.null(cell[["value"]])) {
+      cell[["value"]] <- .decodeJaspRObject(
+        cell[["value"]],
+        fieldName = fieldName,
+        decodeContext = decodeContext
+      )
+      data[[i]] <- cell
+    }
+  }
+
+  result <- vctrs::new_vctr(data, column = attr(x, "column", exact = TRUE), class = "mixed")
+  objectNames <- names(x)
+  if (!is.null(objectNames))
+    names(result) <- .decodeJaspText(objectNames, decodeContext = decodeContext)
+  result
+}
+
+.decodeJaspRObjectAttributes <- function(x, decodeContext = NULL) {
+  decodeContext <- .normalizeJaspDecodeContext(decodeContext)
+  attributesToDecode <- setdiff(
+    names(attributes(x)),
+    c("class", "dim", "dimnames", "names", "row.names", "jaspObjectEnvironment")
+  )
+
+  for (attribute in attributesToDecode)
+    attr(x, attribute) <- .decodeJaspRObject(attr(x, attribute), fieldName = attribute, decodeContext = decodeContext)
+
+  x
+}
 
 .jaspHtmlPixelizer <- function(maxWidth) {
   if(is.numeric(maxWidth)) return(paste0(as.character(maxWidth), "px"))
@@ -487,7 +746,7 @@ jaspContainerR <- R6::R6Class(
     children    = list(),
     jaspObject  = NULL,
     jaspCppToR6 = function(cppObj) {
-      return(switch(
+      r6Obj <- switch(
         class(cppObj),
         "Rcpp_jaspPlot"      = jaspPlotR$new(      jaspObject = cppObj ),
         "Rcpp_jaspTable"     = jaspTableR$new(     jaspObject = cppObj ),
@@ -498,11 +757,16 @@ jaspContainerR <- R6::R6Class(
         "Rcpp_jaspQmlSource" = jaspQmlSourceR$new(jaspObject = cppObj  ),
 		    "Rcpp_jaspReport"    = jaspReportR$new(    jaspObject = cppObj ),
         stop(sprintf("Invalid call to jaspCppToR6. Expected jaspResults object but got %s", class(cppObj)), domain = NA)
-      ))
+      )
+      if (is.JaspResultsObj(r6Obj))
+        r6Obj$setDecodeContext(private$decodeContext)
+      r6Obj
     },
     #These two functions should be the exact same as those for jaspResults
     setField   = function(field, value) {
       field <- decodeName(field)
+      if (is.JaspResultsObj(value))
+        value$setDecodeContext(private$decodeContext)
       private$jaspObject[[field]] <- private$getJaspObject(value);
       private$children[[field]]   <- value;
     },
