@@ -69,7 +69,7 @@ sendFatalErrorMessage <- function(name, title, msg)
 
 
 #' @export
-runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE) {
+runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall = name, preloadData=FALSE, multiDataSetJson = NULL) {
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
@@ -105,8 +105,39 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysis    <- eval(parse(text=functionCall))
   dataset     <- NULL
+  multiDataSet <- .isMultiDataSetJson(multiDataSetJson)
 
-  if(preloadData)
+  if (multiDataSet) {
+    # Multi-dataset aware run: the engine queued every filter this analysis references, one read
+    # per queued call below (see DataBridge::prepareMultiDataSetRun). The list is keyed by filter
+    # id - exactly what a per-form dataset selection option carries - with the dataset titles in
+    # attr "dataSetNames", each slice's dataset id in attr "dataSetIds" and the analysis' own
+    # slice in attr "primarySliceKey". readDataSet* is broken while this mode is active: there is
+    # no single "the" dataset.
+    dsInfo <- fromJSON(multiDataSetJson)
+    ids    <- as.character(dsInfo$ids)   # slice keys: the resolved FILTER id of each slice
+
+    .multiDataSetMode(TRUE)
+    on.exit(.multiDataSetMode(FALSE), add = TRUE)
+
+    # The slices arrive with their column names ENCODED by the same per-dataset encoder that encoded
+    # the options (rbridge_readDataSetRequested), so an option value indexes its column in
+    # datasets[[key]] as-is - the same encoded namespace a classic single-dataset run lives in.
+    # Keys are filter ids (per-form selections ARE filter selections, and a filter implies its
+    # dataset), one slice per distinct filter the options reference: a form's selection option
+    # indexes ITS slice directly, datasets[[as.character(options$dataSetA$value)]. attr
+    # "dataSetIds" maps every slice key back to its dataset id. Result strings are decoded on
+    # their way back to the GUI by Engine::sendString.
+    datasets <- list()
+
+    for (id in ids)
+      datasets[[id]] <- .fromRCPP(".readDataSetRequestedNative")
+
+    attr(datasets, "dataSetNames") <- dsInfo$names
+    attr(datasets, "dataSetIds")   <- dsInfo$dataSetIds
+    attr(datasets, "primarySliceKey") <- if (!is.null(dsInfo$primary)) as.character(dsInfo$primary) else NULL
+
+  } else if (preloadData)
     dataset <- .fromRCPP(".readDataSetRequestedNative")
 
   # ensure an analysis always starts with a clean hashtable of computed jasp Objects
@@ -114,7 +145,10 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
 
   analysisResult <-
     tryCatch(
-      expr=withCallingHandlers(expr=analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
+      expr=withCallingHandlers(expr=if (multiDataSet)
+                                       analysis(jaspResults=jaspResults, dataset=NULL, options=options, datasets=datasets)
+                                     else
+                                       analysis(jaspResults=jaspResults, dataset=dataset, options=options), error=.addStackTrace),
       error=function(e) e,
       jaspAnalysisAbort=function(e) e
     )
@@ -260,6 +294,57 @@ isTryError <- function(obj){
   return(cols);
 }
 
+# ---------------------------------------------------------------------------
+# Multi-dataset aware runs
+#
+# A multiDataSetAware analysis gets every dataset it needs as the `datasets` parameter of
+# runJaspResults (and thus of the analysis function), instead of reading "the" dataset through
+# the readDataSet* functions below. While such a run is active those read functions stop: the
+# very notion of one current dataset is meaningless when an analysis runs on several.
+# ---------------------------------------------------------------------------
+
+.multiDataSetState <- new.env(parent = emptyenv())
+
+.multiDataSetMode <- function(set = NULL) {
+  if (!is.null(set)) .multiDataSetState$active <- set
+  isTRUE(.multiDataSetState$active)
+}
+
+.stopIfMultiDataSetMode <- function(what) {
+  if (.multiDataSetMode())
+    stop(sprintf(paste0("%s() is not available in multi-dataset aware analyses; those get the datasets they ",
+                        "need as the `datasets` argument (a named list, keyed by FILTER id - the same id ",
+                        "the form's dataset selection option holds; attr(datasets, \"dataSetNames\") maps ",
+                        "those keys to the dataset titles)."), what),
+         call. = FALSE)
+}
+
+.isMultiDataSetJson <- function(multiDataSetJson) {
+  !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
+}
+
+# ---- the datasets contract (NO accessors; CTO zero-export decision 2026-10-09) ------------------
+#
+# Options and datasets meet in the ENCODED namespace: the engine encodes every variable option
+# against the encoder of the dataset it was selected from, and the slice reads hand back columns
+# encoded by that very same encoder. Both sides are the same strings
+# ("JASPColumn_<dataSetId>_<counter>_Encoded" - DataSet::setupEncoderPrefix embeds the dataset
+# id), so an analysis indexes directly: datasets[[key]][[optionValue]].
+#
+#   datasets            named list, ONE ENTRY PER FILTER the analysis references; the name (key)
+#                       is that filter's id - exactly what a per-form dataset selection option
+#                       (the qml's dataSetSelectionOption) holds:
+#                         key <- as.character(options$dataSetA$value)  # or tail(unlist(...), 1)
+#                         slice <- datasets[[key]]
+#   attr "dataSetNames"  key -> dataset title (display only - titles are user-editable)
+#   attr "dataSetIds"    key -> dataset id
+#   attr "primarySliceKey" the analysis' own slice (its filter, else the primary dataset's default)
+#
+# Results are decoded on the way back to the GUI (Engine::sendString), so nothing in R ever has
+# to decode; there is nothing to look up beyond the key. There are deliberately NO accessor
+# helpers (no getSlice/getSliceKey/getDataSetColumn family): earlier generations of them scanned
+# every dataset for a name and could silently serve the wrong one. If an analysis needs the
+# column of its selection, it indexes it - and gets an honest error when the key is wrong.
 #' @title readDataSetByVariableTypes
 #'
 #' @param options options from QML.
@@ -271,6 +356,8 @@ isTryError <- function(obj){
 #'
 #' @export
 readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL) {
+
+  .stopIfMultiDataSetMode("readDataSetByVariableTypes")
 
   if (!is.list(options))
     stop(".readDataSetByVariableTypes received `options` that are not a list.")
@@ -375,6 +462,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 #' @export
 .readDataSetToEnd <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, exclude.na.listwise=NULL, ...) {
 
+  .stopIfMultiDataSetMode("readDataSet")
+
   columns              <- .readDataSetCleanNAs(columns)
   columns.as.numeric   <- .readDataSetCleanNAs(columns.as.numeric)
   columns.as.ordinal   <- .readDataSetCleanNAs(columns.as.ordinal)
@@ -393,6 +482,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 #' @export
 .readFullDataset <- function(exclude.na.listwise=NULL, ...) {
 
+  .stopIfMultiDataSetMode("readFullDataset")
+
   exclude.na.listwise  <- .readDataSetCleanNAs(exclude.na.listwise)
 
   dataset <- .fromRCPP(".readFullDatasetToEnd")
@@ -403,6 +494,8 @@ readDataSetByVariableTypes <- function(options, keys, exclude.na.listwise = NULL
 
 #' @export
 .readDataSetHeader <- function(columns=NULL, columns.as.numeric=NULL, columns.as.ordinal=NULL, columns.as.factor=NULL, all.columns=FALSE, ...) {
+
+  .stopIfMultiDataSetMode("readDataSetHeader")
 
   columns              <- .readDataSetCleanNAs(columns)
   columns.as.numeric   <- .readDataSetCleanNAs(columns.as.numeric)
@@ -1186,8 +1279,25 @@ storeDataSet <- function(dataset) {
   jaspSyntax::loadDataSet(dataset)
 }
 
+#' @title storeDataSets
+#'
+#' @description Internal: store several datasets in the JASP syntax bridge at once, for
+#'   runWrappedAnalysis (the wrapper form of `jaspSyntax::loadDataSets(datasets)`).
+#'
+#' @param datasets named list of dataframes; the names become the dataset titles.
+#'
+#' @noRd
+storeDataSets <- function(datasets) {
+  # Load every dataset into the syntax bridge's workspace (jaspSyntax::loadDataSets): each list
+  # name becomes a DataSet title and every dataset gets a real id and column encoder, so the
+  # VariablesForms can select them by name and the bridge can encode per dataset. The analysis
+  # then gets the slices from the bridge's queue (keyed by filter id), never from R-side hands.
+  jaspSyntax::loadDataSets(datasets)
+  invisible(NULL)
+}
+
 #' @export
-runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData) {
+runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, version, preloadData, datasets = NULL) {
   if (jaspResultsCalledFromJasp()) {
     # In this case, it is JASP Desktop that called the wrapper. This was done to parse the R code, and to get the arguments
     # in a structured way. In this way the Desktop can then set the options to the QML controls of the form, and this will run the analysis.
@@ -1198,14 +1308,35 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
     # The wrapper is called inside an R environment (R Studio probably).
     # The options must be parsed and checked by the QML form, and then the real analysis can be called.
     qmlFile <- file.path(find.package(moduleName), "qml", qmlFileName)
-    # Load the qml form, and set the right options (formula should be parsed and all logics set in QML should be checked), and run the analysis
-    options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
 
-    if (options == "")
-      stop("Error when parsing the options")
+    multiDataSetJson <- NULL
+
+    if (!is.null(datasets)) {
+      # MultiDataSetAware wrapper: load every dataset into the bridge workspace (names become
+      # DataSet titles), let the QML forms select them through their dataSetSelectionOption
+      # (depends-ordered, so the column options bind against the selected dataset and the
+      # controls stamp the .meta provenance), and have the bridge encode per dataset and queue
+      # the slices - the exact preparation a desktop run gets from Engine::runAnalysis (shared
+      # through DataBridge::prepareMultiDataSetRun). runJaspResults then reads the slices from
+      # the queue: encoded columns matching the encoded options, keyed by slice (filter) id.
+      storeDataSets(datasets)
+
+      status           <- jaspSyntax::loadQmlAndParseOptionsStatus(moduleName, analysisName, qmlFile,
+                                                                   as.character(toJSON(options)), version, preloadData)
+      options          <- status$options
+      multiDataSetJson <- if (nzchar(status$multiDataSetJson)) status$multiDataSetJson else NULL
+
+      if (!length(options) || !nzchar(options))
+        stop("Error when parsing the options")
+    } else {
+      options <- jaspSyntax::loadQmlAndParseOptions(moduleName, analysisName, qmlFile, as.character(toJSON(options)), version, preloadData)
+
+      if (options == "")
+        stop("Error when parsing the options")
+    }
 
      internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData))
+     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData, multiDataSetJson = multiDataSetJson))
   }
 }
