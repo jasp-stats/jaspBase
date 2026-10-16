@@ -233,7 +233,21 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
 
     .makeDecodedGuide <- function(axisName, positional = TRUE) {
       existing <- currentGuides$guides[[axisName]]
-      if (is.character(existing)) {
+
+      # A guide can also be given to the scale itself (e.g. scale_fill_manual(guide = guide_legend(title = ...))).
+      # That one is only used when the plot has no guide for the aesthetic, and the plot-level guide added
+      # below would override it, so its title and settings would be lost. Decode that guide instead.
+      if (is.null(existing)) {
+        scale <- x@scales$get_scales(axisName)
+        if (!is.null(scale) && (inherits(scale$guide, "Guide") || identical(scale$guide, "none")))
+          existing <- scale$guide
+      }
+
+      # A hidden guide must stay hidden
+      if (identical(existing, "none"))
+        return("none")
+
+      if (!inherits(existing, "Guide")) {
         newTitle <- decodeColNames
       } else {
         title    <- existing$params$title
@@ -246,6 +260,11 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
         } else {
           decodeColNames
         }
+
+        # Keep the guide with all its other settings (number of rows, key size, ...), only with a decoded title
+        decoded <- ggplot2::ggproto(NULL, existing)
+        decoded$params$title <- newTitle
+        return(decoded)
       }
 
       if (positional) {
