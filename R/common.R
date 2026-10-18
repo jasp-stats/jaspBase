@@ -328,8 +328,8 @@ isTryError <- function(obj){
 # Options and datasets meet in the ENCODED namespace: the engine encodes every variable option
 # against the encoder of the dataset it was selected from, and the slice reads hand back columns
 # encoded by that very same encoder. Both sides are the same strings
-# ("JASPColumn_<dataSetId>_<counter>_Encoded" - DataSet::setupEncoderPrefix embeds the dataset
-# id), so an analysis indexes directly: datasets[[key]][[optionValue]].
+# ("JASPColumn_D<dsId>_F<filterId>_<n>_Encoded" - the filter's encoder-view prefix embeds both
+# ids), so an analysis indexes directly: datasets[[key]][[optionValue]].
 #
 #   datasets            named list, ONE ENTRY PER FILTER the analysis references; the name (key)
 #                       is that filter's id - exactly what a per-form dataset selection option
