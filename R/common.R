@@ -1062,6 +1062,8 @@ editImage <- function(name, optionsJson) {
 
   plot     <- NULL
   revision <- -1
+  # set before the try, so that an error while editing gives an error response instead of failing below and crashing the engine
+  interactiveJsonData <- NULL
 
   # uncomment to profile (and make sure that profvis is installed)
   # profvis::profvis(prof_output = "~/jaspDeletable/robjects/profileEditImage", expr = {
