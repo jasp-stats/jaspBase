@@ -233,21 +233,32 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
 
     .makeDecodedGuide <- function(axisName, positional = TRUE) {
       existing <- currentGuides$guides[[axisName]]
+      scale    <- x@scales$get_scales(axisName)
 
       # A guide can also be given to the scale itself (e.g. scale_fill_manual(guide = guide_legend(title = ...))).
       # That one is only used when the plot has no guide for the aesthetic, and the plot-level guide added
       # below would override it, so its title and settings would be lost. Decode that guide instead.
-      if (is.null(existing)) {
-        scale <- x@scales$get_scales(axisName)
-        if (!is.null(scale) && (inherits(scale$guide, "Guide") || identical(scale$guide, "none")))
-          existing <- scale$guide
-      }
+      if (is.null(existing) && !is.null(scale) && !is.null(scale$guide) && !ggplot2::is_waiver(scale$guide))
+        existing <- scale$guide
 
       # A hidden guide must stay hidden
       if (identical(existing, "none"))
         return("none")
 
+      # A guide given by name ("colourbar" is the default of continuous colour scales, "coloursteps" of binned ones, ...)
+      # is turned into its guide object, so that the legend keeps its type instead of becoming a discrete legend
+      if (is.character(existing)) {
+        guideConstructor <- get0(paste0("guide_", existing), envir = asNamespace("ggplot2"), mode = "function")
+        if (!is.null(guideConstructor))
+          existing <- guideConstructor()
+      }
+
       if (!inherits(existing, "Guide")) {
+        # Without a scale, ggplot2 only picks the type of the legend (colourbar, legend, ...) when the plot is built,
+        # so no guide is added here: its title can then only come from the labels, which are decoded below
+        if (!positional && is.null(scale))
+          return(NULL)
+
         newTitle <- decodeColNames
       } else {
         title    <- existing$params$title
@@ -274,13 +285,38 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
       }
     }
 
-    x <- x + ggplot2::guides(
-      x     = .makeDecodedGuide("x",      positional = TRUE),
-      y     = .makeDecodedGuide("y",      positional = TRUE),
+    decodedGuides <- list(
+      x      = .makeDecodedGuide("x",      positional = TRUE),
+      y      = .makeDecodedGuide("y",      positional = TRUE),
       colour = .makeDecodedGuide("colour", positional = FALSE),
-      fill  = .makeDecodedGuide("fill",   positional = FALSE),
-      shape = .makeDecodedGuide("shape",  positional = FALSE)
+      fill   = .makeDecodedGuide("fill",   positional = FALSE),
+      shape  = .makeDecodedGuide("shape",  positional = FALSE)
     )
+    withoutGuide  <- names(decodedGuides)[vapply(decodedGuides, is.null, logical(1))]
+    decodedGuides <- decodedGuides[setdiff(names(decodedGuides), withoutGuide)]
+
+    # Decode the titles of the legends that got no guide through their labels instead.
+    # Only for mapped aesthetics: ggplot2 warns about labels of aesthetics the plot does not use.
+    mapped        <- unique(c(names(x@mapping), unlist(lapply(x@layers, function(layer) names(layer$mapping)))))
+    currentLabels <- x@labels
+    decodedLabels <- list()
+    for (aesthetic in intersect(withoutGuide, mapped)) {
+      label <- currentLabels[[aesthetic]]
+      if (aesthetic %in% names(currentLabels) && is.null(label))
+        next # the title was removed on purpose
+
+      decodedLabels[[aesthetic]] <- if (is.character(label)) {
+        decodeColNames(label)
+      } else if (is.function(label)) {
+        local({ f <- label; function(t) decodeColNames(f(t)) })
+      } else {
+        decodeColNames
+      }
+    }
+
+    x <- x + do.call(ggplot2::guides, decodedGuides)
+    if (length(decodedLabels) > 0)
+      x <- x + do.call(ggplot2::labs, decodedLabels)
   }
   if (returnGrob) {
     grDevices::png(f <- tempfile())
