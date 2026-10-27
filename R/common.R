@@ -323,7 +323,7 @@ isTryError <- function(obj){
   !is.null(multiDataSetJson) && !identical(multiDataSetJson, "") && !identical(multiDataSetJson, "null")
 }
 
-# ---- the datasets contract (NO accessors; CTO zero-export decision 2026-10-09) ------------------
+# ---- the datasets contract ------------------
 #
 # Options and datasets meet in the ENCODED namespace: the engine encodes every variable option
 # against the encoder of the dataset it was selected from, and the slice reads hand back columns
