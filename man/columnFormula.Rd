@@ -4,7 +4,7 @@
 \alias{columnFormula}
 \title{Build a Formula from Column Names}
 \usage{
-columnFormula(..., dependent = NULL, intercept = TRUE)
+columnFormula(..., dependent = NULL, intercept = TRUE, checkColumns = TRUE)
 }
 \arguments{
 \item{...}{Character strings or vectors of column names to include on the
@@ -15,6 +15,12 @@ The default, \code{NULL}, creates a one-sided formula.}
 
 \item{intercept}{A single logical value indicating whether to include an
 intercept. Defaults to \code{TRUE}.}
+
+\item{checkColumns}{A single logical value. When \code{TRUE} (the default) and a
+dataset is available as \code{data} or \code{filteredData} (as in the R Commander),
+a warning points out every column that does not exist and suggests close
+matches. The check is skipped when no dataset is available; use \code{FALSE}
+to disable it entirely.}
 }
 \value{
 An object of class \code{formula}, with the calling environment as its
@@ -32,6 +38,9 @@ treated literally: \code{"a+b"} refers to one column named \code{a+b}.
 
 With no right-hand-side columns, the formula is \code{~ 1} (or \code{~ 0} when
 \code{intercept = FALSE}), optionally with a dependent variable.
+
+Errors name the argument that caused them and suggest how to fix it. The
+column check only warns and never changes the resulting formula.
 }
 \examples{
 columnFormula("x1", "x2", dependent = "y")
