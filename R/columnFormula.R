@@ -172,11 +172,17 @@ columnFormula <- function(..., dependent = NULL, intercept = TRUE, checkColumns 
   if (!is.function(encodeStrict))
     return(invisible(NULL))
 
-  suggest <- get0(".suggestColumnNames", envir = callerEnv, inherits = TRUE)
+  suggest      <- get0(".suggestColumnNames",   envir = callerEnv, inherits = TRUE)
+  decodeStrict <- get0(".decodeColNamesStrict", envir = callerEnv, inherits = TRUE)
 
   for (name in unique(names)) {
     encoded <- tryCatch(encodeStrict(name), error = function(e) NULL)
     if (!is.null(encoded) && nzchar(encoded))
+      next
+
+    # names(data) gives the encoded names, which are columns too
+    decoded <- if (is.function(decodeStrict)) tryCatch(decodeStrict(name), error = function(e) NULL)
+    if (!is.null(decoded) && nzchar(decoded))
       next
 
     warningMessage <- sprintf('No column named "%s" in the dataset.', name)
