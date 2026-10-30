@@ -168,6 +168,18 @@ testthat::test_that("unknown columns get a did-you-mean warning when a dataset i
                            fixed = TRUE)
 })
 
+testthat::test_that("already-encoded names, as names(data) gives them in JASP, are not reported as missing", {
+  .stubDataset(c("part length", "temperature"))
+  .decodeColNamesStrict <- function(name) {
+    original <- sub("^encoded:", "", name)
+    if (original != name && original %in% c("part length", "temperature")) original else stop("not encoded: ", name)
+  }
+
+  testthat::expect_no_warning(columnFormula("encoded:part length"))
+  testthat::expect_warning(columnFormula("encoded:nothing"),
+                           'No column named "encoded:nothing" in the dataset.', fixed = TRUE)
+})
+
 testthat::test_that("each unknown column gets its own warning", {
   .stubDataset(c("part length", "temperature"))
 
