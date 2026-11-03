@@ -73,12 +73,6 @@ runJaspResults <- function(name, title, dataKey, options, stateKey, functionCall
   # resets jaspGraphs::graphOptions & options after this function finishes
   setOptionsCleanupHook()
 
-  # let's disable this for now
-  # if (identical(.Platform$OS.type, "windows"))
-  #   compiler::enableJIT(0)
-
-  setLegacyRng()
-
   jaspResultsCPP        <- loadJaspResults(name)
   jaspResultsCPP$title  <- title
   jaspResults           <- jaspResultsR$new(jaspResultsCPP)
