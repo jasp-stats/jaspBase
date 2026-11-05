@@ -109,6 +109,28 @@ test_that("continuous colour scales keep their colourbar", {
   expect_equal(legend$title, "Horse Power")
 })
 
+test_that("all legends are decoded, so legends of the same variable still merge", {
+  localDecoder()
+  # As in afex_plot (jaspMixedModels): one variable mapped to shape, linetype and fill, all with the same encoded title
+  plot <- ggplot2::ggplot(testData, ggplot2::aes(wt, mpg, shape = encoded_cyl, linetype = encoded_cyl, fill = encoded_cyl)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line() +
+    ggplot2::scale_shape_discrete(name = "encoded_cyl") +
+    ggplot2::scale_linetype_discrete(name = "encoded_cyl") +
+    ggplot2::scale_fill_discrete(name = "encoded_cyl")
+
+  legends <- builtLegends(decodedPlot(plot))
+  expect_length(legends, 1)
+  expect_equal(legends[[1]]$title, "Cylinders")
+
+  plot <- ggplot2::ggplot(testData, ggplot2::aes(wt, mpg, size = encoded_hp, alpha = encoded_hp, linewidth = encoded_hp)) +
+    ggplot2::geom_point() +
+    ggplot2::geom_line()
+  legends <- builtLegends(decodedPlot(plot))
+  expect_length(legends, 1)
+  expect_equal(legends[[1]]$title, "Horse Power")
+})
+
 test_that("labels are decoded and removed titles stay removed", {
   localDecoder()
   expect_equal(builtLegends(decodedPlot(continuousPlot + ggplot2::labs(colour = "encoded_hp per car")))$colour$title, "Horse Power per car")
