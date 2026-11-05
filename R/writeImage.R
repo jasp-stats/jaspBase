@@ -285,12 +285,15 @@ decodeplot.gg <- function(x, returnGrob = TRUE, ...) {
       }
     }
 
-    decodedGuides <- list(
-      x      = .makeDecodedGuide("x",      positional = TRUE),
-      y      = .makeDecodedGuide("y",      positional = TRUE),
-      colour = .makeDecodedGuide("colour", positional = FALSE),
-      fill   = .makeDecodedGuide("fill",   positional = FALSE),
-      shape  = .makeDecodedGuide("shape",  positional = FALSE)
+    # Every aesthetic that can get a legend: ggplot2 merges legends only when their titles are equal,
+    # so one legend left encoded splits e.g. a shape + linetype legend in two
+    legendAesthetics <- c("colour", "fill", "shape", "linetype", "linewidth", "size", "alpha")
+    decodedGuides <- c(
+      list(
+        x = .makeDecodedGuide("x", positional = TRUE),
+        y = .makeDecodedGuide("y", positional = TRUE)
+      ),
+      stats::setNames(lapply(legendAesthetics, .makeDecodedGuide, positional = FALSE), legendAesthetics)
     )
     withoutGuide  <- names(decodedGuides)[vapply(decodedGuides, is.null, logical(1))]
     decodedGuides <- decodedGuides[setdiff(names(decodedGuides), withoutGuide)]
