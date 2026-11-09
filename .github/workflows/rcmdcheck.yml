@@ -28,6 +28,13 @@ jobs:
           r-version: ${{ matrix.r }}
           use-public-rspm: true
 
+      # On macOS R-devel there are no binary packages, so everything is built from source.
+      # CRAN's R-devel has NLS enabled, so e.g. data.table needs libintl.h, which CRAN's
+      # build machines get from the gettext recipe in /opt/R/<arch>; the runner does not have it.
+      - name: Install gettext (macOS R-devel)
+        if: runner.os == 'macOS' && matrix.r == 'devel'
+        run: sudo Rscript -e 'source("https://mac.R-project.org/bin/install.R"); install.libs("gettext")'
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: rcmdcheck
