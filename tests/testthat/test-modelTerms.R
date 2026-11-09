@@ -544,15 +544,16 @@ test_that("frozen constants: new data never changes scale, polynomial or spline"
                unname(drop(as.matrix(mtDesign(prepared, 1, data = new, intercept = TRUE)) %*% stats::coef(fit))))
 
   # the constants are numeric literals in the text of the term and keep their value when the text is parsed again
+  # (the two computations can differ in the last bit, e.g. on macOS arm64)
   terms <- prepared$models[[1]]$terms
   scaleText <- terms$expression[terms$id == "t1"]
   expect_false(grepl("mean", scaleText, fixed = TRUE))
   expect_match(scaleText, "[0-9]\\.[0-9]{14,}")
-  expect_identical(as.numeric(eval(str2lang(scaleText), data)), mtDesign(prepared, 1)$t1)
+  expect_equal(as.numeric(eval(str2lang(scaleText), data)), mtDesign(prepared, 1)$t1, tolerance = 1e-12)
   polyText <- terms$expression[terms$id == "t2"]
-  expect_identical(as.vector(eval(str2lang(polyText), data)), as.vector(mtMatrix(mtDesign(prepared, 1)[c("t2.1", "t2.2", "t2.3")])))
+  expect_equal(as.vector(eval(str2lang(polyText), data)), as.vector(mtMatrix(mtDesign(prepared, 1)[c("t2.1", "t2.2", "t2.3")])), tolerance = 1e-12)
   splineText <- terms$expression[terms$id == "t3"]
-  expect_identical(as.vector(eval(str2lang(splineText), data)), as.vector(mtMatrix(mtDesign(prepared, 1)[c("t3.1", "t3.2", "t3.3")])))
+  expect_equal(as.vector(eval(str2lang(splineText), data)), as.vector(mtMatrix(mtDesign(prepared, 1)[c("t3.1", "t3.2", "t3.3")])), tolerance = 1e-12)
 })
 
 test_that("new data is checked against the domain of the learned versions", {
