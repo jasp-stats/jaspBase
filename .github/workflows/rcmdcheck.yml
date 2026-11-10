@@ -29,11 +29,18 @@ jobs:
           use-public-rspm: true
 
       # On macOS R-devel there are no binary packages, so everything is built from source.
-      # CRAN's R-devel has NLS enabled, so e.g. data.table needs libintl.h, which CRAN's
-      # build machines get from the gettext recipe in /opt/R/<arch>; the runner does not have it.
-      - name: Install gettext (macOS R-devel)
+      # CRAN's build machines get the system libraries for that from its recipes in
+      # /opt/R/<arch>; the runner does not have them. Install the ones our dependencies need:
+      #   gettext (libintl.h, R-devel has NLS enabled): data.table
+      #   libpng: svglite, rvg; freetype: gdtools; freetype/libpng/tiff/jpeg/libwebp: ragg
+      #   fontconfig/freetype/harfbuzz/fribidi: systemfonts, textshaping
+      # ragg & co. locate them via `pkg-config --static`, so put CRAN's pkg-config
+      # (which searches /opt/R/<arch>/lib/pkgconfig) first on the PATH.
+      - name: Install system libraries (macOS R-devel)
         if: runner.os == 'macOS' && matrix.r == 'devel'
-        run: sudo Rscript -e 'source("https://mac.R-project.org/bin/install.R"); install.libs("gettext")'
+        run: |
+          sudo Rscript -e 'source("https://mac.R-project.org/bin/install.R"); install.libs(c("gettext", "pkgconfig", "libpng", "freetype", "fontconfig", "harfbuzz", "fribidi", "jpeg", "tiff", "libwebp"))'
+          echo "/opt/R/$(uname -m)/bin" >> "$GITHUB_PATH"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
