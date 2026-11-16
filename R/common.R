@@ -1329,8 +1329,25 @@ runWrappedAnalysis <- function(moduleName, analysisName, qmlFileName, options, v
         stop("Error when parsing the options")
     }
 
-     internalAnalysisName <- paste0(moduleName, "::", analysisName, "Internal")
+     analysisFunction <- .wrappedAnalysisFunction(moduleName, analysisName)
 
-     return(runJaspResults(name=internalAnalysisName, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=internalAnalysisName, preloadData=preloadData, multiDataSetJson = multiDataSetJson))
+     return(runJaspResults(name=analysisFunction, title=analysisName, dataKey="{}", options=options, stateKey="{}", functionCall=analysisFunction, preloadData=preloadData, multiDataSetJson = multiDataSetJson))
   }
+}
+
+# In a module with wrappers, <analysis> is the wrapper and the analysis itself is <analysis>Internal. A module without
+# wrappers only has the analysis, under its own name: runWrappedAnalysis then runs that, so an analysis of any module can
+# be run with its options in R (e.g. by jaspTools, with the options of a .jasp file).
+.wrappedAnalysisFunction <- function(moduleName, analysisName) {
+  exports <- .moduleExports(moduleName)
+
+  for (name in paste0(analysisName, c("Internal", "")))
+    if (name %in% exports)
+      return(paste0(moduleName, "::", name))
+
+  stop(gettextf("Module %1$s exports neither %2$s nor %3$s", moduleName, paste0(analysisName, "Internal"), analysisName), call. = FALSE)
+}
+
+.moduleExports <- function(moduleName) {
+  getNamespaceExports(moduleName)
 }

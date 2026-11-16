@@ -549,7 +549,7 @@ jaspResultsR <- R6::R6Class(
     children    = list(),
     jaspObject  = NULL,
     getJaspObject           = function(R6obj)   R6obj$.__enclos_env__$private$jaspObject,
-    getResults              = function()        private$jaspObject$getResults(),
+    getResults              = function()        .decodedResults(private$jaspObject$getResults()),
     setOptions              = function(options) private$jaspObject$setOptions(options),
     send                    = function()        private$jaspObject$send(),
     setErrorMessage         = function(msg)     private$jaspObject$setErrorMessage(msg),
@@ -566,6 +566,19 @@ jaspResultsR <- R6::R6Class(
     initCollapsed  = function(...) { warning("setting 'initCollapsed' on jaspResults has no effect!", domain = NA) }
   )
 )
+
+# The analysis only sees encoded column names, so its results have them too. In JASP the engine decodes the results
+# it sends (Engine::sendString); in R the results are decoded here, with the decoding table of the datasets jaspSyntax
+# loaded, so that they have the plain column names.
+.decodedResults <- function(results) {
+  if (jaspResultsCalledFromJasp() || !.hasJaspSyntax())
+    return(results)
+
+  .decodeJsonText(results)
+}
+
+.hasJaspSyntax  <- function()     requireNamespace("jaspSyntax", quietly = TRUE)
+.decodeJsonText <- function(json) jaspSyntax::decodeJsonText(json)
 
 jaspPlotR <- R6::R6Class(
   classname = "jaspPlotR",
