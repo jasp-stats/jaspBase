@@ -83,6 +83,24 @@ test_that("the plot object is decoded only outside JASP, and kept when it cannot
   expect_null(.decodedPlotObject(NULL))
 })
 
+test_that("a base R plot stays a plot: decodeplot() would give it back as a grob", {
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
+
+  basePlot <- function() graphics::plot(1:3, xlab = "encoded_cont")
+  expect_identical(.decodedPlotObject(basePlot), basePlot)
+
+  grDevices::pdf(NULL)
+  grDevices::dev.control("enable")
+  basePlot()
+  recorded <- grDevices::recordPlot()
+  grDevices::dev.off()
+  expect_identical(.decodedPlotObject(recorded), recorded)
+
+  figures <- list("resources/_1.png" = list(obj = basePlot, width = 480, height = 320))
+  expect_identical(.decodedStateFigures(figures), figures)
+})
+
 quosureText <- function(quosure) deparse(unclass(quosure)[[2L]])
 
 test_that("the fields of a plot are decoded: data, mappings, layers, facets, labels and scales", {

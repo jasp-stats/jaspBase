@@ -169,9 +169,11 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
 # The plot object toRObject() gives (jaspPlot.cpp): the analysis built it with encoded column names, so outside JASP its
 # fields are decoded (.decodePlotFields) and then it is decoded the way JASP decodes a plot before it draws it, so that it
 # also prints with the plain names. A ggplot stays a ggplot (returnGrob = FALSE), so it can still be changed with `+`.
-# In JASP the object is only used for the RDS export, which drops it, so it is left alone there.
+# In JASP the object is only used for the RDS export, which drops it, so it is left alone there. A base R plot (a function
+# or a recorded plot) is left as it is too: decodeplot() can only give it back as a grob, which is no longer the plot
+# (e.g. jaspTools skips a grob in its plot tests).
 .decodedPlotObject <- function(plot) {
-  if (is.null(plot) || jaspResultsCalledFromJasp())
+  if (is.null(plot) || jaspResultsCalledFromJasp() || !inherits(plot, c("gg", "jaspGraphsPlot", "qgraph", "jaspPlotRecipe")))
     return(plot)
 
   decodedFields <- tryCatch(.decodePlotFields(plot), error = function(e) plot)
