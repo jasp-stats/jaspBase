@@ -45,6 +45,7 @@ test_that("toRObject decodes the names, titles, html and plots of a run in R", {
   plotWrapper <- result$plots[["contNormal"]]
   expect_identical(attr(plotWrapper, "title"), "contNormal")
   expect_true(ggplot2::is_ggplot(plotWrapper$plotObject))
+  expect_identical(plotWrapper$plotObject$labels$x, "contNormal")
   expect_true("contNormal" %in% drawnText(plotWrapper$plotObject))
   expect_false(any(grepl("encoded_cont", drawnText(plotWrapper$plotObject))))
 
@@ -80,4 +81,54 @@ test_that("the plot object is decoded only outside JASP, and kept when it cannot
   notAPlot <- structure(list(1), class = "somethingDecodeplotDoesNotKnow")
   expect_identical(.decodedPlotObject(notAPlot), notAPlot)
   expect_null(.decodedPlotObject(NULL))
+})
+
+quosureText <- function(quosure) deparse(unclass(quosure)[[2L]])
+
+test_that("the fields of a plot are decoded: data, mappings, layers, facets, labels and scales", {
+  localFakeDecoder(function(x) gsub("encoded_grp", "my group", gsub("encoded_cont", "contNormal", x, fixed = TRUE), fixed = TRUE))
+
+  data <- data.frame(encoded_cont = 1:4, y = 1:4, encoded_grp = c("a", "b", "a", "b"), lab = c("encoded_cont", "x", "y", "z"))
+  plot <- ggplot2::ggplot(data, ggplot2::aes(x = encoded_cont, y = .data[["y"]], colour = .data[["encoded_grp"]])) +
+    ggplot2::geom_point() +
+    ggplot2::geom_text(ggplot2::aes(label = lab)) +
+    ggplot2::annotate("text", x = 2, y = 2, label = "about encoded_cont") +
+    ggplot2::facet_wrap(~encoded_grp) +
+    ggplot2::scale_y_continuous(name = "y of encoded_cont") +
+    ggplot2::labs(title = "Title encoded_cont")
+
+  decoded <- .decodePlotFields(plot)
+
+  expect_identical(names(decoded$data), c("contNormal", "y", "my group", "lab"))
+  expect_identical(decoded$data$lab, c("contNormal", "x", "y", "z"))
+  expect_identical(quosureText(decoded$mapping$x), "contNormal")
+  expect_identical(quosureText(decoded$mapping$colour), '.data[["my group"]]')
+  expect_identical(decoded$layers[[3]]$aes_params$label, "about contNormal")
+  expect_identical(quosureText(decoded$facet$params$facets[[1]]), "my group")
+  expect_identical(decoded$labels$title, "Title contNormal")
+  expect_identical(decoded$scales$get_scales("y")$name, "y of contNormal")
+
+  # it still finds its columns, and draws with the plain names
+  text <- drawnText(decoded)
+  expect_true(all(c("contNormal", "my group", "Title contNormal", "y of contNormal") %in% text))
+  expect_false(any(grepl("encoded_", text)))
+
+  # the plot it was decoded from is not changed: layers, facets and scales are shared ggproto objects
+  expect_identical(names(plot$data)[1], "encoded_cont")
+  expect_identical(quosureText(plot$facet$params$facets[[1]]), "encoded_grp")
+  expect_identical(plot$scales$get_scales("y")$name, "y of encoded_cont")
+  expect_identical(plot$layers[[3]]$aes_params$label, "about encoded_cont")
+})
+
+test_that("a column keeps its encoded name when its decoded name is taken", {
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+
+  data <- data.frame(encoded_cont = 1:3, contNormal = 3:1)
+  plot <- ggplot2::ggplot(data, ggplot2::aes(encoded_cont, contNormal)) + ggplot2::geom_point()
+
+  decoded <- .decodePlotFields(plot)
+
+  expect_identical(names(decoded$data), c("encoded_cont", "contNormal"))
+  expect_identical(quosureText(decoded$mapping$x), "encoded_cont")
+  expect_silent(ggplot2::ggplot_build(decoded))
 })
