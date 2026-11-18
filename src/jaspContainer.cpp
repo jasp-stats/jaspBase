@@ -430,11 +430,11 @@ Rcpp::List jaspContainer::toRObject() /*const*/
 
 		Rcpp::List Robj = child->toRObject();
 		if (Robj.length() > 0)
-			lst.push_back(Robj, key);
+			lst.push_back(Robj, decodeColumnNames(key)); // a key is often a column name, e.g. one plot per variable
 	}
 
 	lst.attr("class") = Rcpp::CharacterVector({"jaspContainerWrapper", "jaspWrapper"});
-	lst.attr("title") = _title;
+	lst.attr("title") = decodeColumnNames(_title);
 
 	// the reason this function is not const
 	Rcpp::Environment jaspObjectEnvironment = Rcpp::new_env();

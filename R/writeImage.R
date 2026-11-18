@@ -166,6 +166,17 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   return(image)
 }
 
+# The plot object toRObject() gives (jaspPlot.cpp): the analysis built it with encoded column names, so outside JASP it is
+# decoded the way JASP decodes a plot before it draws it, and it prints with the plain names. A ggplot stays a ggplot
+# (returnGrob = FALSE), so it can still be changed with `+`. In JASP the object is only used for the RDS export, which
+# drops it, so it is left alone there.
+.decodedPlotObject <- function(plot) {
+  if (is.null(plot) || jaspResultsCalledFromJasp())
+    return(plot)
+
+  tryCatch(decodeplot(plot, returnGrob = FALSE), error = function(e) plot)
+}
+
 # intentionally not exported
 decodeplot <- function(x, ...) {
   UseMethod("decodeplot", x)
