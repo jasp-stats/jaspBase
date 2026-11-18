@@ -35,7 +35,7 @@ finishJaspResults <- function(jaspResultsCPP, calledFromAnalysis = TRUE) {
   jaspResultsCPP$prepareForWriting()
 
   newState <- list(
-    figures = jaspResultsCPP$getPlotObjectsForState(),
+    figures = .decodedStateFigures(jaspResultsCPP$getPlotObjectsForState()),
     other   = jaspResultsCPP$getOtherObjectsForState()
   )
 

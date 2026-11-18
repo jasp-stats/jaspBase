@@ -132,3 +132,21 @@ test_that("a column keeps its encoded name when its decoded name is taken", {
   expect_identical(quosureText(decoded$mapping$x), "encoded_cont")
   expect_silent(ggplot2::ggplot_build(decoded))
 })
+
+test_that("the plots of the state are decoded outside JASP, and left as they are in JASP", {
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+
+  plot    <- ggplot2::ggplot(data.frame(encoded_cont = 1:3), ggplot2::aes(encoded_cont, encoded_cont)) + ggplot2::geom_point()
+  figures <- list("resources/_1.png" = list(obj = plot, width = 480, height = 320), "resources/_2.png" = list(width = 1))
+
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
+  decoded <- .decodedStateFigures(figures)
+  expect_named(decoded, names(figures))
+  expect_identical(names(decoded[[1]]$obj$data), "contNormal")
+  expect_identical(decoded[[1]][c("width", "height")], figures[[1]][c("width", "height")])
+  expect_identical(decoded[[2]], figures[[2]])
+  expect_identical(.decodedStateFigures(list()), list())
+
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() TRUE)
+  expect_identical(.decodedStateFigures(figures), figures)
+})

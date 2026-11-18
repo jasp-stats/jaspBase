@@ -178,6 +178,21 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   tryCatch(decodeplot(decodedFields, returnGrob = FALSE), error = function(e) decodedFields)
 }
 
+# The plots the state keeps (state$figures[[name]]$obj), outside JASP decoded like those of toRObject(): in R the state is
+# what e.g. jaspTools gives as results$state$figures, which its plot tests draw. In JASP the state keeps the plots as the
+# analysis built them, for plot editing and resizing, so it is left alone there. A plot restored from the state into a
+# later run in R is drawn as it is: decoding a decoded plot changes nothing.
+.decodedStateFigures <- function(figures) {
+  if (length(figures) == 0L || jaspResultsCalledFromJasp())
+    return(figures)
+
+  lapply(figures, function(figure) {
+    if (is.list(figure) && !is.null(figure[["obj"]]))
+      figure[["obj"]] <- .decodedPlotObject(figure[["obj"]])
+    figure
+  })
+}
+
 # intentionally not exported
 decodeplot <- function(x, ...) {
   UseMethod("decodeplot", x)
