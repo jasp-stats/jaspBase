@@ -150,3 +150,54 @@ test_that("the plots of the state are decoded outside JASP, and left as they are
   local_mocked_bindings(jaspResultsCalledFromJasp = function() TRUE)
   expect_identical(.decodedStateFigures(figures), figures)
 })
+
+test_that("a column does not get a name that rlang or ggplot2 reads in a mapping", {
+  for (reserved in c(".data", ".env", "..count..")) {
+    localFakeDecoder(local({ name <- reserved; function(x) gsub("encoded_cont", name, x, fixed = TRUE) }))
+
+    plot    <- ggplot2::ggplot(data.frame(encoded_cont = c("a", "b"), v = 1:2), ggplot2::aes(encoded_cont, v)) + ggplot2::geom_point()
+    decoded <- .decodePlotFields(plot)
+
+    expect_identical(names(decoded$data), c("encoded_cont", "v"), info = reserved)
+    expect_silent(ggplot2::ggplot_build(decoded))
+  }
+})
+
+test_that("no column is renamed in a plot with a layer whose data is a function, which still draws with the plain names", {
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
+
+  # the function refers to the column by its encoded name: renamed, it would silently select nothing
+  plot <- ggplot2::ggplot(data.frame(encoded_cont = 1:3, v = 1:3), ggplot2::aes(encoded_cont, v)) +
+    ggplot2::geom_point(data = function(d) d[d$encoded_cont > 1, ])
+
+  decoded <- .decodedPlotObject(plot)
+
+  expect_identical(names(decoded$data), c("encoded_cont", "v"))
+  expect_identical(nrow(ggplot2::layer_data(decoded)), 2L)
+  text <- drawnText(decoded)
+  expect_true("contNormal" %in% text)
+  expect_false(any(grepl("encoded_cont", text)))
+})
+
+test_that("a decoded plot that does not build is given back with its fields as they were", {
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+  local_mocked_bindings(.decodeGgplotFields = function(plot) plot + ggplot2::aes(x = no_such_column))
+
+  plot <- ggplot2::ggplot(data.frame(encoded_cont = 1:3), ggplot2::aes(encoded_cont, encoded_cont)) + ggplot2::geom_point()
+
+  expect_identical(.decodePlotFields(plot), plot)
+})
+
+test_that("container names that would decode to the same name keep their encoded name", {
+  localFakeDecoder(function(x) gsub("encoded_[ab]", "contNormal", gsub("encoded_c", "other", x)))
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
+
+  jaspResults <- jaspResultsR$new(loadJaspResults("duplicateNames"))
+  container   <- createJaspContainer(title = "Tables")
+  jaspResults[["tables"]] <- container
+  for (key in c("encoded_a", "encoded_b", "encoded_c"))
+    container[[key]] <- createJaspHtml(text = key)
+
+  expect_setequal(names(jaspResults$toRObject()$tables), c("encoded_a", "encoded_b", "other"))
+})

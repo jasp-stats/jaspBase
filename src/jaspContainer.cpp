@@ -423,14 +423,22 @@ Rcpp::List jaspContainer::toRObject() /*const*/
 	std::vector<std::string> keys = getSortedDataFields();
 	Rcpp::List lst;
 
+	// A key is often a column name, e.g. one plot per variable, so it is decoded. Keys that would get the same name (the
+	// same column name in two datasets) keep their encoded name: the list could not tell them apart.
+	std::vector<std::string>		decodedKeys;
+	std::map<std::string, size_t>	decodedKeyCount;
 	for (const auto & key : keys)
+		decodedKeyCount[decodedKeys.emplace_back(decodeColumnNames(key))]++;
+
+	for (size_t i = 0; i < keys.size(); i++)
 	{
+		const std::string & key = keys[i];
 
 		jaspObject* child = _data.at(key);
 
 		Rcpp::List Robj = child->toRObject();
 		if (Robj.length() > 0)
-			lst.push_back(Robj, decodeColumnNames(key)); // a key is often a column name, e.g. one plot per variable
+			lst.push_back(Robj, decodedKeyCount[decodedKeys[i]] > 1 ? key : decodedKeys[i]);
 	}
 
 	lst.attr("class") = Rcpp::CharacterVector({"jaspContainerWrapper", "jaspWrapper"});

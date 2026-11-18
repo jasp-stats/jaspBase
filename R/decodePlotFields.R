@@ -4,13 +4,16 @@
 #
 # - the column names of the data of the plot and of its layers, with the mappings and facets that refer to them renamed
 #   the same way. A column is only renamed when its decoded name is free in all the data of the plot, so the plot still
-#   finds every column;
+#   finds every column, and when it is not a name rlang or ggplot2 reads in a mapping (.data, .env, ..count..);
 # - the text and factor values of that data (e.g. variable names that are the categories of an axis);
 # - the stored labels, the text parameters of the layers (e.g. annotate(label = ...)) and the name, labels, limits and
 #   breaks of the scales.
 #
 # Layers, facets and scales are ggproto objects that the plot shares with any copy of it: they are cloned before they
-# are changed, so the plot JASP keeps stays as it is. Only used outside JASP (see .decodedPlotObject).
+# are changed, so the plot JASP keeps stays as it is. Code in the plot that refers to a column cannot be rewritten: no
+# column is renamed in a plot with a layer whose data is a function (it could silently select nothing), and a decoded
+# plot that does not build any more is given back with its fields as they were. decodeplot() still makes it draw with the
+# plain names. Only used outside JASP (see .decodedPlotObject).
 
 .decodePlotFields <- function(plot) {
   if (inherits(plot, "jaspGraphsPlot")) {
@@ -24,7 +27,15 @@
   if (inherits(plot, "patchwork"))
     plot$patches$plots <- lapply(plot$patches$plots, .decodePlotFields)
 
-  .decodeGgplotFields(plot)
+  decoded <- .decodeGgplotFields(plot)
+  if (.plotBuilds(decoded)) decoded else plot
+}
+
+.plotBuilds <- function(plot) {
+  tryCatch({
+    suppressMessages(suppressWarnings(ggplot2::ggplot_build(plot)))
+    TRUE
+  }, error = function(e) FALSE)
 }
 
 .decodeGgplotFields <- function(plot) {
@@ -70,6 +81,9 @@
 # The encoded column names of the data of the plot and its layers, named by them, that can take their decoded name.
 .plotColumnRenames <- function(plot) {
   datas   <- c(list(plot$data), lapply(plot$layers, function(layer) layer$data))
+  if (any(vapply(datas, is.function, logical(1L))))
+    return(character(0))
+
   columns <- unique(unlist(lapply(datas, function(data) if (is.data.frame(data)) names(data))))
   if (length(columns) == 0L)
     return(character(0))
@@ -79,10 +93,12 @@
   renames <- stats::setNames(decoded[encoded], columns[encoded])
 
   # a decoded name that another column already has, or that two columns decode to, would make the plot pick the
-  # wrong column: those columns keep their encoded name
-  taken   <- columns[!encoded]
-  clashes <- renames %in% taken | duplicated(renames) | duplicated(renames, fromLast = TRUE)
-  renames[!clashes]
+  # wrong column, and in a mapping rlang reads .data and .env as pronouns and ggplot2 ..name.. as a computed variable:
+  # those columns keep their encoded name
+  taken    <- columns[!encoded]
+  clashes  <- renames %in% taken | duplicated(renames) | duplicated(renames, fromLast = TRUE)
+  reserved <- renames %in% c(".data", ".env") | grepl("^\\.\\..+\\.\\.$", renames)
+  renames[!clashes & !reserved]
 }
 
 .decodePlotData <- function(data, renames) {
