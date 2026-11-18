@@ -1,6 +1,7 @@
 # The analysis only sees encoded column names. toRObject() gives the results of a run in R (an R wrapper) with the plain
 # names: tables (cells, titles, row names), container names and titles, plot titles, html text, and the plot objects,
-# decoded as JASP decodes a plot before it draws it. The decoder is the one the bridge installs, faked here.
+# decoded as JASP decodes a plot before it draws it: a plot recipe is built from its decoded arguments, any other plot only
+# gets its titles decoded. The decoder is the one the bridge installs, faked here.
 localFakeDecoder <- function(decoder, envir = parent.frame()) {
   oldDecoder <- get0(".decodeColNamesLax", envir = .GlobalEnv, inherits = FALSE)
   assign(".decodeColNamesLax", decoder, envir = .GlobalEnv)
@@ -45,7 +46,6 @@ test_that("toRObject decodes the names, titles, html and plots of a run in R", {
   plotWrapper <- result$plots[["contNormal"]]
   expect_identical(attr(plotWrapper, "title"), "contNormal")
   expect_true(ggplot2::is_ggplot(plotWrapper$plotObject))
-  expect_identical(plotWrapper$plotObject$labels$x, "contNormal")
   expect_true("contNormal" %in% drawnText(plotWrapper$plotObject))
   expect_false(any(grepl("encoded_cont", drawnText(plotWrapper$plotObject))))
 
@@ -101,110 +101,83 @@ test_that("a base R plot stays a plot: decodeplot() would give it back as a grob
   expect_identical(.decodedStateFigures(figures), figures)
 })
 
-quosureText <- function(quosure) deparse(unclass(quosure)[[2L]])
+decodeRecipeNames <- function(x) {
+  decodings <- c(encoded_cont = "contNormal", encoded_grp = "facGender", encoded_a = "f", encoded_b = "m")
+  for (encoded in names(decodings))
+    x <- gsub(encoded, decodings[[encoded]], x, fixed = TRUE)
+  x
+}
 
-test_that("the fields of a plot are decoded: data, mappings, layers, facets, labels and scales", {
-  localFakeDecoder(function(x) gsub("encoded_grp", "my group", gsub("encoded_cont", "contNormal", x, fixed = TRUE), fixed = TRUE))
+# as e.g. the descriptives plot of jaspTTests: the plot is built from these arguments when it is drawn
+encodedRecipe <- function() {
+  jaspGraphs::createJaspPlotRecipe(
+    fun  = "jaspGraphs::descriptivesPlot",
+    args = list(
+      x = factor(c("encoded_a", "encoded_b")), y = c(1, 2), ciLower = c(0, 1), ciUpper = c(2, 3),
+      xName = "encoded_grp", yName = "encoded_cont", noXLevelNames = FALSE
+    )
+  )
+}
 
-  data <- data.frame(encoded_cont = 1:4, y = 1:4, encoded_grp = c("a", "b", "a", "b"), lab = c("encoded_cont", "x", "y", "z"))
-  plot <- ggplot2::ggplot(data, ggplot2::aes(x = encoded_cont, y = .data[["y"]], colour = .data[["encoded_grp"]])) +
-    ggplot2::geom_point() +
-    ggplot2::geom_text(ggplot2::aes(label = lab)) +
-    ggplot2::annotate("text", x = 2, y = 2, label = "about encoded_cont") +
-    ggplot2::facet_wrap(~encoded_grp) +
-    ggplot2::scale_y_continuous(name = "y of encoded_cont") +
-    ggplot2::labs(title = "Title encoded_cont")
+plotDataText <- function(plot) unlist(lapply(plot$data, as.character))
 
-  decoded <- .decodePlotFields(plot)
+test_that("toRObject gives a plot recipe as the plot built from its decoded arguments", {
+  localFakeDecoder(decodeRecipeNames)
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
 
-  expect_identical(names(decoded$data), c("contNormal", "y", "my group", "lab"))
-  expect_identical(decoded$data$lab, c("contNormal", "x", "y", "z"))
-  expect_identical(quosureText(decoded$mapping$x), "contNormal")
-  expect_identical(quosureText(decoded$mapping$colour), '.data[["my group"]]')
-  expect_identical(decoded$layers[[3]]$aes_params$label, "about contNormal")
-  expect_identical(quosureText(decoded$facet$params$facets[[1]]), "my group")
-  expect_identical(decoded$labels$title, "Title contNormal")
-  expect_identical(decoded$scales$get_scales("y")$name, "y of contNormal")
+  jaspResults <- jaspResultsR$new(loadJaspResults("toRObjectRecipe"))
+  plot        <- createJaspPlot(title = "encoded_cont by encoded_grp")
+  jaspResults[["plot_encoded_cont"]] <- plot
+  suppressWarnings(plot$plotObject <- encodedRecipe())
 
-  # it still finds its columns, and draws with the plain names
+  result      <- jaspResults$toRObject()
+  plotWrapper <- result[["plot_contNormal"]]
+  expect_identical(attr(plotWrapper, "title"), "contNormal by facGender")
+
+  decoded <- plotWrapper$plotObject
+  expect_true(ggplot2::is_ggplot(decoded))
+  # not only how it draws: its data has the plain names too
+  expect_true(all(c("f", "m") %in% plotDataText(decoded)))
+  expect_false(any(grepl("encoded_", plotDataText(decoded))))
   text <- drawnText(decoded)
-  expect_true(all(c("contNormal", "my group", "Title contNormal", "y of contNormal") %in% text))
+  expect_true(all(c("contNormal", "facGender", "f", "m") %in% text))
   expect_false(any(grepl("encoded_", text)))
 
-  # the plot it was decoded from is not changed: layers, facets and scales are shared ggproto objects
-  expect_identical(names(plot$data)[1], "encoded_cont")
-  expect_identical(quosureText(plot$facet$params$facets[[1]]), "encoded_grp")
-  expect_identical(plot$scales$get_scales("y")$name, "y of encoded_cont")
-  expect_identical(plot$layers[[3]]$aes_params$label, "about encoded_cont")
+  # still a ggplot that can be changed
+  expect_true("added" %in% drawnText(decoded + ggplot2::ggtitle("added")))
 })
 
-test_that("a column keeps its encoded name when its decoded name is taken", {
-  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+test_that("a plot that is not a recipe keeps its encoded data, but draws with the plain names", {
+  localFakeDecoder(decodeRecipeNames)
+  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
 
-  data <- data.frame(encoded_cont = 1:3, contNormal = 3:1)
-  plot <- ggplot2::ggplot(data, ggplot2::aes(encoded_cont, contNormal)) + ggplot2::geom_point()
+  plot    <- ggplot2::ggplot(data.frame(encoded_cont = 1:3), ggplot2::aes(encoded_cont, encoded_cont)) + ggplot2::geom_point()
+  decoded <- .decodedPlotObject(plot)
 
-  decoded <- .decodePlotFields(plot)
-
-  expect_identical(names(decoded$data), c("encoded_cont", "contNormal"))
-  expect_identical(quosureText(decoded$mapping$x), "encoded_cont")
-  expect_silent(ggplot2::ggplot_build(decoded))
+  expect_true(ggplot2::is_ggplot(decoded))
+  expect_identical(names(decoded$data), "encoded_cont")
+  text <- drawnText(decoded)
+  expect_true("contNormal" %in% text)
+  expect_false(any(grepl("encoded_", text)))
 })
 
 test_that("the plots of the state are decoded outside JASP, and left as they are in JASP", {
-  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
+  localFakeDecoder(decodeRecipeNames)
 
-  plot    <- ggplot2::ggplot(data.frame(encoded_cont = 1:3), ggplot2::aes(encoded_cont, encoded_cont)) + ggplot2::geom_point()
-  figures <- list("resources/_1.png" = list(obj = plot, width = 480, height = 320), "resources/_2.png" = list(width = 1))
+  recipe  <- encodedRecipe()
+  figures <- list("resources/_1.png" = list(obj = recipe, width = 480, height = 320), "resources/_2.png" = list(width = 1))
 
   local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
   decoded <- .decodedStateFigures(figures)
   expect_named(decoded, names(figures))
-  expect_identical(names(decoded[[1]]$obj$data), "contNormal")
+  expect_true(ggplot2::is_ggplot(decoded[[1]]$obj))
+  expect_false(any(grepl("encoded_", c(plotDataText(decoded[[1]]$obj), drawnText(decoded[[1]]$obj)))))
   expect_identical(decoded[[1]][c("width", "height")], figures[[1]][c("width", "height")])
   expect_identical(decoded[[2]], figures[[2]])
   expect_identical(.decodedStateFigures(list()), list())
 
   local_mocked_bindings(jaspResultsCalledFromJasp = function() TRUE)
   expect_identical(.decodedStateFigures(figures), figures)
-})
-
-test_that("a column does not get a name that rlang or ggplot2 reads in a mapping", {
-  for (reserved in c(".data", ".env", "..count..")) {
-    localFakeDecoder(local({ name <- reserved; function(x) gsub("encoded_cont", name, x, fixed = TRUE) }))
-
-    plot    <- ggplot2::ggplot(data.frame(encoded_cont = c("a", "b"), v = 1:2), ggplot2::aes(encoded_cont, v)) + ggplot2::geom_point()
-    decoded <- .decodePlotFields(plot)
-
-    expect_identical(names(decoded$data), c("encoded_cont", "v"), info = reserved)
-    expect_silent(ggplot2::ggplot_build(decoded))
-  }
-})
-
-test_that("no column is renamed in a plot with a layer whose data is a function, which still draws with the plain names", {
-  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
-  local_mocked_bindings(jaspResultsCalledFromJasp = function() FALSE)
-
-  # the function refers to the column by its encoded name: renamed, it would silently select nothing
-  plot <- ggplot2::ggplot(data.frame(encoded_cont = 1:3, v = 1:3), ggplot2::aes(encoded_cont, v)) +
-    ggplot2::geom_point(data = function(d) d[d$encoded_cont > 1, ])
-
-  decoded <- .decodedPlotObject(plot)
-
-  expect_identical(names(decoded$data), c("encoded_cont", "v"))
-  expect_identical(nrow(ggplot2::layer_data(decoded)), 2L)
-  text <- drawnText(decoded)
-  expect_true("contNormal" %in% text)
-  expect_false(any(grepl("encoded_cont", text)))
-})
-
-test_that("a decoded plot that does not build is given back with its fields as they were", {
-  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", x, fixed = TRUE))
-  local_mocked_bindings(.decodeGgplotFields = function(plot) plot + ggplot2::aes(x = no_such_column))
-
-  plot <- ggplot2::ggplot(data.frame(encoded_cont = 1:3), ggplot2::aes(encoded_cont, encoded_cont)) + ggplot2::geom_point()
-
-  expect_identical(.decodePlotFields(plot), plot)
 })
 
 test_that("container names that would decode to the same name keep their encoded name", {
@@ -226,30 +199,10 @@ test_that("missing values stay missing, although the decoders of the bridge give
 
   expect_identical(decodeColNames(c("encoded_cont", NA)), c("contNormal", NA))
 
-  data    <- data.frame(x = 1:3, y = 1:3, lab = c(NA, "encoded_cont", NA), grp = c("a", NA, "b"))
-  plot    <- ggplot2::ggplot(data, ggplot2::aes(x, y, label = lab, colour = grp)) + ggplot2::geom_text()
-  decoded <- .decodePlotFields(plot)
+  # the arguments of a plot recipe are decoded that way, in JASP too: a missing group must not become an "NA" group
+  args    <- list(data = data.frame(lab = c(NA, "encoded_cont", NA), grp = c("a", NA, "b")))
+  decoded <- .decodeJaspPlotRecipeArguments(args, decodeNames = FALSE)
 
   expect_identical(decoded$data$lab, c(NA, "contNormal", NA))
   expect_identical(decoded$data$grp, c("a", NA, "b"))
-  # only the one label is drawn, not the text "NA" for the others
-  expect_identical(ggplot2::layer_data(decoded)$label, c(NA, "contNormal", NA))
-})
-
-test_that("factor limits, breaks and labels of a scale are decoded like the data they refer to", {
-  localFakeDecoder(function(x) gsub("encoded_a", "contNormal", gsub("encoded_b", "contGamma", x, fixed = TRUE), fixed = TRUE))
-
-  # e.g. the paired samples bar plot of jaspTTests: scale_x_discrete(limits = <the factor on the x-axis>)
-  groups  <- factor(c("encoded_a", "encoded_b"))
-  plot    <- ggplot2::ggplot(data.frame(group = groups, y = 1:2), ggplot2::aes(group, y)) +
-    ggplot2::geom_point() +
-    ggplot2::scale_x_discrete(limits = groups, breaks = groups, labels = groups)
-  decoded <- .decodePlotFields(plot)
-  scale   <- decoded$scales$get_scales("x")
-
-  expect_identical(levels(decoded$data$group), c("contNormal", "contGamma"))
-  for (field in c("limits", "breaks", "labels"))
-    expect_identical(as.character(scale[[field]]), c("contNormal", "contGamma"), info = field)
-  # every point still falls within the limits
-  expect_identical(sum(!is.na(ggplot2::layer_data(decoded)$x)), 2L)
 })
