@@ -493,8 +493,10 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 }
 
 .applyEnDeCoder.character <- function(x, fun, ...) {
+  # a missing value stays missing: the en/decoders JASP installs take an Rcpp::String, and give back the string "NA" for it
   for (i in seq_along(x))
-    x[i] <- fun(x[i])
+    if (!is.na(x[i]))
+      x[i] <- fun(x[i])
   return(x)
 }
 

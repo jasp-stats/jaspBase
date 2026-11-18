@@ -201,3 +201,37 @@ test_that("container names that would decode to the same name keep their encoded
 
   expect_setequal(names(jaspResults$toRObject()$tables), c("encoded_a", "encoded_b", "other"))
 })
+
+test_that("missing values stay missing, although the decoders of the bridge give back \"NA\" for them", {
+  # as .decodeColNamesLax of the bridge does: its Rcpp::String argument turns a missing value into "NA"
+  localFakeDecoder(function(x) gsub("encoded_cont", "contNormal", if (is.na(x)) "NA" else x, fixed = TRUE))
+
+  expect_identical(decodeColNames(c("encoded_cont", NA)), c("contNormal", NA))
+
+  data    <- data.frame(x = 1:3, y = 1:3, lab = c(NA, "encoded_cont", NA), grp = c("a", NA, "b"))
+  plot    <- ggplot2::ggplot(data, ggplot2::aes(x, y, label = lab, colour = grp)) + ggplot2::geom_text()
+  decoded <- .decodePlotFields(plot)
+
+  expect_identical(decoded$data$lab, c(NA, "contNormal", NA))
+  expect_identical(decoded$data$grp, c("a", NA, "b"))
+  # only the one label is drawn, not the text "NA" for the others
+  expect_identical(ggplot2::layer_data(decoded)$label, c(NA, "contNormal", NA))
+})
+
+test_that("factor limits, breaks and labels of a scale are decoded like the data they refer to", {
+  localFakeDecoder(function(x) gsub("encoded_a", "contNormal", gsub("encoded_b", "contGamma", x, fixed = TRUE), fixed = TRUE))
+
+  # e.g. the paired samples bar plot of jaspTTests: scale_x_discrete(limits = <the factor on the x-axis>)
+  groups  <- factor(c("encoded_a", "encoded_b"))
+  plot    <- ggplot2::ggplot(data.frame(group = groups, y = 1:2), ggplot2::aes(group, y)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_x_discrete(limits = groups, breaks = groups, labels = groups)
+  decoded <- .decodePlotFields(plot)
+  scale   <- decoded$scales$get_scales("x")
+
+  expect_identical(levels(decoded$data$group), c("contNormal", "contGamma"))
+  for (field in c("limits", "breaks", "labels"))
+    expect_identical(as.character(scale[[field]]), c("contNormal", "contGamma"), info = field)
+  # every point still falls within the limits
+  expect_identical(sum(!is.na(ggplot2::layer_data(decoded)$x)), 2L)
+})

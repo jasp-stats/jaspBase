@@ -69,8 +69,10 @@
   scales <- plot$scales$clone()
   for (scale in scales$scales) {
     scale$name <- .decodeTextIn(scale$name)
+    # a factor too, e.g. scale_x_discrete(limits = <the factor on the x-axis>): left encoded, none of the decoded data
+    # values would fall within the limits
     for (field in c("labels", "limits", "breaks"))
-      if (is.character(scale[[field]]))
+      if (is.character(scale[[field]]) || is.factor(scale[[field]]))
         scale[[field]] <- decodeColNames(scale[[field]])
   }
   plot$scales <- scales
