@@ -103,14 +103,14 @@ Rcpp::List jaspHtml::toRObject()
 {
 	// mimics convertToJSON, could also be a named character vector since everything is a string
 	Rcpp::List lst = Rcpp::List::create(
-		Rcpp::Named("rawtext")		= _rawText,
-		Rcpp::Named("text")			= convertTextToHtml(_rawText),
+		Rcpp::Named("rawtext")		= decodeColumnNames(_rawText),
+		Rcpp::Named("text")			= decodeColumnNames(convertTextToHtml(_rawText)),
 		Rcpp::Named("class")		= _class,
 		Rcpp::Named("maxWidth")		= _maxWidth,
 		Rcpp::Named("elementType")	= _elementType
 	);
 
-	lst.attr("title") = _title;
+	lst.attr("title") = decodeColumnNames(_title);
 	lst.attr("class") = Rcpp::CharacterVector({"jaspHtmlWrapper", "jaspWrapper"});
 
 	// the reason this function is not const

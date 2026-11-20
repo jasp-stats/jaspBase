@@ -314,8 +314,11 @@ std::string jaspPlot::toHtml() const
 
 Rcpp::List jaspPlot::toRObject()
 {
-	Rcpp::List lst = Rcpp::List::create(Rcpp::Named("plotObject") = getPlotObject());
-	lst.attr("title") = _title;
+	// The analysis built the plot with encoded column names: give it decoded, as JASP draws it (see .decodedPlotObject)
+	static Rcpp::Function decodedPlotObject = Rcpp::Environment::namespace_env("jaspBase")[".decodedPlotObject"];
+
+	Rcpp::List lst = Rcpp::List::create(Rcpp::Named("plotObject") = decodedPlotObject(getPlotObject()));
+	lst.attr("title") = decodeColumnNames(_title);
 	lst.attr("class") = Rcpp::CharacterVector({"jaspPlotWrapper", "jaspWrapper"});
 
 	// Include the export field so RoboReport and other RDS consumers can

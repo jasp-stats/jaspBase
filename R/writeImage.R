@@ -166,6 +166,36 @@ writeImageJaspResults <- function(plot, width = 320, height = 320, obj = TRUE, r
   return(image)
 }
 
+# The plot object toRObject() gives (jaspPlot.cpp): the analysis built it with encoded column names, so outside JASP it is
+# decoded the way JASP decodes a plot before it draws it. A plot recipe is built from its decoded arguments
+# (decodeplot.jaspPlotRecipe), so its data, mappings and labels all have the plain names. Of any other ggplot only the
+# titles of its axes and legends are decoded: its data and mappings keep the encoded names until it becomes a recipe.
+# A ggplot stays a ggplot (returnGrob = FALSE), so it can still be changed with `+`.
+# In JASP the object is only used for the RDS export, which drops it, so it is left alone there. A base R plot (a function
+# or a recorded plot) is left as it is too: decodeplot() can only give it back as a grob, which is no longer the plot
+# (e.g. jaspTools skips a grob in its plot tests).
+.decodedPlotObject <- function(plot) {
+  if (is.null(plot) || jaspResultsCalledFromJasp() || !inherits(plot, c("gg", "jaspGraphsPlot", "qgraph", "jaspPlotRecipe")))
+    return(plot)
+
+  tryCatch(decodeplot(plot, returnGrob = FALSE), error = function(e) plot)
+}
+
+# The plots the state keeps (state$figures[[name]]$obj), outside JASP decoded like those of toRObject(): in R the state is
+# what e.g. jaspTools gives as results$state$figures, which its plot tests draw. In JASP the state keeps the plots as the
+# analysis built them, for plot editing and resizing, so it is left alone there. A plot restored from the state into a
+# later run in R is drawn as it is: decoding a decoded plot changes nothing.
+.decodedStateFigures <- function(figures) {
+  if (length(figures) == 0L || jaspResultsCalledFromJasp())
+    return(figures)
+
+  lapply(figures, function(figure) {
+    if (is.list(figure) && !is.null(figure[["obj"]]))
+      figure[["obj"]] <- .decodedPlotObject(figure[["obj"]])
+    figure
+  })
+}
+
 # intentionally not exported
 decodeplot <- function(x, ...) {
   UseMethod("decodeplot", x)
@@ -466,8 +496,10 @@ decodeColNames <- function(x, strict = FALSE, fun = NULL, ...) {
 }
 
 .applyEnDeCoder.character <- function(x, fun, ...) {
+  # a missing value stays missing: the en/decoders JASP installs take an Rcpp::String, and give back the string "NA" for it
   for (i in seq_along(x))
-    x[i] <- fun(x[i])
+    if (!is.na(x[i]))
+      x[i] <- fun(x[i])
   return(x)
 }
 
