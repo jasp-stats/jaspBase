@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.18.0\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2025-12-16 18:00+0000\n"
 "Last-Translator: Jose Ramon Rueda <joseramon.rueda@ehu.eus>\n"
 "Language-Team: Basque <https://hosted.weblate.org/projects/jasp/jaspbase/eu/"
@@ -18,6 +18,10 @@ msgstr "<em>Oharra.</em>"
 
 msgid "no plot object was found"
 msgstr "ez da grafiko-objekturik aurkitu"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "%1$s-ko balioak tartetik kanpo daude [%2$s, %3$s]"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Arazo hauek gertatu dira analisia exekutatzean:"

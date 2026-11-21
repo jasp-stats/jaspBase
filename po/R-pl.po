@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2024-04-09 13:33+0000\n"
 "Last-Translator: Tomasz Misiuro <tomaszmisiuro@gmail.com>\n"
 "Language-Team: Polish <https://hosted.weblate.org/projects/jasp/jaspbase/pl/"
@@ -20,6 +20,10 @@ msgstr "<em>Uwaga.</em>"
 msgid "no plot object was found"
 msgstr "nie znaleziono wykresu"
 
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "Wartości w %1$s są poza przedziałem [%2$s, %3$s]"
+
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Podczas wykonywania analizy wystąpił następujący problem:"
 
@@ -32,8 +36,8 @@ msgid ""
 "reports"
 msgstr ""
 "Nieoczekiwane zakończenie analizy. %s Aby uzyskać pomoc w rozwiązaniu tego "
-"problemu, należy zgłosić powyższy komunikat na stronie: https://jasp-stats."
-"org/bug-reports"
+"problemu, należy zgłosić powyższy komunikat na stronie: https://jasp-"
+"stats.org/bug-reports"
 
 msgid "Infinity found in %s"
 msgstr "W %s znaleziono wartości nieskończone"

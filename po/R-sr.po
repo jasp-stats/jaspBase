@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.19.2\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2025-04-13 00:02+0000\n"
 "Last-Translator: Marko Bojović <bojovicmarko@outlook.com>\n"
 "Language-Team: Serbian <https://hosted.weblate.org/projects/jasp/jaspbase/sr/"
@@ -19,6 +19,10 @@ msgstr "<em>Напомена.</em>"
 
 msgid "no plot object was found"
 msgstr "није пронађен графички објекат"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "Вредности у %1$s изван интервала [%2$s, %3$s]"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "Дошло је до следећег проблема током извршавања анализе:"

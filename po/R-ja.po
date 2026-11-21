@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2026-08-20 01:33+0000\n"
 "Last-Translator: Koji Kosugi <kosugitti@gmail.com>\n"
 "Language-Team: Japanese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -18,6 +18,10 @@ msgstr "<em>注</em>"
 
 msgid "no plot object was found"
 msgstr "プロットオブジェクトが見つかりませんでした"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "%1$s の値が区間 [%2$s, %3$s] の外にあります"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "分析の実行中に次の問題が発生しました:"

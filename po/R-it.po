@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.16.4\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2024-06-30 10:01+0000\n"
 "Last-Translator: Marco Capozzi <giammarcous@yahoo.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/jasp/jaspbase/it/"
@@ -18,6 +18,10 @@ msgstr "<em>Note.</em>"
 
 msgid "no plot object was found"
 msgstr "non è stato trovato alcun oggetto del grafico"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "Valori nel %1$s al di fuori dell'intervallo [%2$s, %3$s]"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr ""

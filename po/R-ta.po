@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.19.2\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2026-01-16 15:01+0000\n"
 "Last-Translator: தமிழ்நேரம் <tamilneram247@gmail.com>\n"
 "Language-Team: Tamil <https://hosted.weblate.org/projects/jasp/jaspbase/ta/"
@@ -18,6 +18,10 @@ msgstr "<em> குறிப்பு.</em>"
 
 msgid "no plot object was found"
 msgstr "சூழ்ச்சி பொருள் எதுவும் கிடைக்கவில்லை"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "%1$s க்கு வெளியே இடைவெளியில் மதிப்புகள் [ %2$s, %3$s]"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "பகுப்பாய்வை இயக்கும் போது பின்வரும் சிக்கல் (கள்) நிகழ்ந்தது:"

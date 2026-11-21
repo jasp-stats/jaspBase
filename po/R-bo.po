@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.20.4\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2026-01-02 22:01+0000\n"
 "Last-Translator: Zev Oster <zevelijah@gmail.com>\n"
 "Language-Team: Tibetan <https://hosted.weblate.org/projects/jasp/jaspbase/bo/"
@@ -20,6 +20,10 @@ msgstr "<em>དོ་སྣང་།</em>"
 #, fuzzy
 msgid "no plot object was found"
 msgstr "དཔེ་རིས་ཀྱི་ object མ་རྙེད།"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "%1$s ནང་གི་རིན་ཐང་དེ་ [%2$s, %3$s] བར་མཚམས་ཕྱི་རོལ་དུ་ཡོད།"
 
 #, fuzzy
 msgid "The following problem(s) occurred while running the analysis:"

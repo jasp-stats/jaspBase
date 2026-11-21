@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: jaspBase 0.15\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2026-04-14 06:09+0000\n"
 "Last-Translator: 陳正昌 <chencc99@gmail.com>\n"
 "Language-Team: Chinese (Traditional Han script) <https://hosted.weblate.org/"
@@ -18,6 +18,10 @@ msgstr "<em>附註</em>"
 
 msgid "no plot object was found"
 msgstr "找不到繪圖物件"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "%1$s 裡有數值在 [%2$s, %3$s] 此區間之外"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr "進行分析時出現以下問題："

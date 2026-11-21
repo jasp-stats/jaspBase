@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: R 3.6.1\n"
 "Report-Msgid-Bugs-To: github.com/jasp-stats/jasp-issues/issues\n"
-"POT-Creation-Date: 2026-04-11 04:23\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: 2026-01-13 14:29+0000\n"
 "Last-Translator: Wendel Paulo Silvestre <wpsilvestre@ucs.br>\n"
 "Language-Team: Portuguese <https://hosted.weblate.org/projects/jasp/jaspbase/"
@@ -22,6 +22,10 @@ msgstr "<em>Nota.</em>"
 
 msgid "no plot object was found"
 msgstr "nenhum objeto de diagrama encontrado"
+
+#, fuzzy
+msgid "Module %1$s exports neither %2$s nor %3$s"
+msgstr "Valores em %1$s fora do intervalo [%2$s, %3$s]"
 
 msgid "The following problem(s) occurred while running the analysis:"
 msgstr ""

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: jaspBase 0.20.5\n"
-"POT-Creation-Date: 2026-11-07 03:38\n"
+"Project-Id-Version: jaspBase 0.20.7\n"
+"POT-Creation-Date: 2026-11-21 03:38\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,6 +14,9 @@ msgid "<em>Note.</em>"
 msgstr ""
 
 msgid "no plot object was found"
+msgstr ""
+
+msgid "Module %1$s exports neither %2$s nor %3$s"
 msgstr ""
 
 msgid "The following problem(s) occurred while running the analysis:"
