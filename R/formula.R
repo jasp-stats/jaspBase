@@ -152,15 +152,26 @@ formulaCheckRequirements <- function(formula, columnNames) {
     stop("JASP formulas do not understand `offset` terms. Analyses that allow the `offset` terms have a special `offset` argument.", domain = NA)
   }
 
-  lhs <- decodeColNames(all.names(formulaExtractLhs(formula)))
+  lhs <- formulaRemoveTypes(decodeColNames(all.names(formulaExtractLhs(formula))), columnNames)
   anyLhsTransformed <- !all(lhs %in% c(columnNames, "cbind", "(", ")"))
 
-  rhs <- decodeColNames(all.names(formulaExtractRhs(formula)))
+  rhs <- formulaRemoveTypes(decodeColNames(all.names(formulaExtractRhs(formula))), columnNames)
   anyRhsTransformed <- !all(rhs %in% c(columnNames, "+", "-", ":", "*", "^", "1", "0", "(", ")", "|", "||"))
 
   if (anyLhsTransformed || anyRhsTransformed) {
     stop(paste0("Cannot parse the formula `", deparse(formula), "`: maybe a wrong variable name is used. Note that variable transformation is not allowed: in this case, please transform your variables before running the analysis."), domain = NA)
   }
+}
+
+# A variable can be given with the type the analysis must use, as `name.type` (e.g. `facFive.nominal`), as in the R syntax
+# JASP generates. JASP reads the type from the name, so only the name without its type has to be a column.
+# A name that is itself a column (e.g. a column called `x.scale`) is kept as it is.
+formulaRemoveTypes <- function(names, columnNames) {
+  typePattern <- "^(.+)\\.(scale|ordinal|nominal)$"
+  typed       <- !(names %in% columnNames) & grepl(typePattern, names)
+  names[typed] <- sub(typePattern, "\\1", names[typed])
+
+  return(names)
 }
 
 formulaGetLhs <- function(formula) {
